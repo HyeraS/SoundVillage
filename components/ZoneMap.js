@@ -846,13 +846,13 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             </div>
           </foreignObject>
 
-          {/* 수집 이펙트 */}
+          {/* 발견 이펙트 */}
           {collecting && (
             <g transform={`translate(${pos.x + CHAR_W/2}, ${pos.y - 16})`}>
               <rect x="-20" y="-14" width="40" height="18" rx="6" fill="#F5EDD8" stroke="#C8A96E" strokeWidth="1"/>
               <text textAnchor="middle" y="-1" fontSize="11"
                 fill="#3A2A14" fontFamily="Nunito,sans-serif" fontWeight="700">
-                {collecting.symbol} 수집!
+                {collecting.symbol} 발견!
               </text>
             </g>
           )}

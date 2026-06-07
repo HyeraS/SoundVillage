@@ -328,7 +328,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
   const inputRef                    = useRef(null);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, toggle, seekVirtual } =
+  const { playing, progress, playCount, audioError, segLabel, toggle, seekVirtual } =
     useSegmentedPlayer(sound.file_path);
 
   // 패널 열릴 때 input 포커스
@@ -370,9 +370,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
     ? null
     : playing
       ? (SEG_STATUS[segLabel] || '듣는 중... 소리를 잘 느껴보세요 👂')
-      : (isSegmented
-          ? '▶ 재생 · 파형을 클릭하면 해당 구간부터 다시 들을 수 있어요'
-          : '버튼을 눌러 소리를 들어보세요');
+      : '▶ 재생 · 파형을 클릭하면 해당 구간부터 다시 들을 수 있어요';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -410,7 +408,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           accent={accent}
           progress={progress}
           segLabel={segLabel}
-          isSegmented={isSegmented}
+          isSegmented={true}
           onSeek={seekVirtual}
         />
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', gap: '12px', alignItems: 'center' }}>
@@ -521,7 +519,7 @@ function Stage2Panel({ sound, zone, palette, participantId, sessionId, myExpress
   const [submitting, setSubmitting] = useState(false);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, isSegmented, segLabel, toggle, seekVirtual } =
+  const { playing, progress, playCount, segLabel, toggle, seekVirtual } =
     useSegmentedPlayer(sound.file_path);
 
   useEffect(() => {
@@ -588,7 +586,7 @@ function Stage2Panel({ sound, zone, palette, participantId, sessionId, myExpress
         border: `1px solid ${accent}20`, padding: '10px 14px',
         boxShadow: `0 0 16px ${glow}`,
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: isSegmented ? '8px' : 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
           <button
             onClick={toggle}
             style={{
@@ -608,7 +606,7 @@ function Stage2Panel({ sound, zone, palette, participantId, sessionId, myExpress
           accent={accent}
           progress={progress}
           segLabel={segLabel}
-          isSegmented={isSegmented}
+          isSegmented={true}
           onSeek={seekVirtual}
         />
       </div>
