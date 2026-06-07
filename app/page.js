@@ -1,65 +1,181 @@
-import Image from "next/image";
+'use client'
+import { useState, useEffect, useCallback } from 'react'
+import StartPanel      from '@/components/StartPanel'
+import WorldMap        from '@/components/WorldMap'
+import ZoneMap         from '@/components/ZoneMap'
+import AnnotationPanel from '@/components/AnnotationPanel'
+import FeedbackPanel   from '@/components/FeedbackPanel'
+import { getTotalCount, getCountByZone } from '@/lib/supabase'
+import soundMetadata from '@/data/sound_metadata.json'
 
-export default function Home() {
-  return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+/* ─────────────────────────────────────────────
+   Zone별 소리 목록 빌드
+───────────────────────────────────────────── */
+const ZONES = ['Forest', 'Creek', 'City', 'Stage', 'Lab']
+
+function buildZoneMap(sounds) {
+  const map = {}
+  ZONES.forEach(z => { map[z] = [] })
+  ;(sounds || []).forEach(s => {
+    if (map[s.game_zone]) map[s.game_zone].push(s)
+  })
+  return map
+}
+const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
+
+/* ─────────────────────────────────────────────
+   화면 상태 정의
+   'start'     → StartPanel (참여자 ID 입력)
+   'world'     → WorldMap   (월드맵 탐험)
+   'zone'      → ZoneMap    (마을 내부 탐험)
+   'annotate'  → AnnotationPanel 오버레이 (ZoneMap 위에)
+───────────────────────────────────────────── */
+export default function HomePage() {
+  const [screen,        setScreen]        = useState('start')
+  const [participantId, setParticipantId] = useState('')
+  const [sessionId,     setSessionId]     = useState('')
+
+  // 현재 진입한 Zone
+  const [activeZone,    setActiveZone]    = useState(null)
+  // ZoneMap에서 줍기 트리거된 소리
+  const [activeSound,   setActiveSound]   = useState(null)
+
+  // 피드백 오버레이
+  const [showFeedback,  setShowFeedback]  = useState(false)
+  const [feedbackZone,  setFeedbackZone]  = useState('')
+
+  // 세션 중 수집 완료된 sound_id Set (ZoneMap 아이템 복원 방지)
+  const [collectedIds,  setCollectedIds]  = useState(new Set())
+
+  // 카운트
+  const [totalCount,    setTotalCount]    = useState(0)
+  const [zoneProgress,  setZoneProgress]  = useState({})
+
+  /* ── 카운트 갱신 ── */
+  const refreshCounts = useCallback(async () => {
+    try {
+      const total = await getTotalCount()
+      setTotalCount(total)
+      const ZONE_MAX = 10
+      const entries = await Promise.all(
+        ZONES.map(async z => [z, Math.min((await getCountByZone(z)) / ZONE_MAX, 1)])
+      )
+      setZoneProgress(Object.fromEntries(entries))
+    } catch {}
+  }, [])
+
+  useEffect(() => { refreshCounts() }, [refreshCounts])
+
+  /* ── StartPanel → WorldMap ── */
+  const handleStart = (pid, sid) => {
+    setParticipantId(pid)
+    setSessionId(sid)
+    setScreen('world')
+  }
+
+  /* ── WorldMap → ZoneMap (ENTER로 진입) ── */
+  const handleEnterZone = useCallback((zone) => {
+    setActiveZone(zone)
+    setScreen('zone')
+  }, [])
+
+  /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
+  const handleExitZone = useCallback(() => {
+    setActiveZone(null)
+    setActiveSound(null)
+    setScreen('world')
+  }, [])
+
+  /* ── ZoneMap에서 소리 줍기 → AnnotationPanel 오버레이 ── */
+  const handleCollectSound = useCallback((sound) => {
+    setActiveSound(sound)
+    setScreen('annotate')
+  }, [])
+
+  /* ── AnnotationPanel 완료 → ZoneMap 복귀 ── */
+  const handleAnnotateComplete = useCallback(({ expression, voted }) => {
+    if (activeSound) {
+      setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
+    }
+    setFeedbackZone(activeZone)
+    setShowFeedback(true)
+    setActiveSound(null)
+    setScreen('zone')
+    refreshCounts()
+  }, [activeSound, activeZone, refreshCounts])
+
+  /* ── AnnotationPanel 닫기 (스킵) → ZoneMap 복귀 ── */
+  const handleAnnotateClose = useCallback(() => {
+    // 스킵한 소리도 collected 처리해서 같은 세션에 다시 안 나오게
+    if (activeSound) {
+      setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
+    }
+    setActiveSound(null)
+    setScreen('zone')
+  }, [activeSound])
+
+  /* ── 피드백 닫기 ── */
+  const handleFeedbackClose = useCallback(() => {
+    setShowFeedback(false)
+    setFeedbackZone('')
+  }, [])
+
+  /* ─────────────────────────────────────────────
+     렌더
+  ───────────────────────────────────────────── */
+
+  // 1. 시작 화면
+  if (screen === 'start') {
+    return <StartPanel onStart={handleStart} />
+  }
+
+  // 2. 월드맵
+  if (screen === 'world') {
+    return (
+      <WorldMap
+        onEnterZone={handleEnterZone}
+        totalCount={totalCount}
+        zoneProgress={zoneProgress}
+      />
+    )
+  }
+
+  // 3. Zone 내부 맵 (+ annotation 오버레이)
+  if (screen === 'zone' || screen === 'annotate') {
+    const zoneSounds = ZONE_SOUND_MAP[activeZone] || []
+    return (
+      <>
+        {/* ZoneMap은 항상 배경에 유지 */}
+        <ZoneMap
+          zone={activeZone}
+          sounds={zoneSounds}
+          onCollectSound={handleCollectSound}
+          onExit={handleExitZone}
+          collectedIds={collectedIds}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.js file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+
+        {/* AnnotationPanel — ZoneMap 위에 오버레이 */}
+        {screen === 'annotate' && activeSound && (
+          <AnnotationPanel
+            sound={activeSound}
+            zone={activeZone}
+            participantId={participantId}
+            sessionId={sessionId}
+            onClose={handleAnnotateClose}
+            onComplete={handleAnnotateComplete}
+          />
+        )}
+
+        {/* 완료 피드백 토스트 */}
+        {showFeedback && (
+          <FeedbackPanel
+            zone={feedbackZone}
+            onClose={handleFeedbackClose}
+          />
+        )}
+      </>
+    )
+  }
+
+  return null
 }

@@ -1,0 +1,141 @@
+sound_id,game_zone,source_type,sub_category,audioset_class,all_labels,fname,file_path,source_dataset,original_fname,duration_sec,ambiguous
+Forest_155299,Forest,Biological,Motorcycle,Motorcycle,"Motorcycle, Dog, Domestic animals and pets, Animal, Motor vehicle (road), Vehicle",155299,Audio/Forest/155299,FSD50K,155299,,False
+Forest_066514,Forest,Biological,Meow,Meow,"Meow, Cat, Domestic animals and pets, Animal",66514,Audio/Forest/66514,FSD50K,66514,,False
+Forest_245673,Forest,Biological,Chatter,Chatter,"Chatter, Chirp and tweet, Livestock and farm animals and working animals, Human group actions, Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",245673,Audio/Forest/245673,FSD50K,245673,,False
+Forest_108766,Forest,Biological,Crow,Crow,"Crow, Bird, Wild animals, Animal",108766,Audio/Forest/108766,FSD50K,108766,,False
+Forest_400575,Forest,Biological,Cat,Cat,"Cat, Domestic animals and pets, Animal",400575,Audio/Forest/400575,FSD50K,400575,,False
+Forest_236044,Forest,Biological,Bark,Bark,"Bark, Dog, Domestic animals and pets, Animal",236044,Audio/Forest/236044,FSD50K,236044,,False
+Forest_369577,Forest,Biological,Dog,Dog,"Dog, Domestic animals and pets, Animal",369577,Audio/Forest/369577,FSD50K,369577,,False
+Forest_019176,Forest,Biological,Chirp and tweet,Chirp and tweet,"Chirp and tweet, Bird, Wild animals, Animal, Bird vocalization and bird call and bird song",19176,Audio/Forest/19176,FSD50K,19176,,False
+Forest_053590,Forest,Biological,Bird vocalization and bird call and bird song,Bird vocalization and bird call and bird song,"Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",53590,Audio/Forest/53590,FSD50K,53590,,False
+Forest_390153,Forest,Biological,Gull and seagull,Gull and seagull,"Gull and seagull, Waves and surf, Bird, Wild animals, Animal, Ocean, Water",390153,Audio/Forest/390153,FSD50K,390153,,False
+Forest_114435,Forest,Biological,Bird,Bird,"Bird, Wild animals, Animal",114435,Audio/Forest/114435,FSD50K,114435,,False
+Forest_334520,Forest,Biological,Bird vocalization and bird call and bird song,Bird vocalization and bird call and bird song,"Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",334520,Audio/Forest/334520,FSD50K,334520,,False
+Forest_236259,Forest,Biological,Dog,Dog,"Dog, Domestic animals and pets, Animal",236259,Audio/Forest/236259,FSD50K,236259,,False
+Forest_118959,Forest,Biological,Purr,Purr,"Purr, Cat, Domestic animals and pets, Animal",118959,Audio/Forest/118959,FSD50K,118959,,False
+Forest_236281,Forest,Biological,Bark,Bark,"Bark, Dog, Domestic animals and pets, Animal",236281,Audio/Forest/236281,FSD50K,236281,,False
+Forest_236108,Forest,Biological,Bark,Bark,"Bark, Dog, Domestic animals and pets, Animal",236108,Audio/Forest/236108,FSD50K,236108,,False
+Forest_095433,Forest,Biological,Buzz,Buzz,"Buzz, Insect, Wild animals, Animal",95433,Audio/Forest/95433,FSD50K,95433,,False
+Forest_372529,Forest,Biological,Bark,Bark,"Bark, Dog, Domestic animals and pets, Animal",372529,Audio/Forest/372529,FSD50K,372529,,False
+Forest_019098,Forest,Biological,Insect,Insect,"Insect, Wild animals, Animal",19098,Audio/Forest/19098,FSD50K,19098,,False
+Forest_165874,Forest,Biological,Thunder,Thunder,"Thunder, Bird, Bird vocalization and bird call and bird song, Wild animals, Animal, Thunderstorm",165874,Audio/Forest/165874,FSD50K,165874,,False
+Forest_353229,Forest,Biological,Chirp and tweet,Chirp and tweet,"Chirp and tweet, Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",353229,Audio/Forest/353229,FSD50K,353229,,False
+Forest_024642,Forest,Biological,Bird,Bird,"Bird, Wild animals, Animal",24642,Audio/Forest/24642,FSD50K,24642,,False
+Forest_388725,Forest,Biological,Chirp and tweet,Chirp and tweet,"Chirp and tweet, Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",388725,Audio/Forest/388725,FSD50K,388725,,False
+Forest_158782,Forest,Biological,Insect,Insect,"Insect, Wild animals, Animal",158782,Audio/Forest/158782,FSD50K,158782,,False
+Forest_333447,Forest,Biological,Hiss,Hiss,Hiss,333447,Audio/Forest/333447,FSD50K,333447,,False
+Forest_057613,Forest,Biological,Bird,Bird,"Bird, Wild animals, Animal",57613,Audio/Forest/57613,FSD50K,57613,,False
+Forest_080784,Forest,Biological,Buzz,Buzz,"Buzz, Insect, Wild animals, Animal",80784,Audio/Forest/80784,FSD50K,80784,,False
+Forest_061072,Forest,Biological,Meow,Meow,"Meow, Cat, Domestic animals and pets, Animal",61072,Audio/Forest/61072,FSD50K,61072,,False
+Forest_389623,Forest,Biological,Purr,Purr,"Purr, Cat, Domestic animals and pets, Animal",389623,Audio/Forest/389623,FSD50K,389623,,False
+Forest_098304,Forest,Biological,Bird,Bird,"Bird, Wild animals, Animal",98304,Audio/Forest/98304,FSD50K,98304,,False
+Creek_050061,Creek,Physical,Rain,Rain,"Rain, Water",50061,Audio/Creek/50061,FSD50K,50061,,False
+Creek_320394,Creek,Physical,Drip,Drip,"Drip, Sink (filling or washing), Liquid, Domestic sounds and home sounds",320394,Audio/Creek/320394,FSD50K,320394,,False
+Creek_422866,Creek,Physical,Wind,Wind,Wind,422866,Audio/Creek/422866,FSD50K,422866,,False
+Creek_274003,Creek,Physical,Drip,Drip,"Drip, Liquid",274003,Audio/Creek/274003,FSD50K,274003,,False
+Creek_426690,Creek,Physical,Thunder,Thunder,"Thunder, Rain, Thunderstorm, Water",426690,Audio/Creek/426690,FSD50K,426690,,False
+Creek_129325,Creek,Physical,Drip,Drip,"Drip, Water tap and faucet, Liquid, Domestic sounds and home sounds",129325,Audio/Creek/129325,FSD50K,129325,,False
+Creek_351390,Creek,Physical,Thunder,Thunder,"Thunder, Rain, Water, Thunderstorm",351390,Audio/Creek/351390,FSD50K,351390,,False
+Creek_085884,Creek,Physical,Drip,Drip,"Drip, Liquid",85884,Audio/Creek/85884,FSD50K,85884,,False
+Creek_319218,Creek,Physical,Stream,Stream,"Stream, Water",319218,Audio/Creek/319218,FSD50K,319218,,False
+Creek_196033,Creek,Physical,Thunder,Thunder,"Thunder, Thunderstorm",196033,Audio/Creek/196033,FSD50K,196033,,False
+Creek_340218,Creek,Physical,Wind,Wind,"Wind, Rain, Water",340218,Audio/Creek/340218,FSD50K,340218,,False
+Creek_368453,Creek,Physical,Wind,Wind,Wind,368453,Audio/Creek/368453,FSD50K,368453,,False
+Creek_167369,Creek,Physical,Waves and surf,Waves and surf,"Waves and surf, Ocean, Water",167369,Audio/Creek/167369,FSD50K,167369,,False
+Creek_050362,Creek,Physical,Thunder,Thunder,"Thunder, Rain, Thunderstorm, Water",50362,Audio/Creek/50362,FSD50K,50362,,False
+Creek_077588,Creek,Physical,Thunder,Thunder,"Thunder, Thunderstorm",77588,Audio/Creek/77588,FSD50K,77588,,False
+Creek_022033,Creek,Physical,Thunder,Thunder,"Thunder, Rain, Water, Thunderstorm",22033,Audio/Creek/22033,FSD50K,22033,,False
+Creek_204013,Creek,Physical,Water,Water,"Water, Splash and splatter, Liquid",204013,Audio/Creek/204013,FSD50K,204013,,False
+Creek_215710,Creek,Physical,Stream,Stream,"Stream, Water",215710,Audio/Creek/215710,FSD50K,215710,,False
+Creek_420314,Creek,Physical,Wind,Wind,Wind,420314,Audio/Creek/420314,FSD50K,420314,,False
+Creek_405140,Creek,Physical,Chirp and tweet,Chirp and tweet,"Chirp and tweet, Wind, Bird vocalization and bird call and bird song, Bird, Wild animals, Animal",405140,Audio/Creek/405140,FSD50K,405140,,False
+Creek_042973,Creek,Physical,Wind,Wind,Wind,42973,Audio/Creek/42973,FSD50K,42973,,False
+Creek_338093,Creek,Physical,Thunder,Thunder,"Thunder, Thunderstorm",338093,Audio/Creek/338093,FSD50K,338093,,False
+Creek_207251,Creek,Physical,Wind,Wind,Wind,207251,Audio/Creek/207251,FSD50K,207251,,False
+Creek_159685,Creek,Physical,Thunder,Thunder,"Thunder, Thunderstorm",159685,Audio/Creek/159685,FSD50K,159685,,False
+Creek_027738,Creek,Physical,Wind,Wind,Wind,27738,Audio/Creek/27738,FSD50K,27738,,False
+Creek_389693,Creek,Physical,Drip,Drip,"Drip, Sink (filling or washing), Water tap and faucet, Liquid, Domestic sounds and home sounds",389693,Audio/Creek/389693,FSD50K,389693,,False
+Creek_099630,Creek,Physical,Alarm,Alarm,"Alarm, Ocean, Boat and Water vehicle, Water, Vehicle",99630,Audio/Creek/99630,FSD50K,99630,,False
+Creek_420298,Creek,Physical,Wind,Wind,Wind,420298,Audio/Creek/420298,FSD50K,420298,,False
+Creek_388090,Creek,Physical,Drip,Drip,"Drip, Water tap and faucet, Liquid, Domestic sounds and home sounds",388090,Audio/Creek/388090,FSD50K,388090,,False
+Creek_220714,Creek,Physical,Waves and surf,Waves and surf,"Waves and surf, Ocean, Water",220714,Audio/Creek/220714,FSD50K,220714,,False
+City_250008,City,Anthropogenic,Car,Car,"Car, Motor vehicle (road), Vehicle",250008,Audio/City/250008,FSD50K,250008,,False
+City_147242,City,Anthropogenic,Car,Car,"Car, Motor vehicle (road), Vehicle",147242,Audio/City/147242,FSD50K,147242,,False
+City_147107,City,Anthropogenic,Bus,Bus,"Bus, Motor vehicle (road), Vehicle",147107,Audio/City/147107,FSD50K,147107,,False
+City_054193,City,Anthropogenic,Alarm,Alarm,Alarm,54193,Audio/City/54193,FSD50K,54193,,False
+City_022354,City,Anthropogenic,Traffic noise and roadway noise,Traffic noise and roadway noise,"Traffic noise and roadway noise, Engine, Car, Bicycle, Motor vehicle (road), Vehicle",22354,Audio/City/22354,FSD50K,22354,,False
+City_179868,City,Anthropogenic,Vehicle horn and car horn and honking,Vehicle horn and car horn and honking,"Vehicle horn and car horn and honking, Car, Motor vehicle (road), Vehicle, Alarm",179868,Audio/City/179868,FSD50K,179868,,False
+City_323125,City,Anthropogenic,Bicycle bell,Bicycle bell,"Bicycle bell, Bicycle, Vehicle, Alarm, Bell",323125,Audio/City/323125,FSD50K,323125,,False
+City_202752,City,Anthropogenic,Drill,Drill,"Drill, Power tool, Tools",202752,Audio/City/202752,FSD50K,202752,,False
+City_340700,City,Anthropogenic,Engine,Engine,Engine,340700,Audio/City/340700,FSD50K,340700,,False
+City_202418,City,Anthropogenic,Siren,Siren,"Siren, Alarm",202418,Audio/City/202418,FSD50K,202418,,False
+City_406387,City,Anthropogenic,Motorcycle,Motorcycle,"Motorcycle, Motor vehicle (road), Vehicle",406387,Audio/City/406387,FSD50K,406387,,False
+City_250390,City,Anthropogenic,Computer keyboard,Computer keyboard,"Computer keyboard, Typing, Domestic sounds and home sounds",250390,Audio/City/250390,FSD50K,250390,,False
+City_147380,City,Anthropogenic,Bicycle,Bicycle,"Bicycle, Vehicle",147380,Audio/City/147380,FSD50K,147380,,False
+City_428484,City,Anthropogenic,Alarm,Alarm,"Alarm, Car, Motor vehicle (road), Vehicle",428484,Audio/City/428484,FSD50K,428484,,False
+City_323123,City,Anthropogenic,Bicycle bell,Bicycle bell,"Bicycle bell, Alarm, Bicycle, Vehicle, Bell",323123,Audio/City/323123,FSD50K,323123,,False
+City_026177,City,Anthropogenic,Traffic noise and roadway noise,Traffic noise and roadway noise,"Traffic noise and roadway noise, Vehicle horn and car horn and honking, Car, Motor vehicle (road), Vehicle, Alarm",26177,Audio/City/26177,FSD50K,26177,,False
+City_107274,City,Anthropogenic,Sawing,Sawing,"Sawing, Tools",107274,Audio/City/107274,FSD50K,107274,,False
+City_383513,City,Anthropogenic,Crowd,Crowd,"Crowd, Human group actions",383513,Audio/City/383513,FSD50K,383513,,False
+City_176641,City,Anthropogenic,Squeak,Squeak,"Squeak, Accelerating and revving and vroom, Vehicle, Engine",176641,Audio/City/176641,FSD50K,176641,,False
+City_076806,City,Anthropogenic,Car,Car,"Car, Motor vehicle (road), Vehicle",76806,Audio/City/76806,FSD50K,76806,,False
+City_414366,City,Anthropogenic,Alarm,Alarm,Alarm,414366,Audio/City/414366,FSD50K,414366,,False
+City_135613,City,Anthropogenic,Alarm,Alarm,Alarm,135613,Audio/City/135613,FSD50K,135613,,False
+City_157766,City,Anthropogenic,Computer keyboard,Computer keyboard,"Computer keyboard, Typing, Domestic sounds and home sounds",157766,Audio/City/157766,FSD50K,157766,,False
+City_184941,City,Anthropogenic,Bicycle,Bicycle,"Bicycle, Vehicle",184941,Audio/City/184941,FSD50K,184941,,False
+City_154692,City,Anthropogenic,Computer keyboard,Computer keyboard,"Computer keyboard, Typing, Domestic sounds and home sounds",154692,Audio/City/154692,FSD50K,154692,,False
+City_216381,City,Anthropogenic,Engine,Engine,Engine,216381,Audio/City/216381,FSD50K,216381,,False
+City_066281,City,Anthropogenic,Drill,Drill,"Drill, Power tool, Tools",66281,Audio/City/66281,FSD50K,66281,,False
+City_256529,City,Anthropogenic,Engine,Engine,Engine,256529,Audio/City/256529,FSD50K,256529,,False
+City_189839,City,Anthropogenic,Applause,Applause,"Applause, Crowd, Human group actions",189839,Audio/City/189839,FSD50K,189839,,False
+City_076116,City,Anthropogenic,Race car and auto racing,Race car and auto racing,"Race car and auto racing, Car, Motor vehicle (road), Vehicle",76116,Audio/City/76116,FSD50K,76116,,False
+Stage_262440,Stage,Musical,Organ,Organ,"Organ, Keyboard (musical), Musical instrument, Music",262440,Audio/Stage/262440,FSD50K,262440,,False
+Stage_357650,Stage,Musical,Trumpet,Trumpet,"Trumpet, Brass instrument, Musical instrument, Music",357650,Audio/Stage/357650,FSD50K,357650,,False
+Stage_377340,Stage,Musical,Hi-hat,Hi-hat,"Hi-hat, Cymbal, Percussion, Musical instrument, Music",377340,Audio/Stage/377340,FSD50K,377340,,False
+Stage_374117,Stage,Musical,Trumpet,Trumpet,"Trumpet, Brass instrument, Musical instrument, Music",374117,Audio/Stage/374117,FSD50K,374117,,False
+Stage_143172,Stage,Musical,Snare drum,Snare drum,"Snare drum, Drum, Percussion, Musical instrument, Music",143172,Audio/Stage/143172,FSD50K,143172,,False
+Stage_138865,Stage,Musical,Hi-hat,Hi-hat,"Hi-hat, Cymbal, Percussion, Musical instrument, Music",138865,Audio/Stage/138865,FSD50K,138865,,False
+Stage_029943,Stage,Musical,Scratching (performance technique),Scratching (performance technique),"Scratching (performance technique), Musical instrument, Music",29943,Audio/Stage/29943,FSD50K,29943,,False
+Stage_146562,Stage,Musical,Snare drum,Snare drum,"Snare drum, Drum, Percussion, Musical instrument, Music",146562,Audio/Stage/146562,FSD50K,146562,,False
+Stage_097222,Stage,Musical,Electric guitar,Electric guitar,"Electric guitar, Guitar, Plucked string instrument, Musical instrument, Music",97222,Audio/Stage/97222,FSD50K,97222,,False
+Stage_137425,Stage,Musical,Hi-hat,Hi-hat,"Hi-hat, Cymbal, Percussion, Musical instrument, Music",137425,Audio/Stage/137425,FSD50K,137425,,False
+Stage_360001,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",360001,Audio/Stage/360001,FSD50K,360001,,False
+Stage_431453,Stage,Musical,Keyboard (musical),Keyboard (musical),"Keyboard (musical), Musical instrument, Music",431453,Audio/Stage/431453,FSD50K,431453,,False
+Stage_152686,Stage,Musical,Crash cymbal,Crash cymbal,"Crash cymbal, Cymbal, Percussion, Musical instrument, Music",152686,Audio/Stage/152686,FSD50K,152686,,False
+Stage_427199,Stage,Musical,Female singing,Female singing,"Female singing, Singing, Human voice",427199,Audio/Stage/427199,FSD50K,427199,,False
+Stage_373943,Stage,Musical,Drum,Drum,"Drum, Percussion, Musical instrument, Music",373943,Audio/Stage/373943,FSD50K,373943,,False
+Stage_358073,Stage,Musical,Bowed string instrument,Bowed string instrument,"Bowed string instrument, Musical instrument, Music",358073,Audio/Stage/358073,FSD50K,358073,,False
+Stage_072941,Stage,Musical,Harp,Harp,"Harp, Musical instrument, Music",72941,Audio/Stage/72941,FSD50K,72941,,False
+Stage_355150,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",355150,Audio/Stage/355150,FSD50K,355150,,False
+Stage_372661,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",372661,Audio/Stage/372661,FSD50K,372661,,False
+Stage_246580,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",246580,Audio/Stage/246580,FSD50K,246580,,False
+Stage_061906,Stage,Musical,Scratching (performance technique),Scratching (performance technique),"Scratching (performance technique), Musical instrument, Music",61906,Audio/Stage/61906,FSD50K,61906,,False
+Stage_153868,Stage,Musical,Bowed string instrument,Bowed string instrument,"Bowed string instrument, Musical instrument, Music",153868,Audio/Stage/153868,FSD50K,153868,,False
+Stage_157441,Stage,Musical,Guitar,Guitar,"Guitar, Plucked string instrument, Musical instrument, Music",157441,Audio/Stage/157441,FSD50K,157441,,False
+Stage_119682,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",119682,Audio/Stage/119682,FSD50K,119682,,False
+Stage_020928,Stage,Musical,Wind instrument and woodwind instrument,Wind instrument and woodwind instrument,"Wind instrument and woodwind instrument, Musical instrument, Music",20928,Audio/Stage/20928,FSD50K,20928,,False
+Stage_252535,Stage,Musical,Guitar,Guitar,"Guitar, Plucked string instrument, Musical instrument, Music",252535,Audio/Stage/252535,FSD50K,252535,,False
+Stage_175056,Stage,Musical,Clapping,Clapping,"Clapping, Hands",175056,Audio/Stage/175056,FSD50K,175056,,False
+Stage_136041,Stage,Musical,Crash cymbal,Crash cymbal,"Crash cymbal, Cymbal, Percussion, Musical instrument, Music",136041,Audio/Stage/136041,FSD50K,136041,,False
+Stage_140692,Stage,Musical,Crash cymbal,Crash cymbal,"Crash cymbal, Cymbal, Percussion, Musical instrument, Music",140692,Audio/Stage/140692,FSD50K,140692,,False
+Stage_375518,Stage,Musical,Crash cymbal,Crash cymbal,"Crash cymbal, Cymbal, Percussion, Musical instrument, Music",375518,Audio/Stage/375518,FSD50K,375518,,False
+Lab_089060,Lab,Electroacoustic,Wind chime,Wind chime,"Wind chime, Chime, Bell",89060,Audio/Lab/89060,FSD50K,89060,,False
+Lab_084701,Lab,Electroacoustic,Wind chime,Wind chime,"Wind chime, Chime, Bell",84701,Audio/Lab/84701,FSD50K,84701,,False
+Lab_270587,Lab,Electroacoustic,Bell,Bell,Bell,270587,Audio/Lab/270587,FSD50K,270587,,False
+Lab_222991,Lab,Electroacoustic,Knock,Knock,"Knock, Door, Domestic sounds and home sounds",222991,Audio/Lab/222991,FSD50K,222991,,False
+Lab_377667,Lab,Electroacoustic,Bell,Bell,Bell,377667,Audio/Lab/377667,FSD50K,377667,,False
+Lab_382813,Lab,Electroacoustic,Cowbell,Cowbell,"Cowbell, Bell",382813,Audio/Lab/382813,FSD50K,382813,,False
+Lab_426372,Lab,Electroacoustic,Knock,Knock,"Knock, Door, Domestic sounds and home sounds",426372,Audio/Lab/426372,FSD50K,426372,,False
+Lab_011728,Lab,Electroacoustic,Squeak,Squeak,Squeak,11728,Audio/Lab/11728,FSD50K,11728,,False
+Lab_024621,Lab,Electroacoustic,Bell,Bell,Bell,24621,Audio/Lab/24621,FSD50K,24621,,False
+Lab_010712,Lab,Electroacoustic,Bell,Bell,Bell,10712,Audio/Lab/10712,FSD50K,10712,,False
+Lab_024248,Lab,Electroacoustic,Squeak,Squeak,"Squeak, Cupboard open or close, Door, Domestic sounds and home sounds",24248,Audio/Lab/24248,FSD50K,24248,,False
+Lab_072663,Lab,Electroacoustic,Squeak,Squeak,Squeak,72663,Audio/Lab/72663,FSD50K,72663,,False
+Lab_201591,Lab,Electroacoustic,Typewriter,Typewriter,"Typewriter, Bell, Typing, Domestic sounds and home sounds",201591,Audio/Lab/201591,FSD50K,201591,,False
+Lab_090565,Lab,Electroacoustic,Cowbell,Cowbell,"Cowbell, Bell",90565,Audio/Lab/90565,FSD50K,90565,,False
+Lab_024734,Lab,Electroacoustic,Squeak,Squeak,Squeak,24734,Audio/Lab/24734,FSD50K,24734,,False
+Lab_127451,Lab,Electroacoustic,Bell,Bell,"Bell, Train, Rail transport, Vehicle",127451,Audio/Lab/127451,FSD50K,127451,,False
+Lab_090544,Lab,Electroacoustic,Cowbell,Cowbell,"Cowbell, Bell",90544,Audio/Lab/90544,FSD50K,90544,,False
+Lab_069184,Lab,Electroacoustic,Bell,Bell,"Bell, Doorbell, Door, Domestic sounds and home sounds, Alarm",69184,Audio/Lab/69184,FSD50K,69184,,False
+Lab_264136,Lab,Electroacoustic,Squeak,Squeak,Squeak,264136,Audio/Lab/264136,FSD50K,264136,,False
+Lab_085253,Lab,Electroacoustic,Knock,Knock,"Knock, Door, Domestic sounds and home sounds",85253,Audio/Lab/85253,FSD50K,85253,,False

@@ -1,26 +1,143 @@
-@import "tailwindcss";
+/* ─────────────────────────────────────────────
+   SoundMimic Village — globals.css  Phase 2
+   낮 감성 Cozy 테마 + 모든 keyframe
+───────────────────────────────────────────── */
 
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Nunito', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #5A9A3A;
+  color: #3A2A14;
+  overscroll-behavior: none;
+  overflow: hidden;
+}
+
+/* 스크롤바 숨기기 */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; -ms-overflow-style: none; }
+
+/* ─── CSS 변수 ─── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* 낮 팔레트 */
+  --beige:        #F5EDD8;
+  --beige-dark:   #E8D8B8;
+  --brown:        #8B6347;
+  --brown-dark:   #6B4327;
+  --border-warm:  #C8A96E;
+  --text-dark:    #3A2A14;
+  --text-mid:     #8B6A3A;
+  --text-light:   #A09080;
+
+  /* Zone 색상 */
+  --forest-accent:  #5B9E3A;
+  --water-accent:   #4A8FD4;
+  --city-accent:    #C4B99A;
+  --music-accent:   #9B6DD4;
+  --mystery-accent: #D4883A;
+
+  /* HUD */
+  --hud-bg:       #F5EDD8;
+  --hud-border:   #C8A96E;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ─── 전역 keyframe ─── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes floatSmall {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-4px); }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(28px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.72); }
+  65%  { transform: scale(1.06); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; transform: scale(0.8); }
+  50%       { opacity: 1;   transform: scale(1.3); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1);    opacity: 1; }
+  50%       { transform: scale(1.08); opacity: 0.85; }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  40%       { transform: translateY(-10px); }
+  60%       { transform: translateY(-5px); }
+}
+
+/* ─── 유틸 클래스 ─── */
+.anim-slide-up   { animation: slideUp   0.4s cubic-bezier(0.34,1.56,0.64,1) both; }
+.anim-pop-in     { animation: popIn     0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+.anim-fade-in    { animation: fadeIn    0.3s ease both; }
+.anim-float      { animation: float     3s ease-in-out infinite; }
+.anim-float-sm   { animation: floatSmall 2.5s ease-in-out infinite; }
+.anim-pulse      { animation: pulse     2s ease-in-out infinite; }
+.anim-bounce     { animation: bounce    0.6s ease both; }
+
+/* ─── 버튼 공통 ─── */
+button {
+  font-family: 'Nunito', sans-serif;
+  border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ─── input 공통 ─── */
+input {
+  font-family: 'Nunito', sans-serif;
+}
+
+/* ─── 링크 스타일 제거 ─── */
+a { color: inherit; text-decoration: none; }
+
+/* ─── 선택 방지 (게임 UI) ─── */
+[role="button"], .no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
 }
