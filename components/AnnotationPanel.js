@@ -358,8 +358,9 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
       });
       resetListeningTime();
       onSubmit({ expression_text: text.trim(), confidence });
-    } catch {
-      setError('저장 중 오류가 발생했어요. 다시 시도해주세요.');
+    } catch (err) {
+      console.error('[AnnotationPanel] 제출 오류:', err);
+      setError(`저장 오류: ${err?.message || '네트워크를 확인해주세요.'}`);
     } finally {
       setSubmitting(false);
     }
