@@ -4,6 +4,7 @@ import StartPanel      from '@/components/StartPanel'
 import WorldMap        from '@/components/WorldMap'
 import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
+import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
 import { getTotalCount, getCountByZone } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
@@ -25,26 +26,26 @@ const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 
 /* ─────────────────────────────────────────────
    화면 상태 정의
-   'start'     → StartPanel (참여자 ID 입력)
-   'world'     → WorldMap   (월드맵 탐험)
-   'zone'      → ZoneMap    (마을 내부 탐험)
-   'annotate'  → AnnotationPanel 오버레이 (ZoneMap 위에)
+   'start'    → StartPanel
+   'world'    → WorldMap
+   'zone'     → ZoneMap
+   'annotate' → AnnotationPanel 오버레이 (ZoneMap 위)
+   'museum'   → SoundMuseum 풀스크린
 ───────────────────────────────────────────── */
 export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
   const [sessionId,     setSessionId]     = useState('')
 
-  // 현재 진입한 Zone
   const [activeZone,    setActiveZone]    = useState(null)
-  // ZoneMap에서 줍기 트리거된 소리
   const [activeSound,   setActiveSound]   = useState(null)
+  const [myExpression,  setMyExpression]  = useState('')
 
   // 피드백 오버레이
   const [showFeedback,  setShowFeedback]  = useState(false)
   const [feedbackZone,  setFeedbackZone]  = useState('')
 
-  // 세션 중 수집 완료된 sound_id Set (ZoneMap 아이템 복원 방지)
+  // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
 
   // 카운트
@@ -92,21 +93,27 @@ export default function HomePage() {
     setScreen('annotate')
   }, [])
 
-  /* ── AnnotationPanel 완료 → ZoneMap 복귀 ── */
-  const handleAnnotateComplete = useCallback(() => {
+  /* ── AnnotationPanel Stage1 완료 → SoundMuseum ── */
+  const handleAnnotateComplete = useCallback(({ expression_text }) => {
+    setMyExpression(expression_text)
+    setScreen('museum')
+  }, [])
+
+  /* ── SoundMuseum 완료 → ZoneMap 복귀 ── */
+  const handleMuseumDone = useCallback(() => {
     if (activeSound) {
       setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     }
     setFeedbackZone(activeZone)
     setShowFeedback(true)
     setActiveSound(null)
+    setMyExpression('')
     setScreen('zone')
     refreshCounts()
   }, [activeSound, activeZone, refreshCounts])
 
   /* ── AnnotationPanel 닫기 (스킵) → ZoneMap 복귀 ── */
   const handleAnnotateClose = useCallback(() => {
-    // 스킵한 소리도 collected 처리해서 같은 세션에 다시 안 나오게
     if (activeSound) {
       setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     }
@@ -140,7 +147,23 @@ export default function HomePage() {
     )
   }
 
-  // 3. Zone 내부 맵 (+ annotation 오버레이)
+  // 3. Sound Museum (Stage 1 제출 후)
+  if (screen === 'museum' && activeSound) {
+    return (
+      <>
+        <SoundMuseum
+          sound={activeSound}
+          zone={activeZone}
+          myExpression={myExpression}
+          participantId={participantId}
+          sessionId={sessionId}
+          onDone={handleMuseumDone}
+        />
+      </>
+    )
+  }
+
+  // 4. Zone 내부 맵 (+ annotation 오버레이)
   if (screen === 'zone' || screen === 'annotate') {
     const zoneSounds = ZONE_SOUND_MAP[activeZone] || []
     return (

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager';
-import { saveAnnotation, getCandidateExpressions, saveVote } from '@/lib/supabase';
+import { saveAnnotation } from '@/lib/supabase';
 
 /* ─────────────────────────────────────────────
    Zone 팔레트 — Mystery 포함
@@ -510,228 +510,14 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
 }
 
 /* ─────────────────────────────────────────────
-   Stage 2 — 공감 투표 패널
-───────────────────────────────────────────── */
-function Stage2Panel({ sound, zone, palette, participantId, sessionId, myExpression, onVoteDone }) {
-  const [candidates, setCandidates] = useState([]);
-  const [selected, setSelected]     = useState(new Set());
-  const [loading, setLoading]       = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-
-  const { accent, card, glow } = palette;
-  const { playing, progress, playCount, segLabel, toggle, seekVirtual } =
-    useSegmentedPlayer(sound.file_path);
-
-  useEffect(() => {
-    getCandidateExpressions(sound.sound_id, myExpression)
-      .then(setCandidates)
-      .catch(() => setCandidates([]))
-      .finally(() => setLoading(false));
-  }, [sound.sound_id, myExpression]);
-
-  const toggleSelect = (id) => {
-    setSelected(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
-  };
-
-  const handleVoteSubmit = async () => {
-    setSubmitting(true);
-    try {
-      if (selected.size > 0) {
-        await saveVote({
-          participant_id:     participantId,
-          session_id:         sessionId,
-          sound_id:           sound.sound_id,
-          zone,
-          voted_ids:          [...selected],
-          play_count:         playCount,
-          listening_time_sec: getListeningTime(),
-          stage:              2,
-          version:            'v0.4-web',
-        });
-        resetListeningTime();
-      }
-      onVoteDone([...selected]);
-    } catch {
-      onVoteDone([]);
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-      {/* 내 표현 배지 */}
-      <div style={{
-        background: `${accent}14`, border: `1.5px solid ${accent}44`,
-        borderRadius: '12px', padding: '12px 16px',
-        display: 'flex', alignItems: 'center', gap: '10px',
-      }}>
-        <span style={{ fontSize: '20px' }}>💬</span>
-        <div>
-          <div style={{ fontSize: '10px', color: '#9A9585', marginBottom: '3px' }}>내가 입력한 표현</div>
-          <div style={{ fontSize: '19px', fontWeight: 800, color: accent, letterSpacing: '1px' }}>
-            {myExpression}
-          </div>
-        </div>
-      </div>
-
-      {/* 미니 재생기 */}
-      <div style={{
-        background: card, borderRadius: '12px',
-        border: `1px solid ${accent}20`, padding: '10px 14px',
-        boxShadow: `0 0 16px ${glow}`,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-          <button
-            onClick={toggle}
-            style={{
-              width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
-              background: playing ? `${accent}28` : accent,
-              border: `2px solid ${accent}`, color: playing ? accent : '#fff',
-              cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-          >
-            <PlayIcon playing={playing} />
-          </button>
-          {playCount > 0 && (
-            <div style={{ fontSize: '10px', color: '#6B6660', marginLeft: 'auto' }}>{playCount}회</div>
-          )}
-        </div>
-        <SegmentedWaveform
-          accent={accent}
-          progress={progress}
-          segLabel={segLabel}
-          isSegmented={true}
-          onSeek={seekVirtual}
-        />
-      </div>
-
-      {/* 주민 코멘트 */}
-      <div style={{
-        background: '#ffffff07', borderRadius: '10px', padding: '10px 14px',
-        fontSize: '12px', color: '#9A9585', lineHeight: 1.6,
-        borderLeft: `3px solid ${accent}55`,
-      }}>
-        <span style={{ color: accent, fontWeight: 700 }}>🏘 마을 주민의 한마디</span>
-        <br />
-        다른 참여자들의 표현을 듣고, 가장 공감되는 것에 투표해주세요.
-        <br />
-        <span style={{ fontSize: '11px', color: '#6B6660' }}>여러 개 선택 가능 · 없으면 그냥 넘어가도 돼요</span>
-      </div>
-
-      {/* 후보 카드 목록 */}
-      {loading ? (
-        <div style={{ textAlign: 'center', color: '#6B6660', padding: '20px', fontSize: '13px' }}>
-          ✦ 후보 표현 불러오는 중...
-        </div>
-      ) : candidates.length === 0 ? (
-        <div style={{
-          textAlign: 'center', color: '#9A9585',
-          padding: '24px 16px', background: card, borderRadius: '12px',
-          fontSize: '13px', lineHeight: 1.7,
-        }}>
-          🎉 첫 번째 표현자예요!<br />
-          <span style={{ fontSize: '11px', color: '#6B6660' }}>다음 참여자가 당신의 표현에 투표하게 됩니다</span>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-          {candidates.map((c) => {
-            const isSelected = selected.has(c.id);
-            return (
-              <button
-                key={c.id}
-                onClick={() => toggleSelect(c.id)}
-                style={{
-                  display: 'flex', alignItems: 'center',
-                  justifyContent: 'space-between',
-                  padding: '12px 16px', borderRadius: '12px',
-                  background: isSelected ? `${accent}1e` : card,
-                  border: isSelected ? `1.5px solid ${accent}` : '1.5px solid #ffffff12',
-                  color: isSelected ? accent : '#F0EDE8',
-                  cursor: 'pointer', transition: 'all 0.15s',
-                  textAlign: 'left', fontFamily: 'Nunito, sans-serif',
-                  boxShadow: isSelected ? `0 0 12px ${accent}33` : 'none',
-                }}
-              >
-                <div>
-                  <div style={{ fontSize: '16px', fontWeight: 700, letterSpacing: '0.5px' }}>
-                    {c.expression_text}
-                  </div>
-                  <div style={{ fontSize: '10px', color: '#6B6660', marginTop: '3px' }}>
-                    👍 {c.vote_count}표 · {c.confidence_label}
-                  </div>
-                </div>
-                {/* 체크 원 */}
-                <div style={{
-                  width: '22px', height: '22px', borderRadius: '50%', flexShrink: 0,
-                  border: `2px solid ${isSelected ? accent : '#ffffff28'}`,
-                  background: isSelected ? accent : 'transparent',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  transition: 'all 0.15s',
-                }}>
-                  {isSelected && (
-                    <svg width="11" height="11" viewBox="0 0 12 12" fill="none">
-                      <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  )}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* 투표 버튼 행 */}
-      <div style={{ display: 'flex', gap: '10px' }}>
-        <button
-          onClick={() => onVoteDone([])}
-          style={{
-            flex: '0 0 90px', padding: '12px', borderRadius: '12px',
-            background: 'transparent', border: '1.5px solid #ffffff15',
-            color: '#6B6660', fontSize: '13px', fontFamily: 'Nunito, sans-serif', cursor: 'pointer',
-          }}
-        >
-          공감 없음
-        </button>
-        <button
-          onClick={handleVoteSubmit}
-          disabled={submitting || selected.size === 0}
-          style={{
-            flex: 1, padding: '13px', borderRadius: '12px', border: 'none',
-            background: selected.size > 0 ? accent : '#ffffff15',
-            color: selected.size > 0 ? '#fff' : '#6B6660',
-            fontSize: '15px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
-            cursor: selected.size > 0 && !submitting ? 'pointer' : 'not-allowed',
-            transition: 'all 0.15s',
-            boxShadow: selected.size > 0 ? `0 4px 20px ${accent}55` : 'none',
-          }}
-        >
-          {submitting ? '저장 중...' : `👍 ${selected.size > 0 ? `${selected.size}개 ` : ''}공감 투표`}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ─────────────────────────────────────────────
-   메인 AnnotationPanel
+   메인 AnnotationPanel — Stage 1 (표현 입력)만 담당
+   Stage 2는 SoundMuseum으로 이전
 ───────────────────────────────────────────── */
 export default function AnnotationPanel({ sound, zone, participantId, sessionId, onClose, onComplete }) {
-  const [stage, setStage]               = useState(1);
-  const [myExpression, setMyExpression] = useState('');
-  const [visible, setVisible]           = useState(false);
-
+  const [visible, setVisible] = useState(false);
   const palette = ZONE_PALETTE[zone] || ZONE_PALETTE.Lab;
 
-  // 마운트 시 슬라이드업 트리거
-  useEffect(() => {
-    requestAnimationFrame(() => setVisible(true));
-  }, []);
+  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
 
   if (!sound) return null;
 
@@ -740,14 +526,10 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
     setTimeout(() => onClose?.(), 300);
   };
 
+  // Stage 1 제출 → 패널 슬라이드다운 후 뮤지엄 전환
   const handleStage1Submit = ({ expression_text }) => {
-    setMyExpression(expression_text);
-    setStage(2);
-  };
-
-  const handleVoteDone = (_votedIds) => {
-    onComplete?.();
-    handleClose();
+    setVisible(false);
+    setTimeout(() => onComplete?.({ expression_text }), 280);
   };
 
   const handleSkip = async () => {
@@ -798,7 +580,6 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
         zIndex: 101,
         transition: 'transform 0.32s cubic-bezier(0.34,1.56,0.64,1)',
         boxShadow: `0 -6px 60px ${palette.glow}, 0 -1px 0 ${palette.accent}33`,
-        /* 스크롤바 숨기기 */
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
       }}>
@@ -814,23 +595,13 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
           padding: '4px 20px 14px',
           borderBottom: `1px solid ${palette.accent}18`,
         }}>
-          {/* Stage 인디케이터 */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <div style={{ display: 'flex', gap: '5px' }}>
-              {[1, 2].map((s) => (
-                <div key={s} style={{
-                  width: s === stage ? '26px' : '7px', height: '7px',
-                  borderRadius: '4px',
-                  background: s <= stage ? palette.accent : '#ffffff18',
-                  transition: 'all 0.35s cubic-bezier(0.34,1.56,0.64,1)',
-                }} />
-              ))}
-            </div>
-            <span style={{ fontSize: '12px', color: '#9A9585' }}>
-              {stage === 1 ? 'Step 1 · 표현 입력' : 'Step 2 · 공감 투표'}
-            </span>
+            <div style={{
+              width: '26px', height: '7px', borderRadius: '4px',
+              background: palette.accent,
+            }} />
+            <span style={{ fontSize: '12px', color: '#9A9585' }}>소리 전사 · 표현 입력</span>
           </div>
-
           <button
             onClick={handleClose}
             style={{
@@ -847,19 +618,11 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
 
         {/* 콘텐츠 */}
         <div style={{ padding: '18px 20px 24px' }}>
-          {stage === 1 ? (
-            <Stage1Panel
-              sound={sound} zone={zone} palette={palette}
-              participantId={participantId} sessionId={sessionId}
-              onSubmit={handleStage1Submit} onSkip={handleSkip}
-            />
-          ) : (
-            <Stage2Panel
-              sound={sound} zone={zone} palette={palette}
-              participantId={participantId} sessionId={sessionId}
-              myExpression={myExpression} onVoteDone={handleVoteDone}
-            />
-          )}
+          <Stage1Panel
+            sound={sound} zone={zone} palette={palette}
+            participantId={participantId} sessionId={sessionId}
+            onSubmit={handleStage1Submit} onSkip={handleSkip}
+          />
         </div>
       </div>
     </>
