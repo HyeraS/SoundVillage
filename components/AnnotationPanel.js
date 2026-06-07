@@ -745,8 +745,8 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
     setStage(2);
   };
 
-  const handleVoteDone = (votedIds) => {
-    onComplete?.({ expression: myExpression, voted: votedIds });
+  const handleVoteDone = (_votedIds) => {
+    onComplete?.();
     handleClose();
   };
 

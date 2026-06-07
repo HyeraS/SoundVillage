@@ -420,7 +420,6 @@ function ZoneObject({ obj, zone, tick }) {
    소리 아이템 — PNG 에셋 / SVG 보석상자 폴백
 ───────────────────────────────────────────── */
 function SoundItem({ item, zone, tick }) {
-  if (item.collected) return null
   const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Forest
   const px    = item.tx * TILE + TILE / 2
   const py    = item.ty * TILE + TILE / 2
@@ -674,7 +673,7 @@ function CompleteModal({ zone, onExit }) {
 /* ─────────────────────────────────────────────
    ZoneMap 메인
 ───────────────────────────────────────────── */
-export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set() }) {
+export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false }) {
   const meta   = ZONE_META[zone]
   const theme  = ZONE_THEME[zone]
   const { keys, press, release } = useKeys()
@@ -692,8 +691,14 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
     w: typeof window !== 'undefined' ? window.innerWidth  : 800,
     h: typeof window !== 'undefined' ? window.innerHeight - HUD_H : 540,
   })
-  const [items,      setItems]     = useState(() => spawnSoundItems(sounds, zone))
+  // 아이템은 초기화 후 위치가 변하지 않으므로 ref로 관리
+  // 가시성은 부모의 collectedIds(제출 완료 후 갱신)로만 결정
+  const itemsRef     = useRef(null)
+  if (itemsRef.current === null) itemsRef.current = spawnSoundItems(sounds, zone)
+
   const [collecting, setCollecting]= useState(null)
+  // 현재 수집 진행 중(annotation 열려 있는 동안) 새 충돌 차단
+  const collectingRef = useRef(false)
 
   const posRef = useRef(pos)
   const viewW  = useRef(typeof window !== 'undefined' ? window.innerWidth  : 800)
@@ -718,6 +723,11 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
   }, [onExit])
+
+  // annotation 패널이 닫히면(제출 or 스킵) 충돌 잠금 해제
+  useEffect(() => {
+    if (!isAnnotating) collectingRef.current = false
+  }, [isAnnotating])
 
   // 게임 루프
   useEffect(() => {
@@ -749,23 +759,20 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         const camY = Math.max(0, Math.min(PX_H - viewH.current, y + CHAR_H/2 - viewH.current/2))
         setCam({ x: camX, y: camY })
 
-        // 아이템 충돌
-        setItems(prev => {
-          const next = [...prev]
-          for (let i = 0; i < next.length; i++) {
-            const item = next[i]
-            if (item.collected || collectedIds.has(item.id)) continue
-            const ix = item.tx * TILE + TILE/2 - 12
-            const iy = item.ty * TILE + TILE/2 - 12
+        // 아이템 충돌 — annotation 열려 있으면 완전 차단
+        if (!collectingRef.current) {
+          for (const item of itemsRef.current) {
+            if (collectedIds.has(item.id)) continue
+            const ix = item.tx * TILE + TILE / 2 - 12
+            const iy = item.ty * TILE + TILE / 2 - 12
             if (overlaps(x, y, CHAR_W, CHAR_H, ix, iy, 24, 24)) {
-              next[i] = { ...item, collected: true }
+              collectingRef.current = true
               setCollecting(item)
               setTimeout(() => { setCollecting(null); onCollectSound(item.sound) }, 500)
               break
             }
           }
-          return next
-        })
+        }
       } else {
         setMoving(false)
       }
@@ -776,8 +783,8 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dir, collectedIds])
 
-  const remaining = items.filter(it => !it.collected && !collectedIds.has(it.id)).length
-  const total     = items.length
+  const remaining = itemsRef.current.filter(it => !collectedIds.has(it.id)).length
+  const total     = itemsRef.current.length
   const collected = total - remaining
 
   return (
@@ -834,10 +841,13 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             <ZoneObject key={i} obj={obj} zone={zone} tick={tick}/>
           ))}
 
-          {/* 소리 아이템 */}
-          {items.map(item => (
-            <SoundItem key={item.id} item={item} zone={zone} tick={tick}/>
-          ))}
+          {/* 소리 아이템 — 제출 완료된 것만 숨김 */}
+          {itemsRef.current
+            .filter(it => !collectedIds.has(it.id))
+            .map(item => (
+              <SoundItem key={item.id} item={item} zone={zone} tick={tick}/>
+            ))
+          }
 
           {/* 캐릭터 */}
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>

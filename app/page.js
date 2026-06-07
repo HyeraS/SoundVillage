@@ -93,7 +93,7 @@ export default function HomePage() {
   }, [])
 
   /* ── AnnotationPanel 완료 → ZoneMap 복귀 ── */
-  const handleAnnotateComplete = useCallback(({ expression, voted }) => {
+  const handleAnnotateComplete = useCallback(() => {
     if (activeSound) {
       setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     }
@@ -152,6 +152,7 @@ export default function HomePage() {
           onCollectSound={handleCollectSound}
           onExit={handleExitZone}
           collectedIds={collectedIds}
+          isAnnotating={screen === 'annotate'}
         />
 
         {/* AnnotationPanel — ZoneMap 위에 오버레이 */}
