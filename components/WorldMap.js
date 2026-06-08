@@ -15,48 +15,91 @@ const CHAR_H = 28
 const HUD_H  = 56
 
 /* ─────────────────────────────────────────────
-   Zone 포털 위치
+   Sound Museum — 맵 중앙
 ───────────────────────────────────────────── */
-const PORTALS = [
-  { zone: 'Forest', tx: 4,  ty: 4,  w: 5, h: 5 },
-  { zone: 'City',   tx: 17, ty: 10, w: 6, h: 6 },
-  { zone: 'Creek',  tx: 29, ty: 4,  w: 5, h: 5 },
-  { zone: 'Stage',  tx: 4,  ty: 20, w: 5, h: 5 },
-  { zone: 'Lab',    tx: 29, ty: 20, w: 5, h: 5 },
-]
-
-/* Sound Museum 위치 — 맵 하단 중앙 (세로 경로와 접함) */
-const MUSEUM = { tx: 15, ty: 17, w: 8, h: 5 }
+const MUSEUM = { tx: 15, ty: 11, w: 10, h: 8 }
 
 /* ─────────────────────────────────────────────
-   경로 타일
+   Zone 포털 — Museum 중심 정육각형 배치
+   flat-top hexagon, radius ≈ 10 tiles
+───────────────────────────────────────────── */
+const PORTALS = [
+  { zone: 'Animal', tx: 22, ty:  3, w: 6, h: 6 },  // top-right  (60°)
+  { zone: 'Lab',    tx: 12, ty:  3, w: 6, h: 6 },  // top-left  (120°)
+  { zone: 'Urban',  tx: 28, ty: 12, w: 5, h: 6 },  // right       (0°)
+  { zone: 'Nature', tx:  6, ty: 12, w: 5, h: 6 },  // left       (180°)
+  { zone: 'Music',  tx: 22, ty: 21, w: 6, h: 6 },  // bottom-right (300°)
+  { zone: 'Human',  tx: 12, ty: 21, w: 6, h: 6 },  // bottom-left (240°)
+]
+
+/* ─────────────────────────────────────────────
+   경로 타일 — 박물관에서 6 방향 방사형 스포크
 ───────────────────────────────────────────── */
 const PATH_TILES = [
-  ...[17,18,19].flatMap(tx => [12,13,14,15].map(ty => ({ tx, ty, plaza: true }))),
-  ...[9,10,11,12,13,14,15,16].map(tx => ({ tx, ty: 6 })),
-  ...[6,7,8].map(ty => ({ tx: 9, ty })),
-  ...[21,22,23,24,25,26,27,28].map(tx => ({ tx, ty: 6 })),
-  ...[6,7,8].map(ty => ({ tx: 27, ty })),
-  ...[9,10,11,12,13,14,15,16].map(tx => ({ tx, ty: 22 })),
-  ...[20,21,22].map(ty => ({ tx: 9, ty })),
-  ...[21,22,23,24,25,26,27,28].map(tx => ({ tx, ty: 22 })),
-  ...[20,21,22].map(ty => ({ tx: 27, ty })),
-  ...[7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22].map(ty => ({ tx: 18, ty })),
+  // Museum 중앙 광장
+  ...[16,17,18,19,20,21,22,23,24].flatMap(tx =>
+    [12,13,14,15,16,17,18].map(ty => ({ tx, ty, plaza: true }))
+  ),
+  // 위쪽 스포크 (ty 8→11)
+  ...[18,19,20,21,22].flatMap(tx => [8,9,10,11].map(ty => ({ tx, ty }))),
+  // 위-오른쪽 → Animal
+  ...[22,23,24,25,26,27].map(tx => ({ tx, ty: 8 })),
+  // 위-왼쪽 → Lab
+  ...[12,13,14,15,16,17,18].map(tx => ({ tx, ty: 8 })),
+  // 오른쪽 스포크 → Urban
+  ...[24,25,26,27,28].map(tx => ({ tx, ty: 15 })),
+  ...[13,14,15,16,17].map(ty => ({ tx: 28, ty })),
+  // 왼쪽 스포크 → Nature
+  ...[11,12,13,14,15,16].map(tx => ({ tx, ty: 15 })),
+  ...[13,14,15,16,17].map(ty => ({ tx: 11, ty })),
+  // 아래쪽 스포크 (ty 19→21)
+  ...[18,19,20,21,22].flatMap(tx => [19,20,21].map(ty => ({ tx, ty }))),
+  // 아래-오른쪽 → Music
+  ...[22,23,24,25,26,27].map(tx => ({ tx, ty: 21 })),
+  ...[22,23].map(ty => ({ tx: 27, ty })),
+  // 아래-왼쪽 → Human
+  ...[12,13,14,15,16,17,18].map(tx => ({ tx, ty: 21 })),
+  ...[22,23].map(ty => ({ tx: 12, ty })),
 ]
+
+const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
 /* ─────────────────────────────────────────────
    나무 배치
 ───────────────────────────────────────────── */
-const TREES = [
+const RAW_TREES = [
+  // 테두리
   ...Array.from({length:18}, (_,i) => ({ tx: 1+i*2, ty: 1,  variant: i%3 })),
   ...Array.from({length:18}, (_,i) => ({ tx: 1+i*2, ty: 28, variant: (i+1)%3 })),
-  ...Array.from({length:12}, (_,i) => ({ tx: 1,  ty: 3+i*2, variant: i%2 })),
-  ...Array.from({length:12}, (_,i) => ({ tx: 38, ty: 3+i*2, variant: (i+1)%2 })),
-  ...[{tx:13,ty:3},{tx:25,ty:3},{tx:13,ty:26},{tx:25,ty:26},
-      {tx:3,ty:12},{tx:3,ty:17},{tx:36,ty:12},{tx:36,ty:17},
-      {tx:14,ty:8},{tx:22,ty:8},{tx:14,ty:20},{tx:22,ty:20}]
-    .map((t,i) => ({...t, variant: i%3})),
+  ...Array.from({length:10}, (_,i) => ({ tx: 1,  ty: 3+i*2, variant: i%2 })),
+  ...Array.from({length:10}, (_,i) => ({ tx: 38, ty: 3+i*2, variant: (i+1)%2 })),
+  // 스포크 사이 빈 공간 채우기
+  {tx:26,ty:9},{tx:27,ty:9},{tx:27,ty:10},{tx:28,ty:10},{tx:29,ty:9},
+  {tx:26,ty:17},{tx:27,ty:17},{tx:27,ty:18},{tx:28,ty:18},{tx:29,ty:17},
+  {tx:18,ty:23},{tx:20,ty:23},{tx:22,ty:23},{tx:20,ty:25},{tx:20,ty:26},
+  {tx:11,ty:17},{tx:11,ty:18},{tx:10,ty:18},{tx:10,ty:17},{tx:9,ty:17},
+  {tx:11,ty:9},{tx:11,ty:10},{tx:10,ty:10},{tx:10,ty:9},{tx:9,ty:9},
+  {tx:18,ty:5},{tx:20,ty:5},{tx:22,ty:5},{tx:20,ty:6},{tx:20,ty:7},
 ]
+
+// Portal 영역 타일 셋
+const PORTAL_SET = new Set(
+  PORTALS.flatMap(p =>
+    Array.from({length: p.w}, (_,dx) =>
+      Array.from({length: p.h}, (_,dy) => `${p.tx+dx},${p.ty+dy}`)
+    ).flat()
+  )
+)
+const MUSEUM_SET = new Set(
+  Array.from({length: MUSEUM.w}, (_,dx) =>
+    Array.from({length: MUSEUM.h}, (_,dy) => `${MUSEUM.tx+dx},${MUSEUM.ty+dy}`)
+  ).flat()
+)
+
+const TREES = RAW_TREES.filter(t => {
+  const k = `${t.tx},${t.ty}`
+  return !PATH_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
+})
 
 /* ─────────────────────────────────────────────
    꽃 배치
@@ -65,25 +108,13 @@ const FLOWERS = Array.from({length:30}, (_,i) => ({
   tx: 3 + (i*73)%34,
   ty: 3 + (i*47)%24,
   type: i % 4,
-})).filter(f => !PATH_TILES.some(p => p.tx===f.tx && p.ty===f.ty))
+})).filter(f => {
+  const k = `${f.tx},${f.ty}`
+  return !PATH_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
+})
 
 /* ─────────────────────────────────────────────
-   헬퍼: 에셋 있으면 PNG, 없으면 SVG 폴백
-───────────────────────────────────────────── */
-function AssetImage({ src, x, y, w, h, fallback }) {
-  if (ASSET_READY.objects && src) {
-    return (
-      <image
-        href={src} x={x} y={y} width={w} height={h}
-        style={{ imageRendering: 'pixelated' }}
-      />
-    )
-  }
-  return fallback
-}
-
-/* ─────────────────────────────────────────────
-   나무 — PNG 에셋 / SVG 폴백 자동 전환
+   헬퍼
 ───────────────────────────────────────────── */
 const TREE_SRCS = [OBJECTS.tree_01, OBJECTS.tree_02, OBJECTS.tree_03]
 const TREE_COLORS = [
@@ -95,14 +126,10 @@ const TREE_COLORS = [
 function PixelTree({ x, y, variant = 0 }) {
   if (ASSET_READY.objects) {
     return (
-      <image
-        href={TREE_SRCS[variant % 3]}
-        x={x} y={y} width={TILE} height={TILE*1.5}
-        style={{ imageRendering: 'pixelated' }}
-      />
+      <image href={TREE_SRCS[variant % 3]} x={x} y={y} width={TILE} height={TILE*1.5}
+        style={{ imageRendering: 'pixelated' }}/>
     )
   }
-  // SVG 폴백
   const c = TREE_COLORS[variant % 3]
   const s = TILE - 4
   return (
@@ -116,28 +143,11 @@ function PixelTree({ x, y, variant = 0 }) {
   )
 }
 
-/* ─────────────────────────────────────────────
-   꽃
-───────────────────────────────────────────── */
-const FLOWER_SRCS = [
-  OBJECTS.flower_yellow, OBJECTS.flower_pink,
-  OBJECTS.flower_blue,   OBJECTS.flower_white,
-]
 const FLOWER_COLORS = [
   ['#F4D03F','#F39C12'], ['#E8A0C0','#D4608A'],
   ['#A8D8EA','#6DB5D4'], ['#F0F0AA','#D4D444'],
 ]
-
 function PixelFlower({ x, y, type }) {
-  if (ASSET_READY.objects) {
-    return (
-      <image
-        href={FLOWER_SRCS[type % 4]}
-        x={x+4} y={y+8} width={TILE*0.6} height={TILE*0.6}
-        style={{ imageRendering: 'pixelated' }}
-      />
-    )
-  }
   const [p, c] = FLOWER_COLORS[type % 4]
   return (
     <g transform={`translate(${x+6},${y+10})`}>
@@ -149,84 +159,75 @@ function PixelFlower({ x, y, type }) {
 }
 
 /* ─────────────────────────────────────────────
-   Zone 빌딩 — PNG 에셋 / SVG 폴백
+   Zone 빌딩 SVG 폴백 (각 zone 테마 맞춤)
 ───────────────────────────────────────────── */
-const ZONE_BUILDING_SRC = {
-  Forest: OBJECTS.cabin,
-  Creek:  OBJECTS.waterfall,
-  City:   OBJECTS.clock_tower,
-  Stage:  OBJECTS.stage,
-  Lab:    OBJECTS.altar,
-}
-
 function ZoneBuilding({ zone, px, py, pw, ph }) {
   const cx = px + pw / 2
-  const cy = py + ph / 2
-  const src = ZONE_BUILDING_SRC[zone]
 
-  if (ASSET_READY.objects && src) {
-    return (
-      <image
-        href={src}
-        x={px + pw*0.1} y={py + ph*0.05}
-        width={pw*0.8} height={ph*0.85}
-        style={{ imageRendering: 'pixelated' }}
-      />
-    )
-  }
-
-  // SVG 폴백 (기존 코드 그대로)
-  if (zone === 'Forest') return (
+  if (zone === 'Animal') return (
     <g>
-      <PixelTree x={px+4}    y={py+4} variant={0}/>
-      <PixelTree x={px+pw-36} y={py+4} variant={1}/>
-      <PixelTree x={cx-16}   y={py+8} variant={2}/>
-      <rect x={cx-16} y={cy+4}  width={32} height={22} rx="2" fill="#8B6347"/>
-      <polygon points={`${cx-20},${cy+8} ${cx},${cy-8} ${cx+20},${cy+8}`} fill="#C0392B"/>
-      <rect x={cx-5}  y={cy+14} width={10} height={12} rx="1" fill="#4A2C0A"/>
-      <rect x={cx-12} y={cy+8}  width={9}  height={8}  rx="1" fill="#87CEEB" opacity="0.8"/>
-      <rect x={cx+6}  y={cy-8}  width={5}  height={10} rx="1" fill="#8B6347"/>
-      <circle cx={cx+8} cy={cy-12} r="4" fill="#ddd" opacity="0.5"/>
+      <PixelTree x={px+4}      y={py+4} variant={0}/>
+      <PixelTree x={px+pw-36}  y={py+4} variant={1}/>
+      <PixelTree x={cx-16}     y={py+8} variant={2}/>
+      <text x={cx-14} y={py+ph*0.68} fontSize="18" style={{userSelect:'none'}}>🐦</text>
+      <text x={cx+6}  y={py+ph*0.78} fontSize="14" style={{userSelect:'none'}}>🐾</text>
+      <text x={cx-22} y={py+ph*0.82} fontSize="13" style={{userSelect:'none'}}>🌿</text>
     </g>
   )
-  if (zone === 'Creek') return (
+
+  if (zone === 'Human') return (
     <g>
-      <ellipse cx={cx} cy={cy+8} rx={pw*0.35} ry={ph*0.25} fill="#4A8FD4" opacity="0.85"/>
-      <rect x={cx+pw*0.12} y={py+4} width={14} height={ph*0.45} rx="3" fill="#7A6A5A"/>
-      <rect x={cx+pw*0.12+3} y={py+4} width={4} height={ph*0.45} rx="2" fill="#4A8FD4" opacity="0.8"/>
-      <rect x={cx-pw*0.3} y={cy+4} width={pw*0.28} height={6} rx="1" fill="#8B6347"/>
-      <ellipse cx={cx-16} cy={cy+8} rx={8} ry={3} fill="#E8D5A0"/>
+      <rect x={cx-18} y={py+ph*0.42} width={36} height={22} rx="2" fill="#D4A87A"/>
+      <polygon points={`${cx-22},${py+ph*0.46} ${cx},${py+ph*0.24} ${cx+22},${py+ph*0.46}`} fill="#A05030"/>
+      <rect x={cx-6} y={py+ph*0.66} width={12} height={12} rx="1" fill="#5A3A1A"/>
+      <rect x={cx-16} y={py+ph*0.5} width={10} height={7} rx="1" fill="#87CEEB" opacity="0.8"/>
+      <rect x={cx+6}  y={py+ph*0.5} width={10} height={7} rx="1" fill="#87CEEB" opacity="0.8"/>
+      <text x={cx} y={py+ph-6} textAnchor="middle" fontSize="13" style={{userSelect:'none'}}>👣</text>
     </g>
   )
-  if (zone === 'City') return (
+
+  if (zone === 'Nature') return (
+    <g>
+      <ellipse cx={cx} cy={py+ph*0.7} rx={pw*0.35} ry={ph*0.22} fill="#4A8FD4" opacity="0.85"/>
+      <polygon points={`${cx-pw*0.35},${py+ph*0.6} ${cx-pw*0.1},${py+ph*0.2} ${cx+pw*0.1},${py+ph*0.6}`}
+        fill="#5A8A5A"/>
+      <polygon points={`${cx},${py+ph*0.6} ${cx+pw*0.22},${py+ph*0.16} ${cx+pw*0.38},${py+ph*0.6}`}
+        fill="#4A7A4A"/>
+      <text x={cx} y={py+10} textAnchor="middle" fontSize="14" style={{userSelect:'none'}}>🌿</text>
+    </g>
+  )
+
+  if (zone === 'Urban') return (
     <g>
       <rect x={cx-14} y={py+4} width={28} height={ph-8} rx="2" fill="#B0A090"/>
       <polygon points={`${cx-18},${py+12} ${cx},${py+2} ${cx+18},${py+12}`} fill="#C0392B"/>
       <rect x={cx-5} y={py-4} width={10} height={12} rx="1" fill="#9A8A7A"/>
       <circle cx={cx} cy={py+2} r="5" fill="#D4C8A8" stroke="#8B7A6A" strokeWidth="1"/>
       {[0,1,2].flatMap(row=>[0,1].map(col=>(
-        <rect key={`${row}${col}`} x={cx-10+col*14} y={py+18+row*10} width={8} height={7} rx="1" fill="#87CEEB" opacity="0.8"/>
+        <rect key={`${row}${col}`} x={cx-10+col*14} y={py+18+row*10} width={8} height={7} rx="1"
+          fill="#87CEEB" opacity="0.8"/>
       )))}
-      <ellipse cx={cx} cy={ph+py-10} rx={12} ry={6} fill="#4A8FD4" opacity="0.7"/>
-      <rect x={cx-2} y={ph+py-20} width={4} height={12} rx="2" fill="#9A9585"/>
+      <text x={cx+pw*0.25} y={py+ph*0.85} fontSize="12" style={{userSelect:'none'}}>🚗</text>
     </g>
   )
-  if (zone === 'Stage') return (
+
+  if (zone === 'Music') return (
     <g>
-      <rect x={px+6} y={cy+2} width={pw-12} height={ph*0.38} rx="4" fill="#5A4A3A"/>
+      <rect x={px+6} y={py+ph*0.55} width={pw-12} height={ph*0.38} rx="4" fill="#5A4A3A"/>
       <rect x={px+4} y={py+4} width={10} height={ph*0.55} rx="2" fill="#8B2252"/>
       <rect x={px+pw-14} y={py+4} width={10} height={ph*0.55} rx="2" fill="#8B2252"/>
-      <text x={cx-14} y={cy-4} fontSize="18" fill="#9B6DD4" style={{userSelect:'none'}}>♪</text>
-      <text x={cx+4}  y={cy-10} fontSize="14" fill="#7B4DC4" style={{userSelect:'none'}}>♫</text>
-      <rect x={px+18} y={cy+8} width={14} height={20} rx="2" fill="#222"/>
-      <circle cx={px+25} cy={cy+16} r="4" fill="#555"/>
+      <text x={cx-14} y={py+ph*0.48} fontSize="18" fill="#9B6DD4" style={{userSelect:'none'}}>♪</text>
+      <text x={cx+4}  y={py+ph*0.4}  fontSize="14" fill="#7B4DC4" style={{userSelect:'none'}}>♫</text>
+      <text x={cx} y={py+ph*0.8} textAnchor="middle" fontSize="13" style={{userSelect:'none'}}>🎵</text>
     </g>
   )
+
+  // Lab
   return (
     <g>
-      <ellipse cx={cx} cy={cy+12} rx={pw*0.38} ry={ph*0.28} fill="#2A1840" opacity="0.9"/>
+      <ellipse cx={cx} cy={py+ph*0.75} rx={pw*0.38} ry={ph*0.28} fill="#2A1840" opacity="0.9"/>
       {[{dx:-20,dy:4,h:28,c:'#9B6DD4'},{dx:0,dy:-4,h:36,c:'#D4883A'},{dx:20,dy:4,h:24,c:'#4A8FD4'}].map((cr,i)=>(
-        <g key={i} transform={`translate(${cx+cr.dx},${cy+cr.dy})`}>
+        <g key={i} transform={`translate(${cx+cr.dx},${py+ph*0.5+cr.dy})`}>
           <polygon points={`0,${-cr.h} ${-cr.h*0.22},0 ${cr.h*0.22},0`} fill={cr.c} opacity="0.85"/>
           <circle cx={0} cy={-cr.h+3} r="2" fill="white" opacity="0.7"/>
         </g>
@@ -236,7 +237,7 @@ function ZoneBuilding({ zone, px, py, pw, ph }) {
 }
 
 /* ─────────────────────────────────────────────
-   Zone 포털 섬 (잔디 베이스 + 빌딩 + 라벨)
+   Zone 포털 섬
 ───────────────────────────────────────────── */
 function PortalIsland({ portal, hovered, progress }) {
   const meta = ZONE_META[portal.zone]
@@ -251,27 +252,25 @@ function PortalIsland({ portal, hovered, progress }) {
         fill="#3A6B2A"
         stroke={hovered ? meta.color : '#2A5A1A'}
         strokeWidth={hovered ? 2.5 : 1}
-        style={{ filter: hovered ? `drop-shadow(0 0 10px ${meta.color}66)` : 'none', transition: 'all 0.25s' }}
+        style={{ filter: hovered ? `drop-shadow(0 0 10px ${meta.color}66)` : 'none', transition:'all 0.25s' }}
       />
       <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#4A8B3A" opacity="0.7"/>
       <rect x={px+pw/2-8} y={py+ph-4} width={16} height={12} rx="2" fill="#C8B89A"/>
 
       <ZoneBuilding zone={portal.zone} px={px} py={py} pw={pw} ph={ph}/>
 
-      {/* 진행바 */}
       <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#ffffff18"/>
       <rect x={px-4} y={py+ph+2} width={(pw+8)*prog} height={4} rx="2" fill={meta.color}/>
 
-      {/* 라벨 */}
       <rect x={px+pw/2-38} y={py-26} width={76} height={22} rx="7"
         fill={hovered ? meta.color : '#000000bb'}
         stroke={meta.color} strokeWidth="1.5"
-        style={{ transition: 'all 0.2s' }}
+        style={{ transition:'all 0.2s' }}
       />
       <text x={px+pw/2} y={py-12} textAnchor="middle" fontSize="10" fontWeight="700"
         fontFamily="Nunito, sans-serif"
         fill={hovered ? '#fff' : meta.color}
-        style={{ userSelect:'none', transition: 'fill 0.2s' }}>
+        style={{ userSelect:'none', transition:'fill 0.2s' }}>
         {meta.emoji} {meta.label}
       </text>
 
@@ -289,7 +288,7 @@ function PortalIsland({ portal, hovered, progress }) {
 }
 
 /* ─────────────────────────────────────────────
-   Sound Museum 섬
+   Sound Museum 섬 (중앙)
 ───────────────────────────────────────────── */
 function MuseumIsland({ hovered }) {
   const px = MUSEUM.tx * TILE, py = MUSEUM.ty * TILE
@@ -298,10 +297,7 @@ function MuseumIsland({ hovered }) {
 
   return (
     <g>
-      {/* 그림자 */}
       <ellipse cx={cx+4} cy={py+ph+8} rx={pw*0.5} ry={10} fill="#00000033"/>
-
-      {/* 잔디 베이스 */}
       <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
         fill="#C8B870"
         stroke={hovered ? '#C8A96E' : '#A89050'}
@@ -309,11 +305,7 @@ function MuseumIsland({ hovered }) {
         style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
       />
       <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#D8C880" opacity="0.6"/>
-
-      {/* 입구 계단 */}
       <rect x={cx-pw*0.2} y={py+ph-4} width={pw*0.4} height={12} rx="2" fill="#C8B880"/>
-
-      {/* 기둥 4개 */}
       {[-1.2,-0.4,0.4,1.2].map((dx,i) => (
         <g key={i} transform={`translate(${cx+dx*pw*0.18},${py+ph*0.18})`}>
           <rect x="-4" y="0" width="8" height={ph*0.52} rx="2" fill="#E8D8B0"/>
@@ -321,21 +313,12 @@ function MuseumIsland({ hovered }) {
           <rect x="-6" y={ph*0.52-1} width="12" height="6" rx="1" fill="#D4C4A0"/>
         </g>
       ))}
-
-      {/* 삼각 지붕 (페디먼트) */}
       <polygon
         points={`${px+6},${py+ph*0.22} ${cx},${py+4} ${px+pw-6},${py+ph*0.22}`}
         fill="#D4B870" stroke="#B89A50" strokeWidth="1.5"
       />
-
-      {/* 🏛 이모지 */}
-      <text x={cx} y={py+ph*0.7} textAnchor="middle" fontSize="22"
-        style={{ userSelect:'none' }}>🏛</text>
-
-      {/* 진행 표시바 위치에 장식선 */}
+      <text x={cx} y={py+ph*0.7} textAnchor="middle" fontSize="22" style={{userSelect:'none'}}>🏛</text>
       <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#D4C870" opacity="0.5"/>
-
-      {/* 라벨 */}
       <rect x={cx-46} y={py-26} width={92} height={22} rx="7"
         fill={hovered ? '#C8A96E' : '#000000bb'}
         stroke="#C8A96E" strokeWidth="1.5"
@@ -347,7 +330,6 @@ function MuseumIsland({ hovered }) {
         style={{ userSelect:'none', transition:'fill 0.2s' }}>
         🏛 Sound Museum
       </text>
-
       {hovered && (
         <g>
           <rect x={cx-32} y={py+ph+10} width={64} height={17} rx="5" fill="#000000cc"/>
@@ -362,7 +344,7 @@ function MuseumIsland({ hovered }) {
 }
 
 /* ─────────────────────────────────────────────
-   캐릭터 — 스프라이트 시트 / SVG 폴백
+   캐릭터
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
@@ -370,40 +352,29 @@ function PixelChar({ dir, moving }) {
   const tick  = Math.floor(Date.now() / 160) % 2
   const frame = moving ? tick : 0
 
-  // ── PNG 스프라이트 시트 방식 ──
   if (ASSET_READY.characters && CHARACTERS.player_sheet) {
     const frameOffsets = CHAR_CFG[dir] || CHAR_CFG.down
     const frameX = frameOffsets[frame] ?? frameOffsets[0]
     const { frameW, frameH, sheetW, sheetH } = CHAR_CFG
-
     return (
-      <svg width={CHAR_W} height={CHAR_H}
-        viewBox={`0 0 ${frameW} ${frameH}`}
-        style={{ overflow: 'hidden', imageRendering: 'pixelated' }}>
+      <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${frameW} ${frameH}`}
+        style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs>
-          <clipPath id="charClip">
-            <rect width={frameW} height={frameH}/>
-          </clipPath>
+          <clipPath id="charClip"><rect width={frameW} height={frameH}/></clipPath>
         </defs>
-        <image
-          href={CHARACTERS.player_sheet}
-          x={-frameX} y={0}
-          width={sheetW} height={sheetH}
-          clipPath="url(#charClip)"
-          style={{ imageRendering: 'pixelated' }}
-        />
+        <image href={CHARACTERS.player_sheet} x={-frameX} y={0}
+          width={sheetW} height={sheetH} clipPath="url(#charClip)"
+          style={{ imageRendering:'pixelated' }}/>
       </svg>
     )
   }
 
-  // ── SVG 폴백 (헤드폰 캐릭터) ──
   const legLY = frame === 0 ? 18 : 21
   const legRY = frame === 0 ? 21 : 18
   const flip  = dir === 'left' ? 'scale(-1,1) translate(-22,0)' : ''
-
   return (
     <svg width={CHAR_W} height={CHAR_H} viewBox="0 0 22 28"
-      style={{ imageRendering: 'pixelated', overflow: 'visible' }}>
+      style={{ imageRendering:'pixelated', overflow:'visible' }}>
       <g transform={flip}>
         <ellipse cx="11" cy="27" rx="7" ry="2" fill="#00000033"/>
         <rect x="4" y="2" width="14" height="3" rx="2" fill="#2A2A3A"/>
@@ -442,25 +413,24 @@ function PixelChar({ dir, moving }) {
 }
 
 /* ─────────────────────────────────────────────
-   바닥 패턴 정의 (에셋 / SVG 폴백)
+   바닥 패턴
 ───────────────────────────────────────────── */
 function GroundPatterns() {
   if (ASSET_READY.tiles) {
     return (
       <defs>
         <pattern id="grass" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
-          <image href={TILES.grass} width={TILE} height={TILE} style={{ imageRendering:'pixelated' }}/>
+          <image href={TILES.grass} width={TILE} height={TILE} style={{imageRendering:'pixelated'}}/>
         </pattern>
         <pattern id="path_tile" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
-          <image href={TILES.path} width={TILE} height={TILE} style={{ imageRendering:'pixelated' }}/>
+          <image href={TILES.path} width={TILE} height={TILE} style={{imageRendering:'pixelated'}}/>
         </pattern>
         <pattern id="plaza_tile" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
-          <image href={TILES.path_center} width={TILE} height={TILE} style={{ imageRendering:'pixelated' }}/>
+          <image href={TILES.path_center} width={TILE} height={TILE} style={{imageRendering:'pixelated'}}/>
         </pattern>
       </defs>
     )
   }
-  // SVG 폴백
   return (
     <defs>
       <pattern id="grass" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
@@ -479,17 +449,18 @@ function GroundPatterns() {
    HUD
 ───────────────────────────────────────────── */
 function HUD({ totalCount, zoneProgress }) {
-  const totalProgress = Object.values(zoneProgress).reduce((s,v)=>s+v,0) / 5
+  const zones = Object.keys(ZONE_META)
+  const totalProgress = Object.values(zoneProgress).reduce((s,v)=>s+v,0) / zones.length
   const pct = Math.round(totalProgress * 100)
   return (
     <div style={{
       position:'absolute', top:0, left:0, right:0, height:`${HUD_H}px`,
       background:'#F5EDD8', borderBottom:'3px solid #C8A96E',
-      display:'flex', alignItems:'center', padding:'0 16px', gap:'16px',
+      display:'flex', alignItems:'center', padding:'0 16px', gap:'12px',
       fontFamily:'Nunito, sans-serif', zIndex:20,
       boxShadow:'0 2px 8px #00000033',
     }}>
-      <div style={{ display:'flex', alignItems:'center', gap:'8px', marginRight:'8px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:'8px', marginRight:'4px' }}>
         <span style={{ fontSize:'22px' }}>🎧</span>
         <div>
           <div style={{ fontSize:'14px', fontWeight:800, color:'#3A2A14', lineHeight:1.1 }}>Sound Village</div>
@@ -507,7 +478,7 @@ function HUD({ totalCount, zoneProgress }) {
         </div>
       </div>
       <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
-      <div style={{ display:'flex', alignItems:'center', gap:'6px' }}>
+      <div style={{ display:'flex', alignItems:'center', gap:'4px' }}>
         <span style={{ fontSize:'20px' }}>⭐</span>
         <div>
           <div style={{ fontSize:'16px', fontWeight:800, color:'#B8860B', lineHeight:1 }}>{totalCount}</div>
@@ -515,16 +486,16 @@ function HUD({ totalCount, zoneProgress }) {
         </div>
       </div>
       <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
-      <div style={{ display:'flex', gap:'6px', alignItems:'center' }}>
-        {Object.entries(zoneProgress).map(([zone, prog]) => (
-          <div key={zone} title={`${ZONE_META[zone].label}: ${Math.round(prog*100)}%`}
+      <div style={{ display:'flex', gap:'4px', alignItems:'center' }}>
+        {zones.map(zone => (
+          <div key={zone} title={`${ZONE_META[zone].label}: ${Math.round((zoneProgress[zone]||0)*100)}%`}
             style={{
-              width:'28px', height:'28px', borderRadius:'6px',
-              background: prog >= 1 ? ZONE_META[zone].color : '#D4C4A0',
+              width:'24px', height:'24px', borderRadius:'6px',
+              background: (zoneProgress[zone]||0) >= 1 ? ZONE_META[zone].color : '#D4C4A0',
               display:'flex', alignItems:'center', justifyContent:'center',
-              fontSize:'14px', border:'2px solid',
-              borderColor: prog >= 1 ? ZONE_META[zone].color : '#C8A96E',
-              opacity: prog > 0 ? 1 : 0.5, transition:'all 0.3s',
+              fontSize:'12px', border:'2px solid',
+              borderColor: (zoneProgress[zone]||0) >= 1 ? ZONE_META[zone].color : '#C8A96E',
+              opacity: (zoneProgress[zone]||0) > 0 ? 1 : 0.5, transition:'all 0.3s',
             }}>
             {ZONE_META[zone].emoji}
           </div>
@@ -542,7 +513,7 @@ function ObjectivePanel({ nearZone, nearMuseum }) {
   return (
     <div style={{
       position:'absolute', bottom:'16px', right:'16px', width:'200px',
-      background:'#F5EDD8', border:`2px solid ${isNearMuseum ? '#C8A96E' : '#C8A96E'}`,
+      background:'#F5EDD8', border:'2px solid #C8A96E',
       borderRadius:'12px', padding:'12px',
       fontFamily:'Nunito, sans-serif',
       boxShadow:'0 4px 16px #00000044', zIndex:10,
@@ -577,7 +548,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
   const [nearZone,   setNearZone]   = useState(null)
   const [nearMuseum, setNearMuseum] = useState(false)
   const [cam,        setCam]        = useState({ x: 0, y: 0 })
-  const [vp,       setVp]       = useState({
+  const [vp,         setVp]         = useState({
     w: typeof window !== 'undefined' ? window.innerWidth  : 800,
     h: typeof window !== 'undefined' ? window.innerHeight - HUD_H : 544,
   })
@@ -630,7 +601,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
 
   useEffect(() => {
     const h = e => {
-      if (e.key==='Enter' || e.key===' ') {
+      if (e.key === 'Enter' || e.key === ' ') {
         if (nearZone) onEnterZone(nearZone)
         else if (nearMuseum && onEnterMuseum) onEnterMuseum()
       }
@@ -647,17 +618,13 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
         background:'#5A9A3A', overflow:'hidden', cursor:'none',
       }}>
-        <svg
-          width="100%" height="100%"
+        <svg width="100%" height="100%"
           viewBox={`${cam.x} ${cam.y} ${vp.w} ${vp.h}`}
           style={{ display:'block', position:'absolute', inset:0 }}
         >
           <GroundPatterns/>
-
-          {/* 잔디 바닥 */}
           <rect width={PX_W} height={PX_H} fill="url(#grass)"/>
 
-          {/* 경로 */}
           {PATH_TILES.map((p,i) => (
             <rect key={i}
               x={p.tx*TILE} y={p.ty*TILE} width={TILE} height={TILE}
@@ -666,21 +633,16 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
             />
           ))}
 
-          {/* 경로 위 돌 (에셋 없을 때만) */}
-          {!ASSET_READY.tiles && [17,18,19].flatMap(tx => [12,13,14,15].map(ty => (
-            <rect key={`${tx}${ty}`}
-              x={tx*TILE+2} y={ty*TILE+2} width={TILE-4} height={TILE-4}
+          {!ASSET_READY.tiles && PATH_TILES.filter(p=>p.plaza).map((p,i) => (
+            <rect key={i}
+              x={p.tx*TILE+2} y={p.ty*TILE+2} width={TILE-4} height={TILE-4}
               rx="3" fill="#D8C8AA" stroke="#B8A88A" strokeWidth="0.5"
             />
-          )))}
+          ))}
 
-          {/* 꽃 */}
           {FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} type={f.type}/>)}
+          {TREES.map((t,i) => <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
 
-          {/* 나무 */}
-          {TREES.map((t,i) => <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant}/>)}
-
-          {/* Zone 섬 */}
           {PORTALS.map(p => (
             <PortalIsland key={p.zone} portal={p}
               hovered={nearZone === p.zone}
@@ -688,10 +650,8 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
             />
           ))}
 
-          {/* Sound Museum 섬 */}
           <MuseumIsland hovered={nearMuseum}/>
 
-          {/* 캐릭터 */}
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}>
               <PixelChar dir={dir} moving={moving}/>

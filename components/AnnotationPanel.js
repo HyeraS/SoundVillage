@@ -8,10 +8,11 @@ import { saveAnnotation } from '@/lib/supabase';
    Zone 팔레트 — Mystery 포함
 ───────────────────────────────────────────── */
 const ZONE_PALETTE = {
-  Forest: { bg: '#111e0d', card: '#1a2e13', accent: '#5B9E3A', glow: '#5B9E3A28', label: '🌲 숲' },
-  Creek:  { bg: '#0a1628', card: '#112240', accent: '#4A8FD4', glow: '#4A8FD428', label: '💧 자연' },
-  City:   { bg: '#161512', card: '#211f1a', accent: '#C4B99A', glow: '#C4B99A28', label: '🏙 도시' },
-  Stage:  { bg: '#110d28', card: '#1a1438', accent: '#9B6DD4', glow: '#9B6DD428', label: '🎵 음악' },
+  Animal: { bg: '#0d1e0a', card: '#162e10', accent: '#5B9E3A', glow: '#5B9E3A28', label: '🐾 동물' },
+  Human:  { bg: '#1e150a', card: '#2e1e10', accent: '#E8A04A', glow: '#E8A04A28', label: '👤 사람' },
+  Nature: { bg: '#0a1628', card: '#112240', accent: '#4A8FD4', glow: '#4A8FD428', label: '🌿 자연' },
+  Urban:  { bg: '#161512', card: '#211f1a', accent: '#C4B99A', glow: '#C4B99A28', label: '🏙 도시' },
+  Music:  { bg: '#110d28', card: '#1a1438', accent: '#9B6DD4', glow: '#9B6DD428', label: '🎵 음악' },
   Lab:    { bg: '#110f1e', card: '#1a172c', accent: '#D4883A', glow: '#D4883A28', label: '✨ 미지' },
 };
 

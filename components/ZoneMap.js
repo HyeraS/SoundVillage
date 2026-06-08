@@ -18,22 +18,27 @@ const HUD_H  = 56
    Zone별 배경 팔레트
 ───────────────────────────────────────────── */
 const ZONE_THEME = {
-  Forest: {
+  Animal: {
     ground: '#4A8B2A', groundDark: '#3A7A1A', path: '#C8B48A',
     border: '#2A5A10', water: null,
     sky: 'linear-gradient(180deg, #87CEEB 0%, #C8E8A0 100%)',
   },
-  Creek:  {
+  Human:  {
+    ground: '#8B7A60', groundDark: '#7A6A50', path: '#D4C8A8',
+    border: '#6A5840', water: null,
+    sky: 'linear-gradient(180deg, #E8D0B0 0%, #F5EDD8 100%)',
+  },
+  Nature: {
     ground: '#4A7A8B', groundDark: '#3A6A7A', path: '#C8C0A8',
     border: '#1A3A5A', water: '#4A8FD4',
     sky: 'linear-gradient(180deg, #87CEEB 0%, #B0D8F0 100%)',
   },
-  City:   {
+  Urban:  {
     ground: '#8A8070', groundDark: '#7A7060', path: '#D4C8B0',
     border: '#4A4030', water: null,
     sky: 'linear-gradient(180deg, #C8D8E8 0%, #E8DCC8 100%)',
   },
-  Stage:  {
+  Music:  {
     ground: '#5A4A8A', groundDark: '#4A3A7A', path: '#C8B0D8',
     border: '#2A1A5A', water: null,
     sky: 'linear-gradient(180deg, #2A1A5A 0%, #8A4AB0 100%)',
@@ -49,11 +54,12 @@ const ZONE_THEME = {
    Zone별 소리 아이템 심볼 + 색상
 ───────────────────────────────────────────── */
 const SOUND_ITEMS = {
-  Forest: { symbols: ['♩','♪','♫','🐦','🍃'], itemBg: '#2A4A1A', itemBorder: '#5B9E3A' },
-  Creek:  { symbols: ['〜','♒','💧','🌊','♪'], itemBg: '#0E2A4A', itemBorder: '#4A8FD4' },
-  City:   { symbols: ['🔔','♪','📯','🚗','♫'], itemBg: '#2A2820', itemBorder: '#C4B99A' },
-  Stage:  { symbols: ['🎵','♩','♪','♫','🎶'],  itemBg: '#1A1238', itemBorder: '#9B6DD4' },
-  Lab:    { symbols: ['✦','❓','◈','⚡','🌀'], itemBg: '#1A0A38', itemBorder: '#D4883A' },
+  Animal: { symbols: ['🐦','🐾','🦋','🐸','🐝'], itemBg: '#1A3A0A', itemBorder: '#5B9E3A' },
+  Human:  { symbols: ['👣','👏','💨','😄','🤲'], itemBg: '#3A2A1A', itemBorder: '#E8A04A' },
+  Nature: { symbols: ['💧','🌊','⛈','💨','🔥'], itemBg: '#0E2A4A', itemBorder: '#4A8FD4' },
+  Urban:  { symbols: ['🚗','🔔','🚨','⚙','🏗'], itemBg: '#2A2820', itemBorder: '#C4B99A' },
+  Music:  { symbols: ['🎵','♩','♪','♫','🎶'],   itemBg: '#1A1238', itemBorder: '#9B6DD4' },
+  Lab:    { symbols: ['✦','❓','◈','⚡','🌀'],   itemBg: '#1A0A38', itemBorder: '#D4883A' },
 }
 
 /* ─────────────────────────────────────────────
@@ -78,10 +84,8 @@ function buildPaths(zone) {
 function buildZoneObjects(zone) {
   const objs = []
   const cx = MAP_W / 2, cy = MAP_H / 2
-  const theme = ZONE_THEME[zone]
 
-  if (zone === 'Forest') {
-    // 나무 군집
+  if (zone === 'Animal') {
     const treePositions = [
       {tx:1,ty:1},{tx:2,ty:2},{tx:4,ty:1},{tx:6,ty:2},{tx:8,ty:1},
       {tx:14,ty:1},{tx:16,ty:2},{tx:18,ty:1},{tx:20,ty:2},{tx:22,ty:1},
@@ -90,65 +94,65 @@ function buildZoneObjects(zone) {
       {tx:1,ty:16},{tx:3,ty:16},{tx:19,ty:16},{tx:22,ty:16},
     ]
     treePositions.forEach((t,i) => objs.push({ type:'tree', ...t, variant: i%3 }))
-    // 꽃밭
     for (let i=0;i<12;i++) objs.push({ type:'flower', tx:3+(i*83)%18, ty:3+(i*67)%11, variant:i%4 })
-    // 오두막 (Zone 특징 건물)
     objs.push({ type:'cabin', tx:3, ty:3 })
-    // 우물
     objs.push({ type:'well', tx:18, ty:3 })
   }
 
-  if (zone === 'Creek') {
-    // 연못 (정적 배경으로)
-    objs.push({ type:'pond', tx:2, ty:2, w:6, h:5 })
+  if (zone === 'Human') {
+    // 건물 (주거지)
+    objs.push({ type:'building', tx:2,  ty:1, h:4, variant:0 })
+    objs.push({ type:'building', tx:18, ty:1, h:4, variant:1 })
+    // 벤치 여러 개
+    objs.push({ type:'bench', tx:4,  ty:8  })
+    objs.push({ type:'bench', tx:18, ty:8  })
+    objs.push({ type:'bench', tx:4,  ty:13 })
+    objs.push({ type:'bench', tx:18, ty:13 })
+    // 중앙 분수 (광장)
+    objs.push({ type:'fountain', tx:cx-2, ty:cy-2 })
+    // 가로등
+    for (let i=0;i<5;i++) objs.push({ type:'lamp', tx:4+i*4, ty:cy-1 })
+    // 꽃밭
+    for (let i=0;i<10;i++) objs.push({ type:'flower', tx:3+(i*71)%19, ty:3+(i*53)%12, variant:i%4 })
+  }
+
+  if (zone === 'Nature') {
+    objs.push({ type:'pond', tx:2,  ty:2,  w:6, h:5 })
     objs.push({ type:'pond', tx:15, ty:10, w:7, h:5 })
-    // 바위
     for (let i=0;i<8;i++) objs.push({ type:'rock', tx:2+(i*71)%20, ty:2+(i*53)%13, variant:i%2 })
-    // 부두
     objs.push({ type:'dock', tx:3, ty:6 })
-    // 갈대
     for (let i=0;i<6;i++) objs.push({ type:'reed', tx:3+(i*31)%6, ty:2+(i*17)%4 })
   }
 
-  if (zone === 'City') {
-    // 건물들
-    objs.push({ type:'building', tx:2, ty:1, h:5, variant:0 })
-    objs.push({ type:'building', tx:7, ty:2, h:4, variant:1 })
+  if (zone === 'Urban') {
+    objs.push({ type:'building', tx:2,  ty:1, h:5, variant:0 })
+    objs.push({ type:'building', tx:7,  ty:2, h:4, variant:1 })
     objs.push({ type:'building', tx:15, ty:1, h:6, variant:2 })
     objs.push({ type:'building', tx:19, ty:2, h:4, variant:0 })
-    // 가로등
     for (let i=0;i<6;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy-1 })
     for (let i=0;i<6;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy+1 })
-    // 분수
     objs.push({ type:'fountain', tx:cx-2, ty:cy-2 })
-    // 벤치
-    objs.push({ type:'bench', tx:4, ty:12 })
+    objs.push({ type:'bench', tx:4,  ty:12 })
     objs.push({ type:'bench', tx:18, ty:12 })
   }
 
-  if (zone === 'Stage') {
-    // 무대
+  if (zone === 'Music') {
     objs.push({ type:'stage', tx:8, ty:2 })
-    // 악기들
-    objs.push({ type:'instrument', tx:3, ty:8, variant:0 })   // 피아노
-    objs.push({ type:'instrument', tx:18, ty:8, variant:1 })  // 기타
-    objs.push({ type:'instrument', tx:3, ty:13, variant:2 })  // 드럼
-    objs.push({ type:'instrument', tx:18, ty:13, variant:3 }) // 스피커
-    // 음표 파티클 (정적)
+    objs.push({ type:'instrument', tx:3,  ty:8,  variant:0 })
+    objs.push({ type:'instrument', tx:18, ty:8,  variant:1 })
+    objs.push({ type:'instrument', tx:3,  ty:13, variant:2 })
+    objs.push({ type:'instrument', tx:18, ty:13, variant:3 })
     for (let i=0;i<8;i++) objs.push({ type:'note', tx:2+(i*61)%20, ty:2+(i*43)%13 })
   }
 
   if (zone === 'Lab') {
-    // 크리스탈 군집
     const crystalPos = [
       {tx:2,ty:2},{tx:4,ty:3},{tx:19,ty:2},{tx:21,ty:3},
       {tx:2,ty:13},{tx:4,ty:14},{tx:19,ty:13},{tx:21,ty:14},
       {tx:10,ty:2},{tx:13,ty:2},{tx:10,ty:14},{tx:13,ty:14},
     ]
     crystalPos.forEach((c,i) => objs.push({ type:'crystal', ...c, variant:i%5 }))
-    // 별 파티클
     for (let i=0;i<16;i++) objs.push({ type:'star', tx:1+(i*73)%22, ty:1+(i*53)%15 })
-    // 제단
     objs.push({ type:'altar', tx:cx-2, ty:3 })
   }
 
@@ -420,7 +424,7 @@ function ZoneObject({ obj, zone, tick }) {
    소리 아이템 — PNG 에셋 / SVG 보석상자 폴백
 ───────────────────────────────────────────── */
 function SoundItem({ item, zone, tick }) {
-  const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Forest
+  const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const px    = item.tx * TILE + TILE / 2
   const py    = item.ty * TILE + TILE / 2
   const bobY  = Math.sin(tick * 0.06 + item.pulse) * 4
@@ -592,7 +596,7 @@ function ZoneHUD({ zone, collected, total, onExit }) {
    소리 아이템 생성
 ───────────────────────────────────────────── */
 function spawnSoundItems(sounds, zone) {
-  const si = SOUND_ITEMS[zone] || SOUND_ITEMS.Forest
+  const si = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const cx = Math.floor(MAP_W / 2), cy = Math.floor(MAP_H / 2)
 
   // 경로 타일 셋 (아이템 배치 금지)

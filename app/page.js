@@ -12,7 +12,7 @@ import soundMetadata from '@/data/sound_metadata.json'
 /* ─────────────────────────────────────────────
    Zone별 소리 목록 빌드
 ───────────────────────────────────────────── */
-const ZONES = ['Forest', 'Creek', 'City', 'Stage', 'Lab']
+const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 
 function buildZoneMap(sounds) {
   const map = {}

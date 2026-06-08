@@ -8,13 +8,15 @@ import { ZONE_META } from '@/components/GameEngine'
    Zone별 룸 테마
 ───────────────────────────────────────────── */
 const ROOM = {
-  Forest: { wall:'#1C120A', floor:'#120A04', shelf:'#3A2010', accent:'#8B6347',
-            glow:'#F4A46030', books:['#2D7A2D','#8B2252','#4A7CC4','#F4A460','#4A6B27','#8B4513'] },
-  Creek:  { wall:'#0A1420', floor:'#060C14', shelf:'#142030', accent:'#4A8FD4',
+  Animal: { wall:'#1C120A', floor:'#120A04', shelf:'#3A2010', accent:'#5B9E3A',
+            glow:'#5B9E3A30', books:['#2D7A2D','#8B6347','#4A9E38','#7A5230','#4A6B27','#2A5A1A'] },
+  Human:  { wall:'#201808', floor:'#140E04', shelf:'#3A2A18', accent:'#E8A04A',
+            glow:'#E8A04A30', books:['#D4A070','#C08040','#E8C090','#A07050','#F0B860','#8B6040'] },
+  Nature: { wall:'#0A1420', floor:'#060C14', shelf:'#142030', accent:'#4A8FD4',
             glow:'#4A8FD430', books:['#1E5A8A','#4A8FD4','#87CEEB','#2A5090','#5A8AAA','#3A6A8A'] },
-  City:   { wall:'#141210', floor:'#0A0806', shelf:'#222018', accent:'#C4B99A',
+  Urban:  { wall:'#141210', floor:'#0A0806', shelf:'#222018', accent:'#C4B99A',
             glow:'#C4B99A30', books:['#8A7060','#C4B99A','#6A5040','#D4C4A0','#504030','#7A6050'] },
-  Stage:  { wall:'#0C0820', floor:'#060414', shelf:'#180E30', accent:'#9B6DD4',
+  Music:  { wall:'#0C0820', floor:'#060414', shelf:'#180E30', accent:'#9B6DD4',
             glow:'#9B6DD430', books:['#9B6DD4','#D4883A','#5A3090','#C060A0','#7A4AB0','#4A2090'] },
   Lab:    { wall:'#060410', floor:'#020208', shelf:'#100C1C', accent:'#D4883A',
             glow:'#D4883A30', books:['#D4883A','#4A8FD4','#9B6DD4','#2A4A8A','#D46D6D','#6DD49B'] },
@@ -24,10 +26,11 @@ const ROOM = {
    Zone NPC
 ───────────────────────────────────────────── */
 const ZONE_NPC = {
-  Forest: { emoji:'🦉', name:'Ollie',  lines:['숲의 소리는 언제나 이야기를 품고 있어요.', '어떤 표현이 이 소리와 가장 잘 어울리나요? 🌿'] },
-  Creek:  { emoji:'🐸', name:'Ripple', lines:['물소리처럼 표현도 자연스럽게 흘러가야 해요.', '첨벙첨벙, 잘 들어보셨나요? 💧'] },
-  City:   { emoji:'🦜', name:'Metro',  lines:['도시의 소음도 누군가에겐 음악이에요.', '가장 도시다운 표현을 골라봐요 🏙'] },
-  Stage:  { emoji:'🎵', name:'Aria',   lines:['무대의 소리를 언어로 옮겨봐요!', '어떤 표현이 가장 공명하나요? 🎶'] },
+  Animal: { emoji:'🦉', name:'Ollie',  lines:['동물들이 내는 소리는 저마다 이야기를 품고 있어요.', '어떤 표현이 이 소리와 가장 잘 어울리나요? 🐾'] },
+  Human:  { emoji:'👤', name:'Sam',    lines:['사람이 만들어내는 소리는 정말 다양하죠.', '이 소리를 듣고 어떤 느낌이 드나요? 👣'] },
+  Nature: { emoji:'🐸', name:'Ripple', lines:['물소리처럼 표현도 자연스럽게 흘러가야 해요.', '자연의 소리를 언어로 담아봐요! 💧'] },
+  Urban:  { emoji:'🦜', name:'Metro',  lines:['도시의 소음도 누군가에겐 음악이에요.', '가장 도시다운 표현을 골라봐요 🏙'] },
+  Music:  { emoji:'🎵', name:'Aria',   lines:['무대의 소리를 언어로 옮겨봐요!', '어떤 표현이 가장 공명하나요? 🎶'] },
   Lab:    { emoji:'🤖', name:'ECHO',   lines:['데이터 분석 중… 최적 표현을 선택하세요.', '미지의 소리에 이름을 붙여봐요 ⚡'] },
 }
 

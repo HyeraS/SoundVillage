@@ -1,8 +1,8 @@
 {
   "sounds": [
     {
-      "sound_id": "Forest_155299",
-      "game_zone": "Forest",
+      "sound_id": "Urban_155299",
+      "game_zone": "Urban",
       "source_type": "Biological",
       "sub_category": "Motorcycle",
       "audioset_class": "Motorcycle",
@@ -12,8 +12,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_066514",
-      "game_zone": "Forest",
+      "sound_id": "Animal_66514",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Meow",
       "audioset_class": "Meow",
@@ -23,8 +23,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_245673",
-      "game_zone": "Forest",
+      "sound_id": "Human_245673",
+      "game_zone": "Human",
       "source_type": "Biological",
       "sub_category": "Chatter",
       "audioset_class": "Chatter",
@@ -34,8 +34,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_108766",
-      "game_zone": "Forest",
+      "sound_id": "Animal_108766",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Crow",
       "audioset_class": "Crow",
@@ -45,8 +45,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_400575",
-      "game_zone": "Forest",
+      "sound_id": "Animal_400575",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Cat",
       "audioset_class": "Cat",
@@ -56,8 +56,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_236044",
-      "game_zone": "Forest",
+      "sound_id": "Animal_236044",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bark",
       "audioset_class": "Bark",
@@ -67,8 +67,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_369577",
-      "game_zone": "Forest",
+      "sound_id": "Animal_369577",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Dog",
       "audioset_class": "Dog",
@@ -78,8 +78,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_019176",
-      "game_zone": "Forest",
+      "sound_id": "Animal_19176",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Chirp and tweet",
       "audioset_class": "Chirp and tweet",
@@ -89,8 +89,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_053590",
-      "game_zone": "Forest",
+      "sound_id": "Animal_53590",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird vocalization and bird call and bird song",
       "audioset_class": "Bird vocalization and bird call and bird song",
@@ -100,8 +100,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_390153",
-      "game_zone": "Forest",
+      "sound_id": "Animal_390153",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Gull and seagull",
       "audioset_class": "Gull and seagull",
@@ -111,8 +111,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_114435",
-      "game_zone": "Forest",
+      "sound_id": "Animal_114435",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird",
       "audioset_class": "Bird",
@@ -122,8 +122,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_334520",
-      "game_zone": "Forest",
+      "sound_id": "Animal_334520",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird vocalization and bird call and bird song",
       "audioset_class": "Bird vocalization and bird call and bird song",
@@ -133,8 +133,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_236259",
-      "game_zone": "Forest",
+      "sound_id": "Animal_236259",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Dog",
       "audioset_class": "Dog",
@@ -144,8 +144,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_118959",
-      "game_zone": "Forest",
+      "sound_id": "Animal_118959",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Purr",
       "audioset_class": "Purr",
@@ -155,8 +155,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_236281",
-      "game_zone": "Forest",
+      "sound_id": "Animal_236281",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bark",
       "audioset_class": "Bark",
@@ -166,8 +166,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_236108",
-      "game_zone": "Forest",
+      "sound_id": "Animal_236108",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bark",
       "audioset_class": "Bark",
@@ -177,8 +177,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_095433",
-      "game_zone": "Forest",
+      "sound_id": "Animal_95433",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Buzz",
       "audioset_class": "Buzz",
@@ -188,8 +188,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_372529",
-      "game_zone": "Forest",
+      "sound_id": "Animal_372529",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bark",
       "audioset_class": "Bark",
@@ -199,8 +199,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_019098",
-      "game_zone": "Forest",
+      "sound_id": "Animal_19098",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Insect",
       "audioset_class": "Insect",
@@ -210,8 +210,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_165874",
-      "game_zone": "Forest",
+      "sound_id": "Nature_165874",
+      "game_zone": "Nature",
       "source_type": "Biological",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -221,8 +221,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_353229",
-      "game_zone": "Forest",
+      "sound_id": "Animal_353229",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Chirp and tweet",
       "audioset_class": "Chirp and tweet",
@@ -232,8 +232,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_024642",
-      "game_zone": "Forest",
+      "sound_id": "Animal_24642",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird",
       "audioset_class": "Bird",
@@ -243,8 +243,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_388725",
-      "game_zone": "Forest",
+      "sound_id": "Animal_388725",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Chirp and tweet",
       "audioset_class": "Chirp and tweet",
@@ -254,8 +254,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_158782",
-      "game_zone": "Forest",
+      "sound_id": "Animal_158782",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Insect",
       "audioset_class": "Insect",
@@ -265,8 +265,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_333447",
-      "game_zone": "Forest",
+      "sound_id": "Animal_333447",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Hiss",
       "audioset_class": "Hiss",
@@ -276,8 +276,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_057613",
-      "game_zone": "Forest",
+      "sound_id": "Animal_57613",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird",
       "audioset_class": "Bird",
@@ -287,8 +287,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_080784",
-      "game_zone": "Forest",
+      "sound_id": "Animal_80784",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Buzz",
       "audioset_class": "Buzz",
@@ -298,8 +298,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_061072",
-      "game_zone": "Forest",
+      "sound_id": "Animal_61072",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Meow",
       "audioset_class": "Meow",
@@ -309,8 +309,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_389623",
-      "game_zone": "Forest",
+      "sound_id": "Animal_389623",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Purr",
       "audioset_class": "Purr",
@@ -320,8 +320,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Forest_098304",
-      "game_zone": "Forest",
+      "sound_id": "Animal_98304",
+      "game_zone": "Animal",
       "source_type": "Biological",
       "sub_category": "Bird",
       "audioset_class": "Bird",
@@ -331,8 +331,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_050061",
-      "game_zone": "Creek",
+      "sound_id": "Nature_50061",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Rain",
       "audioset_class": "Rain",
@@ -342,8 +342,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_320394",
-      "game_zone": "Creek",
+      "sound_id": "Nature_320394",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -353,8 +353,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_422866",
-      "game_zone": "Creek",
+      "sound_id": "Nature_422866",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -364,8 +364,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_274003",
-      "game_zone": "Creek",
+      "sound_id": "Nature_274003",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -375,8 +375,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_426690",
-      "game_zone": "Creek",
+      "sound_id": "Nature_426690",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -386,8 +386,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_129325",
-      "game_zone": "Creek",
+      "sound_id": "Nature_129325",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -397,8 +397,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_351390",
-      "game_zone": "Creek",
+      "sound_id": "Nature_351390",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -408,8 +408,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_085884",
-      "game_zone": "Creek",
+      "sound_id": "Nature_85884",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -419,8 +419,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_319218",
-      "game_zone": "Creek",
+      "sound_id": "Nature_319218",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Stream",
       "audioset_class": "Stream",
@@ -430,8 +430,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_196033",
-      "game_zone": "Creek",
+      "sound_id": "Nature_196033",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -441,8 +441,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_340218",
-      "game_zone": "Creek",
+      "sound_id": "Nature_340218",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -452,8 +452,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_368453",
-      "game_zone": "Creek",
+      "sound_id": "Nature_368453",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -463,8 +463,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_167369",
-      "game_zone": "Creek",
+      "sound_id": "Nature_167369",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Waves and surf",
       "audioset_class": "Waves and surf",
@@ -474,8 +474,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_050362",
-      "game_zone": "Creek",
+      "sound_id": "Nature_50362",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -485,8 +485,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_022033",
-      "game_zone": "Creek",
+      "sound_id": "Nature_22033",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -496,8 +496,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_204013",
-      "game_zone": "Creek",
+      "sound_id": "Nature_204013",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Water",
       "audioset_class": "Water",
@@ -507,8 +507,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_215710",
-      "game_zone": "Creek",
+      "sound_id": "Nature_215710",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Stream",
       "audioset_class": "Stream",
@@ -518,8 +518,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_420314",
-      "game_zone": "Creek",
+      "sound_id": "Nature_420314",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -529,8 +529,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_405140",
-      "game_zone": "Creek",
+      "sound_id": "Animal_405140",
+      "game_zone": "Animal",
       "source_type": "Physical",
       "sub_category": "Chirp and tweet",
       "audioset_class": "Chirp and tweet",
@@ -540,8 +540,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_042973",
-      "game_zone": "Creek",
+      "sound_id": "Nature_42973",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -551,8 +551,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_338093",
-      "game_zone": "Creek",
+      "sound_id": "Nature_338093",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -562,8 +562,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_207251",
-      "game_zone": "Creek",
+      "sound_id": "Nature_207251",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -573,8 +573,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_159685",
-      "game_zone": "Creek",
+      "sound_id": "Nature_159685",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Thunder",
       "audioset_class": "Thunder",
@@ -584,8 +584,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_027738",
-      "game_zone": "Creek",
+      "sound_id": "Nature_27738",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -595,8 +595,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_389693",
-      "game_zone": "Creek",
+      "sound_id": "Nature_389693",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -606,8 +606,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_099630",
-      "game_zone": "Creek",
+      "sound_id": "Urban_99630",
+      "game_zone": "Urban",
       "source_type": "Physical",
       "sub_category": "Alarm",
       "audioset_class": "Alarm",
@@ -617,8 +617,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_420298",
-      "game_zone": "Creek",
+      "sound_id": "Nature_420298",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Wind",
       "audioset_class": "Wind",
@@ -628,8 +628,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_388090",
-      "game_zone": "Creek",
+      "sound_id": "Nature_388090",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Drip",
       "audioset_class": "Drip",
@@ -639,8 +639,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Creek_220714",
-      "game_zone": "Creek",
+      "sound_id": "Nature_220714",
+      "game_zone": "Nature",
       "source_type": "Physical",
       "sub_category": "Waves and surf",
       "audioset_class": "Waves and surf",
@@ -650,8 +650,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_250008",
-      "game_zone": "City",
+      "sound_id": "Urban_250008",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Car",
       "audioset_class": "Car",
@@ -661,8 +661,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_147242",
-      "game_zone": "City",
+      "sound_id": "Urban_147242",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Car",
       "audioset_class": "Car",
@@ -672,8 +672,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_147107",
-      "game_zone": "City",
+      "sound_id": "Urban_147107",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Bus",
       "audioset_class": "Bus",
@@ -683,8 +683,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_054193",
-      "game_zone": "City",
+      "sound_id": "Urban_54193",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Alarm",
       "audioset_class": "Alarm",
@@ -694,8 +694,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_022354",
-      "game_zone": "City",
+      "sound_id": "Urban_22354",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Traffic noise and roadway noise",
       "audioset_class": "Traffic noise and roadway noise",
@@ -705,8 +705,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_323125",
-      "game_zone": "City",
+      "sound_id": "Urban_323125",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Bicycle bell",
       "audioset_class": "Bicycle bell",
@@ -716,8 +716,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_202752",
-      "game_zone": "City",
+      "sound_id": "Urban_202752",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Drill",
       "audioset_class": "Drill",
@@ -727,8 +727,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_340700",
-      "game_zone": "City",
+      "sound_id": "Urban_340700",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Engine",
       "audioset_class": "Engine",
@@ -738,8 +738,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_202418",
-      "game_zone": "City",
+      "sound_id": "Urban_202418",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Siren",
       "audioset_class": "Siren",
@@ -749,8 +749,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_406387",
-      "game_zone": "City",
+      "sound_id": "Urban_406387",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Motorcycle",
       "audioset_class": "Motorcycle",
@@ -760,8 +760,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_250390",
-      "game_zone": "City",
+      "sound_id": "Urban_250390",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Computer keyboard",
       "audioset_class": "Computer keyboard",
@@ -771,8 +771,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_147380",
-      "game_zone": "City",
+      "sound_id": "Urban_147380",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Bicycle",
       "audioset_class": "Bicycle",
@@ -782,8 +782,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_428484",
-      "game_zone": "City",
+      "sound_id": "Urban_428484",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Alarm",
       "audioset_class": "Alarm",
@@ -793,8 +793,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_323123",
-      "game_zone": "City",
+      "sound_id": "Urban_323123",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Bicycle bell",
       "audioset_class": "Bicycle bell",
@@ -804,8 +804,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_026177",
-      "game_zone": "City",
+      "sound_id": "Urban_26177",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Traffic noise and roadway noise",
       "audioset_class": "Traffic noise and roadway noise",
@@ -815,8 +815,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_107274",
-      "game_zone": "City",
+      "sound_id": "Urban_107274",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Sawing",
       "audioset_class": "Sawing",
@@ -826,8 +826,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_383513",
-      "game_zone": "City",
+      "sound_id": "Human_383513",
+      "game_zone": "Human",
       "source_type": "Anthropogenic",
       "sub_category": "Crowd",
       "audioset_class": "Crowd",
@@ -837,8 +837,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_176641",
-      "game_zone": "City",
+      "sound_id": "Urban_176641",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Squeak",
       "audioset_class": "Squeak",
@@ -848,8 +848,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_076806",
-      "game_zone": "City",
+      "sound_id": "Urban_76806",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Car",
       "audioset_class": "Car",
@@ -859,8 +859,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_414366",
-      "game_zone": "City",
+      "sound_id": "Urban_414366",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Alarm",
       "audioset_class": "Alarm",
@@ -870,8 +870,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_135613",
-      "game_zone": "City",
+      "sound_id": "Urban_135613",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Alarm",
       "audioset_class": "Alarm",
@@ -881,8 +881,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_157766",
-      "game_zone": "City",
+      "sound_id": "Urban_157766",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Computer keyboard",
       "audioset_class": "Computer keyboard",
@@ -892,8 +892,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_184941",
-      "game_zone": "City",
+      "sound_id": "Urban_184941",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Bicycle",
       "audioset_class": "Bicycle",
@@ -903,8 +903,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_154692",
-      "game_zone": "City",
+      "sound_id": "Urban_154692",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Computer keyboard",
       "audioset_class": "Computer keyboard",
@@ -914,8 +914,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_216381",
-      "game_zone": "City",
+      "sound_id": "Urban_216381",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Engine",
       "audioset_class": "Engine",
@@ -925,8 +925,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_066281",
-      "game_zone": "City",
+      "sound_id": "Urban_66281",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Drill",
       "audioset_class": "Drill",
@@ -936,8 +936,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_256529",
-      "game_zone": "City",
+      "sound_id": "Urban_256529",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Engine",
       "audioset_class": "Engine",
@@ -947,8 +947,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_189839",
-      "game_zone": "City",
+      "sound_id": "Human_189839",
+      "game_zone": "Human",
       "source_type": "Anthropogenic",
       "sub_category": "Applause",
       "audioset_class": "Applause",
@@ -958,8 +958,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "City_076116",
-      "game_zone": "City",
+      "sound_id": "Urban_76116",
+      "game_zone": "Urban",
       "source_type": "Anthropogenic",
       "sub_category": "Race car and auto racing",
       "audioset_class": "Race car and auto racing",
@@ -969,8 +969,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_262440",
-      "game_zone": "Stage",
+      "sound_id": "Music_262440",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Organ",
       "audioset_class": "Organ",
@@ -980,8 +980,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_357650",
-      "game_zone": "Stage",
+      "sound_id": "Music_357650",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Trumpet",
       "audioset_class": "Trumpet",
@@ -991,8 +991,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_377340",
-      "game_zone": "Stage",
+      "sound_id": "Music_377340",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Hi-hat",
       "audioset_class": "Hi-hat",
@@ -1002,8 +1002,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_374117",
-      "game_zone": "Stage",
+      "sound_id": "Music_374117",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Trumpet",
       "audioset_class": "Trumpet",
@@ -1013,8 +1013,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_143172",
-      "game_zone": "Stage",
+      "sound_id": "Music_143172",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Snare drum",
       "audioset_class": "Snare drum",
@@ -1024,8 +1024,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_138865",
-      "game_zone": "Stage",
+      "sound_id": "Music_138865",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Hi-hat",
       "audioset_class": "Hi-hat",
@@ -1035,8 +1035,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_029943",
-      "game_zone": "Stage",
+      "sound_id": "Music_29943",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Scratching (performance technique)",
       "audioset_class": "Scratching (performance technique)",
@@ -1046,8 +1046,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_146562",
-      "game_zone": "Stage",
+      "sound_id": "Music_146562",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Snare drum",
       "audioset_class": "Snare drum",
@@ -1057,8 +1057,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_097222",
-      "game_zone": "Stage",
+      "sound_id": "Music_97222",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Electric guitar",
       "audioset_class": "Electric guitar",
@@ -1068,8 +1068,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_137425",
-      "game_zone": "Stage",
+      "sound_id": "Music_137425",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Hi-hat",
       "audioset_class": "Hi-hat",
@@ -1079,8 +1079,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_360001",
-      "game_zone": "Stage",
+      "sound_id": "Music_360001",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1090,8 +1090,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_431453",
-      "game_zone": "Stage",
+      "sound_id": "Music_431453",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Keyboard (musical)",
       "audioset_class": "Keyboard (musical)",
@@ -1101,8 +1101,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_152686",
-      "game_zone": "Stage",
+      "sound_id": "Music_152686",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Crash cymbal",
       "audioset_class": "Crash cymbal",
@@ -1112,8 +1112,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_427199",
-      "game_zone": "Stage",
+      "sound_id": "Music_427199",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Female singing",
       "audioset_class": "Female singing",
@@ -1123,8 +1123,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_373943",
-      "game_zone": "Stage",
+      "sound_id": "Music_373943",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Drum",
       "audioset_class": "Drum",
@@ -1134,8 +1134,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_358073",
-      "game_zone": "Stage",
+      "sound_id": "Music_358073",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Bowed string instrument",
       "audioset_class": "Bowed string instrument",
@@ -1145,8 +1145,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_072941",
-      "game_zone": "Stage",
+      "sound_id": "Music_72941",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Harp",
       "audioset_class": "Harp",
@@ -1156,8 +1156,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_355150",
-      "game_zone": "Stage",
+      "sound_id": "Music_355150",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1167,8 +1167,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_372661",
-      "game_zone": "Stage",
+      "sound_id": "Music_372661",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1178,8 +1178,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_246580",
-      "game_zone": "Stage",
+      "sound_id": "Music_246580",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1189,8 +1189,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_061906",
-      "game_zone": "Stage",
+      "sound_id": "Music_61906",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Scratching (performance technique)",
       "audioset_class": "Scratching (performance technique)",
@@ -1200,8 +1200,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_153868",
-      "game_zone": "Stage",
+      "sound_id": "Music_153868",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Bowed string instrument",
       "audioset_class": "Bowed string instrument",
@@ -1211,8 +1211,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_157441",
-      "game_zone": "Stage",
+      "sound_id": "Music_157441",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Guitar",
       "audioset_class": "Guitar",
@@ -1222,8 +1222,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_119682",
-      "game_zone": "Stage",
+      "sound_id": "Music_119682",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1233,8 +1233,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_020928",
-      "game_zone": "Stage",
+      "sound_id": "Music_20928",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Wind instrument and woodwind instrument",
       "audioset_class": "Wind instrument and woodwind instrument",
@@ -1244,8 +1244,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_252535",
-      "game_zone": "Stage",
+      "sound_id": "Music_252535",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Guitar",
       "audioset_class": "Guitar",
@@ -1255,8 +1255,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_175056",
-      "game_zone": "Stage",
+      "sound_id": "Human_175056",
+      "game_zone": "Human",
       "source_type": "Musical",
       "sub_category": "Clapping",
       "audioset_class": "Clapping",
@@ -1266,8 +1266,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_136041",
-      "game_zone": "Stage",
+      "sound_id": "Music_136041",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Crash cymbal",
       "audioset_class": "Crash cymbal",
@@ -1277,8 +1277,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_140692",
-      "game_zone": "Stage",
+      "sound_id": "Music_140692",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Crash cymbal",
       "audioset_class": "Crash cymbal",
@@ -1288,8 +1288,8 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Stage_375518",
-      "game_zone": "Stage",
+      "sound_id": "Music_375518",
+      "game_zone": "Music",
       "source_type": "Musical",
       "sub_category": "Crash cymbal",
       "audioset_class": "Crash cymbal",
@@ -1299,7 +1299,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_089060",
+      "sound_id": "Lab_89060",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Wind chime",
@@ -1310,7 +1310,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_084701",
+      "sound_id": "Lab_84701",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Wind chime",
@@ -1376,7 +1376,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_011728",
+      "sound_id": "Lab_11728",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Squeak",
@@ -1387,7 +1387,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_024621",
+      "sound_id": "Lab_24621",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Bell",
@@ -1398,7 +1398,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_010712",
+      "sound_id": "Lab_10712",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Bell",
@@ -1409,7 +1409,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_024248",
+      "sound_id": "Lab_24248",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Squeak",
@@ -1420,7 +1420,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_072663",
+      "sound_id": "Lab_72663",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Squeak",
@@ -1442,7 +1442,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_090565",
+      "sound_id": "Lab_90565",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Cowbell",
@@ -1453,7 +1453,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_024734",
+      "sound_id": "Lab_24734",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Squeak",
@@ -1475,7 +1475,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_090544",
+      "sound_id": "Lab_90544",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Cowbell",
@@ -1486,7 +1486,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_069184",
+      "sound_id": "Lab_69184",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Bell",
@@ -1508,7 +1508,7 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Lab_085253",
+      "sound_id": "Lab_85253",
       "game_zone": "Lab",
       "source_type": "Electroacoustic",
       "sub_category": "Knock",
@@ -1516,6 +1516,886 @@
       "file_path": "Audio/Lab/85253",
       "source_dataset": "FSD50K",
       "original_fname": "85253",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_30041",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/30041",
+      "source_dataset": "FSD50K",
+      "original_fname": "30041",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_94252",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/94252",
+      "source_dataset": "FSD50K",
+      "original_fname": "94252",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_55061",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/55061",
+      "source_dataset": "FSD50K",
+      "original_fname": "55061",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_19197",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/19197",
+      "source_dataset": "FSD50K",
+      "original_fname": "19197",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_344001",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/344001",
+      "source_dataset": "FSD50K",
+      "original_fname": "344001",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_171114",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/171114",
+      "source_dataset": "FSD50K",
+      "original_fname": "171114",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_428995",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/428995",
+      "source_dataset": "FSD50K",
+      "original_fname": "428995",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_58168",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Laughter",
+      "audioset_class": "Laughter",
+      "file_path": "Audio/Human/58168",
+      "source_dataset": "FSD50K",
+      "original_fname": "58168",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_383335",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/383335",
+      "source_dataset": "FSD50K",
+      "original_fname": "383335",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_65184",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/65184",
+      "source_dataset": "FSD50K",
+      "original_fname": "65184",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_263935",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/263935",
+      "source_dataset": "FSD50K",
+      "original_fname": "263935",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_252220",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/252220",
+      "source_dataset": "FSD50K",
+      "original_fname": "252220",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_432377",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/432377",
+      "source_dataset": "FSD50K",
+      "original_fname": "432377",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_109640",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Cough",
+      "audioset_class": "Cough",
+      "file_path": "Audio/Human/109640",
+      "source_dataset": "FSD50K",
+      "original_fname": "109640",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_22154",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/22154",
+      "source_dataset": "FSD50K",
+      "original_fname": "22154",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_422098",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/422098",
+      "source_dataset": "FSD50K",
+      "original_fname": "422098",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_9999",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/9999",
+      "source_dataset": "FSD50K",
+      "original_fname": "9999",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_399302",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/399302",
+      "source_dataset": "FSD50K",
+      "original_fname": "399302",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_151239",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/151239",
+      "source_dataset": "FSD50K",
+      "original_fname": "151239",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_9891",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Breathing",
+      "audioset_class": "Breathing",
+      "file_path": "Audio/Human/9891",
+      "source_dataset": "FSD50K",
+      "original_fname": "9891",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_346789",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Finger snapping",
+      "audioset_class": "Finger snapping",
+      "file_path": "Audio/Human/346789",
+      "source_dataset": "FSD50K",
+      "original_fname": "346789",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_409102",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Finger snapping",
+      "audioset_class": "Finger snapping",
+      "file_path": "Audio/Human/409102",
+      "source_dataset": "FSD50K",
+      "original_fname": "409102",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_361770",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Finger snapping",
+      "audioset_class": "Finger snapping",
+      "file_path": "Audio/Human/361770",
+      "source_dataset": "FSD50K",
+      "original_fname": "361770",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_425790",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Finger snapping",
+      "audioset_class": "Finger snapping",
+      "file_path": "Audio/Human/425790",
+      "source_dataset": "FSD50K",
+      "original_fname": "425790",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_406995",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Finger snapping",
+      "audioset_class": "Finger snapping",
+      "file_path": "Audio/Human/406995",
+      "source_dataset": "FSD50K",
+      "original_fname": "406995",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_187960",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Clapping",
+      "audioset_class": "Clapping",
+      "file_path": "Audio/Human/187960",
+      "source_dataset": "FSD50K",
+      "original_fname": "187960",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_180759",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Clapping",
+      "audioset_class": "Clapping",
+      "file_path": "Audio/Human/180759",
+      "source_dataset": "FSD50K",
+      "original_fname": "180759",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_154399",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Clapping",
+      "audioset_class": "Clapping",
+      "file_path": "Audio/Human/154399",
+      "source_dataset": "FSD50K",
+      "original_fname": "154399",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_192337",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Clapping",
+      "audioset_class": "Clapping",
+      "file_path": "Audio/Human/192337",
+      "source_dataset": "FSD50K",
+      "original_fname": "192337",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_88707",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Clapping",
+      "audioset_class": "Clapping",
+      "file_path": "Audio/Human/88707",
+      "source_dataset": "FSD50K",
+      "original_fname": "88707",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_408748",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Sneeze",
+      "audioset_class": "Sneeze",
+      "file_path": "Audio/Human/408748",
+      "source_dataset": "FSD50K",
+      "original_fname": "408748",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_368802",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Sneeze",
+      "audioset_class": "Sneeze",
+      "file_path": "Audio/Human/368802",
+      "source_dataset": "FSD50K",
+      "original_fname": "368802",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_167640",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Sneeze",
+      "audioset_class": "Sneeze",
+      "file_path": "Audio/Human/167640",
+      "source_dataset": "FSD50K",
+      "original_fname": "167640",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Human_399287",
+      "game_zone": "Human",
+      "source_type": "Biological",
+      "sub_category": "Sneeze",
+      "audioset_class": "Sneeze",
+      "file_path": "Audio/Human/399287",
+      "source_dataset": "FSD50K",
+      "original_fname": "399287",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_32512",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/32512",
+      "source_dataset": "FSD50K",
+      "original_fname": "32512",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_32807",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/32807",
+      "source_dataset": "FSD50K",
+      "original_fname": "32807",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_396993",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/396993",
+      "source_dataset": "FSD50K",
+      "original_fname": "396993",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_32511",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/32511",
+      "source_dataset": "FSD50K",
+      "original_fname": "32511",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_149092",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/149092",
+      "source_dataset": "FSD50K",
+      "original_fname": "149092",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_86123",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Frog",
+      "audioset_class": "Frog",
+      "file_path": "Audio/Animal/86123",
+      "source_dataset": "FSD50K",
+      "original_fname": "86123",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_90566",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Cow",
+      "audioset_class": "Cow",
+      "file_path": "Audio/Animal/90566",
+      "source_dataset": "FSD50K",
+      "original_fname": "90566",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_91000",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Cow",
+      "audioset_class": "Cow",
+      "file_path": "Audio/Animal/91000",
+      "source_dataset": "FSD50K",
+      "original_fname": "91000",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_91139",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Cow",
+      "audioset_class": "Cow",
+      "file_path": "Audio/Animal/91139",
+      "source_dataset": "FSD50K",
+      "original_fname": "91139",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Animal_91003",
+      "game_zone": "Animal",
+      "source_type": "Biological",
+      "sub_category": "Cow",
+      "audioset_class": "Cow",
+      "file_path": "Audio/Animal/91003",
+      "source_dataset": "FSD50K",
+      "original_fname": "91003",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_321785",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/321785",
+      "source_dataset": "FSD50K",
+      "original_fname": "321785",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_434248",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/434248",
+      "source_dataset": "FSD50K",
+      "original_fname": "434248",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_434230",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/434230",
+      "source_dataset": "FSD50K",
+      "original_fname": "434230",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_234592",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/234592",
+      "source_dataset": "FSD50K",
+      "original_fname": "234592",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_234882",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/234882",
+      "source_dataset": "FSD50K",
+      "original_fname": "234882",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_109750",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Fire",
+      "audioset_class": "Fire",
+      "file_path": "Audio/Nature/109750",
+      "source_dataset": "FSD50K",
+      "original_fname": "109750",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_371583",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Crackle",
+      "audioset_class": "Crackle",
+      "file_path": "Audio/Nature/371583",
+      "source_dataset": "FSD50K",
+      "original_fname": "371583",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_46289",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Crackle",
+      "audioset_class": "Crackle",
+      "file_path": "Audio/Nature/46289",
+      "source_dataset": "FSD50K",
+      "original_fname": "46289",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_395883",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Crackle",
+      "audioset_class": "Crackle",
+      "file_path": "Audio/Nature/395883",
+      "source_dataset": "FSD50K",
+      "original_fname": "395883",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Nature_156323",
+      "game_zone": "Nature",
+      "source_type": "Physical",
+      "sub_category": "Crackle",
+      "audioset_class": "Crackle",
+      "file_path": "Audio/Nature/156323",
+      "source_dataset": "FSD50K",
+      "original_fname": "156323",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_143126",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Train",
+      "audioset_class": "Train",
+      "file_path": "Audio/Urban/143126",
+      "source_dataset": "FSD50K",
+      "original_fname": "143126",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_170848",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Train",
+      "audioset_class": "Train",
+      "file_path": "Audio/Urban/170848",
+      "source_dataset": "FSD50K",
+      "original_fname": "170848",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_160606",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Train",
+      "audioset_class": "Train",
+      "file_path": "Audio/Urban/160606",
+      "source_dataset": "FSD50K",
+      "original_fname": "160606",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_36899",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Train",
+      "audioset_class": "Train",
+      "file_path": "Audio/Urban/36899",
+      "source_dataset": "FSD50K",
+      "original_fname": "36899",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_25276",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Crowd",
+      "audioset_class": "Crowd",
+      "file_path": "Audio/Urban/25276",
+      "source_dataset": "FSD50K",
+      "original_fname": "25276",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_59303",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Crowd",
+      "audioset_class": "Crowd",
+      "file_path": "Audio/Urban/59303",
+      "source_dataset": "FSD50K",
+      "original_fname": "59303",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_72844",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Crowd",
+      "audioset_class": "Crowd",
+      "file_path": "Audio/Urban/72844",
+      "source_dataset": "FSD50K",
+      "original_fname": "72844",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Urban_336996",
+      "game_zone": "Urban",
+      "source_type": "Anthropogenic",
+      "sub_category": "Crowd",
+      "audioset_class": "Crowd",
+      "file_path": "Audio/Urban/336996",
+      "source_dataset": "FSD50K",
+      "original_fname": "336996",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_319585",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Piano",
+      "audioset_class": "Piano",
+      "file_path": "Audio/Music/319585",
+      "source_dataset": "FSD50K",
+      "original_fname": "319585",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_328545",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Piano",
+      "audioset_class": "Piano",
+      "file_path": "Audio/Music/328545",
+      "source_dataset": "FSD50K",
+      "original_fname": "328545",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_316902",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Piano",
+      "audioset_class": "Piano",
+      "file_path": "Audio/Music/316902",
+      "source_dataset": "FSD50K",
+      "original_fname": "316902",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_382350",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Piano",
+      "audioset_class": "Piano",
+      "file_path": "Audio/Music/382350",
+      "source_dataset": "FSD50K",
+      "original_fname": "382350",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_25483",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Piano",
+      "audioset_class": "Piano",
+      "file_path": "Audio/Music/25483",
+      "source_dataset": "FSD50K",
+      "original_fname": "25483",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_239820",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Bass guitar",
+      "audioset_class": "Bass guitar",
+      "file_path": "Audio/Music/239820",
+      "source_dataset": "FSD50K",
+      "original_fname": "239820",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_59973",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Bass guitar",
+      "audioset_class": "Bass guitar",
+      "file_path": "Audio/Music/59973",
+      "source_dataset": "FSD50K",
+      "original_fname": "59973",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Music_173645",
+      "game_zone": "Music",
+      "source_type": "Musical",
+      "sub_category": "Bass guitar",
+      "audioset_class": "Bass guitar",
+      "file_path": "Audio/Music/173645",
+      "source_dataset": "FSD50K",
+      "original_fname": "173645",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_117496",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Tick",
+      "audioset_class": "Tick",
+      "file_path": "Audio/Lab/117496",
+      "source_dataset": "FSD50K",
+      "original_fname": "117496",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_259674",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Tick",
+      "audioset_class": "Tick",
+      "file_path": "Audio/Lab/259674",
+      "source_dataset": "FSD50K",
+      "original_fname": "259674",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_328900",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Tick",
+      "audioset_class": "Tick",
+      "file_path": "Audio/Lab/328900",
+      "source_dataset": "FSD50K",
+      "original_fname": "328900",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_232257",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Tick",
+      "audioset_class": "Tick",
+      "file_path": "Audio/Lab/232257",
+      "source_dataset": "FSD50K",
+      "original_fname": "232257",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_234268",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Tick",
+      "audioset_class": "Tick",
+      "file_path": "Audio/Lab/234268",
+      "source_dataset": "FSD50K",
+      "original_fname": "234268",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_128484",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Hum",
+      "audioset_class": "Hum",
+      "file_path": "Audio/Lab/128484",
+      "source_dataset": "FSD50K",
+      "original_fname": "128484",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_33549",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Hum",
+      "audioset_class": "Hum",
+      "file_path": "Audio/Lab/33549",
+      "source_dataset": "FSD50K",
+      "original_fname": "33549",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_93023",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Hum",
+      "audioset_class": "Hum",
+      "file_path": "Audio/Lab/93023",
+      "source_dataset": "FSD50K",
+      "original_fname": "93023",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_346684",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Hum",
+      "audioset_class": "Hum",
+      "file_path": "Audio/Lab/346684",
+      "source_dataset": "FSD50K",
+      "original_fname": "346684",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "Lab_277598",
+      "game_zone": "Lab",
+      "source_type": "Electroacoustic",
+      "sub_category": "Hum",
+      "audioset_class": "Hum",
+      "file_path": "Audio/Lab/277598",
+      "source_dataset": "FSD50K",
+      "original_fname": "277598",
       "ambiguous": false
     }
   ]

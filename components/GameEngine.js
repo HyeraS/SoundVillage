@@ -8,10 +8,11 @@ export const TILE  = 32   // 타일 1칸 px
 export const SPEED = 3    // 픽셀/프레임
 
 export const ZONE_META = {
-  Forest: { label: '숲속 마을',        color: '#5B9E3A', bg: '#1C3512', emoji: '🌲' },
-  Creek:  { label: '자연 소리 마을',   color: '#4A8FD4', bg: '#0E2040', emoji: '💧' },
-  City:   { label: '도시 마을',        color: '#C4B99A', bg: '#1C1B17', emoji: '🏙' },
-  Stage:  { label: '음악 마을',        color: '#9B6DD4', bg: '#18123A', emoji: '🎵' },
+  Animal: { label: '동물 마을',        color: '#5B9E3A', bg: '#1C3512', emoji: '🐾' },
+  Human:  { label: '사람 마을',        color: '#E8A04A', bg: '#2A1A08', emoji: '👤' },
+  Nature: { label: '자연 마을',        color: '#4A8FD4', bg: '#0E2040', emoji: '🌿' },
+  Urban:  { label: '도시 마을',        color: '#C4B99A', bg: '#1C1B17', emoji: '🏙' },
+  Music:  { label: '음악 마을',        color: '#9B6DD4', bg: '#18123A', emoji: '🎵' },
   Lab:    { label: '미지의 소리 마을', color: '#D4883A', bg: '#1A1420', emoji: '✨' },
 }
 
