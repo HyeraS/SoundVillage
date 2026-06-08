@@ -25,6 +25,9 @@ const PORTALS = [
   { zone: 'Lab',    tx: 29, ty: 20, w: 5, h: 5 },
 ]
 
+/* Sound Museum 위치 — 맵 하단 중앙 (세로 경로와 접함) */
+const MUSEUM = { tx: 15, ty: 17, w: 8, h: 5 }
+
 /* ─────────────────────────────────────────────
    경로 타일
 ───────────────────────────────────────────── */
@@ -286,6 +289,79 @@ function PortalIsland({ portal, hovered, progress }) {
 }
 
 /* ─────────────────────────────────────────────
+   Sound Museum 섬
+───────────────────────────────────────────── */
+function MuseumIsland({ hovered }) {
+  const px = MUSEUM.tx * TILE, py = MUSEUM.ty * TILE
+  const pw = MUSEUM.w  * TILE, ph = MUSEUM.h  * TILE
+  const cx = px + pw / 2
+
+  return (
+    <g>
+      {/* 그림자 */}
+      <ellipse cx={cx+4} cy={py+ph+8} rx={pw*0.5} ry={10} fill="#00000033"/>
+
+      {/* 잔디 베이스 */}
+      <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
+        fill="#C8B870"
+        stroke={hovered ? '#C8A96E' : '#A89050'}
+        strokeWidth={hovered ? 3 : 1.5}
+        style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
+      />
+      <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#D8C880" opacity="0.6"/>
+
+      {/* 입구 계단 */}
+      <rect x={cx-pw*0.2} y={py+ph-4} width={pw*0.4} height={12} rx="2" fill="#C8B880"/>
+
+      {/* 기둥 4개 */}
+      {[-1.2,-0.4,0.4,1.2].map((dx,i) => (
+        <g key={i} transform={`translate(${cx+dx*pw*0.18},${py+ph*0.18})`}>
+          <rect x="-4" y="0" width="8" height={ph*0.52} rx="2" fill="#E8D8B0"/>
+          <rect x="-6" y="-4" width="12" height="6" rx="1" fill="#D4C4A0"/>
+          <rect x="-6" y={ph*0.52-1} width="12" height="6" rx="1" fill="#D4C4A0"/>
+        </g>
+      ))}
+
+      {/* 삼각 지붕 (페디먼트) */}
+      <polygon
+        points={`${px+6},${py+ph*0.22} ${cx},${py+4} ${px+pw-6},${py+ph*0.22}`}
+        fill="#D4B870" stroke="#B89A50" strokeWidth="1.5"
+      />
+
+      {/* 🏛 이모지 */}
+      <text x={cx} y={py+ph*0.7} textAnchor="middle" fontSize="22"
+        style={{ userSelect:'none' }}>🏛</text>
+
+      {/* 진행 표시바 위치에 장식선 */}
+      <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#D4C870" opacity="0.5"/>
+
+      {/* 라벨 */}
+      <rect x={cx-46} y={py-26} width={92} height={22} rx="7"
+        fill={hovered ? '#C8A96E' : '#000000bb'}
+        stroke="#C8A96E" strokeWidth="1.5"
+        style={{ transition:'all 0.2s' }}
+      />
+      <text x={cx} y={py-12} textAnchor="middle" fontSize="10" fontWeight="700"
+        fontFamily="Nunito, sans-serif"
+        fill={hovered ? '#fff' : '#C8A96E'}
+        style={{ userSelect:'none', transition:'fill 0.2s' }}>
+        🏛 Sound Museum
+      </text>
+
+      {hovered && (
+        <g>
+          <rect x={cx-32} y={py+ph+10} width={64} height={17} rx="5" fill="#000000cc"/>
+          <text x={cx} y={py+ph+21} textAnchor="middle" fontSize="9"
+            fontFamily="Nunito, sans-serif" fill="#F0EDE8" style={{userSelect:'none'}}>
+            ENTER 진입
+          </text>
+        </g>
+      )}
+    </g>
+  )
+}
+
+/* ─────────────────────────────────────────────
    캐릭터 — 스프라이트 시트 / SVG 폴백
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
@@ -461,24 +537,27 @@ function HUD({ totalCount, zoneProgress }) {
 /* ─────────────────────────────────────────────
    목표 패널
 ───────────────────────────────────────────── */
-function ObjectivePanel({ nearZone, totalCount }) {
+function ObjectivePanel({ nearZone, nearMuseum }) {
+  const isNearMuseum = !nearZone && nearMuseum
   return (
     <div style={{
       position:'absolute', bottom:'16px', right:'16px', width:'200px',
-      background:'#F5EDD8', border:'2px solid #C8A96E',
+      background:'#F5EDD8', border:`2px solid ${isNearMuseum ? '#C8A96E' : '#C8A96E'}`,
       borderRadius:'12px', padding:'12px',
       fontFamily:'Nunito, sans-serif',
       boxShadow:'0 4px 16px #00000044', zIndex:10,
     }}>
       <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
-        <span style={{ fontSize:'14px' }}>🚩</span>
+        <span style={{ fontSize:'14px' }}>{isNearMuseum ? '🏛' : '🚩'}</span>
         <span style={{ fontSize:'11px', fontWeight:800, color:'#3A2A14' }}>현재 목표</span>
       </div>
       <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14', marginBottom:'4px' }}>
-        {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} 진입` : '마을 탐험하기'}
+        {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} 진입`
+          : isNearMuseum ? '🏛 Sound Museum 진입'
+          : '마을 탐험하기'}
       </div>
       <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5, marginBottom:'6px' }}>
-        {nearZone ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
+        {nearZone || isNearMuseum ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
       </div>
       <div style={{ height:'1px', background:'#D4C4A0', margin:'4px 0' }}/>
       <div style={{ fontSize:'10px', color:'#8B6A3A' }}>💡 WASD / 방향키 이동</div>
@@ -489,14 +568,15 @@ function ObjectivePanel({ nearZone, totalCount }) {
 /* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
-export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, participantId = '' }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, participantId = '' }) {
   const { keys, press, release } = useKeys()
 
-  const [pos,      setPos]      = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H/2 - CHAR_H/2 })
-  const [dir,      setDir]      = useState('down')
-  const [moving,   setMoving]   = useState(false)
-  const [nearZone, setNearZone] = useState(null)
-  const [cam,      setCam]      = useState({ x: 0, y: 0 })
+  const [pos,        setPos]        = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H/2 - CHAR_H/2 })
+  const [dir,        setDir]        = useState('down')
+  const [moving,     setMoving]     = useState(false)
+  const [nearZone,   setNearZone]   = useState(null)
+  const [nearMuseum, setNearMuseum] = useState(false)
+  const [cam,        setCam]        = useState({ x: 0, y: 0 })
   const [vp,       setVp]       = useState({
     w: typeof window !== 'undefined' ? window.innerWidth  : 800,
     h: typeof window !== 'undefined' ? window.innerHeight - HUD_H : 544,
@@ -540,6 +620,7 @@ export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, p
       } else { setMoving(false) }
       const near = PORTALS.find(p => overlaps(x, y, CHAR_W, CHAR_H, p.tx*TILE-20, p.ty*TILE-10, p.w*TILE+40, p.h*TILE+30))
       setNearZone(near?.zone ?? null)
+      setNearMuseum(overlaps(x, y, CHAR_W, CHAR_H, MUSEUM.tx*TILE-20, MUSEUM.ty*TILE-10, MUSEUM.w*TILE+40, MUSEUM.h*TILE+30))
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
@@ -548,10 +629,15 @@ export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, p
   }, [dir])
 
   useEffect(() => {
-    const h = e => { if ((e.key==='Enter'||e.key===' ') && nearZone) onEnterZone(nearZone) }
+    const h = e => {
+      if (e.key==='Enter' || e.key===' ') {
+        if (nearZone) onEnterZone(nearZone)
+        else if (nearMuseum && onEnterMuseum) onEnterMuseum()
+      }
+    }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [nearZone, onEnterZone])
+  }, [nearZone, nearMuseum, onEnterZone, onEnterMuseum])
 
   return (
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
@@ -602,6 +688,9 @@ export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, p
             />
           ))}
 
+          {/* Sound Museum 섬 */}
+          <MuseumIsland hovered={nearMuseum}/>
+
           {/* 캐릭터 */}
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}>
@@ -611,7 +700,7 @@ export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, p
         </svg>
       </div>
 
-      <ObjectivePanel nearZone={nearZone} totalCount={totalCount}/>
+      <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum}/>
 
       {nearZone && (
         <div style={{
@@ -625,6 +714,21 @@ export default function WorldMap({ onEnterZone, totalCount, zoneProgress = {}, p
           boxShadow:`0 4px 16px ${ZONE_META[nearZone].color}44`, zIndex:15,
         }}>
           {ZONE_META[nearZone].emoji} {ZONE_META[nearZone].label} 근처 — ENTER로 진입
+        </div>
+      )}
+
+      {!nearZone && nearMuseum && (
+        <div style={{
+          position:'absolute', bottom:'100px', left:'50%', transform:'translateX(-50%)',
+          background:'#F5EDD8cc', border:'2px solid #C8A96E',
+          borderRadius:'20px', padding:'8px 20px',
+          fontSize:'13px', fontFamily:'Nunito, sans-serif',
+          color:'#3A2A14', fontWeight:700, backdropFilter:'blur(6px)',
+          animation:'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)',
+          pointerEvents:'none', whiteSpace:'nowrap',
+          boxShadow:'0 4px 16px #C8A96E44', zIndex:15,
+        }}>
+          🏛 Sound Museum 근처 — ENTER로 진입
         </div>
       )}
 

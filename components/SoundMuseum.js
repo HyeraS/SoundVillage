@@ -362,22 +362,24 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             }
           </div>
 
-          {/* 내 표현 배지 */}
-          <div style={{
-            background: `${accent}10`, border: `1.5px solid ${accent}40`,
-            borderRadius: '12px', padding: '10px 16px',
-            display: 'flex', alignItems: 'center', gap: '10px',
-          }}>
-            <span style={{ fontSize: '18px' }}>💬</span>
-            <div>
-              <div style={{ fontSize: '9px', color: '#8B6A3A', fontWeight: 800, letterSpacing: '1.5px' }}>
-                MY EXPRESSION
-              </div>
-              <div style={{ fontSize: '19px', fontWeight: 800, color: accent, letterSpacing: '1px' }}>
-                {myExpression}
+          {/* 내 표현 배지 — 표현이 있을 때만 표시 */}
+          {myExpression ? (
+            <div style={{
+              background: `${accent}10`, border: `1.5px solid ${accent}40`,
+              borderRadius: '12px', padding: '10px 16px',
+              display: 'flex', alignItems: 'center', gap: '10px',
+            }}>
+              <span style={{ fontSize: '18px' }}>💬</span>
+              <div>
+                <div style={{ fontSize: '9px', color: '#8B6A3A', fontWeight: 800, letterSpacing: '1.5px' }}>
+                  MY EXPRESSION
+                </div>
+                <div style={{ fontSize: '19px', fontWeight: 800, color: accent, letterSpacing: '1px' }}>
+                  {myExpression}
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
 
           {/* 후보 표현 섹션 */}
           {loading ? (

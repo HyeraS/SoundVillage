@@ -40,6 +40,7 @@ export default function HomePage() {
   const [activeZone,    setActiveZone]    = useState(null)
   const [activeSound,   setActiveSound]   = useState(null)
   const [myExpression,  setMyExpression]  = useState('')
+  const [museumSource,  setMuseumSource]  = useState(null) // 'zone' | 'world'
 
   // 피드백 오버레이
   const [showFeedback,  setShowFeedback]  = useState(false)
@@ -93,24 +94,43 @@ export default function HomePage() {
     setScreen('annotate')
   }, [])
 
-  /* ── AnnotationPanel Stage1 완료 → SoundMuseum ── */
-  const handleAnnotateComplete = useCallback(({ expression_text }) => {
-    setMyExpression(expression_text)
+  /* ── WorldMap에서 Sound Museum 직접 진입 ── */
+  const handleEnterMuseum = useCallback(() => {
+    const all = soundMetadata.sounds
+    if (!all || all.length === 0) return
+    const sound = all[Math.floor(Math.random() * all.length)]
+    setActiveSound(sound)
+    setActiveZone(sound.game_zone || 'Forest')
+    setMyExpression('')
+    setMuseumSource('world')
     setScreen('museum')
   }, [])
 
-  /* ── SoundMuseum 완료 → ZoneMap 복귀 ── */
+  /* ── AnnotationPanel Stage1 완료 → SoundMuseum ── */
+  const handleAnnotateComplete = useCallback(({ expression_text }) => {
+    setMyExpression(expression_text)
+    setMuseumSource('zone')
+    setScreen('museum')
+  }, [])
+
+  /* ── SoundMuseum 완료 → 출처에 따라 분기 ── */
   const handleMuseumDone = useCallback(() => {
-    if (activeSound) {
-      setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
+    if (museumSource === 'zone') {
+      if (activeSound) {
+        setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
+      }
+      setFeedbackZone(activeZone)
+      setShowFeedback(true)
+      setScreen('zone')
+      refreshCounts()
+    } else {
+      // 'world'에서 진입 — 월드맵으로 복귀
+      setScreen('world')
     }
-    setFeedbackZone(activeZone)
-    setShowFeedback(true)
     setActiveSound(null)
     setMyExpression('')
-    setScreen('zone')
-    refreshCounts()
-  }, [activeSound, activeZone, refreshCounts])
+    setMuseumSource(null)
+  }, [museumSource, activeSound, activeZone, refreshCounts])
 
   /* ── AnnotationPanel 닫기 (스킵) → ZoneMap 복귀 ── */
   const handleAnnotateClose = useCallback(() => {
@@ -141,6 +161,7 @@ export default function HomePage() {
     return (
       <WorldMap
         onEnterZone={handleEnterZone}
+        onEnterMuseum={handleEnterMuseum}
         totalCount={totalCount}
         zoneProgress={zoneProgress}
       />
