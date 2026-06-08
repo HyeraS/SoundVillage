@@ -1,0 +1,48 @@
+sound_id,game_zone,source_type,sub_category,audioset_class,all_labels,fname,file_path,source_dataset,original_fname,duration_sec,ambiguous
+Human_406688,Human,Biological,Footstep,Footstep,Walk and footsteps,406688,Audio/Human/406688,FSD50K,406688,,False
+Human_405112,Human,Biological,Footstep,Footstep,Walk and footsteps,405112,Audio/Human/405112,FSD50K,405112,,False
+Human_381194,Human,Biological,Footstep,Footstep,"Walk and footsteps, Hiss",381194,Audio/Human/381194,FSD50K,381194,,False
+Human_36362,Human,Biological,Footstep,Footstep,"Walk and footsteps, Splash and splatter, Liquid",36362,Audio/Human/36362,FSD50K,36362,,False
+Human_377491,Human,Biological,Footstep,Footstep,Walk and footsteps,377491,Audio/Human/377491,FSD50K,377491,,False
+Human_429322,Human,Biological,Footstep,Footstep,Walk and footsteps,429322,Audio/Human/429322,FSD50K,429322,,False
+Human_188848,Human,Biological,Footstep,Footstep,Walk and footsteps,188848,Audio/Human/188848,FSD50K,188848,,False
+Human_410241,Human,Biological,Footstep,Footstep,"Walk and footsteps, Wind",410241,Audio/Human/410241,FSD50K,410241,,False
+Human_15562,Human,Biological,Footstep,Footstep,Walk and footsteps,15562,Audio/Human/15562,FSD50K,15562,,False
+Human_422762,Human,Biological,Footstep,Footstep,Walk and footsteps,422762,Audio/Human/422762,FSD50K,422762,,False
+Human_39864,Human,Biological,Laughter,Laughter,"Laughter, Human voice",39864,Audio/Human/39864,FSD50K,39864,,False
+Human_389640,Human,Biological,Laughter,Laughter,"Laughter, Human voice",389640,Audio/Human/389640,FSD50K,389640,,False
+Human_318828,Human,Biological,Laughter,Laughter,"Laughter, Human voice",318828,Audio/Human/318828,FSD50K,318828,,False
+Human_365704,Human,Biological,Laughter,Laughter,"Laughter, Cough, Human voice, Respiratory sounds",365704,Audio/Human/365704,FSD50K,365704,,False
+Human_30039,Human,Biological,Laughter,Laughter,"Laughter, Human voice",30039,Audio/Human/30039,FSD50K,30039,,False
+Human_317479,Human,Biological,Laughter,Laughter,"Laughter, Human voice",317479,Audio/Human/317479,FSD50K,317479,,False
+Human_162859,Human,Biological,Laughter,Laughter,"Laughter, Human voice",162859,Audio/Human/162859,FSD50K,162859,,False
+Human_69205,Human,Biological,Laughter,Laughter,"Laughter, Human voice",69205,Audio/Human/69205,FSD50K,69205,,False
+Human_210431,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",210431,Audio/Human/210431,FSD50K,210431,,False
+Human_62291,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",62291,Audio/Human/62291,FSD50K,62291,,False
+Human_252219,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",252219,Audio/Human/252219,FSD50K,252219,,False
+Human_252241,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",252241,Audio/Human/252241,FSD50K,252241,,False
+Human_207829,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",207829,Audio/Human/207829,FSD50K,207829,,False
+Human_69491,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",69491,Audio/Human/69491,FSD50K,69491,,False
+Human_429915,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",429915,Audio/Human/429915,FSD50K,429915,,False
+Human_193911,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",193911,Audio/Human/193911,FSD50K,193911,,False
+Human_10145,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",10145,Audio/Human/10145,FSD50K,10145,,False
+Human_323446,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",323446,Audio/Human/323446,FSD50K,323446,,False
+Human_411663,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",411663,Audio/Human/411663,FSD50K,411663,,False
+Human_361746,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",361746,Audio/Human/361746,FSD50K,361746,,False
+Human_346792,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",346792,Audio/Human/346792,FSD50K,346792,,False
+Human_409102,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",409102,Audio/Human/409102,FSD50K,409102,,False
+Human_151214,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",151214,Audio/Human/151214,FSD50K,151214,,False
+Human_187960,Human,Biological,Clapping,Clapping,"Clapping, Hands",187960,Audio/Human/187960,FSD50K,187960,,False
+Human_180769,Human,Biological,Clapping,Clapping,"Clapping, Hands",180769,Audio/Human/180769,FSD50K,180769,,False
+Human_351996,Human,Biological,Clapping,Clapping,"Clapping, Hands",351996,Audio/Human/351996,FSD50K,351996,,False
+Human_216659,Human,Biological,Clapping,Clapping,"Clapping, Hands",216659,Audio/Human/216659,FSD50K,216659,,False
+Human_182095,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",182095,Audio/Human/182095,FSD50K,182095,,False
+Human_121784,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",121784,Audio/Human/121784,FSD50K,121784,,False
+Human_198374,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",198374,Audio/Human/198374,FSD50K,198374,,False
+Human_332310,Human,Biological,Cheering,Cheering,"Cheering, Human group actions",332310,Audio/Human/332310,FSD50K,332310,,False
+Human_101310,Human,Biological,Cheering,Cheering,"Cheering, Shout, Human group actions, Human voice",101310,Audio/Human/101310,FSD50K,101310,,False
+Human_240760,Human,Biological,Cheering,Cheering,"Cheering, Human group actions",240760,Audio/Human/240760,FSD50K,240760,,False
+Human_425776,Human,Biological,Crying,Crying,"Crying and sobbing, Human voice",425776,Audio/Human/425776,FSD50K,425776,,False
+Human_408740,Human,Biological,Crying,Crying,"Crying and sobbing, Human voice",408740,Audio/Human/408740,FSD50K,408740,,False
+Human_427160,Human,Biological,Sigh,Sigh,"Sigh, Human voice",427160,Audio/Human/427160,FSD50K,427160,,False
+Human_377736,Human,Biological,Sigh,Sigh,"Sigh, Human voice",377736,Audio/Human/377736,FSD50K,377736,,False
