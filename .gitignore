@@ -48,3 +48,4 @@ download_errors.csv
 scripts/download_errors.csv
 .env.local
 *.log
+public/audio/

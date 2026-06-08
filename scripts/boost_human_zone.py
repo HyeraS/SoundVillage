@@ -3,7 +3,7 @@ boost_human_zone.py
 Human zone 클립 다운로드 → Supabase 업로드 → sound_metadata.json 업데이트
 
 사전 준비:
-    pip install requests
+    pip install requests supabase
 
 키 설정 (.env.local에 추가):
     FREESOUND_API_KEY=발급받은키
@@ -36,7 +36,9 @@ def _load_env(env_file: Path):
         if not line or line.startswith('#') or '=' not in line:
             continue
         key, _, val = line.partition('=')
-        os.environ.setdefault(key.strip(), val.strip())
+        # 따옴표 제거 (KEY="value" 또는 KEY='value' 형태 대응)
+        val = val.strip().strip('"').strip("'")
+        os.environ.setdefault(key.strip(), val)
 
 _load_env(Path(__file__).parent.parent / '.env.local')
 
@@ -78,24 +80,25 @@ def download_preview(fname: str, api_key: str) -> Path | None:
 
 
 # ────────────────────────────────────────────────────────
-#  Supabase Storage 업로드
+#  Supabase Storage 업로드 (supabase-py 클라이언트 사용)
+#  신형 키(sb_secret_*) 포함 모든 키 형식에 대응
 # ────────────────────────────────────────────────────────
 def upload_to_supabase(local_file: Path, supabase_key: str) -> bool:
-    storage_path = f"Human/{local_file.name}"   # Human/123456.mp3
-    url = f"{SUPABASE_URL}/storage/v1/object/{STORAGE_BUCKET}/{storage_path}"
-    headers = {
-        "Authorization": f"Bearer {supabase_key}",
-        "Content-Type":  "audio/mpeg",
-        "x-upsert":      "true",   # 이미 있으면 덮어쓰기
-    }
+    storage_path = f"Human/{local_file.name}"
     try:
-        r = requests.post(url, headers=headers, data=local_file.read_bytes(), timeout=60)
-        if r.status_code in (200, 201):
-            print(f"  UP  OK: {storage_path}")
-            return True
-        else:
-            print(f"  UP  FAIL {storage_path}: {r.status_code} {r.text[:120]}")
-            return False
+        from supabase import create_client
+        client = create_client(SUPABASE_URL, supabase_key)
+        with open(local_file, "rb") as f:
+            client.storage.from_(STORAGE_BUCKET).upload(
+                path=storage_path,
+                file=f.read(),
+                file_options={"upsert": "true", "content-type": "audio/mpeg"},
+            )
+        print(f"  UP  OK: {storage_path}")
+        return True
+    except ImportError:
+        print("  ERROR: supabase 패키지 없음 — `pip install supabase` 실행 후 재시도")
+        return False
     except Exception as e:
         print(f"  UP  FAIL {storage_path}: {e}")
         return False

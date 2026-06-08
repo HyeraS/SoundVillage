@@ -132,14 +132,11 @@ export default function HomePage() {
     setMuseumSource(null)
   }, [museumSource, activeSound, activeZone, refreshCounts])
 
-  /* ── AnnotationPanel 닫기 (스킵) → ZoneMap 복귀 ── */
+  /* ── AnnotationPanel 닫기 (X / 건너뛰기) → ZoneMap 복귀, 소리는 그대로 유지 ── */
   const handleAnnotateClose = useCallback(() => {
-    if (activeSound) {
-      setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
-    }
     setActiveSound(null)
     setScreen('zone')
-  }, [activeSound])
+  }, [])
 
   /* ── 피드백 닫기 ── */
   const handleFeedbackClose = useCallback(() => {
