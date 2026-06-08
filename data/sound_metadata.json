@@ -485,17 +485,6 @@
       "ambiguous": false
     },
     {
-      "sound_id": "Nature_77588",
-      "game_zone": "Nature",
-      "source_type": "Physical",
-      "sub_category": "Thunder",
-      "audioset_class": "Thunder",
-      "file_path": "Audio/Creek/77588",
-      "source_dataset": "FSD50K",
-      "original_fname": "77588",
-      "ambiguous": false
-    },
-    {
       "sound_id": "Nature_22033",
       "game_zone": "Nature",
       "source_type": "Physical",
@@ -713,17 +702,6 @@
       "file_path": "Audio/City/22354",
       "source_dataset": "FSD50K",
       "original_fname": "22354",
-      "ambiguous": false
-    },
-    {
-      "sound_id": "Urban_179868",
-      "game_zone": "Urban",
-      "source_type": "Anthropogenic",
-      "sub_category": "Vehicle horn and car horn and honking",
-      "audioset_class": "Vehicle horn and car horn and honking",
-      "file_path": "Audio/City/179868",
-      "source_dataset": "FSD50K",
-      "original_fname": "179868",
       "ambiguous": false
     },
     {
@@ -3298,6 +3276,28 @@
       "file_path": "Audio/Urban/235962",
       "source_dataset": "FSD50K",
       "original_fname": "235962",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "NAT_249806",
+      "game_zone": "Nature",
+      "source_type": "Natural",
+      "sub_category": "Thunder",
+      "audioset_class": "Drip",
+      "file_path": "Audio/Nature/249806",
+      "source_dataset": "FSD50K",
+      "original_fname": "249806",
+      "ambiguous": false
+    },
+    {
+      "sound_id": "URB_36834",
+      "game_zone": "Urban",
+      "source_type": "Mechanical",
+      "sub_category": "Car",
+      "audioset_class": "Car",
+      "file_path": "Audio/Urban/36834",
+      "source_dataset": "FSD50K",
+      "original_fname": "36834",
       "ambiguous": false
     }
   ]
