@@ -823,6 +823,9 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             )}
           </defs>
 
+          {/* 뷰포트 전체 배경 (맵 바깥 영역이 보일 때 빈 틈 방지) */}
+          <rect x={cam.x} y={cam.y} width={vp.w} height={vp.h} fill={theme.border}/>
+
           {/* 바닥 */}
           <rect width={PX_W} height={PX_H} fill={`url(#ground_${zone})`}/>
 
