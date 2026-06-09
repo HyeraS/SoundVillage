@@ -689,12 +689,8 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const [pos,        setPos]       = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H - TILE*3 })
   const [dir,        setDir]       = useState('up')
   const [moving,     setMoving]    = useState(false)
-  const [cam,        setCam]       = useState({ x: 0, y: 0 })
   const [tick,       setTick]      = useState(0)
-  const [vp,         setVp]        = useState({
-    w: typeof window !== 'undefined' ? window.innerWidth  : 800,
-    h: typeof window !== 'undefined' ? window.innerHeight - HUD_H : 540,
-  })
+
   // 아이템은 초기화 후 위치가 변하지 않으므로 ref로 관리
   // 가시성은 부모의 collectedIds(제출 완료 후 갱신)로만 결정
   const itemsRef     = useRef(null)
@@ -705,21 +701,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const collectingRef = useRef(false)
 
   const posRef = useRef(pos)
-  const viewW  = useRef(typeof window !== 'undefined' ? window.innerWidth  : 800)
-  const viewH  = useRef(typeof window !== 'undefined' ? window.innerHeight - HUD_H : 540)
   const rafRef = useRef(null)
-
-  // 뷰포트
-  useEffect(() => {
-    const measure = () => {
-      const w = window.innerWidth, h = window.innerHeight - HUD_H
-      viewW.current = w; viewH.current = h
-      setVp({ w, h })
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
 
   // ESC
   useEffect(() => {
@@ -759,9 +741,6 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         setPos({ x, y })
         if (newDir !== dir) setDir(newDir)
         setMoving(true)
-        const camX = Math.max(0, Math.min(PX_W - viewW.current, x + CHAR_W/2 - viewW.current/2))
-        const camY = Math.max(0, Math.min(PX_H - viewH.current, y + CHAR_H/2 - viewH.current/2))
-        setCam({ x: camX, y: camY })
 
         // 아이템 충돌 — annotation 열려 있으면 완전 차단
         if (!collectingRef.current) {
@@ -800,11 +779,12 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       {/* 게임 캔버스 */}
       <div style={{
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
-        background: theme.sky, overflow:'hidden', cursor:'none',
+        background: theme.border, overflow:'hidden', cursor:'none',
       }}>
         <svg
           width="100%" height="100%"
-          viewBox={`${cam.x} ${cam.y} ${vp.w} ${vp.h}`}
+          viewBox={`0 0 ${PX_W} ${PX_H}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display:'block', position:'absolute', inset:0 }}
         >
           <defs>
@@ -822,9 +802,6 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
               </pattern>
             )}
           </defs>
-
-          {/* 뷰포트 전체 배경 (맵 바깥 영역이 보일 때 빈 틈 방지) */}
-          <rect x={cam.x} y={cam.y} width={vp.w} height={vp.h} fill={theme.border}/>
 
           {/* 바닥 */}
           <rect width={PX_W} height={PX_H} fill={`url(#ground_${zone})`}/>
