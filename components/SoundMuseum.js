@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { playSound, stopSound, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager'
+import { playSound, pauseSound, resumeSound, isSoundPaused, stopSound, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager'
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
 import { ZONE_META } from '@/components/GameEngine'
 
@@ -171,35 +171,67 @@ function useMuseumPlayer(filePath) {
   const [progress,  setProgress]  = useState(0)
   const [playCount, setPlayCount] = useState(0)
   const [error,     setError]     = useState('')
-  const durRef  = useRef(null)
-  const playRef = useRef(false)
-  const pollRef = useRef(null)
+  const durRef    = useRef(null)
+  const pausedRef = useRef(false)   // pause 상태 추적 (언로드 없이 재개 가능)
+  const pollRef   = useRef(null)
 
-  const clearPoll = () => {
+  const clearPoll = useCallback(() => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
-  }
+  }, [])
+
+  const startPoll = useCallback(() => {
+    clearPoll()
+    pollRef.current = setInterval(() => {
+      const pos = getCurrentTime()
+      if (pos !== null && durRef.current) setProgress(Math.min(pos / durRef.current, 1))
+    }, 100)
+  }, [clearPoll])
+
+  // filePath 바뀌면 재생 상태 초기화
+  useEffect(() => {
+    stopSound()
+    clearPoll()
+    pausedRef.current = false
+    durRef.current = null
+    setPlaying(false)
+    setProgress(0)
+    setError('')
+  }, [filePath, clearPoll])
 
   const toggle = useCallback(async () => {
-    if (playing) { stopSound(); clearPoll(); playRef.current = false; setPlaying(false); return }
+    // 재생 중 → 일시정지 (언로드 없이)
+    if (playing) {
+      pauseSound()
+      clearPoll()
+      pausedRef.current = true
+      setPlaying(false)
+      return
+    }
+
+    // 일시정지 상태 → 재개 (재다운로드 없음)
+    if (pausedRef.current && isSoundPaused()) {
+      resumeSound()
+      pausedRef.current = false
+      setPlaying(true)
+      startPoll()
+      return
+    }
+
+    // 첫 재생 or 종료 후 재시작
     setError('')
+    pausedRef.current = false
     try {
       const dur = await playSound(filePath, {
-        onEnd: () => { clearPoll(); playRef.current = false; setPlaying(false); setProgress(1) },
+        onEnd: () => { clearPoll(); pausedRef.current = false; setPlaying(false); setProgress(1) },
       })
       durRef.current = dur
-      playRef.current = true
       setPlaying(true)
       setPlayCount(c => c + 1)
-      clearPoll()
-      pollRef.current = setInterval(() => {
-        if (!playRef.current) { clearPoll(); return }
-        const pos = getCurrentTime()
-        if (pos !== null && durRef.current) setProgress(Math.min(pos / durRef.current, 1))
-      }, 100)
+      startPoll()
     } catch { setError('오디오를 불러올 수 없어요.') }
-  }, [playing, filePath])
+  }, [playing, filePath, clearPoll, startPoll])
 
-  useEffect(() => () => { stopSound(); clearPoll() }, [])
+  useEffect(() => () => { stopSound(); clearPoll() }, [clearPoll])
   return { playing, progress, playCount, error, toggle }
 }
 
@@ -228,7 +260,7 @@ function MiniWave({ progress, accent }) {
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound, zone, myExpression, participantId, sessionId, onDone }) {
+export default function SoundMuseum({ sound, zone, myExpression, participantId, sessionId, onDone, onExit }) {
   const room  = ROOM[zone]      || ROOM.Lab
   const npc   = ZONE_NPC[zone]  || ZONE_NPC.Lab
   const meta  = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
@@ -290,7 +322,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const noCandidate = !loading && candidates.length === 0
   const canSubmit   = noCandidate || pick !== null
 
-  const CONF_LABEL = ['', 'Low', '', 'Medium', '', 'High']
+  const CONF_LABEL = ['', '전혀 동의하지 않음', '동의하지 않음', '보통', '동의함', '매우 동의함']
 
   return (
     <div style={{
@@ -324,14 +356,36 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
           padding: '16px 20px 12px',
           borderRadius: '20px 20px 0 0',
         }}>
-          <div style={{
-            fontSize: '9px', fontWeight: 800, color: accent,
-            letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px',
-          }}>TODAY'S EXHIBITION</div>
-          <div style={{ fontSize: '17px', fontWeight: 800, color: '#2A1F0E', lineHeight: 1.2 }}>
-            {meta.emoji} {meta.label} — {sound.sub_category || 'Unknown Sound'}
+          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '8px' }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{
+                fontSize: '9px', fontWeight: 800, color: accent,
+                letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px',
+              }}>TODAY'S EXHIBITION</div>
+              <div style={{ fontSize: '17px', fontWeight: 800, color: '#2A1F0E', lineHeight: 1.2 }}>
+                {meta.emoji} {meta.label} — {sound.sub_category || 'Unknown Sound'}
+              </div>
+              <div style={{ fontSize: '10px', color: '#8B6A3A', marginTop: '3px' }}>#{sound.sound_id}</div>
+            </div>
+            {onExit && (
+              <button onClick={onExit} style={{
+                flexShrink: 0,
+                padding: '6px 10px',
+                background: '#F0EBE0',
+                border: `1.5px solid ${accent}44`,
+                borderRadius: '10px',
+                color: '#8B6A3A',
+                fontSize: '11px', fontWeight: 800,
+                fontFamily: 'Nunito, sans-serif',
+                cursor: 'pointer',
+                display: 'flex', alignItems: 'center', gap: '4px',
+                transition: 'all 0.15s',
+                whiteSpace: 'nowrap',
+              }}>
+                🗺 월드맵
+              </button>
+            )}
           </div>
-          <div style={{ fontSize: '10px', color: '#8B6A3A', marginTop: '3px' }}>#{sound.sound_id}</div>
         </div>
 
         <div style={{ padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -489,14 +543,19 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             </>
           )}
 
-          {/* Confidence 슬라이더 */}
+          {/* 동의 슬라이더 */}
           <div>
             <div style={{
-              fontSize: '9px', fontWeight: 800, color: '#8B6A3A',
-              letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '6px',
+              fontSize: '11px', fontWeight: 800, color: '#3A2A14',
+              marginBottom: '4px',
             }}>
-              CONFIDENCE LEVEL:{' '}
-              <span style={{ color: accent }}>{CONF_LABEL[confidence]}</span>
+              이 표현에 동의하나요?
+            </div>
+            <div style={{
+              fontSize: '12px', fontWeight: 700, color: accent,
+              marginBottom: '8px', minHeight: '18px',
+            }}>
+              {CONF_LABEL[confidence]}
             </div>
             <input
               type="range" min="1" max="5" value={confidence}
@@ -505,9 +564,20 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             />
             <div style={{
               display: 'flex', justifyContent: 'space-between',
-              fontSize: '9px', color: '#A09080', marginTop: '3px',
+              marginTop: '4px', padding: '0 2px',
             }}>
-              <span>Low</span><span>Medium</span><span>High</span>
+              {[1, 2, 3, 4, 5].map(n => (
+                <div key={n} style={{
+                  display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px',
+                  cursor: 'pointer',
+                }} onClick={() => setConfidence(n)}>
+                  <span style={{
+                    fontSize: '13px', fontWeight: confidence === n ? 800 : 600,
+                    color: confidence === n ? accent : '#A09080',
+                    transition: 'color 0.15s',
+                  }}>{n}</span>
+                </div>
+              ))}
             </div>
           </div>
 

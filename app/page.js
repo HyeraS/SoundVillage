@@ -132,6 +132,14 @@ export default function HomePage() {
     setMuseumSource(null)
   }, [museumSource, activeSound, activeZone, refreshCounts])
 
+  /* ── SoundMuseum에서 월드맵 직접 이동 ── */
+  const handleMuseumExit = useCallback(() => {
+    setActiveSound(null)
+    setMyExpression('')
+    setMuseumSource(null)
+    setScreen('world')
+  }, [])
+
   /* ── AnnotationPanel 닫기 (X / 건너뛰기) → ZoneMap 복귀, 소리는 그대로 유지 ── */
   const handleAnnotateClose = useCallback(() => {
     setActiveSound(null)
@@ -176,6 +184,7 @@ export default function HomePage() {
           participantId={participantId}
           sessionId={sessionId}
           onDone={handleMuseumDone}
+          onExit={handleMuseumExit}
         />
       </>
     )
