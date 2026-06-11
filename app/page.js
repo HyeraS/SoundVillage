@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone } from '@/lib/supabase'
+import { getTotalCount, getCountByZone, getAnnotatedSoundIds } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -95,12 +95,22 @@ export default function HomePage() {
   }, [])
 
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
-  const handleEnterMuseum = useCallback(() => {
+  const handleEnterMuseum = useCallback(async () => {
     const all = soundMetadata.sounds
     if (!all || all.length === 0) return
-    const sound = all[Math.floor(Math.random() * all.length)]
+
+    let sound
+    try {
+      const annotatedIds = await getAnnotatedSoundIds()
+      if (annotatedIds.length > 0) {
+        const pickedId = annotatedIds[Math.floor(Math.random() * annotatedIds.length)]
+        sound = all.find(s => s.sound_id === pickedId)
+      }
+    } catch {}
+    if (!sound) sound = all[Math.floor(Math.random() * all.length)]
+
     setActiveSound(sound)
-    setActiveZone(sound.game_zone || 'Forest')
+    setActiveZone(sound.game_zone || 'Animal')
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
