@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds } from '@/lib/supabase'
+import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getCandidateExpressions } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -117,11 +117,35 @@ export default function HomePage() {
   }, [])
 
   /* ── AnnotationPanel Stage1 완료 → SoundMuseum ── */
-  const handleAnnotateComplete = useCallback(({ expression_text }) => {
-    setMyExpression(expression_text)
+  const handleAnnotateComplete = useCallback(async ({ expression_text }) => {
     setMuseumSource('zone')
+
+    let targetSound      = activeSound
+    let targetExpression = expression_text
+
+    try {
+      // 방금 전사한 소리에 다른 참여자 데이터가 있는지 확인
+      const existing = await getCandidateExpressions(activeSound.sound_id, expression_text)
+      if (existing.length === 0) {
+        // 없으면 다른 어노테이션된 소리 중 하나로 전환
+        const ids    = await getAnnotatedSoundIds()
+        const others = ids.filter(id => id !== activeSound.sound_id)
+        if (others.length > 0) {
+          const pickedId = others[Math.floor(Math.random() * others.length)]
+          const found    = soundMetadata.sounds.find(s => s.sound_id === pickedId)
+          if (found) {
+            targetSound      = found
+            targetExpression = ''
+          }
+        }
+      }
+    } catch {}
+
+    setActiveSound(targetSound)
+    setActiveZone(targetSound.game_zone || 'Animal')
+    setMyExpression(targetExpression)
     setScreen('museum')
-  }, [])
+  }, [activeSound])
 
   /* ── SoundMuseum 완료 → 출처에 따라 분기 ── */
   const handleMuseumDone = useCallback(() => {

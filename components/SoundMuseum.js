@@ -283,7 +283,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   useEffect(() => {
     getCandidateExpressions(sound.sound_id, myExpression)
       .then(data => setCandidates(data.slice(0, 3)))
-      .catch(() => setCandidates([]))
+      .catch(err => { console.error('[Museum] 후보 로드 오류:', err); setCandidates([]) })
       .finally(() => setLoading(false))
   }, [sound.sound_id, myExpression])
 
