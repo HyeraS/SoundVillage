@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\('howler:', d.get\\('dependencies',{}\\).get\\('howler','없음'\\)\\); print\\('next:', d.get\\('dependencies',{}\\).get\\('next','없음'\\)\\)\")"
+    ]
+  }
+}
