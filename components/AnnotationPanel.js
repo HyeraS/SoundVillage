@@ -62,14 +62,6 @@ function segRatios(segs) {
   return segs.map(s => s.vDur / total);
 }
 
-/* ─────────────────────────────────────────────
-   짧은 클립 반복 재생 계산
-   4초 이하: 총 청취 ~6초 목표로 N회 반복
-───────────────────────────────────────────── */
-function computeLoopTotal(dur) {
-  if (!dur || dur > 4) return 0;
-  return Math.min(8, Math.max(3, Math.ceil(6 / dur)));
-}
 
 /* ─────────────────────────────────────────────
    파형 시각화 (세그먼트 지원, 동적 비율)
@@ -202,10 +194,8 @@ function ConfidenceSelector({ value, onChange, accent }) {
 
 /* ─────────────────────────────────────────────
    세그먼트 재생 훅
-   - 8s 초과 클립: [도입 2s] → [핵심 5s] → [마무리 1s] 자동 점프
-   - 4s~8s 클립: 전체 재생
-   - 4s 미만 클립: 총 청취 ~6s 목표로 N회 자동 반복 (MUSHRA 기준)
-   - seekVirtual(ratio): 파형 클릭 시 해당 위치로 이동
+   - ≤4s: 전체 재생, 끝나면 다시듣기 버튼
+   - >4s: 가변 세그먼트 (도입→핵심→마무리)
 ───────────────────────────────────────────── */
 function useSegmentedPlayer(filePath) {
   const [playing,     setPlaying]     = useState(false);
@@ -214,41 +204,20 @@ function useSegmentedPlayer(filePath) {
   const [audioError,  setAudioError]  = useState('');
   const [isSegmented, setIsSegmented] = useState(false);
   const [segLabel,    setSegLabel]    = useState('');
-  const [loopCurrent, setLoopCurrent] = useState(0); // 현재까지 완료된 루프 수
-  const [loopTotal,   setLoopTotal]   = useState(0); // 총 루프 횟수 (0 = 짧은 클립 아님)
+  const [isShort,     setIsShort]     = useState(false);
 
-  const durationRef    = useRef(null);
-  const segsRef        = useRef(null);
-  const segIdxRef      = useRef(0);
-  const playingRef     = useRef(false);
-  const pollRef        = useRef(null);
-  const loopCurRef     = useRef(0);
-  const loopTotRef     = useRef(0);
-  const replayTimerRef = useRef(null);
-  const playAgainRef   = useRef(null); // 루프 재생용 함수 ref
+  const durationRef = useRef(null);
+  const segsRef     = useRef(null);
+  const segIdxRef   = useRef(0);
+  const playingRef  = useRef(false);
+  const pollRef     = useRef(null);
 
   const clearPoll = () => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
   };
-  const clearReplayTimer = () => {
-    if (replayTimerRef.current) { clearTimeout(replayTimerRef.current); replayTimerRef.current = null; }
-  };
 
   const finish = useCallback(() => {
     clearPoll();
-
-    // 짧은 클립 루프 남아있으면 다음 루프 예약
-    if (playingRef.current && loopCurRef.current < loopTotRef.current - 1 && playAgainRef.current) {
-      loopCurRef.current += 1;
-      setLoopCurrent(loopCurRef.current);
-      setProgress(0);
-      replayTimerRef.current = setTimeout(() => {
-        if (playingRef.current) playAgainRef.current?.();
-      }, 300);
-      return;
-    }
-
-    clearReplayTimer();
     playingRef.current = false;
     setPlaying(false);
     setProgress(1);
@@ -265,7 +234,6 @@ function useSegmentedPlayer(filePath) {
       const segs = segsRef.current;
 
       if (!segs) {
-        // 전체 재생 모드 (짧은 클립 포함) — 위치 기반 progress
         const dur = durationRef.current;
         if (dur) setProgress(Math.min(pos / dur, 1));
         return;
@@ -297,7 +265,6 @@ function useSegmentedPlayer(filePath) {
     if (playing) {
       stopSound();
       clearPoll();
-      clearReplayTimer();
       playingRef.current = false;
       setPlaying(false);
       return;
@@ -306,16 +273,6 @@ function useSegmentedPlayer(filePath) {
     setAudioError('');
     setProgress(0);
 
-    // 루프 재생 함수 (짧은 클립 루프마다 호출)
-    const playOnce = async () => {
-      const dur = await playSound(filePath, {
-        onEnd: () => { if (playingRef.current) finish(); },
-      });
-      durationRef.current = dur;
-      startPoll();
-    };
-    playAgainRef.current = playOnce;
-
     try {
       const dur = await playSound(filePath, {
         onEnd: () => { if (playingRef.current) finish(); },
@@ -323,17 +280,11 @@ function useSegmentedPlayer(filePath) {
 
       durationRef.current = dur;
       const segs = computeSegments(dur);
-      segsRef.current   = segs;
-      segIdxRef.current = 0;
+      segsRef.current    = segs;
+      segIdxRef.current  = 0;
       playingRef.current = true;
 
-      // 짧은 클립 루프 초기화
-      const lt = computeLoopTotal(dur);
-      loopTotRef.current = lt;
-      loopCurRef.current = 0;
-      setLoopTotal(lt);
-      setLoopCurrent(0);
-
+      setIsShort(dur <= 4);
       setIsSegmented(!!segs);
       setSegLabel(segs ? segs[0].label : '');
       setPlaying(true);
@@ -345,7 +296,6 @@ function useSegmentedPlayer(filePath) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playing, filePath, finish, startPoll]);
 
-  // 파형 클릭 → 가상 타임라인(0~1) 기준으로 실제 위치 이동
   const seekVirtual = useCallback((ratio) => {
     if (!playingRef.current) return;
     const segs = segsRef.current;
@@ -370,9 +320,9 @@ function useSegmentedPlayer(filePath) {
     }
   }, []);
 
-  useEffect(() => () => { stopSound(); clearPoll(); clearReplayTimer(); }, []);
+  useEffect(() => () => { stopSound(); clearPoll(); }, []);
 
-  return { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, segs: segsRef.current, toggle, seekVirtual };
+  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual };
 }
 
 /* ─────────────────────────────────────────────
@@ -392,12 +342,10 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
   const inputRef                    = useRef(null);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, segs, toggle, seekVirtual } =
+  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual } =
     useSegmentedPlayer(sound.file_path);
 
-  const isShortClip  = loopTotal > 0;
-  const loopsLeft    = loopTotal - loopCurrent - 1; // 현재 루프 완료 후 남은 횟수
-  const allLoopsDone = loopCurrent >= loopTotal - 1;
+  const played = playCount > 0;
 
   // 패널 열릴 때 input 포커스
   useEffect(() => { setTimeout(() => inputRef.current?.focus(), 300); }, []);
@@ -437,12 +385,10 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
   const statusMsg = audioError
     ? null
     : playing
-      ? isShortClip
-        ? `${loopCurrent + 1} / ${loopTotal}회 재생 중...`
-        : (SEG_STATUS[segLabel] || '듣는 중... 소리를 잘 느껴보세요 👂')
-      : isShortClip && loopTotal > 0 && !allLoopsDone && playCount > 0
-        ? '한 번 더 들어보세요 👂'
-        : '▶ 재생 · 파형을 클릭하면 해당 구간부터 다시 들을 수 있어요';
+      ? (SEG_STATUS[segLabel] || '듣는 중... 소리를 잘 느껴보세요 👂')
+      : played
+        ? '파형을 클릭하면 해당 구간부터 다시 들을 수 있어요'
+        : '▶ 재생 버튼을 눌러 소리를 들어보세요';
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -477,9 +423,9 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
         boxShadow: `0 0 24px ${glow}`,
       }}>
         {/* 짧은 클립 안내 */}
-        {isShortClip && playCount === 0 && (
+        {isShort && !played && (
           <div style={{ textAlign: 'center', fontSize: '11px', color: `${accent}bb`, marginBottom: '8px', fontWeight: 600 }}>
-            짧은 소리예요 · {loopTotal}회 들려드릴게요
+            짧은 소리예요 · 여러 번 들어보세요
           </div>
         )}
 
@@ -492,22 +438,8 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           onSeek={seekVirtual}
         />
 
-        {/* 루프 도트 인디케이터 */}
-        {isShortClip && playCount > 0 && (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '5px', marginTop: '8px' }}>
-            {Array.from({ length: loopTotal }, (_, i) => (
-              <div key={i} style={{
-                width: '6px', height: '6px', borderRadius: '50%',
-                background: i < loopCurrent ? accent
-                  : i === loopCurrent ? (playing ? accent : `${accent}99`)
-                  : `${accent}30`,
-                transition: 'background 0.2s',
-              }} />
-            ))}
-          </div>
-        )}
-
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', gap: '12px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '10px', gap: '10px' }}>
+          {/* 재생/정지 버튼 */}
           <button
             onClick={toggle}
             style={{
@@ -524,24 +456,39 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           >
             <PlayIcon playing={playing} />
           </button>
+
+          {/* 다시 듣기 버튼 — 한 번 이상 재생 후 표시 */}
+          {played && !playing && (
+            <button
+              onClick={toggle}
+              style={{
+                padding: '8px 14px', borderRadius: '20px',
+                background: 'transparent',
+                border: `1.5px solid ${accent}55`,
+                color: accent,
+                fontSize: '12px', fontWeight: 700,
+                fontFamily: 'Nunito, sans-serif',
+                cursor: 'pointer', transition: 'all 0.15s',
+                display: 'flex', alignItems: 'center', gap: '5px',
+              }}
+            >
+              ↺ 다시 듣기
+            </button>
+          )}
         </div>
+
         <div style={{ textAlign: 'center', fontSize: '11px', marginTop: '8px', minHeight: '16px' }}>
           {audioError
             ? <span style={{ color: '#E24B4A' }}>{audioError}</span>
-            : <span style={{ color: playing && isShortClip ? accent : segLabel === 'middle' ? accent : '#6B6660' }}>{statusMsg}</span>
+            : <span style={{ color: segLabel === 'middle' ? accent : '#6B6660' }}>{statusMsg}</span>
           }
         </div>
       </div>
 
       {/* 의성어 입력 */}
-      <div style={{ opacity: isShortClip && playCount === 0 ? 0.45 : 1, transition: 'opacity 0.3s' }}>
+      <div style={{ opacity: !played ? 0.45 : 1, transition: 'opacity 0.3s' }}>
         <label style={{ fontSize: '12px', color: '#9A9585', display: 'block', marginBottom: '7px', fontWeight: 600 }}>
           ✏️ 이 소리를 글자로 표현한다면?
-          {isShortClip && !allLoopsDone && playCount > 0 && (
-            <span style={{ marginLeft: '6px', color: `${accent}99`, fontWeight: 400 }}>
-              ({loopsLeft}회 더 들을 수 있어요)
-            </span>
-          )}
         </label>
         <input
           ref={inputRef}
@@ -555,7 +502,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
             }
             if (e.key === 'Enter' && !submitting) handleSubmit()
           }}
-          placeholder={isShortClip && playCount === 0 ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
+          placeholder={!played ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
           maxLength={80}
           style={{
             width: '100%', boxSizing: 'border-box',
