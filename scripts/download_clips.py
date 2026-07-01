@@ -86,7 +86,10 @@ def main(csv_path, out_base, api_key, mode="preview", delay=0.5):
     errors = []
 
     for i, row in df.iterrows():
-        zone  = row["game_zone"]
+        if "game_zone" in df.columns:
+            zone = row["game_zone"]
+        else:
+            zone = str(row["sound_id"]).split("_")[0]
         fname = str(row["original_fname"])
         zone_dir = out_base / zone
 

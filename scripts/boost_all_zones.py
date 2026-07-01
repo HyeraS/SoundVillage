@@ -50,6 +50,7 @@ META_PATH       = PROJECT_ROOT / "data" / "sound_metadata.json"
 
 ALL_ZONES = ['Animal', 'Nature', 'Urban', 'Music', 'Lab', 'Human']
 CSV_MAP   = {z: PROJECT_ROOT / "scripts" / f"pilot_clips_{z.lower()}.csv" for z in ALL_ZONES}
+CSV_MAP_NEW = {z: PROJECT_ROOT / "scripts" / f"pilot_clips_{z.lower()}_new.csv" for z in ALL_ZONES}
 
 
 # ────────────────────────────────────────────────────────
@@ -131,7 +132,7 @@ def update_metadata(new_sounds: list[dict]) -> None:
     print(f"\n메타데이터 업데이트 완료 (+{added}개 추가)")
     print("  존별 현황:")
     for z, c in sorted(zone_count.items()):
-        bar = "█" * (c // 2)
+        bar = "#" * (c // 2)
         print(f"    {z:<8} {c:>3}  {bar}")
 
 
@@ -139,13 +140,21 @@ def update_metadata(new_sounds: list[dict]) -> None:
 #  Zone 처리
 # ────────────────────────────────────────────────────────
 def process_zone(zone: str, args, freesound_key: str, supabase_key: str) -> list[dict]:
-    csv_path = CSV_MAP[zone]
-    if not csv_path.exists():
-        print(f"  [SKIP] CSV 없음: {csv_path}")
-        return []
+    rows = []
+    seen_ids = set()
+    for csv_path in (CSV_MAP[zone], CSV_MAP_NEW[zone]):
+        if not csv_path.exists():
+            continue
+        with open(csv_path, newline="") as f:
+            for row in csv.DictReader(f):
+                if row["sound_id"] in seen_ids:
+                    continue
+                seen_ids.add(row["sound_id"])
+                rows.append(row)
 
-    with open(csv_path, newline="") as f:
-        rows = list(csv.DictReader(f))
+    if not rows:
+        print(f"  [SKIP] CSV 없음: {CSV_MAP[zone]} / {CSV_MAP_NEW[zone]}")
+        return []
 
     print(f"\n{'='*50}")
     print(f"  {zone} zone - {len(rows)}개 처리")
