@@ -53,26 +53,31 @@ export default function HomePage() {
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
 
-  /* ── 카운트 갱신 ── */
+  /* ── 카운트 갱신 (현재 참여자 기준) ── */
   const refreshCounts = useCallback(async () => {
+    if (!participantId) return
     try {
-      const total = await getTotalCount()
+      const total = await getTotalCount(participantId)
       setTotalCount(total)
-      const ZONE_MAX = 10
       const entries = await Promise.all(
-        ZONES.map(async z => [z, Math.min((await getCountByZone(z)) / ZONE_MAX, 1)])
+        ZONES.map(async z => {
+          const zoneMax = ZONE_SOUND_MAP[z]?.length || 100
+          const count   = await getCountByZone(z, participantId)
+          return [z, Math.min(count / zoneMax, 1)]
+        })
       )
       setZoneProgress(Object.fromEntries(entries))
     } catch {}
-  }, [])
+  }, [participantId])
 
-  useEffect(() => { refreshCounts() }, [refreshCounts])
+  useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
 
   /* ── StartPanel → WorldMap ── */
   const handleStart = (pid, gid) => {
     setParticipantId(pid)
     setGroupId(gid)
     setScreen('world')
+    // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
 
   /* ── WorldMap → ZoneMap (ENTER로 진입) ── */
