@@ -24,6 +24,26 @@ function buildZoneMap(sounds) {
 }
 const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 
+// 그룹 필터: groupId가 없으면 전체, 있으면 해당 그룹만
+function getGroupSounds(zone, groupId) {
+  const all = ZONE_SOUND_MAP[zone] || []
+  if (!groupId) return all
+  const g = groupId.trim().toUpperCase().replace(/^G/i, '')  // "G1"→"1", "A"→"A"
+  const label = g === '1' ? 'A' : g === '2' ? 'B' : g      // 그룹 번호 → 라벨 변환
+  return all.filter(s => !s.group || s.group === label)
+}
+
+// Museum용: 다른 그룹 사운드 전체 목록
+function getOtherGroupSounds(groupId) {
+  const all = soundMetadata.sounds || []
+  if (!groupId) return all
+  const g = groupId.trim().toUpperCase().replace(/^G/i, '')
+  const myLabel    = g === '1' ? 'A' : g === '2' ? 'B' : g
+  if (!myLabel) return all
+  const otherLabel = myLabel === 'A' ? 'B' : 'A'
+  return all.filter(s => !s.group || s.group === otherLabel)
+}
+
 /* ─────────────────────────────────────────────
    화면 상태 정의
    'start'    → StartPanel
@@ -45,6 +65,7 @@ export default function HomePage() {
   // 피드백 오버레이
   const [showFeedback,  setShowFeedback]  = useState(false)
   const [feedbackZone,  setFeedbackZone]  = useState('')
+  const [museumEmpty,   setMuseumEmpty]   = useState(false)  // Museum: 5개 미달 알림
 
   // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
@@ -53,7 +74,7 @@ export default function HomePage() {
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
 
-  /* ── 카운트 갱신 (현재 참여자 기준) ── */
+  /* ── 카운트 갱신 (현재 참여자 + 그룹 기준) ── */
   const refreshCounts = useCallback(async () => {
     if (!participantId) return
     try {
@@ -61,14 +82,14 @@ export default function HomePage() {
       setTotalCount(total)
       const entries = await Promise.all(
         ZONES.map(async z => {
-          const zoneMax = ZONE_SOUND_MAP[z]?.length || 100
+          const zoneMax = getGroupSounds(z, groupId).length || 100
           const count   = await getCountByZone(z, participantId)
           return [z, Math.min(count / zoneMax, 1)]
         })
       )
       setZoneProgress(Object.fromEntries(entries))
     } catch {}
-  }, [participantId])
+  }, [participantId, groupId])
 
   useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
 
@@ -127,32 +148,42 @@ export default function HomePage() {
 
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
   const handleEnterMuseum = useCallback(async () => {
+    setMuseumEmpty(false)
     const all = soundMetadata.sounds
     if (!all || all.length === 0) return
+
+    // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
+    const otherGroupSounds = getOtherGroupSounds(groupId)
 
     let sound = null
     try {
       const annotatedIds = await getAnnotatedSoundIds()
-      console.log('[Museum] annotatedIds:', annotatedIds)
-      // 셔플 후 최대 12개 시도 — 실제로 후보가 있는 소리를 찾을 때까지
+      console.log('[Museum] annotatedIds:', annotatedIds, 'otherGroup:', otherGroupSounds.length)
+      // 다른 그룹 사운드 중 5개 이상 어노테이션된 것 탐색
+      const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
       const shuffled = [...annotatedIds].sort(() => Math.random() - 0.5)
-      for (const dbId of shuffled.slice(0, 20)) {
+      for (const dbId of shuffled.slice(0, 30)) {
         const found = resolveSoundFromDbId(dbId, all)
         if (!found) continue
+        // 그룹 필터: group 필드가 없거나 다른 그룹인 경우
+        if (found.group && !otherIds.has(found.sound_id)) continue
         const count = await getAnnotationCountForSound(found.sound_id)
         if (count >= 5) { sound = found; break }
       }
     } catch (e) {
       console.error('[Museum] 진입 오류:', e)
     }
-    if (!sound) sound = all[Math.floor(Math.random() * all.length)]
+    if (!sound) {
+      setMuseumEmpty(true)
+      return
+    }
 
     setActiveSound(sound)
     setActiveZone(sound.game_zone || 'Lab')
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
-  }, [findSoundByDbId, resolveSoundFromDbId])
+  }, [groupId, findSoundByDbId, resolveSoundFromDbId])
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 (Museum은 WorldMap에서 별도 진입) ── */
   const handleAnnotateComplete = useCallback(() => {
@@ -205,12 +236,38 @@ export default function HomePage() {
   // 2. 월드맵
   if (screen === 'world') {
     return (
-      <WorldMap
-        onEnterZone={handleEnterZone}
-        onEnterMuseum={handleEnterMuseum}
-        totalCount={totalCount}
-        zoneProgress={zoneProgress}
-      />
+      <>
+        <WorldMap
+          onEnterZone={handleEnterZone}
+          onEnterMuseum={handleEnterMuseum}
+          totalCount={totalCount}
+          zoneProgress={zoneProgress}
+        />
+        {museumEmpty && (
+          <div style={{
+            position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
+            background:'#00000055', zIndex:200,
+          }} onClick={() => setMuseumEmpty(false)}>
+            <div style={{
+              background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:'16px',
+              padding:'28px 36px', textAlign:'center', fontFamily:'Nunito, sans-serif',
+              boxShadow:'0 8px 32px #00000044',
+            }}>
+              <div style={{ fontSize:'32px', marginBottom:'10px' }}>🏛</div>
+              <div style={{ fontSize:'14px', fontWeight:800, color:'#3A2A14', marginBottom:'8px' }}>
+                아직 전시 중인 소리가 없어요
+              </div>
+              <div style={{ fontSize:'12px', color:'#8B6A3A', lineHeight:1.6 }}>
+                다른 그룹 참여자들이 소리를 더 수집하면<br/>
+                Sound Museum에서 만날 수 있어요 ✨
+              </div>
+              <div style={{ marginTop:'16px', fontSize:'11px', color:'#A09080' }}>
+                화면을 클릭하면 닫힙니다
+              </div>
+            </div>
+          </div>
+        )}
+      </>
     )
   }
 
@@ -233,7 +290,7 @@ export default function HomePage() {
 
   // 4. Zone 내부 맵 (+ annotation 오버레이)
   if (screen === 'zone' || screen === 'annotate') {
-    const zoneSounds = ZONE_SOUND_MAP[activeZone] || []
+    const zoneSounds = getGroupSounds(activeZone, groupId)
     return (
       <>
         {/* ZoneMap은 항상 배경에 유지 */}
