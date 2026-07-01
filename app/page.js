@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getCandidateExpressions, getAnnotationCountForSound } from '@/lib/supabase'
+import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -149,77 +149,24 @@ export default function HomePage() {
     setScreen('museum')
   }, [findSoundByDbId, resolveSoundFromDbId])
 
-  /* ── AnnotationPanel Stage1 완료 → SoundMuseum ──
-     Museum 대상: 5개 이상 쌓인 sound만 가능
-     1) 방금 전사한 sound가 5개 이상 → 그 sound 평가
-     2) 아니면 5개 이상인 다른 sound 탐색 → 그 sound 평가
-     3) 없으면 Museum 스킵, Zone 복귀
-  ── */
-  const handleAnnotateComplete = useCallback(async ({ expression_text }) => {
-    setMuseumSource('zone')
-    const all = soundMetadata.sounds
-
-    try {
-      // 1) 방금 전사한 sound가 5개 이상인지 확인
-      const myCount = await getAnnotationCountForSound(activeSound.sound_id)
-      if (myCount >= 5) {
-        setMyExpression(expression_text)
-        setScreen('museum')
-        return
-      }
-
-      // 2) 다른 sound 중 5개 이상인 것 탐색
-      const annotatedIds = await getAnnotatedSoundIds()
-      const myNum = parseInt(String(activeSound.sound_id).split('_').pop(), 10)
-      const others = annotatedIds
-        .filter(dbId => parseInt(String(dbId).split('_').pop(), 10) !== myNum)
-        .sort(() => Math.random() - 0.5)
-
-      for (const dbId of others.slice(0, 20)) {
-        const found = resolveSoundFromDbId(dbId, all)
-        if (!found) continue
-        const count = await getAnnotationCountForSound(found.sound_id)
-        if (count >= 5) {
-          setActiveSound(found)
-          setActiveZone(found.game_zone || 'Lab')
-          setMyExpression('')
-          setScreen('museum')
-          return
-        }
-      }
-    } catch (e) {
-      console.error('[Museum] 후보 선택 오류:', e)
-    }
-
-    // 3) 5개 이상인 sound 없음 → Zone 복귀
+  /* ── AnnotationPanel Stage1 완료 → Zone 복귀 (Museum은 WorldMap에서 별도 진입) ── */
+  const handleAnnotateComplete = useCallback(() => {
     if (activeSound) setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     setFeedbackZone(activeZone)
     setShowFeedback(true)
     setActiveSound(null)
     setMyExpression('')
-    setMuseumSource(null)
     setScreen('zone')
     refreshCounts()
-  }, [activeSound, activeZone, resolveSoundFromDbId, refreshCounts])
+  }, [activeSound, activeZone, refreshCounts])
 
-  /* ── SoundMuseum 완료 → 출처에 따라 분기 ── */
+  /* ── SoundMuseum 완료 → WorldMap 복귀 ── */
   const handleMuseumDone = useCallback(() => {
-    if (museumSource === 'zone') {
-      if (activeSound) {
-        setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
-      }
-      setFeedbackZone(activeZone)
-      setShowFeedback(true)
-      setScreen('zone')
-      refreshCounts()
-    } else {
-      // 'world'에서 진입 — 월드맵으로 복귀
-      setScreen('world')
-    }
     setActiveSound(null)
     setMyExpression('')
     setMuseumSource(null)
-  }, [museumSource, activeSound, activeZone, refreshCounts])
+    setScreen('world')
+  }, [])
 
   /* ── SoundMuseum에서 월드맵 직접 이동 ── */
   const handleMuseumExit = useCallback(() => {
