@@ -149,31 +149,58 @@ export default function HomePage() {
     setScreen('museum')
   }, [findSoundByDbId, resolveSoundFromDbId])
 
-  /* ── AnnotationPanel Stage1 완료 → 5개 쌓였으면 SoundMuseum, 아니면 Zone 복귀 ── */
+  /* ── AnnotationPanel Stage1 완료 → SoundMuseum ──
+     Museum 대상: 5개 이상 쌓인 sound만 가능
+     1) 방금 전사한 sound가 5개 이상 → 그 sound 평가
+     2) 아니면 5개 이상인 다른 sound 탐색 → 그 sound 평가
+     3) 없으면 Museum 스킵, Zone 복귀
+  ── */
   const handleAnnotateComplete = useCallback(async ({ expression_text }) => {
+    setMuseumSource('zone')
+    const all = soundMetadata.sounds
+
     try {
-      const count = await getAnnotationCountForSound(activeSound.sound_id)
-      if (count >= 5) {
-        setMuseumSource('zone')
+      // 1) 방금 전사한 sound가 5개 이상인지 확인
+      const myCount = await getAnnotationCountForSound(activeSound.sound_id)
+      if (myCount >= 5) {
         setMyExpression(expression_text)
         setScreen('museum')
         return
       }
+
+      // 2) 다른 sound 중 5개 이상인 것 탐색
+      const annotatedIds = await getAnnotatedSoundIds()
+      const myNum = parseInt(String(activeSound.sound_id).split('_').pop(), 10)
+      const others = annotatedIds
+        .filter(dbId => parseInt(String(dbId).split('_').pop(), 10) !== myNum)
+        .sort(() => Math.random() - 0.5)
+
+      for (const dbId of others.slice(0, 20)) {
+        const found = resolveSoundFromDbId(dbId, all)
+        if (!found) continue
+        const count = await getAnnotationCountForSound(found.sound_id)
+        if (count >= 5) {
+          setActiveSound(found)
+          setActiveZone(found.game_zone || 'Lab')
+          setMyExpression('')
+          setScreen('museum')
+          return
+        }
+      }
     } catch (e) {
-      console.error('[Museum] 카운트 확인 오류:', e)
+      console.error('[Museum] 후보 선택 오류:', e)
     }
 
-    // 5개 미만 → Museum 스킵, Zone으로 복귀
-    if (activeSound) {
-      setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
-    }
+    // 3) 5개 이상인 sound 없음 → Zone 복귀
+    if (activeSound) setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     setFeedbackZone(activeZone)
     setShowFeedback(true)
     setActiveSound(null)
     setMyExpression('')
+    setMuseumSource(null)
     setScreen('zone')
     refreshCounts()
-  }, [activeSound, activeZone, refreshCounts])
+  }, [activeSound, activeZone, resolveSoundFromDbId, refreshCounts])
 
   /* ── SoundMuseum 완료 → 출처에 따라 분기 ── */
   const handleMuseumDone = useCallback(() => {
