@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound } from '@/lib/supabase'
+import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -23,6 +23,11 @@ function buildZoneMap(sounds) {
   return map
 }
 const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
+
+// 블록 필터: 해당 그룹의 block <= blockNum인 소리만 반환
+function getBlockSounds(zone, groupId, blockNum) {
+  return getGroupSounds(zone, groupId).filter(s => (s.block || 1) <= blockNum)
+}
 
 // 그룹 필터: groupId가 없으면 전체, 있으면 해당 그룹만
 function getGroupSounds(zone, groupId) {
@@ -70,6 +75,11 @@ export default function HomePage() {
   // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
 
+  // 블록 퀘스트 상태
+  const [unlockedBlock,   setUnlockedBlock]   = useState({})  // { zone: blockNum }
+  const [blockUnlockInfo, setBlockUnlockInfo] = useState(null) // { block, zone } 완료 오버레이용
+  const [zoneLoading,     setZoneLoading]     = useState(false)
+
   // 카운트
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
@@ -101,25 +111,6 @@ export default function HomePage() {
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
 
-  /* ── WorldMap → ZoneMap (ENTER로 진입) ── */
-  const handleEnterZone = useCallback((zone) => {
-    setActiveZone(zone)
-    setScreen('zone')
-  }, [])
-
-  /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
-  const handleExitZone = useCallback(() => {
-    setActiveZone(null)
-    setActiveSound(null)
-    setScreen('world')
-  }, [])
-
-  /* ── ZoneMap에서 소리 줍기 → AnnotationPanel 오버레이 ── */
-  const handleCollectSound = useCallback((sound) => {
-    setActiveSound(sound)
-    setScreen('annotate')
-  }, [])
-
   /* ── sound_id 포맷 무관하게 메타데이터 소리를 찾는 헬퍼 ── */
   const findSoundByDbId = useCallback((dbId, all) => {
     // 먼저 exact match
@@ -145,6 +136,57 @@ export default function HomePage() {
       sub_category: String(dbId),
     }
   }, [findSoundByDbId])
+
+  /* ── WorldMap → ZoneMap (ENTER로 진입) ── */
+  const handleEnterZone = useCallback(async (zone) => {
+    setZoneLoading(true)
+    setActiveZone(zone)
+    try {
+      const dbIds = await getAnnotatedByParticipantZone(participantId, zone)
+      const all   = soundMetadata.sounds
+
+      // DB sound_id → 메타데이터 sound_id 변환 (구버전 포맷 브리지)
+      const annotatedSet = new Set()
+      for (const dbId of dbIds) {
+        const found = findSoundByDbId(dbId, all)
+        if (found) annotatedSet.add(found.sound_id)
+      }
+
+      // 현재 언락된 블록 계산 (완료된 블록의 다음 블록)
+      const zoneSounds = getGroupSounds(zone, groupId)
+      const maxBlock   = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
+      let currentBlock = 1
+      for (let b = 1; b <= maxBlock; b++) {
+        const bs = zoneSounds.filter(s => (s.block || 1) === b)
+        if (bs.length > 0 && bs.every(s => annotatedSet.has(s.sound_id))) {
+          currentBlock = b + 1
+        } else break
+      }
+      currentBlock = Math.min(currentBlock, maxBlock)
+
+      setUnlockedBlock(prev => ({ ...prev, [zone]: currentBlock }))
+      setCollectedIds(annotatedSet)
+    } catch (e) {
+      console.error('[Zone] 블록 로드 오류:', e)
+      setUnlockedBlock(prev => ({ ...prev, [zone]: prev[zone] || 1 }))
+      setCollectedIds(new Set())
+    }
+    setZoneLoading(false)
+    setScreen('zone')
+  }, [participantId, groupId, findSoundByDbId])
+
+  /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
+  const handleExitZone = useCallback(() => {
+    setActiveZone(null)
+    setActiveSound(null)
+    setScreen('world')
+  }, [])
+
+  /* ── ZoneMap에서 소리 줍기 → AnnotationPanel 오버레이 ── */
+  const handleCollectSound = useCallback((sound) => {
+    setActiveSound(sound)
+    setScreen('annotate')
+  }, [])
 
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
   const handleEnterMuseum = useCallback(async () => {
@@ -185,16 +227,33 @@ export default function HomePage() {
     setScreen('museum')
   }, [groupId, findSoundByDbId, resolveSoundFromDbId])
 
-  /* ── AnnotationPanel Stage1 완료 → Zone 복귀 (Museum은 WorldMap에서 별도 진입) ── */
+  /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
   const handleAnnotateComplete = useCallback(() => {
-    if (activeSound) setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
+    const newCollected = new Set([...collectedIds, ...(activeSound ? [activeSound.sound_id] : [])])
+    setCollectedIds(newCollected)
+
+    // 블록 완료 여부 체크
+    if (activeSound && activeZone) {
+      const currentBlock = unlockedBlock[activeZone] || 1
+      const zoneSounds   = getGroupSounds(activeZone, groupId)
+      const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
+      const blockSounds  = zoneSounds.filter(s => (s.block || 1) === currentBlock)
+      const allDone      = blockSounds.every(s => newCollected.has(s.sound_id))
+
+      if (allDone && currentBlock < maxBlock) {
+        const next = currentBlock + 1
+        setUnlockedBlock(prev => ({ ...prev, [activeZone]: next }))
+        setBlockUnlockInfo({ block: next, zone: activeZone })
+      }
+    }
+
     setFeedbackZone(activeZone)
     setShowFeedback(true)
     setActiveSound(null)
     setMyExpression('')
     setScreen('zone')
     refreshCounts()
-  }, [activeSound, activeZone, refreshCounts])
+  }, [activeSound, activeZone, collectedIds, groupId, unlockedBlock, refreshCounts])
 
   /* ── SoundMuseum 완료 → WorldMap 복귀 ── */
   const handleMuseumDone = useCallback(() => {
@@ -212,11 +271,12 @@ export default function HomePage() {
     setScreen('world')
   }, [])
 
-  /* ── AnnotationPanel 닫기 (X / 건너뛰기) → ZoneMap 복귀, 소리는 그대로 유지 ── */
+  /* ── AnnotationPanel 닫기 (X / 건너뛰기) → ZoneMap 복귀, 스킵도 collectedIds에 추가 ── */
   const handleAnnotateClose = useCallback(() => {
+    if (activeSound) setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     setActiveSound(null)
     setScreen('zone')
-  }, [])
+  }, [activeSound])
 
   /* ── 피드백 닫기 ── */
   const handleFeedbackClose = useCallback(() => {
@@ -233,7 +293,7 @@ export default function HomePage() {
     return <StartPanel onStart={handleStart} />
   }
 
-  // 2. 월드맵
+  // 2. 월드맵 (zone 진입 로딩 포함)
   if (screen === 'world') {
     return (
       <>
@@ -243,6 +303,22 @@ export default function HomePage() {
           totalCount={totalCount}
           zoneProgress={zoneProgress}
         />
+        {/* Zone 진입 로딩 */}
+        {zoneLoading && (
+          <div style={{
+            position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
+            background:'#00000055', zIndex:200, fontFamily:'Nunito, sans-serif',
+          }}>
+            <div style={{
+              background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:'16px',
+              padding:'24px 36px', textAlign:'center',
+            }}>
+              <div style={{ fontSize:'24px', marginBottom:'8px' }}>🎧</div>
+              <div style={{ fontSize:'13px', fontWeight:700, color:'#3A2A14' }}>소리 목록 불러오는 중...</div>
+            </div>
+          </div>
+        )}
+
         {museumEmpty && (
           <div style={{
             position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
@@ -290,17 +366,23 @@ export default function HomePage() {
 
   // 4. Zone 내부 맵 (+ annotation 오버레이)
   if (screen === 'zone' || screen === 'annotate') {
-    const zoneSounds = getGroupSounds(activeZone, groupId)
+    const currentBlock = unlockedBlock[activeZone] || 1
+    const zoneSounds   = getGroupSounds(activeZone, groupId)
+    const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
+    const blockSounds  = getBlockSounds(activeZone, groupId, currentBlock)
     return (
       <>
-        {/* ZoneMap은 항상 배경에 유지 */}
+        {/* ZoneMap — 블록별 key로 언락 시 리마운트 */}
         <ZoneMap
+          key={`${activeZone}-block${currentBlock}`}
           zone={activeZone}
-          sounds={zoneSounds}
+          sounds={blockSounds}
           onCollectSound={handleCollectSound}
           onExit={handleExitZone}
           collectedIds={collectedIds}
           isAnnotating={screen === 'annotate'}
+          blockNum={currentBlock}
+          blockTotal={maxBlock}
         />
 
         {/* AnnotationPanel — ZoneMap 위에 오버레이 */}
@@ -313,6 +395,39 @@ export default function HomePage() {
             onClose={handleAnnotateClose}
             onComplete={handleAnnotateComplete}
           />
+        )}
+
+        {/* 블록 해제 오버레이 */}
+        {blockUnlockInfo && blockUnlockInfo.zone === activeZone && (
+          <div style={{
+            position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
+            background:'#00000066', zIndex:300, fontFamily:'Nunito, sans-serif',
+          }} onClick={() => setBlockUnlockInfo(null)}>
+            <div style={{
+              background:'#F5EDD8', border:'3px solid #C8A96E', borderRadius:'20px',
+              padding:'32px 40px', textAlign:'center',
+              boxShadow:'0 12px 48px #00000044',
+              animation:'slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1)',
+            }}>
+              <div style={{ fontSize:'40px', marginBottom:'12px' }}>🎉</div>
+              <div style={{ fontSize:'16px', fontWeight:800, color:'#3A2A14', marginBottom:'8px' }}>
+                구역 {blockUnlockInfo.block - 1} 완료!
+              </div>
+              <div style={{ fontSize:'13px', color:'#8B6A3A', lineHeight:1.7, marginBottom:'20px' }}>
+                새로운 소리들이 나타났어요.<br/>
+                구역 {blockUnlockInfo.block}을 탐험해 보세요 ✨
+              </div>
+              <button onClick={() => setBlockUnlockInfo(null)} style={{
+                padding:'10px 28px', borderRadius:'10px',
+                background:'linear-gradient(180deg, #7BC850 0%, #5B9E3A 100%)',
+                border:'2px solid #4A8A2A', color:'#fff',
+                fontSize:'13px', fontWeight:800, cursor:'pointer',
+                boxShadow:'0 4px 0 #2A6A10',
+              }}>
+                계속 탐험하기 →
+              </button>
+            </div>
+          </div>
         )}
 
         {/* 완료 피드백 토스트 */}

@@ -138,24 +138,31 @@ export default function StartPanel({ onStart }) {
           }}>
             👥 그룹 ID
           </label>
-          <input
-            placeholder="예: G1"
+          <select
             value={groupId}
             onChange={e => setGroupId(e.target.value)}
             onFocus={() => setFocused('gid')}
             onBlur={()  => setFocused(null)}
-            onKeyDown={e => e.key === 'Enter' && handleStart()}
             style={{
               width: '100%', boxSizing: 'border-box',
               padding: '11px 14px', borderRadius: '10px',
               background: '#FFF8ED',
               border: `2px solid ${focused === 'gid' ? '#C8A96E' : '#D4C4A0'}`,
-              color: '#3A2A14', fontSize: '14px',
+              color: groupId ? '#3A2A14' : '#A09080', fontSize: '14px',
               fontFamily: 'Nunito, sans-serif', fontWeight: 600,
               outline: 'none', transition: 'border-color 0.15s',
               boxShadow: focused === 'gid' ? '0 0 0 3px #C8A96E33' : 'none',
+              cursor: 'pointer', appearance: 'none',
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238B6A3A' strokeWidth='2' fill='none' strokeLinecap='round'/%3E%3C/svg%3E")`,
+              backgroundRepeat: 'no-repeat',
+              backgroundPosition: 'right 14px center',
+              paddingRight: '36px',
             }}
-          />
+          >
+            <option value="" disabled>그룹을 선택하세요</option>
+            <option value="A">그룹 A</option>
+            <option value="B">그룹 B</option>
+          </select>
         </div>
 
         {/* 시작 버튼 — 나무 간판 스타일 */}

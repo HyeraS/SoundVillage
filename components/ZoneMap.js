@@ -561,7 +561,7 @@ function PixelChar({ dir, moving }) {
 /* ─────────────────────────────────────────────
    Zone 내부 HUD (상단 — WorldMap HUD와 통일)
 ───────────────────────────────────────────── */
-function ZoneHUD({ zone, collected, total, onExit }) {
+function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTotal = 1 }) {
   const meta = ZONE_META[zone]
   const pct  = total > 0 ? Math.round((collected / total) * 100) : 0
   return (
@@ -590,7 +590,9 @@ function ZoneHUD({ zone, collected, total, onExit }) {
         <span style={{ fontSize:'22px' }}>{meta.emoji}</span>
         <div>
           <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14', lineHeight:1.1 }}>{meta.label}</div>
-          <div style={{ fontSize:'10px', color:'#8B6A3A' }}>소리를 찾아 수집하세요</div>
+          <div style={{ fontSize:'10px', color:'#8B6A3A' }}>
+            구역 {blockNum}/{blockTotal}
+          </div>
         </div>
       </div>
 
@@ -707,7 +709,7 @@ function CompleteModal({ zone, onExit }) {
 /* ─────────────────────────────────────────────
    ZoneMap 메인
 ───────────────────────────────────────────── */
-export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false }) {
+export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
   const meta   = ZONE_META[zone]
   const theme  = ZONE_THEME[zone]
   const { keys, press, release } = useKeys()
@@ -852,7 +854,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
 
       {/* Zone HUD */}
-      <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit}/>
+      <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal}/>
 
       {/* 게임 캔버스 */}
       <div style={{
