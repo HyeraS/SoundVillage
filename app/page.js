@@ -35,7 +35,7 @@ const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
-  const [sessionId,     setSessionId]     = useState('')
+  const [groupId,       setGroupId]       = useState('')
 
   const [activeZone,    setActiveZone]    = useState(null)
   const [activeSound,   setActiveSound]   = useState(null)
@@ -69,9 +69,9 @@ export default function HomePage() {
   useEffect(() => { refreshCounts() }, [refreshCounts])
 
   /* ── StartPanel → WorldMap ── */
-  const handleStart = (pid, sid) => {
+  const handleStart = (pid, gid) => {
     setParticipantId(pid)
-    setSessionId(sid)
+    setGroupId(gid)
     setScreen('world')
   }
 
@@ -218,7 +218,7 @@ export default function HomePage() {
           zone={activeZone}
           myExpression={myExpression}
           participantId={participantId}
-          sessionId={sessionId}
+          sessionId={groupId}
           onDone={handleMuseumDone}
           onExit={handleMuseumExit}
         />
@@ -247,7 +247,7 @@ export default function HomePage() {
             sound={activeSound}
             zone={activeZone}
             participantId={participantId}
-            sessionId={sessionId}
+            sessionId={groupId}
             onClose={handleAnnotateClose}
             onComplete={handleAnnotateComplete}
           />

@@ -6,14 +6,14 @@ import { useState } from 'react'
 ───────────────────────────────────────────── */
 export default function StartPanel({ onStart }) {
   const [participantId, setParticipantId] = useState('')
-  const [sessionId,     setSessionId]     = useState('')
+  const [groupId,       setGroupId]       = useState('')
   const [focused,       setFocused]       = useState(null)
 
   function handleStart() {
-    if (!participantId.trim() || !sessionId.trim()) return
-    onStart(participantId.trim(), sessionId.trim())
+    if (!participantId.trim() || !groupId.trim()) return
+    onStart(participantId.trim(), groupId.trim())
   }
-  const canStart = participantId.trim() && sessionId.trim()
+  const canStart = participantId.trim() && groupId.trim()
 
   return (
     <div style={{
@@ -136,24 +136,24 @@ export default function StartPanel({ onStart }) {
             color: '#6B4A2A', marginBottom: '6px', letterSpacing: '0.05em',
             textTransform: 'uppercase',
           }}>
-            🗓 세션 ID
+            👥 그룹 ID
           </label>
           <input
-            placeholder="예: S001"
-            value={sessionId}
-            onChange={e => setSessionId(e.target.value)}
-            onFocus={() => setFocused('sid')}
+            placeholder="예: G1"
+            value={groupId}
+            onChange={e => setGroupId(e.target.value)}
+            onFocus={() => setFocused('gid')}
             onBlur={()  => setFocused(null)}
             onKeyDown={e => e.key === 'Enter' && handleStart()}
             style={{
               width: '100%', boxSizing: 'border-box',
               padding: '11px 14px', borderRadius: '10px',
               background: '#FFF8ED',
-              border: `2px solid ${focused === 'sid' ? '#C8A96E' : '#D4C4A0'}`,
+              border: `2px solid ${focused === 'gid' ? '#C8A96E' : '#D4C4A0'}`,
               color: '#3A2A14', fontSize: '14px',
               fontFamily: 'Nunito, sans-serif', fontWeight: 600,
               outline: 'none', transition: 'border-color 0.15s',
-              boxShadow: focused === 'sid' ? '0 0 0 3px #C8A96E33' : 'none',
+              boxShadow: focused === 'gid' ? '0 0 0 3px #C8A96E33' : 'none',
             }}
           />
         </div>
