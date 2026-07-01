@@ -6,13 +6,15 @@ import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE } from
 /* ─────────────────────────────────────────────
    맵 크기
 ───────────────────────────────────────────── */
-const MAP_W  = 24
-const MAP_H  = 18
-const PX_W   = MAP_W * TILE   // 768
-const PX_H   = MAP_H * TILE   // 576
-const CHAR_W = 22
-const CHAR_H = 28
-const HUD_H  = 56
+const MAP_W   = 48          // 타일 수 (2× 확장)
+const MAP_H   = 36
+const PX_W    = MAP_W * TILE  // 1536
+const PX_H    = MAP_H * TILE  // 1152
+const VIEW_W  = 24 * TILE     // 768 — 화면에 보이는 뷰포트
+const VIEW_H  = 18 * TILE     // 576
+const CHAR_W  = 22
+const CHAR_H  = 28
+const HUD_H   = 56
 
 /* ─────────────────────────────────────────────
    Zone별 배경 팔레트
@@ -73,6 +75,12 @@ function buildPaths(zone) {
   for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: cy })
   // 세로 중앙로
   for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: cx, ty })
+  // 가로 보조로 (위/아래 1/4 지점)
+  for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: Math.floor(MAP_H / 4) })
+  for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: Math.floor(MAP_H * 3 / 4) })
+  // 세로 보조로 (좌/우 1/4 지점)
+  for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: Math.floor(MAP_W / 4), ty })
+  for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: Math.floor(MAP_W * 3 / 4), ty })
   // 입구 (하단)
   for (let tx = cx - 1; tx <= cx + 1; tx++) paths.push({ tx, ty: MAP_H - 1 })
   return paths
@@ -84,6 +92,8 @@ function buildPaths(zone) {
 function buildZoneObjects(zone) {
   const objs = []
   const cx = MAP_W / 2, cy = MAP_H / 2
+  // 구버전 24×18 좌표계 → 현재 48×36 좌표계로 변환
+  const s = (v) => v * 2
 
   if (zone === 'Animal') {
     const treePositions = [
@@ -92,68 +102,88 @@ function buildZoneObjects(zone) {
       {tx:1,ty:5},{tx:1,ty:8},{tx:1,ty:11},{tx:1,ty:14},
       {tx:22,ty:5},{tx:22,ty:8},{tx:22,ty:11},{tx:22,ty:14},
       {tx:1,ty:16},{tx:3,ty:16},{tx:19,ty:16},{tx:22,ty:16},
+      // 확장 영역 추가 장식
+      {tx:26,ty:2},{tx:30,ty:1},{tx:34,ty:2},{tx:38,ty:1},{tx:42,ty:2},{tx:46,ty:1},
+      {tx:46,ty:5},{tx:46,ty:10},{tx:46,ty:15},{tx:46,ty:20},{tx:46,ty:25},{tx:46,ty:30},
+      {tx:1,ty:20},{tx:1,ty:25},{tx:1,ty:30},{tx:3,ty:34},{tx:46,ty:34},
+      {tx:26,ty:34},{tx:30,ty:34},{tx:34,ty:34},{tx:38,ty:34},
     ]
-    treePositions.forEach((t,i) => objs.push({ type:'tree', ...t, variant: i%3 }))
-    for (let i=0;i<12;i++) objs.push({ type:'flower', tx:3+(i*83)%18, ty:3+(i*67)%11, variant:i%4 })
-    objs.push({ type:'cabin', tx:3, ty:3 })
-    objs.push({ type:'well', tx:18, ty:3 })
+    treePositions.forEach((t,i) => objs.push({ type:'tree', tx:t.tx, ty:t.ty, variant: i%3 }))
+    for (let i=0;i<30;i++) objs.push({ type:'flower', tx:3+(i*83)%42, ty:3+(i*67)%28, variant:i%4 })
+    objs.push({ type:'cabin', tx:s(3), ty:s(3) })
+    objs.push({ type:'well',  tx:s(18), ty:s(3) })
+    objs.push({ type:'cabin', tx:36, ty:20 })
+    objs.push({ type:'well',  tx:40, ty:24 })
   }
 
   if (zone === 'Human') {
-    // 건물 (주거지)
-    objs.push({ type:'building', tx:2,  ty:1, h:4, variant:0 })
-    objs.push({ type:'building', tx:18, ty:1, h:4, variant:1 })
-    // 벤치 여러 개
-    objs.push({ type:'bench', tx:4,  ty:8  })
-    objs.push({ type:'bench', tx:18, ty:8  })
-    objs.push({ type:'bench', tx:4,  ty:13 })
-    objs.push({ type:'bench', tx:18, ty:13 })
-    // 중앙 분수 (광장)
+    objs.push({ type:'building', tx:s(2),  ty:s(1), h:4, variant:0 })
+    objs.push({ type:'building', tx:s(18), ty:s(1), h:4, variant:1 })
+    objs.push({ type:'building', tx:36,    ty:18,   h:4, variant:2 })
+    objs.push({ type:'building', tx:4,     ty:20,   h:4, variant:0 })
+    objs.push({ type:'bench', tx:s(4),  ty:s(8)  })
+    objs.push({ type:'bench', tx:s(18), ty:s(8)  })
+    objs.push({ type:'bench', tx:s(4),  ty:s(13) })
+    objs.push({ type:'bench', tx:s(18), ty:s(13) })
+    objs.push({ type:'bench', tx:36,    ty:22    })
+    objs.push({ type:'bench', tx:8,     ty:28    })
     objs.push({ type:'fountain', tx:cx-2, ty:cy-2 })
-    // 가로등
-    for (let i=0;i<5;i++) objs.push({ type:'lamp', tx:4+i*4, ty:cy-1 })
-    // 꽃밭
-    for (let i=0;i<10;i++) objs.push({ type:'flower', tx:3+(i*71)%19, ty:3+(i*53)%12, variant:i%4 })
+    objs.push({ type:'fountain', tx:10,   ty:26   })
+    for (let i=0;i<10;i++) objs.push({ type:'lamp', tx:4+i*4, ty:cy-1 })
+    for (let i=0;i<10;i++) objs.push({ type:'lamp', tx:4+i*4, ty:cy+1 })
+    for (let i=0;i<24;i++) objs.push({ type:'flower', tx:3+(i*71)%42, ty:3+(i*53)%28, variant:i%4 })
   }
 
   if (zone === 'Nature') {
-    objs.push({ type:'pond', tx:2,  ty:2,  w:6, h:5 })
-    objs.push({ type:'pond', tx:15, ty:10, w:7, h:5 })
-    for (let i=0;i<8;i++) objs.push({ type:'rock', tx:2+(i*71)%20, ty:2+(i*53)%13, variant:i%2 })
-    objs.push({ type:'dock', tx:3, ty:6 })
-    for (let i=0;i<6;i++) objs.push({ type:'reed', tx:3+(i*31)%6, ty:2+(i*17)%4 })
+    objs.push({ type:'pond', tx:s(2),  ty:s(2),  w:6, h:5 })
+    objs.push({ type:'pond', tx:s(15), ty:s(10), w:7, h:5 })
+    objs.push({ type:'pond', tx:28,    ty:4,     w:8, h:6 })
+    objs.push({ type:'pond', tx:6,     ty:24,    w:7, h:5 })
+    for (let i=0;i<20;i++) objs.push({ type:'rock', tx:2+(i*71)%44, ty:2+(i*53)%30, variant:i%2 })
+    objs.push({ type:'dock', tx:s(3), ty:s(6) })
+    objs.push({ type:'dock', tx:30,   ty:26   })
+    for (let i=0;i<16;i++) objs.push({ type:'reed', tx:3+(i*31)%12, ty:2+(i*17)%8 })
   }
 
   if (zone === 'Urban') {
-    objs.push({ type:'building', tx:2,  ty:1, h:5, variant:0 })
-    objs.push({ type:'building', tx:7,  ty:2, h:4, variant:1 })
-    objs.push({ type:'building', tx:15, ty:1, h:6, variant:2 })
-    objs.push({ type:'building', tx:19, ty:2, h:4, variant:0 })
-    for (let i=0;i<6;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy-1 })
-    for (let i=0;i<6;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy+1 })
-    objs.push({ type:'fountain', tx:cx-2, ty:cy-2 })
-    objs.push({ type:'bench', tx:4,  ty:12 })
-    objs.push({ type:'bench', tx:18, ty:12 })
+    objs.push({ type:'building', tx:s(2),  ty:s(1), h:5, variant:0 })
+    objs.push({ type:'building', tx:s(7),  ty:s(2), h:4, variant:1 })
+    objs.push({ type:'building', tx:s(15), ty:s(1), h:6, variant:2 })
+    objs.push({ type:'building', tx:s(19), ty:s(2), h:4, variant:0 })
+    objs.push({ type:'building', tx:30,    ty:18,   h:5, variant:1 })
+    objs.push({ type:'building', tx:38,    ty:22,   h:4, variant:2 })
+    for (let i=0;i<14;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy-1 })
+    for (let i=0;i<14;i++) objs.push({ type:'lamp', tx:4+i*3, ty:cy+1 })
+    objs.push({ type:'fountain', tx:cx-2,  ty:cy-2 })
+    objs.push({ type:'fountain', tx:32,    ty:26   })
+    objs.push({ type:'bench', tx:s(4),  ty:s(12) })
+    objs.push({ type:'bench', tx:s(18), ty:s(12) })
+    objs.push({ type:'bench', tx:36,    ty:28    })
   }
 
   if (zone === 'Music') {
-    objs.push({ type:'stage', tx:8, ty:2 })
-    objs.push({ type:'instrument', tx:3,  ty:8,  variant:0 })
-    objs.push({ type:'instrument', tx:18, ty:8,  variant:1 })
-    objs.push({ type:'instrument', tx:3,  ty:13, variant:2 })
-    objs.push({ type:'instrument', tx:18, ty:13, variant:3 })
-    for (let i=0;i<8;i++) objs.push({ type:'note', tx:2+(i*61)%20, ty:2+(i*43)%13 })
+    objs.push({ type:'stage', tx:s(8), ty:s(2) })
+    objs.push({ type:'stage', tx:32,   ty:22   })
+    objs.push({ type:'instrument', tx:s(3),  ty:s(8),  variant:0 })
+    objs.push({ type:'instrument', tx:s(18), ty:s(8),  variant:1 })
+    objs.push({ type:'instrument', tx:s(3),  ty:s(13), variant:2 })
+    objs.push({ type:'instrument', tx:s(18), ty:s(13), variant:3 })
+    objs.push({ type:'instrument', tx:36,    ty:20,    variant:0 })
+    objs.push({ type:'instrument', tx:10,    ty:26,    variant:2 })
+    for (let i=0;i<20;i++) objs.push({ type:'note', tx:2+(i*61)%44, ty:2+(i*43)%30 })
   }
 
   if (zone === 'Lab') {
     const crystalPos = [
-      {tx:2,ty:2},{tx:4,ty:3},{tx:19,ty:2},{tx:21,ty:3},
-      {tx:2,ty:13},{tx:4,ty:14},{tx:19,ty:13},{tx:21,ty:14},
-      {tx:10,ty:2},{tx:13,ty:2},{tx:10,ty:14},{tx:13,ty:14},
+      {tx:s(2),ty:s(2)},{tx:s(4),ty:s(3)},{tx:s(19),ty:s(2)},{tx:s(21),ty:s(3)},
+      {tx:s(2),ty:s(13)},{tx:s(4),ty:s(14)},{tx:s(19),ty:s(13)},{tx:s(21),ty:s(14)},
+      {tx:s(10),ty:s(2)},{tx:s(13),ty:s(2)},{tx:s(10),ty:s(14)},{tx:s(13),ty:s(14)},
+      {tx:30,ty:18},{tx:36,ty:20},{tx:10,ty:26},{tx:40,ty:28},{tx:24,ty:30},
     ]
     crystalPos.forEach((c,i) => objs.push({ type:'crystal', ...c, variant:i%5 }))
-    for (let i=0;i<16;i++) objs.push({ type:'star', tx:1+(i*73)%22, ty:1+(i*53)%15 })
-    objs.push({ type:'altar', tx:cx-2, ty:3 })
+    for (let i=0;i<36;i++) objs.push({ type:'star', tx:1+(i*73)%46, ty:1+(i*53)%34 })
+    objs.push({ type:'altar', tx:cx-2, ty:s(3) })
+    objs.push({ type:'altar', tx:30,   ty:26   })
   }
 
   return objs
@@ -686,7 +716,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const zoneObjects = useRef(buildZoneObjects(zone))
   const pathTiles   = useRef(buildPaths(zone))
 
-  const [pos,        setPos]       = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H - TILE*3 })
+  const [pos,        setPos]       = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H - TILE*4 })
   const [dir,        setDir]       = useState('up')
   const [moving,     setMoving]    = useState(false)
   const [tick,       setTick]      = useState(0)
@@ -814,6 +844,10 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const total     = itemsRef.current.length
   const collected = total - remaining
 
+  // 카메라: 플레이어 중심, 맵 경계에서 클램프
+  const camX = Math.max(0, Math.min(pos.x + CHAR_W / 2 - VIEW_W / 2, PX_W - VIEW_W))
+  const camY = Math.max(0, Math.min(pos.y + CHAR_H / 2 - VIEW_H / 2, PX_H - VIEW_H))
+
   return (
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
 
@@ -827,7 +861,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       }}>
         <svg
           width="100%" height="100%"
-          viewBox={`0 0 ${PX_W} ${PX_H}`}
+          viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
           preserveAspectRatio="xMidYMid meet"
           style={{ display:'block', position:'absolute', inset:0 }}
         >
