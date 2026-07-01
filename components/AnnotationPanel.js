@@ -536,7 +536,13 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           type="text"
           value={text}
           onChange={(e) => { setText(e.target.value); setError(''); }}
-          onKeyDown={(e) => e.key === 'Enter' && !submitting && handleSubmit()}
+          onKeyDown={(e) => {
+            if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
+              e.stopPropagation()
+              return
+            }
+            if (e.key === 'Enter' && !submitting) handleSubmit()
+          }}
           placeholder={isShortClip && playCount === 0 ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
           maxLength={80}
           style={{

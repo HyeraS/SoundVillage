@@ -48,7 +48,7 @@ STORAGE_BUCKET  = "audio"
 PROJECT_ROOT    = Path(__file__).parent.parent
 META_PATH       = PROJECT_ROOT / "data" / "sound_metadata.json"
 
-ALL_ZONES = ['Animal', 'Nature', 'Urban', 'Music', 'Lab']
+ALL_ZONES = ['Animal', 'Nature', 'Urban', 'Music', 'Lab', 'Human']
 CSV_MAP   = {z: PROJECT_ROOT / "scripts" / f"pilot_clips_{z.lower()}.csv" for z in ALL_ZONES}
 
 
@@ -85,24 +85,25 @@ def download_preview(fname: str, zone: str, api_key: str) -> Path | None:
 
 
 # ────────────────────────────────────────────────────────
-#  Supabase Storage 업로드 (supabase-py 사용 — 신형 키 대응)
+#  Supabase Storage 업로드 (REST API 직접 호출)
 # ────────────────────────────────────────────────────────
 def upload_to_supabase(local_file: Path, zone: str, supabase_key: str) -> bool:
     storage_path = f"{zone}/{local_file.name}"
+    url = f"{SUPABASE_URL}/storage/v1/object/{STORAGE_BUCKET}/{storage_path}"
+    headers = {
+        "Authorization": f"Bearer {supabase_key}",
+        "Content-Type": "audio/mpeg",
+        "x-upsert": "true",
+    }
     try:
-        from supabase import create_client
-        client = create_client(SUPABASE_URL, supabase_key)
         with open(local_file, "rb") as f:
-            client.storage.from_(STORAGE_BUCKET).upload(
-                path=storage_path,
-                file=f.read(),
-                file_options={"upsert": "true", "content-type": "audio/mpeg"},
-            )
-        print(f"    UP  OK: {storage_path}")
-        return True
-    except ImportError:
-        print("    ERROR: supabase 패키지 없음 — `pip install supabase` 실행 후 재시도")
-        return False
+            resp = requests.post(url, headers=headers, data=f, timeout=120)
+        if resp.status_code in (200, 201):
+            print(f"    UP  OK: {storage_path}")
+            return True
+        else:
+            print(f"    UP  FAIL {storage_path}: {resp.status_code} {resp.text[:120]}")
+            return False
     except Exception as e:
         print(f"    UP  FAIL {storage_path}: {e}")
         return False
@@ -147,7 +148,7 @@ def process_zone(zone: str, args, freesound_key: str, supabase_key: str) -> list
         rows = list(csv.DictReader(f))
 
     print(f"\n{'='*50}")
-    print(f"  {zone} zone — {len(rows)}개 처리")
+    print(f"  {zone} zone - {len(rows)}개 처리")
     print(f"{'='*50}")
 
     successful = []
@@ -195,10 +196,11 @@ def process_zone(zone: str, args, freesound_key: str, supabase_key: str) -> list
 def _source_type(zone: str) -> str:
     return {
         'Animal': 'Biological',
-        'Nature': 'Natural',
-        'Urban':  'Mechanical',
+        'Nature': 'Physical',
+        'Urban':  'Anthropogenic',
         'Music':  'Musical',
-        'Lab':    'Synthetic',
+        'Lab':    'Electroacoustic',
+        'Human':  'Biological',
     }.get(zone, 'Unknown')
 
 

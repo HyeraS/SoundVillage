@@ -268,7 +268,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
 
   const [candidates,  setCandidates]  = useState([])
   const [loading,     setLoading]     = useState(true)
-  const [pick,        setPick]        = useState(null) // 'A'|'B'|'C'|'similar'|'none'
+  const [pick,        setPick]        = useState(null) // 'A'|'B'|'C'|'D'|'E'
   const [submitting,  setSubmitting]  = useState(false)
   const [npcIdx,      setNpcIdx]      = useState(0)
   const [visible,     setVisible]     = useState(false)
@@ -281,7 +281,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   // 후보 표현 로드
   useEffect(() => {
     getCandidateExpressions(sound.sound_id, myExpression)
-      .then(data => setCandidates(data.slice(0, 3)))
+      .then(data => setCandidates(data.slice(0, 5)))
       .catch(err => { console.error('[Museum] 후보 로드 오류:', err); setCandidates([]) })
       .finally(() => setLoading(false))
   }, [sound.sound_id, myExpression])
@@ -295,7 +295,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const handleSubmit = async () => {
     setSubmitting(true)
     try {
-      const letterMap = { A: 0, B: 1, C: 2 }
+      const letterMap = { A: 0, B: 1, C: 2, D: 3, E: 4 }
       if (pick && pick in letterMap) {
         const candidate = candidates[letterMap[pick]]
         if (candidate) {
@@ -459,7 +459,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
               {/* 표현 카드 갤러리 */}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {candidates.map((c, i) => {
-                  const letter = ['A', 'B', 'C'][i]
+                  const letter = ['A', 'B', 'C', 'D', 'E'][i]
                   const isSelected = pick === letter
                   return (
                     <div
@@ -518,29 +518,6 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
                 })}
               </div>
 
-              {/* NONE 버튼 */}
-              <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
-                {candidates.length >= 2 && (
-                  <button onClick={() => setPick(pick === 'similar' ? null : 'similar')} style={{
-                    padding: '6px 12px', height: '32px', borderRadius: '8px',
-                    background: pick === 'similar' ? '#C8A96E' : '#F0EBE0',
-                    border: `1.5px solid ${pick === 'similar' ? '#C8A96E' : '#C8A96E66'}`,
-                    color: pick === 'similar' ? '#fff' : '#8B6A3A',
-                    fontSize: '10px', fontWeight: 800,
-                    fontFamily: 'Nunito, sans-serif', cursor: 'pointer',
-                    transition: 'all 0.15s',
-                  }}>비슷함</button>
-                )}
-                <button onClick={() => setPick(pick === 'none' ? null : 'none')} style={{
-                  padding: '6px 12px', height: '32px', borderRadius: '8px',
-                  background: pick === 'none' ? '#8A8070' : '#F0EBE0',
-                  border: `1.5px solid ${pick === 'none' ? '#8A8070' : '#C8A96E66'}`,
-                  color: pick === 'none' ? '#fff' : '#8B6A3A',
-                  fontSize: '10px', fontWeight: 800,
-                  fontFamily: 'Nunito, sans-serif', cursor: 'pointer',
-                  transition: 'all 0.15s',
-                }}>해당 없음</button>
-              </div>
             </>
           )}
 

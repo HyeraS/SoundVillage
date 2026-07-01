@@ -1,48 +1,221 @@
-sound_id,game_zone,source_type,sub_category,audioset_class,all_labels,fname,file_path,source_dataset,original_fname,duration_sec,ambiguous
-Human_406688,Human,Biological,Footstep,Footstep,Walk and footsteps,406688,Audio/Human/406688,FSD50K,406688,,False
-Human_405112,Human,Biological,Footstep,Footstep,Walk and footsteps,405112,Audio/Human/405112,FSD50K,405112,,False
-Human_381194,Human,Biological,Footstep,Footstep,"Walk and footsteps, Hiss",381194,Audio/Human/381194,FSD50K,381194,,False
-Human_36362,Human,Biological,Footstep,Footstep,"Walk and footsteps, Splash and splatter, Liquid",36362,Audio/Human/36362,FSD50K,36362,,False
-Human_377491,Human,Biological,Footstep,Footstep,Walk and footsteps,377491,Audio/Human/377491,FSD50K,377491,,False
-Human_429322,Human,Biological,Footstep,Footstep,Walk and footsteps,429322,Audio/Human/429322,FSD50K,429322,,False
-Human_188848,Human,Biological,Footstep,Footstep,Walk and footsteps,188848,Audio/Human/188848,FSD50K,188848,,False
-Human_410241,Human,Biological,Footstep,Footstep,"Walk and footsteps, Wind",410241,Audio/Human/410241,FSD50K,410241,,False
-Human_15562,Human,Biological,Footstep,Footstep,Walk and footsteps,15562,Audio/Human/15562,FSD50K,15562,,False
-Human_422762,Human,Biological,Footstep,Footstep,Walk and footsteps,422762,Audio/Human/422762,FSD50K,422762,,False
-Human_39864,Human,Biological,Laughter,Laughter,"Laughter, Human voice",39864,Audio/Human/39864,FSD50K,39864,,False
-Human_389640,Human,Biological,Laughter,Laughter,"Laughter, Human voice",389640,Audio/Human/389640,FSD50K,389640,,False
-Human_318828,Human,Biological,Laughter,Laughter,"Laughter, Human voice",318828,Audio/Human/318828,FSD50K,318828,,False
-Human_365704,Human,Biological,Laughter,Laughter,"Laughter, Cough, Human voice, Respiratory sounds",365704,Audio/Human/365704,FSD50K,365704,,False
-Human_30039,Human,Biological,Laughter,Laughter,"Laughter, Human voice",30039,Audio/Human/30039,FSD50K,30039,,False
-Human_317479,Human,Biological,Laughter,Laughter,"Laughter, Human voice",317479,Audio/Human/317479,FSD50K,317479,,False
-Human_162859,Human,Biological,Laughter,Laughter,"Laughter, Human voice",162859,Audio/Human/162859,FSD50K,162859,,False
-Human_69205,Human,Biological,Laughter,Laughter,"Laughter, Human voice",69205,Audio/Human/69205,FSD50K,69205,,False
-Human_210431,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",210431,Audio/Human/210431,FSD50K,210431,,False
-Human_62291,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",62291,Audio/Human/62291,FSD50K,62291,,False
-Human_252219,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",252219,Audio/Human/252219,FSD50K,252219,,False
-Human_252241,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",252241,Audio/Human/252241,FSD50K,252241,,False
-Human_207829,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",207829,Audio/Human/207829,FSD50K,207829,,False
-Human_69491,Human,Biological,Cough,Cough,"Cough, Respiratory sounds",69491,Audio/Human/69491,FSD50K,69491,,False
-Human_429915,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",429915,Audio/Human/429915,FSD50K,429915,,False
-Human_193911,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",193911,Audio/Human/193911,FSD50K,193911,,False
-Human_10145,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",10145,Audio/Human/10145,FSD50K,10145,,False
-Human_323446,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",323446,Audio/Human/323446,FSD50K,323446,,False
-Human_411663,Human,Biological,Breathing,Breathing,"Breathing, Respiratory sounds",411663,Audio/Human/411663,FSD50K,411663,,False
-Human_361746,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",361746,Audio/Human/361746,FSD50K,361746,,False
-Human_346792,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",346792,Audio/Human/346792,FSD50K,346792,,False
-Human_409102,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",409102,Audio/Human/409102,FSD50K,409102,,False
-Human_151214,Human,Biological,Finger snapping,Finger snapping,"Finger snapping, Hands",151214,Audio/Human/151214,FSD50K,151214,,False
-Human_187960,Human,Biological,Clapping,Clapping,"Clapping, Hands",187960,Audio/Human/187960,FSD50K,187960,,False
-Human_180769,Human,Biological,Clapping,Clapping,"Clapping, Hands",180769,Audio/Human/180769,FSD50K,180769,,False
-Human_351996,Human,Biological,Clapping,Clapping,"Clapping, Hands",351996,Audio/Human/351996,FSD50K,351996,,False
-Human_216659,Human,Biological,Clapping,Clapping,"Clapping, Hands",216659,Audio/Human/216659,FSD50K,216659,,False
-Human_182095,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",182095,Audio/Human/182095,FSD50K,182095,,False
-Human_121784,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",121784,Audio/Human/121784,FSD50K,121784,,False
-Human_198374,Human,Biological,Sneeze,Sneeze,"Sneeze, Respiratory sounds",198374,Audio/Human/198374,FSD50K,198374,,False
-Human_332310,Human,Biological,Cheering,Cheering,"Cheering, Human group actions",332310,Audio/Human/332310,FSD50K,332310,,False
-Human_101310,Human,Biological,Cheering,Cheering,"Cheering, Shout, Human group actions, Human voice",101310,Audio/Human/101310,FSD50K,101310,,False
-Human_240760,Human,Biological,Cheering,Cheering,"Cheering, Human group actions",240760,Audio/Human/240760,FSD50K,240760,,False
-Human_425776,Human,Biological,Crying,Crying,"Crying and sobbing, Human voice",425776,Audio/Human/425776,FSD50K,425776,,False
-Human_408740,Human,Biological,Crying,Crying,"Crying and sobbing, Human voice",408740,Audio/Human/408740,FSD50K,408740,,False
-Human_427160,Human,Biological,Sigh,Sigh,"Sigh, Human voice",427160,Audio/Human/427160,FSD50K,427160,,False
-Human_377736,Human,Biological,Sigh,Sigh,"Sigh, Human voice",377736,Audio/Human/377736,FSD50K,377736,,False
+sound_id,original_fname,sub_category,audioset_class
+Human_390256,390256,Crying and sobbing,Crying and sobbing
+Human_340965,340965,Crowd,Crowd
+Human_124795,124795,Breathing,Breathing
+Human_403057,403057,Applause,Applause
+Human_19152,19152,Laughter,Laughter
+Human_60688,60688,Crowd,Crowd
+Human_418831,418831,Laughter,Laughter
+Human_150963,150963,Crowd,Crowd
+Human_253533,253533,Laughter,Laughter
+Human_394856,394856,Run,Run
+Human_196087,196087,Laughter,Laughter
+Human_9995,9995,Breathing,Breathing
+Human_16357,16357,Laughter,Laughter
+Human_344077,344077,Laughter,Laughter
+Human_272556,272556,Run,Run
+Human_175046,175046,Clapping,Clapping
+Human_274636,274636,Applause,Applause
+Human_4237,4237,Laughter,Laughter
+Human_172398,172398,Breathing,Breathing
+Human_277022,277022,Applause,Applause
+Human_197271,197271,Crowd,Crowd
+Human_434461,434461,Chewing and mastication,Chewing and mastication
+Human_219903,219903,Gasp,Gasp
+Human_231896,231896,Clapping,Clapping
+Human_294425,294425,Laughter,Laughter
+Human_363582,363582,Gasp,Gasp
+Human_215333,215333,Burping and eructation,Burping and eructation
+Human_323711,323711,Burping and eructation,Burping and eructation
+Human_134720,134720,Laughter,Laughter
+Human_197272,197272,Crowd,Crowd
+Human_124025,124025,Crowd,Crowd
+Human_61356,61356,Burping and eructation,Burping and eructation
+Human_73087,73087,Clapping,Clapping
+Human_109742,109742,Crowd,Crowd
+Human_242867,242867,Breathing,Breathing
+Human_171442,171442,Giggle,Giggle
+Human_69202,69202,Run,Run
+Human_259608,259608,Crying and sobbing,Crying and sobbing
+Human_63609,63609,Applause,Applause
+Human_353649,353649,Cough,Cough
+Human_112257,112257,Cheering,Cheering
+Human_361735,361735,Clapping,Clapping
+Human_130037,130037,Finger snapping,Finger snapping
+Human_156839,156839,Burping and eructation,Burping and eructation
+Human_113521,113521,Crowd,Crowd
+Human_389659,389659,Run,Run
+Human_389640,389640,Laughter,Laughter
+Human_353320,353320,Clapping,Clapping
+Human_353154,353154,Breathing,Breathing
+Human_210431,210431,Cough,Cough
+Human_399762,399762,Burping and eructation,Burping and eructation
+Human_180789,180789,Clapping,Clapping
+Human_241905,241905,Applause,Applause
+Human_216570,216570,Run,Run
+Human_273406,273406,Run,Run
+Human_407688,407688,Chewing and mastication,Chewing and mastication
+Human_180752,180752,Clapping,Clapping
+Human_274349,274349,Crowd,Crowd
+Human_241546,241546,Laughter,Laughter
+Human_2780,2780,Clapping,Clapping
+Human_343984,343984,Giggle,Giggle
+Human_148225,148225,Human voice,Human voice
+Human_361706,361706,Clapping,Clapping
+Human_381362,381362,Applause,Applause
+Human_367737,367737,Chewing and mastication,Chewing and mastication
+Human_165492,165492,Cheering,Cheering
+Human_361757,361757,Finger snapping,Finger snapping
+Human_197718,197718,Crying and sobbing,Crying and sobbing
+Human_278931,278931,Run,Run
+Human_377025,377025,Applause,Applause
+Human_142603,142603,Cough,Cough
+Human_183692,183692,Breathing,Breathing
+Human_364724,364724,Finger snapping,Finger snapping
+Human_387962,387962,Burping and eructation,Burping and eructation
+Human_396891,396891,Breathing,Breathing
+Human_155920,155920,Rattle,Rattle
+Human_198337,198337,Crowd,Crowd
+Human_124023,124023,Applause,Applause
+Human_191911,191911,Applause,Applause
+Human_412157,412157,Rattle,Rattle
+Human_238819,238819,Laughter,Laughter
+Human_85536,85536,Breathing,Breathing
+Human_194268,194268,Clapping,Clapping
+Human_217667,217667,Burping and eructation,Burping and eructation
+Human_140228,140228,Gasp,Gasp
+Human_32868,32868,Applause,Applause
+Human_63621,63621,Laughter,Laughter
+Human_150964,150964,Gasp,Gasp
+Human_361766,361766,Finger snapping,Finger snapping
+Human_406647,406647,Breathing,Breathing
+Human_170332,170332,Laughter,Laughter
+Human_428953,428953,Chewing and mastication,Chewing and mastication
+Human_424866,424866,Chatter,Chatter
+Human_395410,395410,Chuckle and chortle,Chuckle and chortle
+Human_136480,136480,Crying and sobbing,Crying and sobbing
+Human_139972,139972,Applause,Applause
+Human_118486,118486,Laughter,Laughter
+Human_330296,330296,Clapping,Clapping
+Human_180762,180762,Clapping,Clapping
+Human_231891,231891,Clapping,Clapping
+Human_75056,75056,Applause,Applause
+Human_399750,399750,Burping and eructation,Burping and eructation
+Human_342669,342669,Cough,Cough
+Human_204703,204703,Laughter,Laughter
+Human_169806,169806,Laughter,Laughter
+Human_381818,381818,Laughter,Laughter
+Human_50778,50778,Breathing,Breathing
+Human_218185,218185,Chuckle and chortle,Chuckle and chortle
+Human_428990,428990,Laughter,Laughter
+Human_22733,22733,Train,Train
+Human_326883,326883,Yell,Yell
+Human_252231,252231,Cough,Cough
+Human_333408,333408,Crowd,Crowd
+Human_109740,109740,Cheering,Cheering
+Human_101154,101154,Burping and eructation,Burping and eructation
+Human_67824,67824,Laughter,Laughter
+Human_196072,196072,Laughter,Laughter
+Human_340971,340971,Crowd,Crowd
+Human_60803,60803,Crowd,Crowd
+Human_274590,274590,Applause,Applause
+Human_160137,160137,Clapping,Clapping
+Human_338182,338182,Clapping,Clapping
+Human_364451,364451,Run,Run
+Human_346520,346520,Sigh,Sigh
+Human_428775,428775,Sneeze,Sneeze
+Human_175536,175536,Clapping,Clapping
+Human_371625,371625,Clapping,Clapping
+Human_19803,19803,Human voice,Human voice
+Human_363586,363586,Gasp,Gasp
+Human_152904,152904,Laughter,Laughter
+Human_343976,343976,Crying and sobbing,Crying and sobbing
+Human_87512,87512,Cough,Cough
+Human_47134,47134,Cough,Cough
+Human_346804,346804,Finger snapping,Finger snapping
+Human_154428,154428,Crying and sobbing,Crying and sobbing
+Human_132814,132814,Laughter,Laughter
+Human_272440,272440,Chewing and mastication,Chewing and mastication
+Human_58650,58650,Chuckle and chortle,Chuckle and chortle
+Human_416703,416703,Giggle,Giggle
+Human_239583,239583,Laughter,Laughter
+Human_175048,175048,Clapping,Clapping
+Human_246312,246312,Laughter,Laughter
+Human_154681,154681,Chewing and mastication,Chewing and mastication
+Human_219768,219768,Cough,Cough
+Human_232861,232861,Applause,Applause
+Human_193467,193467,Crowd,Crowd
+Human_273109,273109,Run,Run
+Human_217669,217669,Burping and eructation,Burping and eructation
+Human_395408,395408,Chuckle and chortle,Chuckle and chortle
+Human_142605,142605,Sneeze,Sneeze
+Human_63805,63805,Walk and footsteps,Walk and footsteps
+Human_19119,19119,Cough,Cough
+Human_393010,393010,Crying and sobbing,Crying and sobbing
+Human_273400,273400,Run,Run
+Human_16580,16580,Cough,Cough
+Human_76461,76461,Laughter,Laughter
+Human_101159,101159,Burping and eructation,Burping and eructation
+Human_323447,323447,Breathing,Breathing
+Human_98935,98935,Laughter,Laughter
+Human_101181,101181,Burping and eructation,Burping and eructation
+Human_166048,166048,Laughter,Laughter
+Human_35034,35034,Cheering,Cheering
+Human_361710,361710,Clapping,Clapping
+Human_253772,253772,Laughter,Laughter
+Human_273407,273407,Run,Run
+Human_19124,19124,Cough,Cough
+Human_171118,171118,Crowd,Crowd
+Human_138338,138338,Run,Run
+Human_18276,18276,Crying and sobbing,Crying and sobbing
+Human_371303,371303,Crying and sobbing,Crying and sobbing
+Human_62870,62870,Laughter,Laughter
+Human_176866,176866,Breathing,Breathing
+Human_193911,193911,Breathing,Breathing
+Human_253775,253775,Cough,Cough
+Human_381357,381357,Applause,Applause
+Human_238495,238495,Breathing,Breathing
+Human_160139,160139,Clapping,Clapping
+Human_399623,399623,Human voice,Human voice
+Human_319019,319019,Crying and sobbing,Crying and sobbing
+Human_364732,364732,Finger snapping,Finger snapping
+Human_156844,156844,Sneeze,Sneeze
+Human_242610,242610,Laughter,Laughter
+Human_67103,67103,Applause,Applause
+Human_240689,240689,Sigh,Sigh
+Human_361753,361753,Finger snapping,Finger snapping
+Human_169802,169802,Laughter,Laughter
+Human_196168,196168,Laughter,Laughter
+Human_9985,9985,Breathing,Breathing
+Human_36346,36346,Breathing,Breathing
+Human_272554,272554,Run,Run
+Human_257919,257919,Breathing,Breathing
+Human_399769,399769,Burping and eructation,Burping and eructation
+Human_399463,399463,Cough,Cough
+Human_235167,235167,Giggle,Giggle
+Human_361745,361745,Finger snapping,Finger snapping
+Human_367680,367680,Laughter,Laughter
+Human_161849,161849,Rattle,Rattle
+Human_241473,241473,Laughter,Laughter
+Human_124024,124024,Laughter,Laughter
+Human_31605,31605,Laughter,Laughter
+Human_430341,430341,Sigh,Sigh
+Human_377056,377056,Applause,Applause
+Human_20738,20738,Applause,Applause
+Human_28227,28227,Clapping,Clapping
+Human_242239,242239,Chuckle and chortle,Chuckle and chortle
+Human_334941,334941,Applause,Applause
+Human_427722,427722,Sigh,Sigh
+Human_235099,235099,Laughter,Laughter
+Human_361730,361730,Clapping,Clapping
+Human_198263,198263,Laughter,Laughter
+Human_254281,254281,Burping and eructation,Burping and eructation
+Human_31650,31650,Applause,Applause
+Human_377054,377054,Applause,Applause
+Human_101153,101153,Burping and eructation,Burping and eructation
+Human_218306,218306,Cough,Cough
+Human_277550,277550,Chuckle and chortle,Chuckle and chortle
+Human_120755,120755,Laughter,Laughter
+Human_192091,192091,Chewing and mastication,Chewing and mastication
+Human_257916,257916,Finger snapping,Finger snapping
+Human_399758,399758,Burping and eructation,Burping and eructation

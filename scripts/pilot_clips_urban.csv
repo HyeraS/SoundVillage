@@ -1,21 +1,221 @@
 sound_id,original_fname,sub_category,audioset_class
-URB_236904,236904,Car,Motor_vehicle_(road)
-URB_237,237,Car,Car
-URB_147840,147840,Car,Car
-URB_17910,17910,Car,Car
-URB_87316,87316,Truck_Bus,Bus
-URB_380320,380320,Truck_Bus,Bus
-URB_362120,362120,Truck_Bus,Motor_vehicle_(road)
-URB_77669,77669,Motorcycle,Car
-URB_211667,211667,Motorcycle,Motor_vehicle_(road)
-URB_82687,82687,Train,Rail_transport
-URB_12698,12698,Train,Rail_transport
-URB_149211,149211,Train,Rail_transport
-URB_376697,376697,Aircraft,Aircraft
-URB_327538,327538,Aircraft,Aircraft
-URB_315758,315758,Siren,Motor_vehicle_(road)
-URB_58371,58371,Siren,Motor_vehicle_(road)
-URB_415199,415199,Construction,Drill
-URB_387698,387698,Construction,Drill
-URB_179866,179866,Traffic,Car
-URB_156195,156195,Traffic,Motor_vehicle_(road)
+Urban_61838,61838,Sawing,Sawing
+Urban_236324,236324,Drill,Drill
+Urban_175416,175416,Telephone,Telephone
+Urban_275164,275164,Car passing by,Car passing by
+Urban_426817,426817,Idling,Idling
+Urban_100856,100856,Bus,Bus
+Urban_337656,337656,Telephone,Telephone
+Urban_237152,237152,Bus,Bus
+Urban_234175,234175,Squeak,Squeak
+Urban_118972,118972,Sawing,Sawing
+Urban_170248,170248,Engine,Engine
+Urban_68660,68660,Car passing by,Car passing by
+Urban_212534,212534,Telephone,Telephone
+Urban_178355,178355,Telephone,Telephone
+Urban_316558,316558,Squeak,Squeak
+Urban_75828,75828,Telephone,Telephone
+Urban_433860,433860,Engine,Engine
+Urban_159755,159755,Motor vehicle (road),Motor vehicle (road)
+Urban_18066,18066,Squeak,Squeak
+Urban_262203,262203,Engine starting,Engine starting
+Urban_425526,425526,Car passing by,Car passing by
+Urban_176904,176904,Engine,Engine
+Urban_280204,280204,Car passing by,Car passing by
+Urban_166265,166265,Bus,Bus
+Urban_379373,379373,Bus,Bus
+Urban_401330,401330,Engine starting,Engine starting
+Urban_339703,339703,Race car and auto racing,Race car and auto racing
+Urban_145541,145541,Motorcycle,Motorcycle
+Urban_379379,379379,Bus,Bus
+Urban_109828,109828,Squeak,Squeak
+Urban_215820,215820,Telephone,Telephone
+Urban_79284,79284,Sawing,Sawing
+Urban_163331,163331,Bus,Bus
+Urban_74474,74474,Alarm,Alarm
+Urban_253314,253314,Alarm,Alarm
+Urban_258138,258138,Squeak,Squeak
+Urban_256458,256458,Typing,Typing
+Urban_165167,165167,Truck,Truck
+Urban_186022,186022,Telephone,Telephone
+Urban_339136,339136,Race car and auto racing,Race car and auto racing
+Urban_148297,148297,Alarm,Alarm
+Urban_151876,151876,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_254907,254907,Vehicle horn and car horn and honking,Vehicle horn and car horn and honking
+Urban_364116,364116,Computer keyboard,Computer keyboard
+Urban_34280,34280,Motor vehicle (road),Motor vehicle (road)
+Urban_87600,87600,Truck,Truck
+Urban_78967,78967,Bicycle,Bicycle
+Urban_113338,113338,Bus,Bus
+Urban_195456,195456,Engine starting,Engine starting
+Urban_425383,425383,Car passing by,Car passing by
+Urban_77658,77658,Race car and auto racing,Race car and auto racing
+Urban_197166,197166,Truck,Truck
+Urban_394945,394945,Computer keyboard,Computer keyboard
+Urban_237323,237323,Sawing,Sawing
+Urban_143970,143970,Idling,Idling
+Urban_51747,51747,Alarm,Alarm
+Urban_43159,43159,Idling,Idling
+Urban_370318,370318,Engine,Engine
+Urban_397159,397159,Telephone,Telephone
+Urban_340670,340670,Engine,Engine
+Urban_265977,265977,Alarm,Alarm
+Urban_70166,70166,Engine,Engine
+Urban_321073,321073,Motorcycle,Motorcycle
+Urban_396137,396137,Alarm,Alarm
+Urban_256436,256436,Typing,Typing
+Urban_329896,329896,Alarm,Alarm
+Urban_402858,402858,Typing,Typing
+Urban_425860,425860,Car passing by,Car passing by
+Urban_136,136,Typing,Typing
+Urban_103183,103183,Truck,Truck
+Urban_204404,204404,Sawing,Sawing
+Urban_389775,389775,Alarm,Alarm
+Urban_87604,87604,Telephone,Telephone
+Urban_431840,431840,Car,Car
+Urban_327525,327525,Engine,Engine
+Urban_364840,364840,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_430237,430237,Car,Car
+Urban_387930,387930,Computer keyboard,Computer keyboard
+Urban_125616,125616,Squeak,Squeak
+Urban_113343,113343,Bus,Bus
+Urban_205505,205505,Car,Car
+Urban_398121,398121,Motorcycle,Motorcycle
+Urban_324675,324675,Car,Car
+Urban_145084,145084,Engine,Engine
+Urban_276608,276608,Ringtone,Ringtone
+Urban_179868,179868,Vehicle horn and car horn and honking,Vehicle horn and car horn and honking
+Urban_79015,79015,Bicycle,Bicycle
+Urban_350360,350360,Computer keyboard,Computer keyboard
+Urban_58260,58260,Race car and auto racing,Race car and auto racing
+Urban_3182,3182,Car passing by,Car passing by
+Urban_51128,51128,Engine,Engine
+Urban_352684,352684,Car,Car
+Urban_15657,15657,Motorcycle,Motorcycle
+Urban_393524,393524,Alarm,Alarm
+Urban_89567,89567,Race car and auto racing,Race car and auto racing
+Urban_340652,340652,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_162828,162828,Bus,Bus
+Urban_25821,25821,Telephone,Telephone
+Urban_254186,254186,Telephone,Telephone
+Urban_26177,26177,Traffic noise and roadway noise,Traffic noise and roadway noise
+Urban_152956,152956,Computer keyboard,Computer keyboard
+Urban_13840,13840,Squeak,Squeak
+Urban_261092,261092,Squeak,Squeak
+Urban_425381,425381,Car passing by,Car passing by
+Urban_117561,117561,Ringtone,Ringtone
+Urban_185170,185170,Drill,Drill
+Urban_128459,128459,Motor vehicle (road),Motor vehicle (road)
+Urban_268855,268855,Printer,Printer
+Urban_33729,33729,Alarm,Alarm
+Urban_335956,335956,Squeak,Squeak
+Urban_345334,345334,Car,Car
+Urban_35433,35433,Alarm,Alarm
+Urban_340668,340668,Engine,Engine
+Urban_271568,271568,Squeak,Squeak
+Urban_336896,336896,Alarm,Alarm
+Urban_178820,178820,Telephone,Telephone
+Urban_340703,340703,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_193972,193972,Typewriter,Typewriter
+Urban_412038,412038,Squeak,Squeak
+Urban_353526,353526,Power tool,Power tool
+Urban_250007,250007,Engine,Engine
+Urban_68953,68953,Squeak,Squeak
+Urban_179301,179301,Telephone,Telephone
+Urban_90193,90193,Telephone,Telephone
+Urban_145265,145265,Printer,Printer
+Urban_165397,165397,Bus,Bus
+Urban_322130,322130,Vehicle horn and car horn and honking,Vehicle horn and car horn and honking
+Urban_332502,332502,Truck,Truck
+Urban_22882,22882,Idling,Idling
+Urban_85205,85205,Telephone,Telephone
+Urban_104098,104098,Squeak,Squeak
+Urban_318910,318910,Alarm,Alarm
+Urban_113184,113184,Engine,Engine
+Urban_156547,156547,Ringtone,Ringtone
+Urban_50770,50770,Car,Car
+Urban_265644,265644,Bicycle bell,Bicycle bell
+Urban_125362,125362,Motorcycle,Motorcycle
+Urban_163114,163114,Bus,Bus
+Urban_24248,24248,Squeak,Squeak
+Urban_49177,49177,Squeak,Squeak
+Urban_68938,68938,Squeak,Squeak
+Urban_24929,24929,Ringtone,Ringtone
+Urban_31236,31236,Squeak,Squeak
+Urban_154954,154954,Alarm,Alarm
+Urban_427068,427068,Car,Car
+Urban_258177,258177,Telephone,Telephone
+Urban_418706,418706,Car passing by,Car passing by
+Urban_426731,426731,Bicycle,Bicycle
+Urban_202744,202744,Squeak,Squeak
+Urban_328156,328156,Squeak,Squeak
+Urban_175844,175844,Traffic noise and roadway noise,Traffic noise and roadway noise
+Urban_380066,380066,Typing,Typing
+Urban_215822,215822,Telephone,Telephone
+Urban_344224,344224,Hiss,Hiss
+Urban_165414,165414,Bus,Bus
+Urban_79440,79440,Telephone,Telephone
+Urban_24246,24246,Squeak,Squeak
+Urban_383593,383593,Bicycle bell,Bicycle bell
+Urban_403458,403458,Engine,Engine
+Urban_235254,235254,Typing,Typing
+Urban_162500,162500,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_212662,212662,Bicycle,Bicycle
+Urban_395041,395041,Squeak,Squeak
+Urban_250063,250063,Engine,Engine
+Urban_405019,405019,Motorcycle,Motorcycle
+Urban_178137,178137,Ringtone,Ringtone
+Urban_106486,106486,Idling,Idling
+Urban_137143,137143,Squeak,Squeak
+Urban_63754,63754,Shout,Shout
+Urban_175843,175843,Traffic noise and roadway noise,Traffic noise and roadway noise
+Urban_342554,342554,Squeak,Squeak
+Urban_179864,179864,Traffic noise and roadway noise,Traffic noise and roadway noise
+Urban_48702,48702,Engine,Engine
+Urban_24644,24644,Squeak,Squeak
+Urban_186555,186555,Sawing,Sawing
+Urban_165425,165425,Bus,Bus
+Urban_143602,143602,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_329611,329611,Engine,Engine
+Urban_384119,384119,Engine,Engine
+Urban_113190,113190,Engine,Engine
+Urban_179718,179718,Sawing,Sawing
+Urban_3179,3179,Car passing by,Car passing by
+Urban_267915,267915,Bicycle,Bicycle
+Urban_58760,58760,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_428457,428457,Accelerating and revving and vroom,Accelerating and revving and vroom
+Urban_71531,71531,Engine,Engine
+Urban_66293,66293,Telephone,Telephone
+Urban_161397,161397,Slam,Slam
+Urban_415483,415483,Car passing by,Car passing by
+Urban_386275,386275,Drill,Drill
+Urban_244932,244932,Alarm,Alarm
+Urban_149757,149757,Computer keyboard,Computer keyboard
+Urban_432442,432442,Sawing,Sawing
+Urban_257931,257931,Car,Car
+Urban_377462,377462,Computer keyboard,Computer keyboard
+Urban_33747,33747,Alarm,Alarm
+Urban_155773,155773,Motorcycle,Motorcycle
+Urban_77912,77912,Race car and auto racing,Race car and auto racing
+Urban_72663,72663,Squeak,Squeak
+Urban_111905,111905,Bus,Bus
+Urban_414263,414263,Motorcycle,Motorcycle
+Urban_9262,9262,Bicycle,Bicycle
+Urban_151833,151833,Squeak,Squeak
+Urban_109825,109825,Squeak,Squeak
+Urban_398919,398919,Squeak,Squeak
+Urban_168621,168621,Motor vehicle (road),Motor vehicle (road)
+Urban_160814,160814,Bus,Bus
+Urban_364856,364856,Car passing by,Car passing by
+Urban_393666,393666,Motor vehicle (road),Motor vehicle (road)
+Urban_343799,343799,Typing,Typing
+Urban_179866,179866,Traffic noise and roadway noise,Traffic noise and roadway noise
+Urban_53383,53383,Motorcycle,Motorcycle
+Urban_166717,166717,Engine,Engine
+Urban_113183,113183,Engine,Engine
+Urban_186938,186938,Idling,Idling
+Urban_332997,332997,Engine,Engine
+Urban_258176,258176,Telephone,Telephone
+Urban_53807,53807,Race car and auto racing,Race car and auto racing
+Urban_326252,326252,Telephone,Telephone
+Urban_70118,70118,Engine,Engine

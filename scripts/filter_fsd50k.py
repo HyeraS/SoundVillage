@@ -1,16 +1,11 @@
 """
-filter_fsd50k.py  (v2 — 정확 레이블 매칭 + 제외 로직)
-
-변경 사항:
-- 부분 문자열 매칭 → 정확한 레이블 집합 매칭
-- 1순위 레이블 우선 (멀티레이블 클립의 주 소리 기준)
-- Zone별 명시적 제외 목록 추가
+filter_fsd50k.py  (v3 — 6개 신 Zone명, Human 추가, Zone별 CSV 출력)
 
 사용법:
     python scripts/filter_fsd50k.py \
-        --csv ~/fsd50k_pilot/FSD50K.ground_truth/dev.csv \
-        --meta ~/fsd50k_pilot/FSD50K.metadata/dev_clips_info_FSD50K.json \
-        --out scripts/pilot_clips.csv
+        --csv fsd50k_pilot/FSD50K.ground_truth/dev.csv \
+        --meta fsd50k_pilot/FSD50K.metadata/dev_clips_info_FSD50K.json \
+        --out scripts/pilot_clips_v3.csv
 """
 
 import argparse
@@ -20,10 +15,10 @@ import pandas as pd
 from pathlib import Path
 
 # ─────────────────────────────────────────────
-# Zone별 허용 레이블 (정확 매칭 — FSD50K AudioSet 레이블 기준)
+# Zone별 허용 레이블 (FSD50K AudioSet 레이블 기준, 언더스코어→공백 변환 후)
 # ─────────────────────────────────────────────
 ZONE_INCLUDE = {
-    "Forest": {
+    "Animal": {
         # 새소리
         "Bird", "Bird vocalization bird call and bird song",
         "Bird song", "Bird vocalization", "Bird call",
@@ -31,17 +26,16 @@ ZONE_INCLUDE = {
         "Crow", "Owl", "Caw",
         # 곤충
         "Insect", "Cricket", "Mosquito", "Bee wasp etc",
+        "Buzz",
         # 양서류
         "Frog",
-        # 포유류 (자연)
+        # 포유류
         "Cat", "Meow", "Purr", "Hiss",
         "Dog", "Bark", "Dog barking", "Growling",
         "Wild animal",
-        # 농장 동물 (선택적 — 아래 ALLOW_FARM_IN_FOREST = True/False로 조절)
-        # "Livestock and farm animals and working animals",
-        # "Chicken rooster", "Rooster", "Hen",
+        "Gull and seagull",
     },
-    "Creek": {
+    "Nature": {
         # 물 소리
         "Water", "Waterfall", "Stream", "Babbling brook",
         "Rain", "Rain on surface", "Raindrop", "Drip",
@@ -50,9 +44,10 @@ ZONE_INCLUDE = {
         # 날씨
         "Thunder", "Thunderstorm", "Lightning",
         "Wind", "Wind noise",
-        # 자연음 (불 소리는 제거 — Creek zone과 어울리지 않음)
+        # 불
+        "Fire", "Crackle",
     },
-    "City": {
+    "Urban": {
         # 차량
         "Car", "Motor vehicle road", "Automobile", "Race car auto racing",
         "Bus", "Truck", "Motorcycle", "Bicycle",
@@ -62,15 +57,14 @@ ZONE_INCLUDE = {
         "Alarm", "Smoke detector smoke alarm",
         "Siren", "Civil defense siren", "Police car siren",
         "Car alarm", "Foghorn", "Horn",
-        "Telephone", "Ringtone", "Dial tone",
-        # 도시/실내 생활
-        "Crowd", "Hubbub speech noise and chatter",
-        "Walk footsteps", "Sliding door",
+        # 도시 생활
         "Printer", "Computer keyboard", "Typing",
         "Drill", "Power tool", "Jackhammer", "Sawing",
-        "Engine", "Engine idling", "Lawn mower", "Air conditioning",
+        "Engine", "Engine idling", "Lawn mower",
+        "Construction",
+        "Squeak", "Bicycle bell",
     },
-    "Stage": {
+    "Music": {
         # 현악기
         "Guitar", "Electric guitar", "Bass guitar",
         "Violin fiddle", "Cello", "Banjo", "Ukulele",
@@ -78,56 +72,67 @@ ZONE_INCLUDE = {
         # 건반
         "Piano", "Keyboard musical", "Organ", "Harpsichord",
         # 타악기
-        "Drum", "Drum kit", "Snare drum", "Bass drum", "Drum machine",
-        "Cymbal", "Hi hat", "Gong", "Tambourine", "Maracas",
-        "Percussion", "Clapping",
+        "Drum", "Drum kit", "Snare drum", "Bass drum",
+        "Cymbal", "Hi hat", "Gong", "Tambourine",
+        "Percussion",
+        "Crash cymbal",
         # 관악기
         "Flute", "Saxophone", "Trumpet", "Trombone", "Clarinet",
         "French horn", "Bagpipes", "Oboe",
+        "Wind instrument and woodwind instrument", "Brass",
         # 기타 악기
         "Harp", "Accordion", "Harmonica",
-        # 보컬
-        "Singing", "Choir", "Gospel music", "A capella",
-        # 장르
-        "Music", "Electronic music",
+        # 보컬/장르
+        "Singing", "Choir", "Gospel music",
+        "Keys",
     },
     "Lab": {
-        # 전자/합성 음향 (FSD50K 실제 레이블 기준)
-        "Synthesizer",
-        "White noise", "Pink noise",
-        "Static noise", "Radio static",
+        # 전자/합성 음향
+        "Synthesizer", "White noise", "Pink noise", "Static noise",
         "Distortion",
-        # 기계음 / 추상음
-        "Mechanical fan", "Whir", "Buzzing",
-        "Hum", "Rumble", "Humming",
+        # 기계음
+        "Mechanical fan", "Whir", "Hum", "Rumble", "Humming",
         "Beep bleep", "Bleep",
         # 충격/추상음
         "Thump thud", "Clunk", "Knock",
         "Click", "Tick tock",
-        # 전자적 처리 / 환경음
-        "Power electronics",
-        "Vibration",
         # 기타 모호한 음향
         "Scratch", "Creak", "Squeak",
         "Whoosh swoosh swish",
         "Chime", "Bell", "Ding",
-        "Sine wave", "Square wave", "Sawtooth wave",
+        "Glass", "Explosion",
+        "Typewriter", "Typing",
+        "Wind chime", "Cowbell",
+    },
+    "Human": {
+        # 신체음
+        "Cough", "Sneeze", "Snoring", "Wheeze", "Breathing", "Hiccup",
+        "Burping and eructation", "Chewing and mastication",
+        # 발성 (비언어)
+        "Laughter", "Chuckle and chortle", "Crying and sobbing", "Crying",
+        "Sigh",
+        # 박수/신체 타악
+        "Applause", "Clapping", "Finger snapping",
+        # 사회적 소리
+        "Cheering", "Crowd", "Hubbub speech noise and chatter",
+        # 발소리/동작
+        "Footstep", "Walk footsteps", "Run",
     },
 }
 
-# Zone별 명시적 제외 레이블 (포함 목록에 있어도 이게 있으면 제외)
+# Zone별 명시적 제외 레이블
 ZONE_EXCLUDE = {
-    "Forest": {
+    "Animal": {
         "Wind instrument", "Flute", "Saxophone", "Trumpet", "Clarinet",
         "Guitar", "Piano", "Drum", "Music", "Singing",
         "Car", "Motor vehicle road", "Engine", "Siren", "Alarm",
         "Synthesizer", "Electronic music",
         "Speech", "Male speech man speaking", "Female speech woman speaking",
-        "Chewing and mastication", "Crowd", "Accelerating and revving and vroom",
+        "Chewing and mastication", "Crowd",
         "Gunshot gunfire", "Fireworks",
+        "Accelerating and revving and vroom",
     },
-    "Creek": {
-        # 절대 넣으면 안 되는 것
+    "Nature": {
         "Wind instrument", "Flute", "Saxophone", "Trumpet", "Clarinet",
         "Guitar", "Piano", "Drum", "Music",
         "Car", "Motor vehicle road", "Engine",
@@ -135,19 +140,20 @@ ZONE_EXCLUDE = {
         "Speech", "Laughter", "Crowd",
         "Synthesizer",
     },
-    "City": {
+    "Urban": {
         "Guitar", "Piano", "Violin fiddle", "Cello",
         "Drum", "Singing", "Music",
         "Synthesizer",
         "Bird", "Frog", "Insect", "Cricket",
         "Water", "Rain", "Thunder",
     },
-    "Stage": {
+    "Music": {
         "Car", "Motor vehicle road", "Engine", "Siren", "Alarm",
         "Water", "Rain", "Thunder", "Wind", "Bird", "Frog", "Insect",
         "Synthesizer",
         "Speech", "Male speech man speaking", "Female speech woman speaking",
         "Crowd",
+        "Gunshot gunfire",
     },
     "Lab": {
         "Guitar", "Piano", "Violin fiddle", "Drum",
@@ -159,16 +165,26 @@ ZONE_EXCLUDE = {
         "Laughter", "Crowd",
         "Gunshot gunfire",
         "Traffic noise roadway noise",
-        "Fire", "Crackle",
+    },
+    "Human": {
+        "Music", "Singing", "Guitar", "Piano", "Drum",
+        "Car", "Motor vehicle road", "Engine",
+        "Bird", "Frog", "Insect", "Cricket",
+        "Water", "Rain", "Thunder",
+        "Synthesizer", "Electronic music",
+        "Male speech man speaking", "Female speech woman speaking",
+        "Speech", "Narration and monologue", "Reading",
+        "Gunshot gunfire",
     },
 }
 
 TARGET_COUNT = {
-    "Forest": 30,
-    "Creek":  30,
-    "City":   30,
-    "Stage":  30,
-    "Lab":    20,
+    "Animal": 220,
+    "Nature": 220,
+    "Urban":  220,
+    "Music":  220,
+    "Lab":    220,
+    "Human":  220,
 }
 
 MIN_DUR = 2.0
@@ -176,39 +192,21 @@ MAX_DUR = 30.0
 
 
 def parse_labels(labels_str):
-    """콤마 구분 레이블 → 정규화된 리스트 반환 (순서 유지)
-
-    FSD50K CSV는 레이블을 언더스코어로 표기하므로 공백으로 변환해
-    ZONE_INCLUDE/ZONE_EXCLUDE 집합과 형식을 맞춘다.
-    예) "Wind_instrument,_woodwind_instrument" → ["Wind instrument", "woodwind instrument"]
-    """
     raw = [l.strip().lstrip("_") for l in str(labels_str).split(",") if l.strip().lstrip("_")]
-    return [r.replace("_", " ") for r in raw]  # 순서 유지 (0번이 1순위 레이블)
+    return [r.replace("_", " ") for r in raw]
 
 
 def label_matches(labels_list, include_set, exclude_set):
-    """
-    포함 조건: labels의 1순위 레이블이 include_set에 있거나
-               2~3순위 중 하나가 include_set에 있으면서 exclude_set 레이블이 없을 때
-    제외 조건: 어떤 레이블이라도 exclude_set에 있으면 제외
-    """
     if not labels_list:
         return False
-
-    # 1. 제외 조건 먼저 — 어떤 레이블이라도 exclude에 해당하면 스킵
     for label in labels_list:
         if label in exclude_set:
             return False
-
-    # 2. 포함 조건 — 1순위 레이블이 include에 있어야 최우선 선택
     if labels_list[0] in include_set:
         return True
-
-    # 3. 1순위 미매칭이면 2~3순위 중 include에 있는지 확인 (선택적 허용)
     for label in labels_list[1:3]:
         if label in include_set:
             return True
-
     return False
 
 
@@ -225,14 +223,14 @@ def load_duration_map(meta_path):
     return dur_map
 
 
-def infer_source_type(zone):
-    return {
-        "Forest": "Biological",
-        "Creek":  "Physical",
-        "City":   "Anthropogenic",
-        "Stage":  "Musical",
-        "Lab":    "Electroacoustic",
-    }[zone]
+SOURCE_TYPE = {
+    "Animal": "Biological",
+    "Nature": "Physical",
+    "Urban":  "Anthropogenic",
+    "Music":  "Musical",
+    "Lab":    "Electroacoustic",
+    "Human":  "Biological",
+}
 
 
 def main(csv_path, meta_path, out_path, seed=42):
@@ -243,13 +241,13 @@ def main(csv_path, meta_path, out_path, seed=42):
 
     results = []
     used_fnames = set()
+    out_dir = Path(out_path).parent
 
-    for zone in ["Forest", "Creek", "City", "Stage", "Lab"]:
+    for zone in ["Animal", "Nature", "Urban", "Music", "Lab", "Human"]:
         include_set = ZONE_INCLUDE[zone]
         exclude_set = ZONE_EXCLUDE[zone]
         target = TARGET_COUNT[zone]
 
-        # 레이블 파싱 + 매칭
         matched = []
         for _, row in df.iterrows():
             fname = str(row["fname"])
@@ -258,7 +256,6 @@ def main(csv_path, meta_path, out_path, seed=42):
             labels = parse_labels(row["labels"])
             if not label_matches(labels, include_set, exclude_set):
                 continue
-            # 길이 필터
             if dur_map:
                 dur = dur_map.get(fname, MIN_DUR)
                 if not (MIN_DUR <= dur <= MAX_DUR):
@@ -268,46 +265,54 @@ def main(csv_path, meta_path, out_path, seed=42):
         pool = pd.DataFrame(matched)
         sampled = pool.sample(min(target, len(pool)), random_state=seed)
 
+        zone_rows = []
         for _, row in sampled.iterrows():
             labels = parse_labels(row["labels"])
             fname  = str(row["fname"])
             dur    = dur_map.get(fname)
-            results.append({
-                "sound_id":       f"{zone}_{fname.zfill(6)}",
+            entry = {
+                "sound_id":       f"{zone}_{fname}",
                 "game_zone":      zone,
-                "source_type":    infer_source_type(zone),
+                "source_type":    SOURCE_TYPE[zone],
                 "sub_category":   labels[0] if labels else "",
                 "audioset_class": labels[0] if labels else "",
-                "all_labels":     ", ".join(labels),     # 검토용
+                "all_labels":     ", ".join(labels),
                 "fname":          fname,
                 "file_path":      f"Audio/{zone}/{fname}",
                 "source_dataset": "FSD50K",
                 "original_fname": fname,
                 "duration_sec":   round(dur, 2) if dur else None,
                 "ambiguous":      False,
-            })
+            }
+            results.append(entry)
+            zone_rows.append(entry)
             used_fnames.add(fname)
 
-        found = len(sampled)
-        print(f"[{zone:8}] 목표 {target:3}개 → 확보 {found:3}개  (풀 {len(pool)}개)")
+        # Zone별 개별 CSV 출력 (boost_all_zones.py가 읽는 형식)
+        zone_csv = out_dir / f"pilot_clips_{zone.lower()}.csv"
+        pd.DataFrame(zone_rows)[["sound_id", "original_fname", "sub_category", "audioset_class"]].to_csv(
+            zone_csv, index=False
+        )
 
+        found = len(sampled)
+        print(f"[{zone:8}] 목표 {target}개 → 확보 {found}개  (풀 {len(pool)}개)  → {zone_csv.name}")
+
+    # 전체 합산 CSV / JSON 출력
     out_df = pd.DataFrame(results)
     out_df.to_csv(out_path, index=False)
     print(f"\n총 {len(out_df)}개 클립 → {out_path}")
 
-    # sound_metadata.json 초안 (all_labels 제외)
-    meta_fields = ["sound_id","game_zone","source_type","sub_category",
-                   "audioset_class","file_path","source_dataset","original_fname","ambiguous"]
+    meta_fields = ["sound_id", "game_zone", "source_type", "sub_category",
+                   "audioset_class", "file_path", "source_dataset", "original_fname", "ambiguous"]
     preview = out_df[meta_fields].to_dict(orient="records")
     json_out = Path(out_path).with_suffix(".json")
     with open(json_out, "w", encoding="utf-8") as f:
         json.dump({"sounds": preview}, f, ensure_ascii=False, indent=2)
     print(f"sound_metadata 초안 → {json_out}")
 
-    # Zone별 분포 요약
     print("\n=== Zone별 1순위 레이블 분포 (상위 5개) ===")
     from collections import Counter
-    for zone in ["Forest","Creek","City","Stage","Lab"]:
+    for zone in ["Animal", "Nature", "Urban", "Music", "Lab", "Human"]:
         clips = [r for r in results if r["game_zone"] == zone]
         cats  = Counter(r["sub_category"] for r in clips)
         print(f"\n[{zone}]")
@@ -319,7 +324,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--csv",  required=True)
     parser.add_argument("--meta", default="")
-    parser.add_argument("--out",  default="scripts/pilot_clips.csv")
+    parser.add_argument("--out",  default="scripts/pilot_clips_v3.csv")
     parser.add_argument("--seed", type=int, default=42)
     args = parser.parse_args()
     main(args.csv, args.meta, args.out, args.seed)
