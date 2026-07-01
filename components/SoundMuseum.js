@@ -269,6 +269,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const [candidates,  setCandidates]  = useState([])
   const [loading,     setLoading]     = useState(true)
   const [pick,        setPick]        = useState(null) // 'A'|'B'|'C'|'D'|'E'
+  const [confidence,  setConfidence]  = useState(3)   // 1=low 3=medium 5=high
   const [submitting,  setSubmitting]  = useState(false)
   const [npcIdx,      setNpcIdx]      = useState(0)
   const [visible,     setVisible]     = useState(false)
@@ -305,6 +306,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             sound_id:           sound.sound_id,
             zone,
             voted_ids:          [candidate.id],
+            confidence,
             play_count:         playCount,
             listening_time_sec: getListeningTime(),
             stage:              2,
@@ -519,6 +521,39 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
               </div>
 
             </>
+          )}
+
+          {/* 확신도 선택 (표현 선택 후 표시) */}
+          {pick !== null && (
+            <div>
+              <div style={{
+                fontSize: '9px', fontWeight: 800, color: '#8B6A3A',
+                letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px',
+              }}>선택에 얼마나 자신 있나요?</div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[
+                  { val: 1, label: '🤔 낮음' },
+                  { val: 3, label: '😊 보통' },
+                  { val: 5, label: '🎯 높음' },
+                ].map(({ val, label }) => (
+                  <button
+                    key={val}
+                    onClick={() => setConfidence(val)}
+                    style={{
+                      flex: 1, padding: '9px 4px', borderRadius: '10px',
+                      border: confidence === val ? `2px solid ${accent}` : `1.5px solid ${accent}30`,
+                      background: confidence === val ? `${accent}18` : '#F0EBE0',
+                      color: confidence === val ? accent : '#8B6A3A',
+                      fontSize: '12px', fontFamily: 'Nunito, sans-serif',
+                      fontWeight: confidence === val ? 800 : 500,
+                      cursor: 'pointer', transition: 'all 0.15s',
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* 제출 버튼 */}

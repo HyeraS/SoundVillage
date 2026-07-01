@@ -34,48 +34,55 @@ function PlayIcon({ playing }) {
 
 /* ─────────────────────────────────────────────
    세그먼트 상수 + 계산
-   재생 구조: [도입 2s] → [핵심 5s] → [마무리 1s]
+   재생 구조: [도입] → [핵심] → [마무리]
+   - ≤4s: null 반환 → 전체 반복 재생
+   - >4s: 가변 세그먼트 (실제 길이 비례)
 ───────────────────────────────────────────── */
-const INTRO_DUR  = 2;
-const MID_DUR    = 5;
-const OUTRO_DUR  = 1;
-const TOTAL_VIRT = INTRO_DUR + MID_DUR + OUTRO_DUR; // 8s
-
-// 도입 0~2/8, 핵심 2~7/8, 마무리 7~8/8
 const SEG_COLORS = {
   intro:  '#88b4e8',
-  middle: null,      // accent 색상 사용
+  middle: null,
   outro:  '#e8b488',
 };
 
 function computeSegments(dur) {
-  if (!dur || dur <= TOTAL_VIRT) return null; // 짧은 클립은 전체 재생
-  const midC = dur / 2;
+  if (!dur || dur <= 4) return null;
+  const INTRO = Math.min(dur * 0.20, 2.5);
+  const OUTRO = Math.min(dur * 0.15, 1.5);
+  const MID   = Math.min(dur * 0.50, 8.0);
+  const midC  = dur / 2;
   return [
-    { label: 'intro',  start: 0,              end: INTRO_DUR,       vDur: INTRO_DUR  },
-    { label: 'middle', start: midC - 2.5,     end: midC + 2.5,      vDur: MID_DUR    },
-    { label: 'outro',  start: dur - OUTRO_DUR, end: dur,             vDur: OUTRO_DUR  },
+    { label: 'intro',  start: 0,            end: INTRO,          vDur: INTRO },
+    { label: 'middle', start: midC - MID/2, end: midC + MID/2,   vDur: MID   },
+    { label: 'outro',  start: dur - OUTRO,  end: dur,            vDur: OUTRO },
   ];
 }
 
-/* ─────────────────────────────────────────────
-   짧은 클립 반복 재생 상수 + 계산
-   4초 미만 클립: 총 청취 ~6초 목표로 N회 반복
-───────────────────────────────────────────── */
-const SHORT_THRESHOLD = 4; // 이 초 미만이면 반복 재생
+function segRatios(segs) {
+  const total = segs.reduce((a, s) => a + s.vDur, 0);
+  return segs.map(s => s.vDur / total);
+}
 
+/* ─────────────────────────────────────────────
+   짧은 클립 반복 재생 계산
+   4초 이하: 총 청취 ~6초 목표로 N회 반복
+───────────────────────────────────────────── */
 function computeLoopTotal(dur) {
-  if (!dur || dur >= SHORT_THRESHOLD) return 0;
+  if (!dur || dur > 4) return 0;
   return Math.min(8, Math.max(3, Math.ceil(6 / dur)));
 }
 
 /* ─────────────────────────────────────────────
-   파형 시각화 (세그먼트 지원)
+   파형 시각화 (세그먼트 지원, 동적 비율)
 ───────────────────────────────────────────── */
-function SegmentedWaveform({ accent, progress, segLabel, isSegmented, onSeek }) {
+function SegmentedWaveform({ accent, progress, segLabel, isSegmented, segs, onSeek }) {
   const BAR = 44;
   const heights = useRef(Array.from({ length: BAR }, () => 18 + Math.random() * 65));
   const wrapRef = useRef(null);
+
+  // 파형 내 세그먼트 경계 비율 (0~1)
+  const ratios = isSegmented && segs ? segRatios(segs) : null;
+  const introCut  = ratios ? ratios[0] : 0.25;
+  const outroCut  = ratios ? 1 - ratios[2] : 0.875;
 
   const handleClick = (e) => {
     if (!onSeek || !wrapRef.current) return;
@@ -87,32 +94,36 @@ function SegmentedWaveform({ accent, progress, segLabel, isSegmented, onSeek }) 
     const r      = (i + 0.5) / BAR;
     const filled = progress !== null && r <= progress;
 
-    if (!isSegmented) {
-      return filled ? accent : `${accent}38`;
-    }
+    if (!isSegmented) return filled ? accent : `${accent}38`;
 
     let base;
-    if (r < 2 / 8)      base = SEG_COLORS.intro;
-    else if (r < 7 / 8) base = accent;
-    else                 base = SEG_COLORS.outro;
+    if (r < introCut)      base = SEG_COLORS.intro;
+    else if (r < outroCut) base = accent;
+    else                   base = SEG_COLORS.outro;
 
     const active =
-      (segLabel === 'intro'  && r < 2 / 8) ||
-      (segLabel === 'middle' && r >= 2 / 8 && r < 7 / 8) ||
-      (segLabel === 'outro'  && r >= 7 / 8);
+      (segLabel === 'intro'  && r < introCut) ||
+      (segLabel === 'middle' && r >= introCut && r < outroCut) ||
+      (segLabel === 'outro'  && r >= outroCut);
 
-    if (filled)  return base;
-    if (active)  return `${base}55`;
+    if (filled) return base;
+    if (active) return `${base}55`;
     return `${base}28`;
   };
+
+  // 세그먼트 라벨용 초(s) 계산
+  const introDur = segs?.[0]?.vDur ?? 2;
+  const midDur   = segs?.[1]?.vDur ?? 5;
+  const outroDur = segs?.[2]?.vDur ?? 1;
+  const fmt = (s) => s < 1 ? `${(s * 10 | 0) / 10}s` : `${Math.round(s)}s`;
 
   return (
     <div>
       {isSegmented && (
         <div style={{ display: 'flex', marginBottom: '5px', fontSize: '9px', fontWeight: 600, userSelect: 'none' }}>
-          <div style={{ flex: INTRO_DUR,  textAlign: 'center', color: SEG_COLORS.intro  }}>↓ 도입 {INTRO_DUR}s</div>
-          <div style={{ flex: MID_DUR,    textAlign: 'center', color: accent             }}>↓ 핵심 {MID_DUR}s</div>
-          <div style={{ flex: OUTRO_DUR,  textAlign: 'center', color: SEG_COLORS.outro  }}>↓ {OUTRO_DUR}s</div>
+          <div style={{ flex: introDur, textAlign: 'center', color: SEG_COLORS.intro }}>↓ 도입 {fmt(introDur)}</div>
+          <div style={{ flex: midDur,   textAlign: 'center', color: accent            }}>↓ 핵심 {fmt(midDur)}</div>
+          <div style={{ flex: outroDur, textAlign: 'center', color: SEG_COLORS.outro }}>↓ {fmt(outroDur)}</div>
         </div>
       )}
 
@@ -138,18 +149,18 @@ function SegmentedWaveform({ accent, progress, segLabel, isSegmented, onSeek }) 
 
         {isSegmented && (
           <>
-            <div style={{ position: 'absolute', left: `${(2 / 8) * 100}%`, top: 0, bottom: 0, width: '1px', background: '#ffffff22', pointerEvents: 'none' }} />
-            <div style={{ position: 'absolute', left: `${(7 / 8) * 100}%`, top: 0, bottom: 0, width: '1px', background: '#ffffff22', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', left: `${introCut * 100}%`, top: 0, bottom: 0, width: '1px', background: '#ffffff22', pointerEvents: 'none' }} />
+            <div style={{ position: 'absolute', left: `${outroCut * 100}%`, top: 0, bottom: 0, width: '1px', background: '#ffffff22', pointerEvents: 'none' }} />
           </>
         )}
       </div>
 
-      {isSegmented && (
+      {isSegmented && segs && (
         <div style={{ position: 'relative', height: '14px', marginTop: '3px', fontSize: '9px', color: '#555050', userSelect: 'none' }}>
           <span style={{ position: 'absolute', left: 0 }}>0s</span>
-          <span style={{ position: 'absolute', left: `${(2 / 8) * 100}%`, transform: 'translateX(-50%)' }}>2s</span>
-          <span style={{ position: 'absolute', left: `${(7 / 8) * 100}%`, transform: 'translateX(-50%)' }}>7s</span>
-          <span style={{ position: 'absolute', right: 0 }}>8s</span>
+          <span style={{ position: 'absolute', left: `${introCut * 100}%`, transform: 'translateX(-50%)' }}>{fmt(segs[0].end)}</span>
+          <span style={{ position: 'absolute', left: `${outroCut * 100}%`, transform: 'translateX(-50%)' }}>{fmt(segs[2].start)}</span>
+          <span style={{ position: 'absolute', right: 0 }}>{fmt(segs[2].end)}</span>
         </div>
       )}
     </div>
@@ -361,16 +372,16 @@ function useSegmentedPlayer(filePath) {
 
   useEffect(() => () => { stopSound(); clearPoll(); clearReplayTimer(); }, []);
 
-  return { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, toggle, seekVirtual };
+  return { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, segs: segsRef.current, toggle, seekVirtual };
 }
 
 /* ─────────────────────────────────────────────
    Stage 1 — 의성어 입력 패널
 ───────────────────────────────────────────── */
 const SEG_STATUS = {
-  intro:  '맥락 파악 중... 처음 2초 🎧',
+  intro:  '맥락 파악 중... 앞부분 듣는 중 🎧',
   middle: '핵심 구간! 이 소리를 표현해주세요 ✏️',
-  outro:  '마무리 1초 🎵',
+  outro:  '마무리 부분 🎵',
 };
 
 function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit, onSkip }) {
@@ -381,7 +392,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
   const inputRef                    = useRef(null);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, toggle, seekVirtual } =
+  const { playing, progress, playCount, audioError, isSegmented, segLabel, loopCurrent, loopTotal, segs, toggle, seekVirtual } =
     useSegmentedPlayer(sound.file_path);
 
   const isShortClip  = loopTotal > 0;
@@ -477,6 +488,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           progress={progress}
           segLabel={segLabel}
           isSegmented={isSegmented}
+          segs={segs}
           onSeek={seekVirtual}
         />
 
