@@ -5,6 +5,11 @@ import { getCandidateExpressions, saveVote } from '@/lib/supabase'
 import { ZONE_META } from '@/components/GameEngine'
 
 /* ─────────────────────────────────────────────
+   동의 정도 슬라이더 라벨 (1~5)
+───────────────────────────────────────────── */
+const CONFIDENCE_LABELS = ['매우 약함', '약함', '보통', '강한 동의', '매우동의']
+
+/* ─────────────────────────────────────────────
    Zone별 룸 테마
 ───────────────────────────────────────────── */
 const ROOM = {
@@ -519,34 +524,33 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             </>
           )}
 
-          {/* 확신도 선택 (표현 선택 후 표시) */}
+          {/* 동의 정도 슬라이더 (표현 선택 후 표시) */}
           {pick !== null && (
             <div>
               <div style={{
                 fontSize: '9px', fontWeight: 800, color: '#8B6A3A',
-                letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '8px',
-              }}>선택에 얼마나 자신 있나요?</div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                {[
-                  { val: 1, label: '🤔 낮음' },
-                  { val: 3, label: '😊 보통' },
-                  { val: 5, label: '🎯 높음' },
-                ].map(({ val, label }) => (
-                  <button
-                    key={val}
-                    onClick={() => setConfidence(val)}
-                    style={{
-                      flex: 1, padding: '9px 4px', borderRadius: '10px',
-                      border: confidence === val ? `2px solid ${accent}` : `1.5px solid ${accent}30`,
-                      background: confidence === val ? `${accent}18` : '#F0EBE0',
-                      color: confidence === val ? accent : '#8B6A3A',
-                      fontSize: '12px', fontFamily: 'Nunito, sans-serif',
-                      fontWeight: confidence === val ? 800 : 500,
-                      cursor: 'pointer', transition: 'all 0.15s',
-                    }}
-                  >
+                letterSpacing: '2px', textTransform: 'uppercase', marginBottom: '4px',
+              }}>이 표현에 얼마나 동의하나요?</div>
+              <div style={{
+                textAlign: 'center', fontSize: '15px', fontWeight: 800,
+                color: accent, marginBottom: '8px',
+              }}>
+                {CONFIDENCE_LABELS[confidence - 1]}
+              </div>
+              <input
+                type="range" min={1} max={5} step={1}
+                value={confidence}
+                onChange={e => setConfidence(Number(e.target.value))}
+                style={{ width: '100%', accentColor: accent, cursor: 'pointer' }}
+              />
+              <div style={{
+                display: 'flex', justifyContent: 'space-between',
+                fontSize: '8px', color: '#A09080', marginTop: '2px', padding: '0 1px',
+              }}>
+                {CONFIDENCE_LABELS.map((label, i) => (
+                  <span key={i} style={{ flex: i === 0 || i === CONFIDENCE_LABELS.length - 1 ? 'none' : 1, textAlign: 'center' }}>
                     {label}
-                  </button>
+                  </span>
                 ))}
               </div>
             </div>

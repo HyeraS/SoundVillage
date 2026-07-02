@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone } from '@/lib/supabase'
+import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -229,19 +229,24 @@ export default function HomePage() {
 
     // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
     const otherGroupSounds = getOtherGroupSounds(groupId)
+    const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
 
     let sound = null
     try {
-      const annotatedIds = await getAnnotatedSoundIds()
-      console.log('[Museum] annotatedIds:', annotatedIds, 'otherGroup:', otherGroupSounds.length)
-      // 다른 그룹 사운드 중 5개 이상 어노테이션된 것 탐색
-      const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
-      const shuffled = [...annotatedIds].sort(() => Math.random() - 0.5)
-      for (const dbId of shuffled.slice(0, 30)) {
-        const found = resolveSoundFromDbId(dbId, all)
-        if (!found) continue
-        // 그룹 필터: group 필드가 없거나 다른 그룹인 경우
-        if (found.group && !otherIds.has(found.sound_id)) continue
+      const [annotatedIds, votedIds] = await Promise.all([
+        getAnnotatedSoundIds(),
+        getVotedSoundIdsByParticipant(participantId),
+      ])
+      const votedSet = new Set(votedIds)
+
+      // 후보: 다른 그룹 소리이면서, 내가 이 소리에 대해 아직 Stage 2 투표를 안 한 것만
+      // (한 번 투표한 소리는 다시 뜨지 않게)
+      const candidates = annotatedIds
+        .map(dbId => resolveSoundFromDbId(dbId, all))
+        .filter(found => found && otherIds.has(found.sound_id) && !votedSet.has(found.sound_id))
+
+      const shuffled = [...candidates].sort(() => Math.random() - 0.5)
+      for (const found of shuffled) {
         const count = await getAnnotationCountForSound(found.sound_id)
         if (count >= 5) { sound = found; break }
       }
@@ -258,7 +263,7 @@ export default function HomePage() {
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
-  }, [groupId, findSoundByDbId, resolveSoundFromDbId])
+  }, [groupId, participantId, findSoundByDbId, resolveSoundFromDbId])
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
   const handleAnnotateComplete = useCallback(() => {
