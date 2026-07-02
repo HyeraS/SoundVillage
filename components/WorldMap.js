@@ -596,25 +596,8 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
   const [moving,     setMoving]     = useState(false)
   const [nearZone,   setNearZone]   = useState(null)
   const [nearMuseum, setNearMuseum] = useState(false)
-  const [cam,        setCam]        = useState({ x: 0, y: 0 })
-  const [vp,         setVp]         = useState({
-    w: typeof window !== 'undefined' ? window.innerWidth  : 800,
-    h: typeof window !== 'undefined' ? window.innerHeight - HUD_H : 544,
-  })
   const posRef = useRef(pos)
-  const viewW  = useRef(typeof window !== 'undefined' ? window.innerWidth  : 800)
-  const viewH  = useRef(typeof window !== 'undefined' ? window.innerHeight - HUD_H : 544)
   const rafRef = useRef(null)
-
-  useEffect(() => {
-    const measure = () => {
-      const w = window.innerWidth, h = window.innerHeight - HUD_H
-      viewW.current = w; viewH.current = h; setVp({ w, h })
-    }
-    measure()
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [])
 
   useEffect(() => {
     let lastTime = performance.now()
@@ -634,9 +617,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         posRef.current = { x, y }; setPos({ x, y })
         if (newDir !== dir) setDir(newDir)
         setMoving(true)
-        const camX = Math.max(0, Math.min(PX_W - viewW.current, x + CHAR_W/2 - viewW.current/2))
-        const camY = Math.max(0, Math.min(PX_H - viewH.current, y + CHAR_H/2 - viewH.current/2))
-        setCam({ x: camX, y: camY })
       } else { setMoving(false) }
       const near = PORTALS.find(p => overlaps(x, y, CHAR_W, CHAR_H, p.tx*TILE-20, p.ty*TILE-10, p.w*TILE+40, p.h*TILE+30))
       setNearZone(near?.zone ?? null)
@@ -668,7 +648,8 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         background:'#5A9A3A', overflow:'hidden', cursor:'none',
       }}>
         <svg width="100%" height="100%"
-          viewBox={`${cam.x} ${cam.y} ${vp.w} ${vp.h}`}
+          viewBox={`0 0 ${PX_W} ${PX_H}`}
+          preserveAspectRatio="xMidYMid meet"
           style={{ display:'block', position:'absolute', inset:0 }}
         >
           <GroundPatterns/>
