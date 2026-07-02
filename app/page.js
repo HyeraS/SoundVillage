@@ -70,6 +70,7 @@ export default function HomePage() {
   const [showFeedback,  setShowFeedback]  = useState(false)
   const [feedbackZone,  setFeedbackZone]  = useState('')
   const [museumEmpty,   setMuseumEmpty]   = useState(false)  // Museum: 5개 미달 알림
+  const [museumDoneToast, setMuseumDoneToast] = useState(false) // Museum 관람 완료 후 안내 토스트
 
   // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
@@ -104,6 +105,13 @@ export default function HomePage() {
   }, [participantId, groupId])
 
   useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
+
+  // Museum 관람 완료 토스트 자동 닫힘
+  useEffect(() => {
+    if (!museumDoneToast) return
+    const t = setTimeout(() => setMuseumDoneToast(false), 3200)
+    return () => clearTimeout(t)
+  }, [museumDoneToast])
 
   /* ── StartPanel → WorldMap ── */
   const handleStart = (pid, gid) => {
@@ -284,12 +292,13 @@ export default function HomePage() {
     refreshCounts()
   }, [activeSound, activeZone, collectedIds, groupId, unlockedBlock, villagesUnlocked, refreshCounts])
 
-  /* ── SoundMuseum 완료 → WorldMap 복귀 ── */
+  /* ── SoundMuseum 완료 → WorldMap 복귀 (+ "오늘은 여기까지" 토스트) ── */
   const handleMuseumDone = useCallback(() => {
     setActiveSound(null)
     setMyExpression('')
     setMuseumSource(null)
     setScreen('world')
+    setMuseumDoneToast(true)
   }, [])
 
   /* ── SoundMuseum에서 월드맵 직접 이동 ── */
@@ -368,6 +377,30 @@ export default function HomePage() {
               </div>
               <div style={{ marginTop:'16px', fontSize:'11px', color:'#A09080' }}>
                 화면을 클릭하면 닫힙니다
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Museum 관람 완료 토스트 — 표현 하나 투표하고 나면 곧장 사라지지 않고,
+            다른 그룹이 더 채울 때까지 기다려야 한다는 걸 짧게 알려준다 */}
+        {museumDoneToast && (
+          <div onClick={() => setMuseumDoneToast(false)} style={{
+            position:'fixed', left:'50%', bottom:'28px', transform:'translateX(-50%)',
+            zIndex:200, cursor:'pointer',
+          }}>
+            <div style={{
+              background:'#F5EDD8ee', border:'2px solid #C8A96E', borderRadius:'16px',
+              padding:'14px 22px', textAlign:'center', fontFamily:'Nunito, sans-serif',
+              boxShadow:'0 8px 28px #00000044', backdropFilter:'blur(6px)',
+              animation:'slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+              maxWidth:'320px',
+            }}>
+              <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14', marginBottom:'4px' }}>
+                🏛 오늘의 전시 관람 완료!
+              </div>
+              <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5 }}>
+                다른 그룹이 소리를 더 채우면<br/>또 새로운 전시를 만날 수 있어요 ✨
               </div>
             </div>
           </div>
