@@ -16,12 +16,8 @@ const CHAR_W  = 22
 const CHAR_H  = 28
 const HUD_H   = 56
 
-// block(구역) 경계로 쓰이는 4×4 격자선 — 지도 중앙 십자로 + 1/4·3/4 보조로와
-// 동일한 좌표를 공유해서, 이 선을 기준으로 블록을 나누면 "길"이 곧 블록 사이의
-// 경계가 된다. PATH_BUFFER는 그 선 좌우/상하로 아이템을 놓지 않는 여백(칸 수)로,
-// 열린 구역과 잠긴 구역 사이에 실제 시각적 거리를 만든다.
-const GRID_COL_LINES = [Math.floor(MAP_W / 4), Math.floor(MAP_W / 2), Math.floor(MAP_W * 3 / 4)]
-const GRID_ROW_LINES = [Math.floor(MAP_H / 4), Math.floor(MAP_H / 2), Math.floor(MAP_H * 3 / 4)]
+// block(구역) 경계선 좌우/상하로 아이템을 놓지 않는 여백(칸 수) — 열린 구역과
+// 잠긴 구역 사이에 "길"만큼의 실제 시각적 거리를 만든다.
 const PATH_BUFFER = 1
 
 /* ─────────────────────────────────────────────
@@ -73,11 +69,39 @@ const SOUND_ITEMS = {
 }
 
 /* ─────────────────────────────────────────────
+   block(구역) 격자 계산 — buildPaths()와 spawnSoundItems()가 공유
+───────────────────────────────────────────── */
+// zone에 실제로 존재하는 block 개수(n)에 딱 맞는 cols×rows를 골라서, block이
+// 적은 zone(예: 7개)은 셀을 크게, block이 많은 zone(예: 11개)은 그만큼만
+// 촘촘하게 나눈다 — 셀이 불필요하게 작아지지 않으면서도 항상 모든 block이
+// 자기 셀을 하나씩 갖는다.
+function computeBlockGrid(sounds) {
+  const byBlock = new Map()
+  for (const s of sounds) {
+    const b = s.block || 1
+    if (!byBlock.has(b)) byBlock.set(b, [])
+    byBlock.get(b).push(s)
+  }
+  const blockNums = [...byBlock.keys()].sort((a, b) => a - b)
+  const n = Math.max(1, blockNums.length)
+
+  let cols = Math.max(1, Math.round(Math.sqrt(n * (MAP_W / MAP_H))))
+  let rows = Math.ceil(n / cols)
+  while (cols * rows < n) cols++ // 반올림 오차로 셀이 모자라면 열을 늘려 보정
+
+  const colBounds = []
+  for (let i = 0; i <= cols; i++) colBounds.push(Math.round(2 + (MAP_W - 4) * i / cols))
+  const rowBounds = []
+  for (let i = 0; i <= rows; i++) rowBounds.push(Math.round(2 + (MAP_H - 4) * i / rows))
+
+  return { byBlock, blockNums, cols, rows, colBounds, rowBounds }
+}
+
+/* ─────────────────────────────────────────────
    경로 타일 생성 (각 Zone 내부 돌길)
 ───────────────────────────────────────────── */
-function buildPaths(zone) {
+function buildPaths(sounds) {
   const cx = Math.floor(MAP_W / 2)
-  const cy = Math.floor(MAP_H / 2)
   const paths = []
   const seen = new Set()
   const add = (tx, ty) => {
@@ -86,18 +110,21 @@ function buildPaths(zone) {
     seen.add(k)
     paths.push({ tx, ty })
   }
-  // block 경계선(중앙 십자로 + 1/4·3/4 보조로)을 PATH_BUFFER만큼 넓혀서 그린다 —
-  // 이 폭이 곧 spawnSoundItems()가 아이템을 놓지 않는 여백과 정확히 일치한다.
-  GRID_ROW_LINES.forEach(ty => {
+  // block 경계선을 PATH_BUFFER만큼 넓혀서 그린다 — 이 폭이 곧 spawnSoundItems()가
+  // 아이템을 놓지 않는 여백과 정확히 일치해서, "길"이 곧 block 사이의 경계가 된다.
+  const { cols, rows, colBounds, rowBounds } = computeBlockGrid(sounds)
+  for (let i = 1; i < cols; i++) {
+    const txLine = colBounds[i]
     for (let d = -PATH_BUFFER; d <= PATH_BUFFER; d++) {
-      for (let tx = 2; tx < MAP_W - 2; tx++) add(tx, ty + d)
+      for (let ty = 2; ty < MAP_H - 2; ty++) add(txLine + d, ty)
     }
-  })
-  GRID_COL_LINES.forEach(tx => {
+  }
+  for (let i = 1; i < rows; i++) {
+    const tyLine = rowBounds[i]
     for (let d = -PATH_BUFFER; d <= PATH_BUFFER; d++) {
-      for (let ty = 2; ty < MAP_H - 2; ty++) add(tx + d, ty)
+      for (let tx = 2; tx < MAP_W - 2; tx++) add(tx, tyLine + d)
     }
-  })
+  }
   // 입구 (하단)
   for (let tx = cx - 1; tx <= cx + 1; tx++) add(tx, MAP_H - 1)
   return paths
@@ -741,21 +768,17 @@ function hashSeed(str) {
 
 function spawnSoundItems(sounds, zone) {
   const si = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
-  const cx = Math.floor(MAP_W / 2), cy = Math.floor(MAP_H / 2)
-  const entranceTx = cx, entranceTy = MAP_H - 1
+  const entranceTx = Math.floor(MAP_W / 2), entranceTy = MAP_H - 1
   const rand = seededRand(hashSeed(zone + '|' + sounds.map(s => s.sound_id).sort().join(',')))
 
-  // 지도를 가로지르는 길(GRID_ROW/COL_LINES, buildPaths()가 그리는 것과 동일한 좌표)로
-  // 나뉘는 4×4 셀 격자를 만든다. block마다 셀을 하나씩 통째로 배정하면, 서로 다른
-  // block의 영역은 항상 길 하나만큼 떨어져 있고 절대 겹치지 않는다.
-  const colBounds = [2, ...GRID_COL_LINES, MAP_W - 2]
-  const rowBounds = [2, ...GRID_ROW_LINES, MAP_H - 2]
-  const NUM_COLS = colBounds.length - 1
-  const NUM_ROWS = rowBounds.length - 1
+  // block 개수(n)에 딱 맞춰 계산된 격자(buildPaths()가 그리는 길과 동일한 좌표)로
+  // 셀을 나눈다. block마다 셀을 하나씩 통째로 배정하면, 서로 다른 block의 영역은
+  // 항상 길 하나만큼 떨어져 있고 절대 겹치지 않는다.
+  const { byBlock, blockNums, cols, rows, colBounds, rowBounds } = computeBlockGrid(sounds)
 
   const cells = []
-  for (let r = 0; r < NUM_ROWS; r++) {
-    for (let c = 0; c < NUM_COLS; c++) {
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
       const x0 = colBounds[c], x1 = colBounds[c + 1]
       const y0 = rowBounds[r], y1 = rowBounds[r + 1]
       cells.push({ x0, x1, y0, y1, tx: (x0 + x1) / 2, ty: (y0 + y1) / 2, tiles: [] })
@@ -763,32 +786,25 @@ function spawnSoundItems(sounds, zone) {
   }
   const cellAt = (tx, ty) => {
     let c = 0, r = 0
-    for (let i = 1; i < NUM_COLS; i++) if (tx >= colBounds[i]) c = i
-    for (let i = 1; i < NUM_ROWS; i++) if (ty >= rowBounds[i]) r = i
-    return cells[r * NUM_COLS + c]
+    for (let i = 1; i < cols; i++) if (tx >= colBounds[i]) c = i
+    for (let i = 1; i < rows; i++) if (ty >= rowBounds[i]) r = i
+    return cells[r * cols + c]
   }
 
   // 길(경계선) 좌우/상하 PATH_BUFFER칸은 아이템 배치 금지 — 구역 사이에
   // 실제 여백을 만들어서 열린 구역과 잠긴 구역이 바싹 붙어 보이지 않게 한다.
+  const innerColLines = colBounds.slice(1, -1)
+  const innerRowLines = rowBounds.slice(1, -1)
   const nearGridLine = (v, lines) => lines.some(l => Math.abs(v - l) <= PATH_BUFFER)
   for (let ty = 2; ty < MAP_H - 2; ty++) {
     for (let tx = 2; tx < MAP_W - 2; tx++) {
-      if (nearGridLine(tx, GRID_COL_LINES) || nearGridLine(ty, GRID_ROW_LINES)) continue
+      if (nearGridLine(tx, innerColLines) || nearGridLine(ty, innerRowLines)) continue
       cellAt(tx, ty).tiles.push({ tx, ty })
     }
   }
 
-  // block별로 소리를 묶는다
-  const byBlock = new Map()
-  for (const s of sounds) {
-    const b = s.block || 1
-    if (!byBlock.has(b)) byBlock.set(b, [])
-    byBlock.get(b).push(s)
-  }
-  const blockNums = [...byBlock.keys()].sort((a, b) => a - b)
-
   // 입구에서 가까운 셀부터 낮은 block을 받아 "안개가 입구에서부터 걷힌다"는
-  // 느낌을 유지한다. (셀은 16개뿐이라 block이 더 많으면 마지막 셀을 공유한다.)
+  // 느낌을 유지한다. (셀 개수는 항상 block 수 이상으로 계산되므로 공유는 일어나지 않는다.)
   const orderedCells = [...cells].sort((a, b) => {
     const da = (a.tx - entranceTx) ** 2 + (a.ty - entranceTy) ** 2
     const db = (b.tx - entranceTx) ** 2 + (b.ty - entranceTy) ** 2
@@ -937,7 +953,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
   // 오브젝트 (한 번만 생성)
   const zoneObjects = useRef(buildZoneObjects(zone))
-  const pathTiles   = useRef(buildPaths(zone))
+  const pathTiles   = useRef(buildPaths(sounds))
 
   const [pos,        setPos]       = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H - TILE*4 })
   const [dir,        setDir]       = useState('up')
