@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
 import { TILES, OBJECTS, CHARACTERS, ASSET_READY } from '@/components/AssetRegistry'
 
@@ -239,47 +239,55 @@ function ZoneBuilding({ zone, px, py, pw, ph }) {
 /* ─────────────────────────────────────────────
    Zone 포털 섬
 ───────────────────────────────────────────── */
-function PortalIsland({ portal, hovered, progress }) {
+function PortalIsland({ portal, hovered, progress, locked }) {
   const meta = ZONE_META[portal.zone]
   const px = portal.tx * TILE, py = portal.ty * TILE
   const pw = portal.w  * TILE, ph = portal.h  * TILE
   const prog = Math.min(Math.max(progress || 0, 0), 1)
+  const accent = locked ? '#8A8A8A' : meta.color
 
   return (
-    <g>
+    <g opacity={locked ? 0.6 : 1} style={{ filter: locked ? 'grayscale(0.8)' : 'none', transition:'all 0.25s' }}>
       <ellipse cx={px+pw/2+4} cy={py+ph+8} rx={pw*0.52} ry={10} fill="#00000033"/>
       <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
         fill="#3A6B2A"
-        stroke={hovered ? meta.color : '#2A5A1A'}
+        stroke={hovered ? accent : '#2A5A1A'}
         strokeWidth={hovered ? 2.5 : 1}
-        style={{ filter: hovered ? `drop-shadow(0 0 10px ${meta.color}66)` : 'none', transition:'all 0.25s' }}
+        style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
       />
       <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#4A8B3A" opacity="0.7"/>
       <rect x={px+pw/2-8} y={py+ph-4} width={16} height={12} rx="2" fill="#C8B89A"/>
 
       <ZoneBuilding zone={portal.zone} px={px} py={py} pw={pw} ph={ph}/>
 
+      {locked && (
+        <g transform={`translate(${px+pw/2},${py+ph/2})`}>
+          <circle r="16" fill="#000000aa"/>
+          <text textAnchor="middle" y="7" fontSize="18" style={{userSelect:'none'}}>🔒</text>
+        </g>
+      )}
+
       <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#ffffff18"/>
-      <rect x={px-4} y={py+ph+2} width={(pw+8)*prog} height={4} rx="2" fill={meta.color}/>
+      <rect x={px-4} y={py+ph+2} width={(pw+8)*prog} height={4} rx="2" fill={accent}/>
 
       <rect x={px+pw/2-38} y={py-26} width={76} height={22} rx="7"
-        fill={hovered ? meta.color : '#000000bb'}
-        stroke={meta.color} strokeWidth="1.5"
+        fill={hovered ? accent : '#000000bb'}
+        stroke={accent} strokeWidth="1.5"
         style={{ transition:'all 0.2s' }}
       />
       <text x={px+pw/2} y={py-12} textAnchor="middle" fontSize="10" fontWeight="700"
         fontFamily="Nunito, sans-serif"
-        fill={hovered ? '#fff' : meta.color}
+        fill={hovered ? '#fff' : accent}
         style={{ userSelect:'none', transition:'fill 0.2s' }}>
-        {meta.emoji} {meta.label}
+        {locked ? '🔒' : meta.emoji} {meta.label}
       </text>
 
       {hovered && (
         <g>
-          <rect x={px+pw/2-32} y={py+ph+10} width={64} height={17} rx="5" fill="#000000cc"/>
+          <rect x={px+pw/2-42} y={py+ph+10} width={84} height={17} rx="5" fill="#000000cc"/>
           <text x={px+pw/2} y={py+ph+21} textAnchor="middle" fontSize="9"
             fontFamily="Nunito, sans-serif" fill="#F0EDE8" style={{userSelect:'none'}}>
-            ENTER 진입
+            {locked ? '🔒 잠긴 마을' : 'ENTER 진입'}
           </text>
         </g>
       )}
@@ -508,7 +516,7 @@ function HUD({ totalCount, zoneProgress }) {
 /* ─────────────────────────────────────────────
    목표 패널
 ───────────────────────────────────────────── */
-function ObjectivePanel({ nearZone, nearMuseum }) {
+function ObjectivePanel({ nearZone, nearMuseum, nearZoneLocked }) {
   const isNearMuseum = !nearZone && nearMuseum
   return (
     <div style={{
@@ -519,16 +527,17 @@ function ObjectivePanel({ nearZone, nearMuseum }) {
       boxShadow:'0 4px 16px #00000044', zIndex:10,
     }}>
       <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
-        <span style={{ fontSize:'14px' }}>{isNearMuseum ? '🏛' : '🚩'}</span>
+        <span style={{ fontSize:'14px' }}>{isNearMuseum ? '🏛' : nearZoneLocked ? '🔒' : '🚩'}</span>
         <span style={{ fontSize:'11px', fontWeight:800, color:'#3A2A14' }}>현재 목표</span>
       </div>
       <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14', marginBottom:'4px' }}>
-        {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} 진입`
+        {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} ${nearZoneLocked ? '(잠김)' : '진입'}`
           : isNearMuseum ? '🏛 Sound Museum 진입'
           : '마을 탐험하기'}
       </div>
       <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5, marginBottom:'6px' }}>
-        {nearZone || isNearMuseum ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
+        {nearZoneLocked ? '🎵 음악 마을 구역 1을 먼저 전사하세요'
+          : nearZone || isNearMuseum ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
       </div>
       <div style={{ height:'1px', background:'#D4C4A0', margin:'4px 0' }}/>
       <div style={{ fontSize:'10px', color:'#8B6A3A' }}>💡 WASD / 방향키 이동</div>
@@ -540,28 +549,37 @@ function ObjectivePanel({ nearZone, nearMuseum }) {
    진입 알림 — zone/museum 근처에 왔을 때 뜨는 배지.
    눈에 잘 띄도록 크게 + 은은한 pulse로 계속 시선을 끈다.
 ───────────────────────────────────────────── */
-function EnterPrompt({ emoji, label, color }) {
+function EnterPrompt({ emoji, label, color, locked }) {
+  const accent = locked ? '#8A8A8A' : color
   return (
     <div style={{
       position:'absolute', bottom:'110px', left:'50%', transform:'translateX(-50%)',
-      background:'#F5EDD8ee', border:`3px solid ${color}`,
+      background:'#F5EDD8ee', border:`3px solid ${accent}`,
       borderRadius:'26px', padding:'16px 34px',
       fontSize:'20px', fontFamily:'Nunito, sans-serif',
       color:'#3A2A14', fontWeight:800, backdropFilter:'blur(8px)',
-      animation:'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1), pulse 1.6s ease-in-out 0.3s infinite',
+      animation: locked
+        ? 'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)'
+        : 'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1), pulse 1.6s ease-in-out 0.3s infinite',
       pointerEvents:'none', whiteSpace:'nowrap',
-      boxShadow:`0 8px 28px ${color}66`, zIndex:15,
+      boxShadow:`0 8px 28px ${accent}66`, zIndex:15,
       display:'flex', alignItems:'center', gap:'12px',
     }}>
-      <span style={{ fontSize:'30px' }}>{emoji}</span>
-      <span>{label} 근처</span>
-      <span style={{
-        background:color, color:'#fff', padding:'5px 14px', borderRadius:'10px',
-        fontSize:'17px', fontWeight:800, letterSpacing:'0.5px',
-        boxShadow:'inset 0 -2px 0 #00000033',
-      }}>
-        ENTER ↵
-      </span>
+      <span style={{ fontSize:'30px' }}>{locked ? '🔒' : emoji}</span>
+      {locked ? (
+        <span>{label} — 음악 마을 구역 1을 먼저 전사하세요</span>
+      ) : (
+        <>
+          <span>{label} 근처</span>
+          <span style={{
+            background:accent, color:'#fff', padding:'5px 14px', borderRadius:'10px',
+            fontSize:'17px', fontWeight:800, letterSpacing:'0.5px',
+            boxShadow:'inset 0 -2px 0 #00000033',
+          }}>
+            ENTER ↵
+          </span>
+        </>
+      )}
     </div>
   )
 }
@@ -569,8 +587,9 @@ function EnterPrompt({ emoji, label, color }) {
 /* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
-export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, participantId = '' }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, participantId = '', lockedZones = [] }) {
   const { keys, press, release } = useKeys()
+  const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
 
   const [pos,        setPos]        = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H/2 - CHAR_H/2 })
   const [dir,        setDir]        = useState('down')
@@ -632,13 +651,13 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
   useEffect(() => {
     const h = e => {
       if (e.key === 'Enter' || e.key === ' ') {
-        if (nearZone) onEnterZone(nearZone)
+        if (nearZone && !lockedSet.has(nearZone)) onEnterZone(nearZone)
         else if (nearMuseum && onEnterMuseum) onEnterMuseum()
       }
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [nearZone, nearMuseum, onEnterZone, onEnterMuseum])
+  }, [nearZone, nearMuseum, onEnterZone, onEnterMuseum, lockedSet])
 
   return (
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
@@ -677,6 +696,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
             <PortalIsland key={p.zone} portal={p}
               hovered={nearZone === p.zone}
               progress={zoneProgress[p.zone] || 0}
+              locked={lockedSet.has(p.zone)}
             />
           ))}
 
@@ -690,13 +710,14 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         </svg>
       </div>
 
-      <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum}/>
+      <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum} nearZoneLocked={nearZone && lockedSet.has(nearZone)}/>
 
       {nearZone && (
         <EnterPrompt
           emoji={ZONE_META[nearZone].emoji}
           label={ZONE_META[nearZone].label}
           color={ZONE_META[nearZone].color}
+          locked={lockedSet.has(nearZone)}
         />
       )}
 

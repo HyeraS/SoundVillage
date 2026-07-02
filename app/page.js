@@ -14,6 +14,10 @@ import soundMetadata from '@/data/sound_metadata.json'
 ───────────────────────────────────────────── */
 const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 
+// 처음엔 Music 마을만 열려있고, Music 구역 1을 전사 완료해야 나머지가 열림
+const FIRST_ZONE          = 'Music'
+const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
+
 function buildZoneMap(sounds) {
   const map = {}
   ZONES.forEach(z => { map[z] = [] })
@@ -75,6 +79,9 @@ export default function HomePage() {
   const [blockUnlockInfo, setBlockUnlockInfo] = useState(null) // { block, zone } 완료 오버레이용
   const [zoneLoading,     setZoneLoading]     = useState(false)
 
+  // 마을 잠금 상태 — Music 구역 1을 전사 완료해야 나머지 마을이 열림
+  const [villagesUnlocked, setVillagesUnlocked] = useState(false)
+
   // 카운트
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
@@ -116,6 +123,29 @@ export default function HomePage() {
     if (isNaN(dbNum)) return null
     return all.find(s => parseInt(String(s.sound_id).split('_').pop(), 10) === dbNum) || null
   }, [])
+
+  /* ── Music 구역 1 전사 완료 여부 확인 → 나머지 마을 잠금 해제 ── */
+  const checkVillagesUnlocked = useCallback(async () => {
+    if (!participantId) return
+    try {
+      const dbIds = await getAnnotatedByParticipantZone(participantId, FIRST_ZONE)
+      const all   = soundMetadata.sounds
+      const annotatedSet = new Set()
+      for (const dbId of dbIds) {
+        const found = findSoundByDbId(dbId, all)
+        if (found) annotatedSet.add(found.sound_id)
+      }
+      const firstZoneSounds = getGroupSounds(FIRST_ZONE, groupId)
+      const block1 = firstZoneSounds.filter(s => (s.block || 1) === 1)
+      if (block1.length > 0 && block1.every(s => annotatedSet.has(s.sound_id))) {
+        setVillagesUnlocked(true)
+      }
+    } catch (e) {
+      console.error('[Village] 잠금 상태 확인 오류:', e)
+    }
+  }, [participantId, groupId, findSoundByDbId])
+
+  useEffect(() => { if (participantId) checkVillagesUnlocked() }, [participantId, checkVillagesUnlocked])
 
   /* ── DB sound_id → 재생 가능한 sound 오브젝트 (메타데이터에 없으면 합성) ── */
   const resolveSoundFromDbId = useCallback((dbId, all) => {
@@ -235,10 +265,14 @@ export default function HomePage() {
       const blockSounds  = zoneSounds.filter(s => (s.block || 1) === currentBlock)
       const allDone      = blockSounds.every(s => newCollected.has(s.sound_id))
 
+      // Music 구역 1을 지금 막 완료했다면 나머지 마을 잠금 해제
+      const justUnlockedVillages = activeZone === FIRST_ZONE && currentBlock === 1 && allDone && !villagesUnlocked
+      if (justUnlockedVillages) setVillagesUnlocked(true)
+
       if (allDone && currentBlock < maxBlock) {
         const next = currentBlock + 1
         setUnlockedBlock(prev => ({ ...prev, [activeZone]: next }))
-        setBlockUnlockInfo({ block: next, zone: activeZone })
+        setBlockUnlockInfo({ block: next, zone: activeZone, villagesUnlocked: justUnlockedVillages })
       }
     }
 
@@ -248,7 +282,7 @@ export default function HomePage() {
     setMyExpression('')
     setScreen('zone')
     refreshCounts()
-  }, [activeSound, activeZone, collectedIds, groupId, unlockedBlock, refreshCounts])
+  }, [activeSound, activeZone, collectedIds, groupId, unlockedBlock, villagesUnlocked, refreshCounts])
 
   /* ── SoundMuseum 완료 → WorldMap 복귀 ── */
   const handleMuseumDone = useCallback(() => {
@@ -296,6 +330,7 @@ export default function HomePage() {
           onEnterMuseum={handleEnterMuseum}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
+          lockedZones={villagesUnlocked ? [] : ZONES_LOCKED_AT_START}
         />
         {/* Zone 진입 로딩 */}
         {zoneLoading && (
@@ -402,13 +437,16 @@ export default function HomePage() {
               boxShadow:'0 12px 48px #00000044',
               animation:'slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1)',
             }}>
-              <div style={{ fontSize:'40px', marginBottom:'12px' }}>🎉</div>
+              <div style={{ fontSize:'40px', marginBottom:'12px' }}>{blockUnlockInfo.villagesUnlocked ? '🗺' : '🎉'}</div>
               <div style={{ fontSize:'16px', fontWeight:800, color:'#3A2A14', marginBottom:'8px' }}>
                 구역 {blockUnlockInfo.block - 1} 완료!
               </div>
               <div style={{ fontSize:'13px', color:'#8B6A3A', lineHeight:1.7, marginBottom:'20px' }}>
                 새로운 소리들이 나타났어요.<br/>
                 구역 {blockUnlockInfo.block}을 탐험해 보세요 ✨
+                {blockUnlockInfo.villagesUnlocked && (
+                  <><br/><br/>🔓 다른 마을들도 모두 열렸어요!</>
+                )}
               </div>
               <button onClick={() => setBlockUnlockInfo(null)} style={{
                 padding:'10px 28px', borderRadius:'10px',
