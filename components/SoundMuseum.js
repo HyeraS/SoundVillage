@@ -278,11 +278,20 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const [submitting,  setSubmitting]  = useState(false)
   const [npcIdx,      setNpcIdx]      = useState(0)
   const [visible,     setVisible]     = useState(false)
+  const cardRef = useRef(null)
 
   const { playing, progress, playCount, error, toggle } = useMuseumPlayer(sound.file_path)
 
   // 슬라이드인 애니메이션
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
+
+  // 표현을 고르면 동의 정도 슬라이더 + 제출 버튼이 스크롤 없이 바로 보이도록
+  // 카드 맨 아래로 스크롤 (작은 화면에서 후보 카드 밑에 가려지는 문제 방지)
+  useEffect(() => {
+    if (pick !== null && cardRef.current) {
+      cardRef.current.scrollTo({ top: cardRef.current.scrollHeight, behavior: 'smooth' })
+    }
+  }, [pick])
 
   // 후보 표현 로드
   useEffect(() => {
@@ -339,7 +348,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
       <RoomBackground zone={zone}/>
 
       {/* 전시 카드 */}
-      <div style={{
+      <div ref={cardRef} style={{
         position: 'relative', zIndex: 10,
         width: '100%', maxWidth: '420px',
         maxHeight: '86vh', overflowY: 'auto',
