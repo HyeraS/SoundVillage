@@ -110,7 +110,7 @@ def assign_blocks_rebuild(sounds: list[dict], zones: list[str], block_size: int)
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--zones", nargs="+", default=ALL_ZONES, choices=ALL_ZONES)
-    parser.add_argument("--block_size", type=int, default=40)
+    parser.add_argument("--block_size", type=int, default=25)
     parser.add_argument("--rebuild", action="store_true",
                          help="기존 block 값을 무시하고 (zone, 그룹) 단위로 처음부터 재배정 (주의: 진행 중인 참여자 영향)")
     args = parser.parse_args()

@@ -453,10 +453,23 @@ function ZoneObject({ obj, zone, tick }) {
 /* ─────────────────────────────────────────────
    소리 아이템 — PNG 에셋 / SVG 보석상자 폴백
 ───────────────────────────────────────────── */
-function SoundItem({ item, zone, tick, done = false }) {
+function SoundItem({ item, zone, tick, state = 'active' }) {
+  const px = item.tx * TILE + TILE / 2
+  const py = item.ty * TILE + TILE / 2
+
+  // 잠긴(아직 구역 해제 안 된) 아이템 — 안개 속 회색 점, 상호작용 불가
+  if (state === 'locked') {
+    const drift = Math.sin(tick * 0.02 + item.pulse) * 1.5
+    const pulse = 0.35 + Math.sin(tick * 0.03 + item.pulse) * 0.15
+    return (
+      <g transform={`translate(${px}, ${py})`}>
+        <circle r={6 + drift} fill="#6B6660" opacity={pulse}/>
+      </g>
+    )
+  }
+
+  const done  = state === 'done'
   const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
-  const px    = item.tx * TILE + TILE / 2
-  const py    = item.ty * TILE + TILE / 2
   const bobY  = done ? 0 : Math.sin(tick * 0.06 + item.pulse) * 4
   const glow  = done ? 0.5 : Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7
   const items = ITEMS[zone] || []
@@ -641,6 +654,9 @@ function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTotal = 1 
 function spawnSoundItems(sounds, zone) {
   const si = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const cx = Math.floor(MAP_W / 2), cy = Math.floor(MAP_H / 2)
+  // 입구 타일 기준 — block이 낮을수록(먼저 열리는 구역) 입구에 가깝게 배치해서
+  // 안개가 입구에서부터 바깥으로 걷히는 것처럼 보이게 한다.
+  const entranceTx = cx, entranceTy = MAP_H - 1
 
   // 경로 타일 셋 (아이템 배치 금지)
   const pathSet = new Set()
@@ -655,13 +671,28 @@ function spawnSoundItems(sounds, zone) {
     }
   }
 
-  // Fisher-Yates 셔플로 고르게 분산
-  for (let i = candidates.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+  // 입구에서 가까운 순서로 정렬
+  candidates.sort((a, b) => {
+    const da = (a.tx - entranceTx) ** 2 + (a.ty - entranceTy) ** 2
+    const db = (b.tx - entranceTx) ** 2 + (b.ty - entranceTy) ** 2
+    return da - db
+  })
+
+  // 거리순 그대로면 한 줄로 늘어서 보이므로, 가까운 순서를 크게 해친지 않는
+  // 선에서 덩어리(chunk) 단위로만 섞어 자연스럽게 분산시킨다.
+  const CHUNK = 30
+  for (let start = 0; start < candidates.length; start += CHUNK) {
+    const end = Math.min(start + CHUNK, candidates.length)
+    for (let i = end - 1; i > start; i--) {
+      const j = start + Math.floor(Math.random() * (i - start + 1))
+      ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+    }
   }
 
-  return sounds.map((s, i) => {
+  // block이 낮은(먼저 열리는) 소리부터 입구 근처 자리를 차지하도록 정렬
+  const sorted = [...sounds].sort((a, b) => (a.block || 1) - (b.block || 1))
+
+  return sorted.map((s, i) => {
     const pos = candidates[i % candidates.length]
     return {
       id:        s.sound_id,
@@ -718,6 +749,53 @@ function CompleteModal({ zone, onExit }) {
 }
 
 /* ─────────────────────────────────────────────
+   입구 확인 모달 — 캐릭터가 입구에 들어서면 표시
+───────────────────────────────────────────── */
+function ExitConfirmModal({ zone, onConfirm, onCancel }) {
+  const meta = ZONE_META[zone]
+  return (
+    <div style={{
+      position:'absolute', inset:0,
+      background:'#00000066', backdropFilter:'blur(4px)',
+      display:'flex', alignItems:'center', justifyContent:'center',
+      zIndex:60,
+    }} onClick={onCancel}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background:'#F5EDD8', border:`3px solid ${meta.color}`,
+        borderRadius:'20px', padding:'28px 36px',
+        textAlign:'center', fontFamily:'Nunito, sans-serif',
+        animation:'popIn 0.3s cubic-bezier(0.34,1.56,0.64,1)',
+        boxShadow:`0 8px 40px ${meta.color}44`,
+      }}>
+        <div style={{ fontSize:'36px', marginBottom:'10px' }}>🚪</div>
+        <div style={{ fontSize:'16px', fontWeight:800, color:'#3A2A14', marginBottom:'20px' }}>
+          월드맵으로 돌아갈까요?
+        </div>
+        <div style={{ display:'flex', gap:'10px', justifyContent:'center' }}>
+          <button onClick={onCancel} style={{
+            padding:'10px 22px', borderRadius:'12px',
+            background:'transparent', border:'2px solid #C8A96E',
+            color:'#8B6A3A', fontSize:'13px', fontWeight:700,
+            fontFamily:'Nunito, sans-serif', cursor:'pointer',
+          }}>
+            더 둘러볼래요
+          </button>
+          <button onClick={onConfirm} style={{
+            padding:'10px 22px', borderRadius:'12px',
+            background:meta.color, border:'none',
+            color:'#fff', fontSize:'13px', fontWeight:700,
+            fontFamily:'Nunito, sans-serif', cursor:'pointer',
+            boxShadow:`0 4px 16px ${meta.color}66`,
+          }}>
+            네, 나갈게요
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    ZoneMap 메인
 ───────────────────────────────────────────── */
 export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
@@ -747,10 +825,18 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // isAnnotating prop을 RAF 루프에서 읽기 위한 ref
   const isAnnotatingRef   = useRef(isAnnotating)
 
+  // 입구 확인 팝업 — 캐릭터가 입구 타일에 들어서면 표시
+  const [exitConfirm, setExitConfirm] = useState(false)
+  // 입구 영역에 이미 들어와 있는지(연속 프레임에서 팝업 재발생 방지용)
+  const inExitZoneRef = useRef(false)
+
   const posRef = useRef(pos)
   const rafRef = useRef(null)
+  // blockNum을 RAF 루프에서 읽기 위한 ref (잠긴 아이템과의 충돌 무시용)
+  const blockNumRef = useRef(blockNum)
 
   useEffect(() => { isAnnotatingRef.current = isAnnotating }, [isAnnotating])
+  useEffect(() => { blockNumRef.current = blockNum }, [blockNum])
 
   // ESC + Enter
   useEffect(() => {
@@ -818,6 +904,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         if (!collectingRef.current) {
           for (const item of itemsRef.current) {
             if (collectedIds.has(item.id)) continue
+            if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
             const iy = item.ty * TILE + TILE / 2 - 12
             if (overlaps(x, y, CHAR_W, CHAR_H, ix, iy, 24, 24)) {
@@ -835,6 +922,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           const { x: sx, y: sy } = posRef.current
           for (const item of itemsRef.current) {
             if (collectedIds.has(item.id)) continue
+            if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
             const iy = item.ty * TILE + TILE / 2 - 12
             if (overlaps(sx, sy, CHAR_W, CHAR_H, ix, iy, 24, 24)) {
@@ -846,6 +934,23 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           }
         }
       }
+
+      // 입구 충돌 — 캐릭터가 화면 하단 중앙 입구 타일에 들어서면 확인 팝업 표시
+      if (!isAnnotatingRef.current) {
+        const { x: ex, y: ey } = posRef.current
+        const atEntranceRow = ey >= maxY - 2
+        const entranceCx    = ex + CHAR_W / 2
+        const inEntranceX   = entranceCx >= PX_W / 2 - 40 && entranceCx <= PX_W / 2 + 40
+        const inExitZone    = atEntranceRow && inEntranceX
+
+        if (inExitZone && !inExitZoneRef.current) {
+          inExitZoneRef.current = true
+          setExitConfirm(true)
+        } else if (!inExitZone) {
+          inExitZoneRef.current = false
+        }
+      }
+
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
@@ -916,10 +1021,14 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             <ZoneObject key={i} obj={obj} zone={zone} tick={tick}/>
           ))}
 
-          {/* 소리 아이템 — 제출 완료된 것도 계속 보이되, 정지된 채로 톤다운되어 표시됨 */}
-          {itemsRef.current.map(item => (
-            <SoundItem key={item.id} item={item} zone={zone} tick={tick} done={collectedIds.has(item.id)}/>
-          ))}
+          {/* 소리 아이템 — zone 전체가 한 화면에 있고, 잠긴 구역은 안개(회색 점)로,
+              해제된 구역은 아이콘으로, 완료된 것은 톤다운된 채로 계속 보임 */}
+          {itemsRef.current.map(item => {
+            const state = collectedIds.has(item.id)
+              ? 'done'
+              : (item.sound.block || 1) <= blockNum ? 'active' : 'locked'
+            return <SoundItem key={item.id} item={item} zone={zone} tick={tick} state={state}/>
+          })}
 
           {/* 캐릭터 */}
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
@@ -969,6 +1078,15 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       {/* 완료 모달 */}
       {remaining === 0 && total > 0 && (
         <CompleteModal zone={zone} onExit={onExit}/>
+      )}
+
+      {/* 입구 확인 모달 */}
+      {exitConfirm && (
+        <ExitConfirmModal
+          zone={zone}
+          onConfirm={onExit}
+          onCancel={() => setExitConfirm(false)}
+        />
       )}
     </div>
   )

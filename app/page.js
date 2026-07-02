@@ -24,11 +24,6 @@ function buildZoneMap(sounds) {
 }
 const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 
-// 블록 필터: 해당 그룹의 block <= blockNum인 소리만 반환
-function getBlockSounds(zone, groupId, blockNum) {
-  return getGroupSounds(zone, groupId).filter(s => (s.block || 1) <= blockNum)
-}
-
 // 그룹 필터: groupId가 없으면 전체, 있으면 해당 그룹만
 function getGroupSounds(zone, groupId) {
   const all = ZONE_SOUND_MAP[zone] || []
@@ -368,14 +363,13 @@ export default function HomePage() {
     const currentBlock = unlockedBlock[activeZone] || 1
     const zoneSounds   = getGroupSounds(activeZone, groupId)
     const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
-    const blockSounds  = getBlockSounds(activeZone, groupId, currentBlock)
     return (
       <>
-        {/* ZoneMap — 블록별 key로 언락 시 리마운트 */}
+        {/* ZoneMap — zone의 모든 소리를 한 화면에 유지. 잠긴/해제된 구역 표시는
+            blockNum prop으로 ZoneMap 내부에서 처리하므로 리마운트하지 않는다. */}
         <ZoneMap
-          key={`${activeZone}-block${currentBlock}`}
           zone={activeZone}
-          sounds={blockSounds}
+          sounds={zoneSounds}
           onCollectSound={handleCollectSound}
           onExit={handleExitZone}
           collectedIds={collectedIds}
