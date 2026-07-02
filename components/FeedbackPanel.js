@@ -68,8 +68,14 @@ export default function FeedbackPanel({ zone, onClose }) {
           ✓
         </div>
 
-        <div style={{ fontSize: '16px', fontWeight: 800, color: '#3A2A14' }}>
-          수집 완료
+        <div style={{ fontSize: '16px', fontWeight: 800, color: '#3A2A14', marginBottom: '4px' }}>
+          소리 수집 완료!
+        </div>
+        <div style={{ fontSize: '12px', color: '#8B6A3A', lineHeight: 1.6 }}>
+          {meta.emoji} {meta.label}의 소리가 기록됐어요<br/>
+          <span style={{ fontSize: '11px', color: '#A09080' }}>
+            다른 소리를 찾아 탐험해보세요 🌿
+          </span>
         </div>
       </div>
     </div>
