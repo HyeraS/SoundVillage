@@ -23943,7 +23943,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "124795",
       "ambiguous": false,
-      "block": 5
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_219903",
@@ -23955,7 +23956,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "219903",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_363582",
@@ -23967,7 +23969,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "363582",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_353649",
@@ -23979,19 +23982,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "353649",
       "ambiguous": false,
-      "block": 5
-    },
-    {
-      "sound_id": "Human_361735",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Clapping",
-      "audioset_class": "Clapping",
-      "file_path": "Audio/Human/361735",
-      "source_dataset": "FSD50K",
-      "original_fname": "361735",
-      "ambiguous": false,
-      "block": 5
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_130037",
@@ -24003,7 +23995,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "130037",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_353154",
@@ -24015,7 +24008,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "353154",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_241905",
@@ -24027,7 +24021,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "241905",
       "ambiguous": false,
-      "block": 5
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_407688",
@@ -24039,7 +24034,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "407688",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_274349",
@@ -24051,7 +24047,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "274349",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_367737",
@@ -24063,31 +24060,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "367737",
       "ambiguous": false,
-      "block": 5
-    },
-    {
-      "sound_id": "Human_396891",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/396891",
-      "source_dataset": "FSD50K",
-      "original_fname": "396891",
-      "ambiguous": false,
-      "block": 5
-    },
-    {
-      "sound_id": "Human_155920",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Rattle",
-      "audioset_class": "Rattle",
-      "file_path": "Audio/Human/155920",
-      "source_dataset": "FSD50K",
-      "original_fname": "155920",
-      "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_85536",
@@ -24099,7 +24073,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "85536",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_406647",
@@ -24111,19 +24086,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "406647",
       "ambiguous": false,
-      "block": 5
-    },
-    {
-      "sound_id": "Human_50778",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/50778",
-      "source_dataset": "FSD50K",
-      "original_fname": "50778",
-      "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_218185",
@@ -24135,7 +24099,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "218185",
       "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_364451",
@@ -24147,19 +24112,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "364451",
       "ambiguous": false,
-      "block": 5
-    },
-    {
-      "sound_id": "Human_363586",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Gasp",
-      "audioset_class": "Gasp",
-      "file_path": "Audio/Human/363586",
-      "source_dataset": "FSD50K",
-      "original_fname": "363586",
-      "ambiguous": false,
-      "block": 5
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_132814",
@@ -24171,7 +24125,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "132814",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_272440",
@@ -24183,7 +24138,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "272440",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_154681",
@@ -24195,7 +24151,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "154681",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_393010",
@@ -24207,7 +24164,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "393010",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_138338",
@@ -24219,19 +24177,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "138338",
       "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_160139",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Clapping",
-      "audioset_class": "Clapping",
-      "file_path": "Audio/Human/160139",
-      "source_dataset": "FSD50K",
-      "original_fname": "160139",
-      "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_319019",
@@ -24243,7 +24190,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "319019",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_36346",
@@ -24255,7 +24203,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "36346",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_377056",
@@ -24267,7 +24216,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "377056",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_427722",
@@ -24279,7 +24229,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "427722",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_198263",
@@ -24291,7 +24242,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "198263",
       "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_377054",
@@ -24303,31 +24255,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "377054",
       "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_218306",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Cough",
-      "audioset_class": "Cough",
-      "file_path": "Audio/Human/218306",
-      "source_dataset": "FSD50K",
-      "original_fname": "218306",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_192091",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Chewing and mastication",
-      "audioset_class": "Chewing and mastication",
-      "file_path": "Audio/Human/192091",
-      "source_dataset": "FSD50K",
-      "original_fname": "192091",
-      "ambiguous": false,
-      "block": 6
+      "block": 5,
+      "group": "B"
     },
     {
       "sound_id": "Human_19189",
@@ -24339,7 +24268,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "19189",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_167578",
@@ -24351,7 +24281,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "167578",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_170623",
@@ -24363,7 +24294,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "170623",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_176913",
@@ -24375,7 +24307,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "176913",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_323696",
@@ -24387,19 +24320,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "323696",
       "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_151217",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Cough",
-      "audioset_class": "Cough",
-      "file_path": "Audio/Human/151217",
-      "source_dataset": "FSD50K",
-      "original_fname": "151217",
-      "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_151255",
@@ -24411,7 +24333,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "151255",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_196084",
@@ -24423,7 +24346,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "196084",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_215322",
@@ -24435,55 +24359,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "215322",
       "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_36162",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Applause",
-      "audioset_class": "Applause",
-      "file_path": "Audio/Human/36162",
-      "source_dataset": "FSD50K",
-      "original_fname": "36162",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_82397",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/82397",
-      "source_dataset": "FSD50K",
-      "original_fname": "82397",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Human_368804",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Sneeze",
-      "audioset_class": "Sneeze",
-      "file_path": "Audio/Human/368804",
-      "source_dataset": "FSD50K",
-      "original_fname": "368804",
-      "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_160130",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Clapping",
-      "audioset_class": "Clapping",
-      "file_path": "Audio/Human/160130",
-      "source_dataset": "FSD50K",
-      "original_fname": "160130",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_315940",
@@ -24495,7 +24372,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "315940",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_215368",
@@ -24507,19 +24385,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "215368",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_31991",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Applause",
-      "audioset_class": "Applause",
-      "file_path": "Audio/Human/31991",
-      "source_dataset": "FSD50K",
-      "original_fname": "31991",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_411170",
@@ -24531,7 +24398,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "411170",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_198256",
@@ -24543,7 +24411,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "198256",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_348749",
@@ -24555,19 +24424,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "348749",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_361750",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Finger snapping",
-      "audioset_class": "Finger snapping",
-      "file_path": "Audio/Human/361750",
-      "source_dataset": "FSD50K",
-      "original_fname": "361750",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_341282",
@@ -24579,7 +24437,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "341282",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_154689",
@@ -24591,7 +24450,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "154689",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_88707",
@@ -24603,19 +24463,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "88707",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_432996",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/432996",
-      "source_dataset": "FSD50K",
-      "original_fname": "432996",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_30035",
@@ -24627,7 +24476,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "30035",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_343987",
@@ -24639,7 +24489,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "343987",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_377395",
@@ -24651,7 +24502,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "377395",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_22722",
@@ -24663,7 +24515,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "22722",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_387406",
@@ -24675,7 +24528,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "387406",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_399765",
@@ -24687,7 +24541,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "399765",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_53663",
@@ -24699,7 +24554,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "53663",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_216127",
@@ -24711,19 +24567,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216127",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_404545",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Clapping",
-      "audioset_class": "Clapping",
-      "file_path": "Audio/Human/404545",
-      "source_dataset": "FSD50K",
-      "original_fname": "404545",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_416920",
@@ -24735,19 +24580,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "416920",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Human_411068",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Sigh",
-      "audioset_class": "Sigh",
-      "file_path": "Audio/Human/411068",
-      "source_dataset": "FSD50K",
-      "original_fname": "411068",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_325371",
@@ -24759,7 +24593,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "325371",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_87797",
@@ -24771,19 +24606,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "87797",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_273408",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Run",
-      "audioset_class": "Run",
-      "file_path": "Audio/Human/273408",
-      "source_dataset": "FSD50K",
-      "original_fname": "273408",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_369834",
@@ -24795,55 +24619,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "369834",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_272539",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Run",
-      "audioset_class": "Run",
-      "file_path": "Audio/Human/272539",
-      "source_dataset": "FSD50K",
-      "original_fname": "272539",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_145487",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Cough",
-      "audioset_class": "Cough",
-      "file_path": "Audio/Human/145487",
-      "source_dataset": "FSD50K",
-      "original_fname": "145487",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_83199",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Crowd",
-      "audioset_class": "Crowd",
-      "file_path": "Audio/Human/83199",
-      "source_dataset": "FSD50K",
-      "original_fname": "83199",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_16201",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/16201",
-      "source_dataset": "FSD50K",
-      "original_fname": "16201",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_187910",
@@ -24855,31 +24632,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "187910",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_242911",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Crying and sobbing",
-      "audioset_class": "Crying and sobbing",
-      "file_path": "Audio/Human/242911",
-      "source_dataset": "FSD50K",
-      "original_fname": "242911",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_196080",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/196080",
-      "source_dataset": "FSD50K",
-      "original_fname": "196080",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_201655",
@@ -24891,7 +24645,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "201655",
       "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_46372",
@@ -24903,19 +24658,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "46372",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_93040",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Gasp",
-      "audioset_class": "Gasp",
-      "file_path": "Audio/Human/93040",
-      "source_dataset": "FSD50K",
-      "original_fname": "93040",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_381355",
@@ -24927,7 +24671,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "381355",
       "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_232664",
@@ -24939,43 +24684,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "232664",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_109620",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/109620",
-      "source_dataset": "FSD50K",
-      "original_fname": "109620",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_238307",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/238307",
-      "source_dataset": "FSD50K",
-      "original_fname": "238307",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_351424",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/351424",
-      "source_dataset": "FSD50K",
-      "original_fname": "351424",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_47135",
@@ -24987,31 +24697,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "47135",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_343910",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Human voice",
-      "audioset_class": "Human voice",
-      "file_path": "Audio/Human/343910",
-      "source_dataset": "FSD50K",
-      "original_fname": "343910",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_196064",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/196064",
-      "source_dataset": "FSD50K",
-      "original_fname": "196064",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_416510",
@@ -25023,7 +24710,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "416510",
       "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_252223",
@@ -25035,31 +24723,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "252223",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_193510",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/193510",
-      "source_dataset": "FSD50K",
-      "original_fname": "193510",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Human_10159",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/10159",
-      "source_dataset": "FSD50K",
-      "original_fname": "10159",
-      "ambiguous": false,
-      "block": 8
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_343478",
@@ -25071,7 +24736,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "343478",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Human_250936",
@@ -25083,7 +24749,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "250936",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_253603",
@@ -25095,7 +24762,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "253603",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_201733",
@@ -25107,7 +24775,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "201733",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_343943",
@@ -25119,7 +24788,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "343943",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_19115",
@@ -25131,7 +24801,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "19115",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_213209",
@@ -25143,19 +24814,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "213209",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Human_160605",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Walk and footsteps",
-      "audioset_class": "Walk and footsteps",
-      "file_path": "Audio/Human/160605",
-      "source_dataset": "FSD50K",
-      "original_fname": "160605",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_351994",
@@ -25167,7 +24827,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "351994",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_347231",
@@ -25179,7 +24840,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "347231",
       "ambiguous": false,
-      "block": 9
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Human_109625",
@@ -25191,7 +24853,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "109625",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_333267",
@@ -25203,7 +24866,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "333267",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_323448",
@@ -25215,7 +24879,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "323448",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_242905",
@@ -25227,7 +24892,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "242905",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_21183",
@@ -25239,31 +24905,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "21183",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Human_75053",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Applause",
-      "audioset_class": "Applause",
-      "file_path": "Audio/Human/75053",
-      "source_dataset": "FSD50K",
-      "original_fname": "75053",
-      "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Human_240365",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/240365",
-      "source_dataset": "FSD50K",
-      "original_fname": "240365",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_9982",
@@ -25275,7 +24918,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "9982",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_150955",
@@ -25287,7 +24931,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "150955",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_404544",
@@ -25299,7 +24944,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "404544",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_316948",
@@ -25311,7 +24957,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "316948",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_216369",
@@ -25323,7 +24970,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216369",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_81087",
@@ -25335,7 +24983,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "81087",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_32939",
@@ -25347,7 +24996,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "32939",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_108513",
@@ -25359,7 +25009,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "108513",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_406645",
@@ -25371,7 +25022,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "406645",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_257915",
@@ -25383,19 +25035,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "257915",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_265483",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Chewing and mastication",
-      "audioset_class": "Chewing and mastication",
-      "file_path": "Audio/Human/265483",
-      "source_dataset": "FSD50K",
-      "original_fname": "265483",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_150969",
@@ -25407,7 +25048,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "150969",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_184879",
@@ -25419,7 +25061,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "184879",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_157038",
@@ -25431,7 +25074,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "157038",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_273111",
@@ -25443,7 +25087,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "273111",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_82800",
@@ -25455,7 +25100,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "82800",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_277552",
@@ -25467,7 +25113,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "277552",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_404546",
@@ -25479,19 +25126,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "404546",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_257787",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Breathing",
-      "audioset_class": "Breathing",
-      "file_path": "Audio/Human/257787",
-      "source_dataset": "FSD50K",
-      "original_fname": "257787",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_182017",
@@ -25503,43 +25139,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "182017",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_175050",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Clapping",
-      "audioset_class": "Clapping",
-      "file_path": "Audio/Human/175050",
-      "source_dataset": "FSD50K",
-      "original_fname": "175050",
-      "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_346790",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Finger snapping",
-      "audioset_class": "Finger snapping",
-      "file_path": "Audio/Human/346790",
-      "source_dataset": "FSD50K",
-      "original_fname": "346790",
-      "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_343895",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Giggle",
-      "audioset_class": "Giggle",
-      "file_path": "Audio/Human/343895",
-      "source_dataset": "FSD50K",
-      "original_fname": "343895",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_88691",
@@ -25551,7 +25152,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "88691",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_194260",
@@ -25563,7 +25165,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "194260",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_346795",
@@ -25575,7 +25178,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "346795",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_267159",
@@ -25587,7 +25191,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "267159",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_60801",
@@ -25599,7 +25204,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "60801",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_273112",
@@ -25611,7 +25217,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "273112",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_241896",
@@ -25623,19 +25230,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "241896",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Human_240856",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/240856",
-      "source_dataset": "FSD50K",
-      "original_fname": "240856",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_335233",
@@ -25647,7 +25243,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "335233",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_231893",
@@ -25659,7 +25256,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "231893",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_101157",
@@ -25671,7 +25269,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "101157",
       "ambiguous": false,
-      "block": 11
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Human_254474",
@@ -25683,31 +25282,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "254474",
       "ambiguous": false,
-      "block": 11
-    },
-    {
-      "sound_id": "Human_171121",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/171121",
-      "source_dataset": "FSD50K",
-      "original_fname": "171121",
-      "ambiguous": false,
-      "block": 11
-    },
-    {
-      "sound_id": "Human_241529",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Laughter",
-      "audioset_class": "Laughter",
-      "file_path": "Audio/Human/241529",
-      "source_dataset": "FSD50K",
-      "original_fname": "241529",
-      "ambiguous": false,
-      "block": 11
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_15390",
@@ -25719,19 +25295,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "15390",
       "ambiguous": false,
-      "block": 11
-    },
-    {
-      "sound_id": "Human_368385",
-      "game_zone": "Human",
-      "source_type": "Biological",
-      "sub_category": "Giggle",
-      "audioset_class": "Giggle",
-      "file_path": "Audio/Human/368385",
-      "source_dataset": "FSD50K",
-      "original_fname": "368385",
-      "ambiguous": false,
-      "block": 11
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Human_273409",
@@ -25743,55 +25308,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "273409",
       "ambiguous": false,
-      "block": 11
-    },
-    {
-      "sound_id": "Lab_90546",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Cowbell",
-      "audioset_class": "Cowbell",
-      "file_path": "Audio/Lab/90546",
-      "source_dataset": "FSD50K",
-      "original_fname": "90546",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Lab_90541",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Cowbell",
-      "audioset_class": "Cowbell",
-      "file_path": "Audio/Lab/90541",
-      "source_dataset": "FSD50K",
-      "original_fname": "90541",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Lab_408225",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Glass",
-      "audioset_class": "Glass",
-      "file_path": "Audio/Lab/408225",
-      "source_dataset": "FSD50K",
-      "original_fname": "408225",
-      "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Lab_109830",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/109830",
-      "source_dataset": "FSD50K",
-      "original_fname": "109830",
-      "ambiguous": false,
-      "block": 6
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_372091",
@@ -25803,7 +25321,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "372091",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_238420",
@@ -25815,7 +25334,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "238420",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_216290",
@@ -25827,7 +25347,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216290",
       "ambiguous": false,
-      "block": 6
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_90545",
@@ -25839,43 +25360,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "90545",
       "ambiguous": false,
-      "block": 6
-    },
-    {
-      "sound_id": "Lab_193956",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Typewriter",
-      "audioset_class": "Typewriter",
-      "file_path": "Audio/Lab/193956",
-      "source_dataset": "FSD50K",
-      "original_fname": "193956",
-      "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_89811",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Glass",
-      "audioset_class": "Glass",
-      "file_path": "Audio/Lab/89811",
-      "source_dataset": "FSD50K",
-      "original_fname": "89811",
-      "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_89914",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Tap",
-      "audioset_class": "Tap",
-      "file_path": "Audio/Lab/89914",
-      "source_dataset": "FSD50K",
-      "original_fname": "89914",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_193955",
@@ -25887,7 +25373,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "193955",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_193973",
@@ -25899,19 +25386,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "193973",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_138332",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/138332",
-      "source_dataset": "FSD50K",
-      "original_fname": "138332",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_339638",
@@ -25923,7 +25399,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "339638",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_140617",
@@ -25935,7 +25412,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "140617",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_334963",
@@ -25947,19 +25425,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "334963",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_430702",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Shatter",
-      "audioset_class": "Shatter",
-      "file_path": "Audio/Lab/430702",
-      "source_dataset": "FSD50K",
-      "original_fname": "430702",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_341420",
@@ -25971,7 +25438,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "341420",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "A"
     },
     {
       "sound_id": "Lab_14363",
@@ -25983,7 +25451,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "14363",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_10441",
@@ -25995,19 +25464,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "10441",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_155191",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/155191",
-      "source_dataset": "FSD50K",
-      "original_fname": "155191",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_268575",
@@ -26019,7 +25477,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "268575",
       "ambiguous": false,
-      "block": 7
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_382823",
@@ -26031,19 +25490,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "382823",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_174189",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Bell",
-      "audioset_class": "Bell",
-      "file_path": "Audio/Lab/174189",
-      "source_dataset": "FSD50K",
-      "original_fname": "174189",
-      "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_193975",
@@ -26055,7 +25503,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "193975",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_110459",
@@ -26067,7 +25516,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "110459",
       "ambiguous": false,
-      "block": 7
+      "block": 6,
+      "group": "B"
     },
     {
       "sound_id": "Lab_216299",
@@ -26079,19 +25529,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216299",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_90544",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Cowbell",
-      "audioset_class": "Cowbell",
-      "file_path": "Audio/Lab/90544",
-      "source_dataset": "FSD50K",
-      "original_fname": "90544",
-      "ambiguous": false,
-      "block": 7
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_90547",
@@ -26103,7 +25542,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "90547",
       "ambiguous": false,
-      "block": 7
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_153339",
@@ -26115,7 +25555,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "153339",
       "ambiguous": false,
-      "block": 7
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_389702",
@@ -26127,19 +25568,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "389702",
       "ambiguous": false,
-      "block": 7
-    },
-    {
-      "sound_id": "Lab_89815",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Glass",
-      "audioset_class": "Glass",
-      "file_path": "Audio/Lab/89815",
-      "source_dataset": "FSD50K",
-      "original_fname": "89815",
-      "ambiguous": false,
-      "block": 7
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_75153",
@@ -26151,7 +25581,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "75153",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_339654",
@@ -26163,7 +25594,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "339654",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_264136",
@@ -26175,7 +25607,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "264136",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_235463",
@@ -26187,7 +25620,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "235463",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_366179",
@@ -26199,19 +25633,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "366179",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_24245",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/24245",
-      "source_dataset": "FSD50K",
-      "original_fname": "24245",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_216286",
@@ -26223,31 +25646,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216286",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_216292",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Shatter",
-      "audioset_class": "Shatter",
-      "file_path": "Audio/Lab/216292",
-      "source_dataset": "FSD50K",
-      "original_fname": "216292",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_410763",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Knock",
-      "audioset_class": "Knock",
-      "file_path": "Audio/Lab/410763",
-      "source_dataset": "FSD50K",
-      "original_fname": "410763",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_88922",
@@ -26259,19 +25659,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "88922",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_410827",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Knock",
-      "audioset_class": "Knock",
-      "file_path": "Audio/Lab/410827",
-      "source_dataset": "FSD50K",
-      "original_fname": "410827",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_162431",
@@ -26283,43 +25672,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "162431",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_365490",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Computer keyboard",
-      "audioset_class": "Computer keyboard",
-      "file_path": "Audio/Lab/365490",
-      "source_dataset": "FSD50K",
-      "original_fname": "365490",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_187767",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Gunshot and gunfire",
-      "audioset_class": "Gunshot and gunfire",
-      "file_path": "Audio/Lab/187767",
-      "source_dataset": "FSD50K",
-      "original_fname": "187767",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_379187",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Chink and clink",
-      "audioset_class": "Chink and clink",
-      "file_path": "Audio/Lab/379187",
-      "source_dataset": "FSD50K",
-      "original_fname": "379187",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_410888",
@@ -26331,7 +25685,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "410888",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_51711",
@@ -26343,7 +25698,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "51711",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_203380",
@@ -26355,43 +25711,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "203380",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_275911",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Knock",
-      "audioset_class": "Knock",
-      "file_path": "Audio/Lab/275911",
-      "source_dataset": "FSD50K",
-      "original_fname": "275911",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_139053",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Bell",
-      "audioset_class": "Bell",
-      "file_path": "Audio/Lab/139053",
-      "source_dataset": "FSD50K",
-      "original_fname": "139053",
-      "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_414588",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Bell",
-      "audioset_class": "Bell",
-      "file_path": "Audio/Lab/414588",
-      "source_dataset": "FSD50K",
-      "original_fname": "414588",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_90557",
@@ -26403,19 +25724,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "90557",
       "ambiguous": false,
-      "block": 8
-    },
-    {
-      "sound_id": "Lab_349814",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Fireworks",
-      "audioset_class": "Fireworks",
-      "file_path": "Audio/Lab/349814",
-      "source_dataset": "FSD50K",
-      "original_fname": "349814",
-      "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_383988",
@@ -26427,7 +25737,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "383988",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_184651",
@@ -26439,7 +25750,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "184651",
       "ambiguous": false,
-      "block": 8
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_216277",
@@ -26451,19 +25763,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "216277",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_223101",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Computer keyboard",
-      "audioset_class": "Computer keyboard",
-      "file_path": "Audio/Lab/223101",
-      "source_dataset": "FSD50K",
-      "original_fname": "223101",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_349786",
@@ -26475,19 +25776,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "349786",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_212683",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Fireworks",
-      "audioset_class": "Fireworks",
-      "file_path": "Audio/Lab/212683",
-      "source_dataset": "FSD50K",
-      "original_fname": "212683",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_235254",
@@ -26499,7 +25789,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "235254",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_377640",
@@ -26511,31 +25802,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "377640",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_148949",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/148949",
-      "source_dataset": "FSD50K",
-      "original_fname": "148949",
-      "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_158425",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Explosion",
-      "audioset_class": "Explosion",
-      "file_path": "Audio/Lab/158425",
-      "source_dataset": "FSD50K",
-      "original_fname": "158425",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_145206",
@@ -26547,31 +25815,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "145206",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_117289",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Squeak",
-      "audioset_class": "Squeak",
-      "file_path": "Audio/Lab/117289",
-      "source_dataset": "FSD50K",
-      "original_fname": "117289",
-      "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_362471",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Gunshot and gunfire",
-      "audioset_class": "Gunshot and gunfire",
-      "file_path": "Audio/Lab/362471",
-      "source_dataset": "FSD50K",
-      "original_fname": "362471",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_341413",
@@ -26583,7 +25828,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "341413",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_267302",
@@ -26595,7 +25841,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "267302",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_434228",
@@ -26607,7 +25854,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "434228",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_23090",
@@ -26619,7 +25867,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "23090",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_238241",
@@ -26631,7 +25880,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "238241",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_180676",
@@ -26643,31 +25893,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "180676",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_77326",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Computer keyboard",
-      "audioset_class": "Computer keyboard",
-      "file_path": "Audio/Lab/77326",
-      "source_dataset": "FSD50K",
-      "original_fname": "77326",
-      "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_54829",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Computer keyboard",
-      "audioset_class": "Computer keyboard",
-      "file_path": "Audio/Lab/54829",
-      "source_dataset": "FSD50K",
-      "original_fname": "54829",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_57479",
@@ -26679,7 +25906,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "57479",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_352065",
@@ -26691,7 +25919,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "352065",
       "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_90969",
@@ -26703,19 +25932,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "90969",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_423491",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Wind chime",
-      "audioset_class": "Wind chime",
-      "file_path": "Audio/Lab/423491",
-      "source_dataset": "FSD50K",
-      "original_fname": "423491",
-      "ambiguous": false,
-      "block": 9
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_90551",
@@ -26727,31 +25945,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "90551",
       "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_411749",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Bell",
-      "audioset_class": "Bell",
-      "file_path": "Audio/Lab/411749",
-      "source_dataset": "FSD50K",
-      "original_fname": "411749",
-      "ambiguous": false,
-      "block": 9
-    },
-    {
-      "sound_id": "Lab_186967",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Boom",
-      "audioset_class": "Boom",
-      "file_path": "Audio/Lab/186967",
-      "source_dataset": "FSD50K",
-      "original_fname": "186967",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_434427",
@@ -26763,7 +25958,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "434427",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_365073",
@@ -26775,7 +25971,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "365073",
       "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "B"
     },
     {
       "sound_id": "Lab_140222",
@@ -26787,19 +25984,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "140222",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Lab_343091",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Hiss",
-      "audioset_class": "Hiss",
-      "file_path": "Audio/Lab/343091",
-      "source_dataset": "FSD50K",
-      "original_fname": "343091",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     },
     {
       "sound_id": "Lab_67560",
@@ -26811,19 +25997,8 @@
       "source_dataset": "FSD50K",
       "original_fname": "67560",
       "ambiguous": false,
-      "block": 10
-    },
-    {
-      "sound_id": "Lab_90548",
-      "game_zone": "Lab",
-      "source_type": "Electroacoustic",
-      "sub_category": "Cowbell",
-      "audioset_class": "Cowbell",
-      "file_path": "Audio/Lab/90548",
-      "source_dataset": "FSD50K",
-      "original_fname": "90548",
-      "ambiguous": false,
-      "block": 10
+      "block": 7,
+      "group": "A"
     }
   ]
 }
