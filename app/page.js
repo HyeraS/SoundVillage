@@ -271,12 +271,11 @@ export default function HomePage() {
     setScreen('world')
   }, [])
 
-  /* ── AnnotationPanel 닫기 (X / 건너뛰기) → ZoneMap 복귀, 스킵도 collectedIds에 추가 ── */
+  /* ── AnnotationPanel 닫기 (X, 제출 없이 취소) → ZoneMap 복귀. 제출 안 했으므로 collectedIds에 넣지 않음 ── */
   const handleAnnotateClose = useCallback(() => {
-    if (activeSound) setCollectedIds(prev => new Set([...prev, activeSound.sound_id]))
     setActiveSound(null)
     setScreen('zone')
-  }, [activeSound])
+  }, [])
 
   /* ── 피드백 닫기 ── */
   const handleFeedbackClose = useCallback(() => {

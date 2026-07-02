@@ -453,21 +453,25 @@ function ZoneObject({ obj, zone, tick }) {
 /* ─────────────────────────────────────────────
    소리 아이템 — PNG 에셋 / SVG 보석상자 폴백
 ───────────────────────────────────────────── */
-function SoundItem({ item, zone, tick }) {
+function SoundItem({ item, zone, tick, done = false }) {
   const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const px    = item.tx * TILE + TILE / 2
   const py    = item.ty * TILE + TILE / 2
-  const bobY  = Math.sin(tick * 0.06 + item.pulse) * 4
-  const glow  = Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7
+  const bobY  = done ? 0 : Math.sin(tick * 0.06 + item.pulse) * 4
+  const glow  = done ? 0.5 : Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7
   const items = ITEMS[zone] || []
   const imgSrc = items[item.index % items.length]
+
+  // 제출 완료된 아이템은 게임 전체에서 쓰는 파라미지 금색/세피아 톤으로 표시
+  const border = done ? '#C8A96E' : si.itemBorder
+  const bg     = done ? '#F0E4C8' : si.itemBg
 
   return (
     <g transform={`translate(${px}, ${py + bobY})`} opacity={glow}>
       {/* 후광 */}
-      <circle r="20" fill={si.itemBorder} opacity="0.12"/>
-      {/* 파티클 */}
-      {[0,1,2].map(i => (
+      <circle r="20" fill={border} opacity="0.12"/>
+      {/* 파티클 (완료 전에만) */}
+      {!done && [0,1,2].map(i => (
         <circle key={i}
           cx={Math.cos(tick * 0.05 + i * 2.09) * 18}
           cy={Math.sin(tick * 0.05 + i * 2.09) * 18}
@@ -480,31 +484,38 @@ function SoundItem({ item, zone, tick }) {
       {ASSET_READY.items && imgSrc ? (
         <>
           <rect x="-14" y="-14" width="28" height="28" rx="6"
-            fill={si.itemBg} stroke={si.itemBorder} strokeWidth="1.5"/>
+            fill={bg} stroke={border} strokeWidth="1.5"/>
           <image
             href={imgSrc}
             x="-10" y="-10" width="20" height="20"
-            style={{ imageRendering: 'pixelated' }}
+            style={{ imageRendering: 'pixelated', filter: done ? 'grayscale(0.7)' : 'none' }}
           />
         </>
       ) : (
         <>
           {/* SVG 보석상자 폴백 */}
           <rect x="-12" y="-11" width="24" height="22" rx="5"
-            fill={si.itemBg} stroke={si.itemBorder} strokeWidth="1.5"/>
+            fill={bg} stroke={border} strokeWidth="1.5"/>
           <rect x="-12" y="-11" width="24" height="9" rx="4"
-            fill={`${si.itemBorder}44`} stroke={si.itemBorder} strokeWidth="1"/>
-          <rect x="-4" y="-12" width="8" height="4" rx="2" fill={si.itemBorder}/>
-          <circle cx="0" cy="4" r="3.5" fill={si.itemBorder} opacity="0.9"/>
-          <circle cx="0" cy="4" r="1.8" fill={si.itemBg}/>
+            fill={`${border}44`} stroke={border} strokeWidth="1"/>
+          <rect x="-4" y="-12" width="8" height="4" rx="2" fill={border}/>
+          <circle cx="0" cy="4" r="3.5" fill={border} opacity="0.9"/>
+          <circle cx="0" cy="4" r="1.8" fill={bg}/>
           <text textAnchor="middle" y="2" fontSize="9"
-            fill={si.itemBorder}
+            fill={border}
             style={{ userSelect:'none', fontFamily:'Nunito,sans-serif', fontWeight:'bold' }}>
             {item.symbol}
           </text>
         </>
       )}
-      <circle cx="-5" cy="-7" r="2" fill="white" opacity={0.3 + Math.sin(tick*0.12)*0.3}/>
+      {!done && <circle cx="-5" cy="-7" r="2" fill="white" opacity={0.3 + Math.sin(tick*0.12)*0.3}/>}
+      {done && (
+        <circle cx="9" cy="-9" r="7" fill="#7A9A6A" stroke="#F5EDD8" strokeWidth="1.2"/>
+      )}
+      {done && (
+        <path d="M6 -9 L8.3 -6.7 L12.5 -11.5" stroke="#F5EDD8" strokeWidth="1.6"
+          fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+      )}
     </g>
   )
 }
@@ -905,13 +916,10 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             <ZoneObject key={i} obj={obj} zone={zone} tick={tick}/>
           ))}
 
-          {/* 소리 아이템 — 제출 완료된 것만 숨김 */}
-          {itemsRef.current
-            .filter(it => !collectedIds.has(it.id))
-            .map(item => (
-              <SoundItem key={item.id} item={item} zone={zone} tick={tick}/>
-            ))
-          }
+          {/* 소리 아이템 — 제출 완료된 것도 계속 보이되, 정지된 채로 톤다운되어 표시됨 */}
+          {itemsRef.current.map(item => (
+            <SoundItem key={item.id} item={item} zone={zone} tick={tick} done={collectedIds.has(item.id)}/>
+          ))}
 
           {/* 캐릭터 */}
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
