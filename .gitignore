@@ -3,3 +3,4 @@ fsd50k_pilot/
 node_modules
 .next/
 .env.local
+scripts/download_errors.csv
