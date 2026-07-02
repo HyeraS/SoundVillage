@@ -16,6 +16,14 @@ const CHAR_W  = 22
 const CHAR_H  = 28
 const HUD_H   = 56
 
+// block(구역) 경계로 쓰이는 4×4 격자선 — 지도 중앙 십자로 + 1/4·3/4 보조로와
+// 동일한 좌표를 공유해서, 이 선을 기준으로 블록을 나누면 "길"이 곧 블록 사이의
+// 경계가 된다. PATH_BUFFER는 그 선 좌우/상하로 아이템을 놓지 않는 여백(칸 수)로,
+// 열린 구역과 잠긴 구역 사이에 실제 시각적 거리를 만든다.
+const GRID_COL_LINES = [Math.floor(MAP_W / 4), Math.floor(MAP_W / 2), Math.floor(MAP_W * 3 / 4)]
+const GRID_ROW_LINES = [Math.floor(MAP_H / 4), Math.floor(MAP_H / 2), Math.floor(MAP_H * 3 / 4)]
+const PATH_BUFFER = 1
+
 /* ─────────────────────────────────────────────
    Zone별 배경 팔레트
 ───────────────────────────────────────────── */
@@ -71,18 +79,27 @@ function buildPaths(zone) {
   const cx = Math.floor(MAP_W / 2)
   const cy = Math.floor(MAP_H / 2)
   const paths = []
-  // 가로 중앙로
-  for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: cy })
-  // 세로 중앙로
-  for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: cx, ty })
-  // 가로 보조로 (위/아래 1/4 지점)
-  for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: Math.floor(MAP_H / 4) })
-  for (let tx = 2; tx < MAP_W - 2; tx++) paths.push({ tx, ty: Math.floor(MAP_H * 3 / 4) })
-  // 세로 보조로 (좌/우 1/4 지점)
-  for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: Math.floor(MAP_W / 4), ty })
-  for (let ty = 2; ty < MAP_H - 2; ty++) paths.push({ tx: Math.floor(MAP_W * 3 / 4), ty })
+  const seen = new Set()
+  const add = (tx, ty) => {
+    const k = `${tx},${ty}`
+    if (seen.has(k)) return
+    seen.add(k)
+    paths.push({ tx, ty })
+  }
+  // block 경계선(중앙 십자로 + 1/4·3/4 보조로)을 PATH_BUFFER만큼 넓혀서 그린다 —
+  // 이 폭이 곧 spawnSoundItems()가 아이템을 놓지 않는 여백과 정확히 일치한다.
+  GRID_ROW_LINES.forEach(ty => {
+    for (let d = -PATH_BUFFER; d <= PATH_BUFFER; d++) {
+      for (let tx = 2; tx < MAP_W - 2; tx++) add(tx, ty + d)
+    }
+  })
+  GRID_COL_LINES.forEach(tx => {
+    for (let d = -PATH_BUFFER; d <= PATH_BUFFER; d++) {
+      for (let ty = 2; ty < MAP_H - 2; ty++) add(tx + d, ty)
+    }
+  })
   // 입구 (하단)
-  for (let tx = cx - 1; tx <= cx + 1; tx++) paths.push({ tx, ty: MAP_H - 1 })
+  for (let tx = cx - 1; tx <= cx + 1; tx++) add(tx, MAP_H - 1)
   return paths
 }
 
@@ -564,24 +581,30 @@ function seededRand(seed) {
 function BlockCloud({ region, tick, seed = 1 }) {
   if (!region) return null
   const rand  = seededRand(seed * 97 + 13)
-  const puffs = Array.from({ length: 6 }, () => ({
-    ox: (rand() - 0.5) * 1.6,
-    oy: (rand() - 0.5) * 1.6,
-    r:  0.5 + rand() * 0.35,
-  }))
+  // 반지름(r) + 중심 오프셋(ox,oy)의 합이 항상 구역 경계(1.0) 안쪽에 머물도록
+  // 클램프해서, 옆 구역(특히 이미 열린 활성 구역)까지 구름이 번지지 않게 한다.
+  const puffs = Array.from({ length: 5 }, () => {
+    const r = 0.3 + rand() * 0.18
+    const maxOffset = Math.max(0.85 - r, 0)
+    return {
+      ox: (rand() - 0.5) * 2 * maxOffset,
+      oy: (rand() - 0.5) * 2 * maxOffset,
+      r,
+    }
+  })
   const cx = region.cx * TILE, cy = region.cy * TILE
   const rx = region.rx * TILE, ry = region.ry * TILE
 
   return (
-    <g style={{ filter: 'url(#cloudBlur)' }} opacity="0.55">
+    <g style={{ filter: 'url(#cloudBlur)' }} opacity="0.6">
       {puffs.map((p, i) => {
-        const dx = Math.sin(tick * 0.008 + seed + i) * TILE * 0.35
-        const dy = Math.cos(tick * 0.006 + seed + i * 1.7) * TILE * 0.25
+        const dx = Math.sin(tick * 0.008 + seed + i) * TILE * 0.1
+        const dy = Math.cos(tick * 0.006 + seed + i * 1.7) * TILE * 0.08
         return (
           <ellipse key={i}
             cx={cx + p.ox * rx + dx}
             cy={cy + p.oy * ry + dy}
-            rx={Math.max(rx * p.r, TILE)} ry={Math.max(ry * p.r, TILE)}
+            rx={Math.max(rx * p.r, TILE * 0.7)} ry={Math.max(ry * p.r, TILE * 0.7)}
             fill="#E8E4D6"
           />
         )
@@ -722,16 +745,36 @@ function spawnSoundItems(sounds, zone) {
   const entranceTx = cx, entranceTy = MAP_H - 1
   const rand = seededRand(hashSeed(zone + '|' + sounds.map(s => s.sound_id).sort().join(',')))
 
-  // 경로 타일 셋 (아이템 배치 금지)
-  const pathSet = new Set()
-  for (let tx = 2; tx < MAP_W - 2; tx++) pathSet.add(`${tx},${cy}`)
-  for (let ty = 2; ty < MAP_H - 2; ty++) pathSet.add(`${cx},${ty}`)
+  // 지도를 가로지르는 길(GRID_ROW/COL_LINES, buildPaths()가 그리는 것과 동일한 좌표)로
+  // 나뉘는 4×4 셀 격자를 만든다. block마다 셀을 하나씩 통째로 배정하면, 서로 다른
+  // block의 영역은 항상 길 하나만큼 떨어져 있고 절대 겹치지 않는다.
+  const colBounds = [2, ...GRID_COL_LINES, MAP_W - 2]
+  const rowBounds = [2, ...GRID_ROW_LINES, MAP_H - 2]
+  const NUM_COLS = colBounds.length - 1
+  const NUM_ROWS = rowBounds.length - 1
 
-  // 배치 가능한 모든 타일을 수집 (맵 테두리 1칸, 경로 제외)
-  const allCandidates = []
+  const cells = []
+  for (let r = 0; r < NUM_ROWS; r++) {
+    for (let c = 0; c < NUM_COLS; c++) {
+      const x0 = colBounds[c], x1 = colBounds[c + 1]
+      const y0 = rowBounds[r], y1 = rowBounds[r + 1]
+      cells.push({ x0, x1, y0, y1, tx: (x0 + x1) / 2, ty: (y0 + y1) / 2, tiles: [] })
+    }
+  }
+  const cellAt = (tx, ty) => {
+    let c = 0, r = 0
+    for (let i = 1; i < NUM_COLS; i++) if (tx >= colBounds[i]) c = i
+    for (let i = 1; i < NUM_ROWS; i++) if (ty >= rowBounds[i]) r = i
+    return cells[r * NUM_COLS + c]
+  }
+
+  // 길(경계선) 좌우/상하 PATH_BUFFER칸은 아이템 배치 금지 — 구역 사이에
+  // 실제 여백을 만들어서 열린 구역과 잠긴 구역이 바싹 붙어 보이지 않게 한다.
+  const nearGridLine = (v, lines) => lines.some(l => Math.abs(v - l) <= PATH_BUFFER)
   for (let ty = 2; ty < MAP_H - 2; ty++) {
     for (let tx = 2; tx < MAP_W - 2; tx++) {
-      if (!pathSet.has(`${tx},${ty}`)) allCandidates.push({ tx, ty })
+      if (nearGridLine(tx, GRID_COL_LINES) || nearGridLine(ty, GRID_ROW_LINES)) continue
+      cellAt(tx, ty).tiles.push({ tx, ty })
     }
   }
 
@@ -744,60 +787,33 @@ function spawnSoundItems(sounds, zone) {
   }
   const blockNums = [...byBlock.keys()].sort((a, b) => a - b)
 
-  // block마다 맵 전역에 격자로 넓게 떨어진 중심점(anchor)을 하나씩 배정한다.
-  // 입구에서 가까운 anchor부터 낮은 block을 받아 "안개가 입구에서부터
-  // 걷힌다"는 느낌은 유지하되, 같은 block끼리 한 지점에 다닥다닥
-  // 뭉치지 않고 맵 전체에 퍼진 하나의 "구역"을 이루도록 한다.
-  const cols = Math.max(1, Math.round(Math.sqrt(blockNums.length * (MAP_W / MAP_H))))
-  const rows = Math.max(1, Math.ceil(blockNums.length / cols))
-  const marginX = 6, marginY = 6
-  const cellW = (MAP_W - marginX * 2) / cols
-  const cellH = (MAP_H - marginY * 2) / rows
-
-  const anchors = []
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      anchors.push({ tx: marginX + cellW * (c + 0.5), ty: marginY + cellH * (r + 0.5) })
-    }
-  }
-  anchors.sort((a, b) => {
+  // 입구에서 가까운 셀부터 낮은 block을 받아 "안개가 입구에서부터 걷힌다"는
+  // 느낌을 유지한다. (셀은 16개뿐이라 block이 더 많으면 마지막 셀을 공유한다.)
+  const orderedCells = [...cells].sort((a, b) => {
     const da = (a.tx - entranceTx) ** 2 + (a.ty - entranceTy) ** 2
     const db = (b.tx - entranceTx) ** 2 + (b.ty - entranceTy) ** 2
     return da - db
   })
+  const cellByBlock = new Map()
+  blockNums.forEach((b, bi) => cellByBlock.set(b, orderedCells[Math.min(bi, orderedCells.length - 1)]))
 
-  const used    = new Set()
   const items   = []
   const regions = {}
 
-  blockNums.forEach((b, bi) => {
-    const anchor      = anchors[bi] || anchors[anchors.length - 1]
+  blockNums.forEach(b => {
     const blockSounds = byBlock.get(b)
+    const cell         = cellByBlock.get(b)
 
-    // anchor에서 가까운 순서로, 아직 다른 block이 쓰지 않은 타일만 후보로
-    const ranked = allCandidates
-      .filter(p => !used.has(`${p.tx},${p.ty}`))
-      .sort((p, q) => {
-        const dp = (p.tx - anchor.tx) ** 2 + (p.ty - anchor.ty) ** 2
-        const dq = (q.tx - anchor.tx) ** 2 + (q.ty - anchor.ty) ** 2
-        return dp - dq
-      })
-
-    // 필요 개수보다 훨씬 넓은 후보 풀에서 무작위로 골라, 같은 구역 안에서도
-    // 아이템끼리 다닥다닥 붙지 않고 성기게 퍼지도록 한다.
-    const pool = ranked.slice(0, Math.min(ranked.length, blockSounds.length * 4))
+    // 자기 셀 타일 안에서만 무작위로 골라, 다닥다닥 붙지 않고 성기게 퍼지도록 한다
+    const pool = [...cell.tiles]
     for (let i = pool.length - 1; i > 0; i--) {
       const j = Math.floor(rand() * (i + 1))
       ;[pool[i], pool[j]] = [pool[j], pool[i]]
     }
     const chosen = pool.slice(0, blockSounds.length)
-    chosen.forEach(p => used.add(`${p.tx},${p.ty}`))
 
-    let minTx = Infinity, maxTx = -Infinity, minTy = Infinity, maxTy = -Infinity
     blockSounds.forEach((s, i) => {
-      const pos = chosen.length ? chosen[i % chosen.length] : anchor
-      minTx = Math.min(minTx, pos.tx); maxTx = Math.max(maxTx, pos.tx)
-      minTy = Math.min(minTy, pos.ty); maxTy = Math.max(maxTy, pos.ty)
+      const pos = chosen.length ? chosen[i % chosen.length] : { tx: cell.tx, ty: cell.ty }
       items.push({
         id:        s.sound_id,
         sound:     s,
@@ -810,11 +826,13 @@ function spawnSoundItems(sounds, zone) {
       })
     })
 
+    // 구름 영역은 셀 자체의 고정된 중심/크기를 그대로 쓴다(아이템 위치의 bounding box가
+    // 아님) — 그래야 구름이 절대 자기 셀 경계를 넘어 옆 구역(길 건너)까지 번지지 않는다.
     regions[b] = {
-      cx: (minTx + maxTx) / 2,
-      cy: (minTy + maxTy) / 2,
-      rx: Math.max((maxTx - minTx) / 2 + 2.5, 4),
-      ry: Math.max((maxTy - minTy) / 2 + 2.5, 4),
+      cx: cell.tx,
+      cy: cell.ty,
+      rx: Math.max((cell.x1 - cell.x0) / 2 - 1, 2),
+      ry: Math.max((cell.y1 - cell.y0) / 2 - 1, 2),
     }
   })
 
@@ -1100,7 +1118,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         >
           <defs>
             <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation={TILE * 0.4}/>
+              <feGaussianBlur stdDeviation={TILE * 0.22}/>
             </filter>
             {ASSET_READY.tiles ? (
               <pattern id={`ground_${zone}`} width={TILE} height={TILE} patternUnits="userSpaceOnUse">
