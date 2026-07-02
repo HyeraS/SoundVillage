@@ -114,7 +114,7 @@ export default function StartPanel({ onStart }) {
             🪪 참여자 ID
           </label>
           <input
-            placeholder="예: P001"
+            placeholder="예: P01"
             value={participantId}
             onChange={e => setParticipantId(e.target.value)}
             onFocus={() => setFocused('pid')}
