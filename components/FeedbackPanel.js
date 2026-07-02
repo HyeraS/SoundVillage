@@ -9,7 +9,7 @@ import { ZONE_META } from '@/components/GameEngine'
 export default function FeedbackPanel({ zone, onClose }) {
   const [progress, setProgress] = useState(100)
   const meta = ZONE_META[zone] || { color: '#5B9E3A', emoji: '🎵', label: zone }
-  const DURATION = 900
+  const DURATION = 400
 
   useEffect(() => {
     // 닫기 타이머

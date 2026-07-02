@@ -706,12 +706,18 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         <EnterPrompt emoji="🏛" label="Sound Museum" color="#C8A96E"/>
       )}
 
-      <DPad press={press} release={release}/>
+      <DPad press={press} release={release}
+        onConfirm={
+          nearZone && !lockedSet.has(nearZone) ? () => onEnterZone(nearZone)
+          : !nearZone && nearMuseum && onEnterMuseum ? () => onEnterMuseum()
+          : null
+        }
+      />
     </div>
   )
 }
 
-function DPad({ press, release }) {
+function DPad({ press, release, onConfirm }) {
   const BTN = [
     {dir:'up',label:'▲',gridArea:'1/2'},{dir:'left',label:'◀',gridArea:'2/1'},
     {dir:'down',label:'▼',gridArea:'2/2'},{dir:'right',label:'▶',gridArea:'2/3'},
@@ -736,6 +742,11 @@ function DPad({ press, release }) {
           {b.label}
         </div>
       ))}
+      {onConfirm && (
+        <div style={{ ...s, gridArea:'1/3', background:'#C8A96E', color:'#fff', fontSize:'18px', border:'2px solid #8B6432' }}
+          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); onConfirm() }}
+        >✓</div>
+      )}
     </div>
   )
 }

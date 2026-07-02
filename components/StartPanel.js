@@ -11,7 +11,9 @@ export default function StartPanel({ onStart }) {
 
   function handleStart() {
     if (!participantId.trim() || !groupId.trim()) return
-    onStart(participantId.trim(), groupId.trim())
+    // 대소문자 차이로 같은 참여자가 다른 사람 취급되지 않도록 정규화
+    // (예: "p1"과 "P1"이 Supabase에서 다른 participant_id로 갈라지는 것 방지)
+    onStart(participantId.trim().toUpperCase(), groupId.trim())
   }
   const canStart = participantId.trim() && groupId.trim()
 

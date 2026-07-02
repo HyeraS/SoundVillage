@@ -347,10 +347,11 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
 
   const played = playCount > 0;
 
-  // 패널 열릴 때 input 포커스
-  useEffect(() => { setTimeout(() => inputRef.current?.focus(), 300); }, []);
+  // 재생해야 입력창이 활성화되므로, 첫 재생이 끝나는 시점에 포커스
+  useEffect(() => { if (played) inputRef.current?.focus(); }, [played]);
 
   const handleSubmit = async () => {
+    if (!played) { setError('먼저 소리를 들어주세요 🎧'); return; }
     if (!text.trim()) { setError('의성어를 입력해주세요 🎵'); return; }
     setSubmitting(true);
     setError('');
@@ -494,6 +495,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           ref={inputRef}
           type="text"
           value={text}
+          disabled={!played}
           onChange={(e) => { setText(e.target.value); setError(''); }}
           onKeyDown={(e) => {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
@@ -513,6 +515,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
             fontFamily: 'Nunito, sans-serif', fontWeight: 600,
             outline: 'none', transition: 'border-color 0.15s',
             letterSpacing: '0.5px',
+            cursor: !played ? 'not-allowed' : 'text',
           }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
@@ -545,15 +548,15 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
         </button>
         <button
           onClick={handleSubmit}
-          disabled={submitting || !text.trim()}
+          disabled={submitting || !played || !text.trim()}
           style={{
             flex: 1, padding: '13px', borderRadius: '12px', border: 'none',
-            background: text.trim() ? accent : '#ffffff15',
-            color: text.trim() ? '#fff' : '#6B6660',
+            background: played && text.trim() ? accent : '#ffffff15',
+            color: played && text.trim() ? '#fff' : '#6B6660',
             fontSize: '15px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
-            cursor: text.trim() && !submitting ? 'pointer' : 'not-allowed',
+            cursor: played && text.trim() && !submitting ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s',
-            boxShadow: text.trim() ? `0 4px 20px ${accent}55` : 'none',
+            boxShadow: played && text.trim() ? `0 4px 20px ${accent}55` : 'none',
           }}
         >
           {submitting ? '저장 중...' : '✅ 제출하기'}
