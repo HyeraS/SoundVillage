@@ -537,6 +537,36 @@ function ObjectivePanel({ nearZone, nearMuseum }) {
 }
 
 /* ─────────────────────────────────────────────
+   진입 알림 — zone/museum 근처에 왔을 때 뜨는 배지.
+   눈에 잘 띄도록 크게 + 은은한 pulse로 계속 시선을 끈다.
+───────────────────────────────────────────── */
+function EnterPrompt({ emoji, label, color }) {
+  return (
+    <div style={{
+      position:'absolute', bottom:'110px', left:'50%', transform:'translateX(-50%)',
+      background:'#F5EDD8ee', border:`3px solid ${color}`,
+      borderRadius:'26px', padding:'16px 34px',
+      fontSize:'20px', fontFamily:'Nunito, sans-serif',
+      color:'#3A2A14', fontWeight:800, backdropFilter:'blur(8px)',
+      animation:'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1), pulse 1.6s ease-in-out 0.3s infinite',
+      pointerEvents:'none', whiteSpace:'nowrap',
+      boxShadow:`0 8px 28px ${color}66`, zIndex:15,
+      display:'flex', alignItems:'center', gap:'12px',
+    }}>
+      <span style={{ fontSize:'30px' }}>{emoji}</span>
+      <span>{label} 근처</span>
+      <span style={{
+        background:color, color:'#fff', padding:'5px 14px', borderRadius:'10px',
+        fontSize:'17px', fontWeight:800, letterSpacing:'0.5px',
+        boxShadow:'inset 0 -2px 0 #00000033',
+      }}>
+        ENTER ↵
+      </span>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
 export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, participantId = '' }) {
@@ -663,33 +693,15 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
       <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum}/>
 
       {nearZone && (
-        <div style={{
-          position:'absolute', bottom:'100px', left:'50%', transform:'translateX(-50%)',
-          background:'#F5EDD8cc', border:`2px solid ${ZONE_META[nearZone].color}`,
-          borderRadius:'20px', padding:'8px 20px',
-          fontSize:'13px', fontFamily:'Nunito, sans-serif',
-          color:'#3A2A14', fontWeight:700, backdropFilter:'blur(6px)',
-          animation:'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-          pointerEvents:'none', whiteSpace:'nowrap',
-          boxShadow:`0 4px 16px ${ZONE_META[nearZone].color}44`, zIndex:15,
-        }}>
-          {ZONE_META[nearZone].emoji} {ZONE_META[nearZone].label} 근처 — ENTER로 진입
-        </div>
+        <EnterPrompt
+          emoji={ZONE_META[nearZone].emoji}
+          label={ZONE_META[nearZone].label}
+          color={ZONE_META[nearZone].color}
+        />
       )}
 
       {!nearZone && nearMuseum && (
-        <div style={{
-          position:'absolute', bottom:'100px', left:'50%', transform:'translateX(-50%)',
-          background:'#F5EDD8cc', border:'2px solid #C8A96E',
-          borderRadius:'20px', padding:'8px 20px',
-          fontSize:'13px', fontFamily:'Nunito, sans-serif',
-          color:'#3A2A14', fontWeight:700, backdropFilter:'blur(6px)',
-          animation:'popIn 0.25s cubic-bezier(0.34,1.56,0.64,1)',
-          pointerEvents:'none', whiteSpace:'nowrap',
-          boxShadow:'0 4px 16px #C8A96E44', zIndex:15,
-        }}>
-          🏛 Sound Museum 근처 — ENTER로 진입
-        </div>
+        <EnterPrompt emoji="🏛" label="Sound Museum" color="#C8A96E"/>
       )}
 
       <DPad press={press} release={release}/>
