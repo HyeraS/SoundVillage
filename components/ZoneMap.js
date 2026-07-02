@@ -456,24 +456,39 @@ function ZoneObject({ obj, zone, tick }) {
 function SoundItem({ item, zone, tick, state = 'active' }) {
   const px = item.tx * TILE + TILE / 2
   const py = item.ty * TILE + TILE / 2
+  const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
+  const items = ITEMS[zone] || []
+  const imgSrc = items[item.index % items.length]
 
-  // 잠긴(아직 구역 해제 안 된) 아이템 — 안개 속 회색 점, 상호작용 불가
+  // 잠긴(아직 구역 해제 안 된) 아이템 — 실제 아이콘을 옅게 보여줘 어디에
+  // 분포되어 있는지는 알 수 있게 하되, 흐림 효과 자체는 구역 전체를 덮는
+  // BlockCloud가 담당하고 여기서는 살짝 톤다운만 한다. 상호작용은 불가.
   if (state === 'locked') {
-    const drift = Math.sin(tick * 0.02 + item.pulse) * 1.5
-    const pulse = 0.35 + Math.sin(tick * 0.03 + item.pulse) * 0.15
+    const drift = Math.sin(tick * 0.02 + item.pulse) * 2
     return (
-      <g transform={`translate(${px}, ${py})`}>
-        <circle r={6 + drift} fill="#6B6660" opacity={pulse}/>
+      <g transform={`translate(${px}, ${py + drift})`} opacity="0.55">
+        {ASSET_READY.items && imgSrc ? (
+          <>
+            <rect x="-14" y="-14" width="28" height="28" rx="6"
+              fill={si.itemBg} stroke={si.itemBorder} strokeWidth="1.5"/>
+            <image href={imgSrc} x="-10" y="-10" width="20" height="20"
+              style={{ imageRendering: 'pixelated', filter: 'grayscale(0.6)' }}/>
+          </>
+        ) : (
+          <>
+            <rect x="-12" y="-11" width="24" height="22" rx="5"
+              fill={si.itemBg} stroke={si.itemBorder} strokeWidth="1.5"/>
+            <rect x="-12" y="-11" width="24" height="9" rx="4"
+              fill={`${si.itemBorder}44`} stroke={si.itemBorder} strokeWidth="1"/>
+          </>
+        )}
       </g>
     )
   }
 
   const done  = state === 'done'
-  const si    = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const bobY  = done ? 0 : Math.sin(tick * 0.06 + item.pulse) * 4
   const glow  = done ? 0.5 : Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7
-  const items = ITEMS[zone] || []
-  const imgSrc = items[item.index % items.length]
 
   // 제출 완료된 아이템은 게임 전체에서 쓰는 파라미지 금색/세피아 톤으로 표시
   const border = done ? '#C8A96E' : si.itemBorder
@@ -529,6 +544,48 @@ function SoundItem({ item, zone, tick, state = 'active' }) {
         <path d="M6 -9 L8.3 -6.7 L12.5 -11.5" stroke="#F5EDD8" strokeWidth="1.6"
           fill="none" strokeLinecap="round" strokeLinejoin="round"/>
       )}
+    </g>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   구역 구름 — 아직 잠긴 block의 아이템들이 모여 있는 영역 전체를
+   덮는 뭉게구름. 그 밑의 아이템은 은은하게 비쳐 보이되 상호작용은 불가.
+───────────────────────────────────────────── */
+function seededRand(seed) {
+  let s = seed % 2147483647
+  if (s <= 0) s += 2147483646
+  return () => {
+    s = (s * 16807) % 2147483647
+    return (s - 1) / 2147483646
+  }
+}
+
+function BlockCloud({ region, tick, seed = 1 }) {
+  if (!region) return null
+  const rand  = seededRand(seed * 97 + 13)
+  const puffs = Array.from({ length: 6 }, () => ({
+    ox: (rand() - 0.5) * 1.6,
+    oy: (rand() - 0.5) * 1.6,
+    r:  0.5 + rand() * 0.35,
+  }))
+  const cx = region.cx * TILE, cy = region.cy * TILE
+  const rx = region.rx * TILE, ry = region.ry * TILE
+
+  return (
+    <g style={{ filter: 'url(#cloudBlur)' }} opacity="0.55">
+      {puffs.map((p, i) => {
+        const dx = Math.sin(tick * 0.008 + seed + i) * TILE * 0.35
+        const dy = Math.cos(tick * 0.006 + seed + i * 1.7) * TILE * 0.25
+        return (
+          <ellipse key={i}
+            cx={cx + p.ox * rx + dx}
+            cy={cy + p.oy * ry + dy}
+            rx={Math.max(rx * p.r, TILE)} ry={Math.max(ry * p.r, TILE)}
+            fill="#E8E4D6"
+          />
+        )
+      })}
     </g>
   )
 }
@@ -651,12 +708,19 @@ function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTotal = 1 
 /* ─────────────────────────────────────────────
    소리 아이템 생성
 ───────────────────────────────────────────── */
+// zone + 소리 목록(=zone/그룹) 기준 안정적인 해시 — 같은 그룹의 모든 참여자, 그리고
+// 같은 참여자가 재입장할 때도 항상 동일한 씨앗값을 받아 동일한 배치가 나오게 한다.
+function hashSeed(str) {
+  let h = 5381
+  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0
+  return Math.abs(h) || 1
+}
+
 function spawnSoundItems(sounds, zone) {
   const si = SOUND_ITEMS[zone] || SOUND_ITEMS.Animal
   const cx = Math.floor(MAP_W / 2), cy = Math.floor(MAP_H / 2)
-  // 입구 타일 기준 — block이 낮을수록(먼저 열리는 구역) 입구에 가깝게 배치해서
-  // 안개가 입구에서부터 바깥으로 걷히는 것처럼 보이게 한다.
   const entranceTx = cx, entranceTy = MAP_H - 1
+  const rand = seededRand(hashSeed(zone + '|' + sounds.map(s => s.sound_id).sort().join(',')))
 
   // 경로 타일 셋 (아이템 배치 금지)
   const pathSet = new Set()
@@ -664,47 +728,97 @@ function spawnSoundItems(sounds, zone) {
   for (let ty = 2; ty < MAP_H - 2; ty++) pathSet.add(`${cx},${ty}`)
 
   // 배치 가능한 모든 타일을 수집 (맵 테두리 1칸, 경로 제외)
-  const candidates = []
+  const allCandidates = []
   for (let ty = 2; ty < MAP_H - 2; ty++) {
     for (let tx = 2; tx < MAP_W - 2; tx++) {
-      if (!pathSet.has(`${tx},${ty}`)) candidates.push({ tx, ty })
+      if (!pathSet.has(`${tx},${ty}`)) allCandidates.push({ tx, ty })
     }
   }
 
-  // 입구에서 가까운 순서로 정렬
-  candidates.sort((a, b) => {
+  // block별로 소리를 묶는다
+  const byBlock = new Map()
+  for (const s of sounds) {
+    const b = s.block || 1
+    if (!byBlock.has(b)) byBlock.set(b, [])
+    byBlock.get(b).push(s)
+  }
+  const blockNums = [...byBlock.keys()].sort((a, b) => a - b)
+
+  // block마다 맵 전역에 격자로 넓게 떨어진 중심점(anchor)을 하나씩 배정한다.
+  // 입구에서 가까운 anchor부터 낮은 block을 받아 "안개가 입구에서부터
+  // 걷힌다"는 느낌은 유지하되, 같은 block끼리 한 지점에 다닥다닥
+  // 뭉치지 않고 맵 전체에 퍼진 하나의 "구역"을 이루도록 한다.
+  const cols = Math.max(1, Math.round(Math.sqrt(blockNums.length * (MAP_W / MAP_H))))
+  const rows = Math.max(1, Math.ceil(blockNums.length / cols))
+  const marginX = 6, marginY = 6
+  const cellW = (MAP_W - marginX * 2) / cols
+  const cellH = (MAP_H - marginY * 2) / rows
+
+  const anchors = []
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      anchors.push({ tx: marginX + cellW * (c + 0.5), ty: marginY + cellH * (r + 0.5) })
+    }
+  }
+  anchors.sort((a, b) => {
     const da = (a.tx - entranceTx) ** 2 + (a.ty - entranceTy) ** 2
     const db = (b.tx - entranceTx) ** 2 + (b.ty - entranceTy) ** 2
     return da - db
   })
 
-  // 거리순 그대로면 한 줄로 늘어서 보이므로, 가까운 순서를 크게 해친지 않는
-  // 선에서 덩어리(chunk) 단위로만 섞어 자연스럽게 분산시킨다.
-  const CHUNK = 30
-  for (let start = 0; start < candidates.length; start += CHUNK) {
-    const end = Math.min(start + CHUNK, candidates.length)
-    for (let i = end - 1; i > start; i--) {
-      const j = start + Math.floor(Math.random() * (i - start + 1))
-      ;[candidates[i], candidates[j]] = [candidates[j], candidates[i]]
+  const used    = new Set()
+  const items   = []
+  const regions = {}
+
+  blockNums.forEach((b, bi) => {
+    const anchor      = anchors[bi] || anchors[anchors.length - 1]
+    const blockSounds = byBlock.get(b)
+
+    // anchor에서 가까운 순서로, 아직 다른 block이 쓰지 않은 타일만 후보로
+    const ranked = allCandidates
+      .filter(p => !used.has(`${p.tx},${p.ty}`))
+      .sort((p, q) => {
+        const dp = (p.tx - anchor.tx) ** 2 + (p.ty - anchor.ty) ** 2
+        const dq = (q.tx - anchor.tx) ** 2 + (q.ty - anchor.ty) ** 2
+        return dp - dq
+      })
+
+    // 필요 개수보다 훨씬 넓은 후보 풀에서 무작위로 골라, 같은 구역 안에서도
+    // 아이템끼리 다닥다닥 붙지 않고 성기게 퍼지도록 한다.
+    const pool = ranked.slice(0, Math.min(ranked.length, blockSounds.length * 4))
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1))
+      ;[pool[i], pool[j]] = [pool[j], pool[i]]
     }
-  }
+    const chosen = pool.slice(0, blockSounds.length)
+    chosen.forEach(p => used.add(`${p.tx},${p.ty}`))
 
-  // block이 낮은(먼저 열리는) 소리부터 입구 근처 자리를 차지하도록 정렬
-  const sorted = [...sounds].sort((a, b) => (a.block || 1) - (b.block || 1))
+    let minTx = Infinity, maxTx = -Infinity, minTy = Infinity, maxTy = -Infinity
+    blockSounds.forEach((s, i) => {
+      const pos = chosen.length ? chosen[i % chosen.length] : anchor
+      minTx = Math.min(minTx, pos.tx); maxTx = Math.max(maxTx, pos.tx)
+      minTy = Math.min(minTy, pos.ty); maxTy = Math.max(maxTy, pos.ty)
+      items.push({
+        id:        s.sound_id,
+        sound:     s,
+        tx:        pos.tx,
+        ty:        pos.ty,
+        index:     items.length,
+        symbol:    si.symbols[items.length % si.symbols.length],
+        collected: false,
+        pulse:     rand() * Math.PI * 2,
+      })
+    })
 
-  return sorted.map((s, i) => {
-    const pos = candidates[i % candidates.length]
-    return {
-      id:        s.sound_id,
-      sound:     s,
-      tx:        pos.tx,
-      ty:        pos.ty,
-      index:     i,
-      symbol:    si.symbols[i % si.symbols.length],
-      collected: false,
-      pulse:     Math.random() * Math.PI * 2,
+    regions[b] = {
+      cx: (minTx + maxTx) / 2,
+      cy: (minTy + maxTy) / 2,
+      rx: Math.max((maxTx - minTx) / 2 + 2.5, 4),
+      ry: Math.max((maxTy - minTy) / 2 + 2.5, 4),
     }
   })
+
+  return { items, regions }
 }
 
 /* ─────────────────────────────────────────────
@@ -816,6 +930,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // 가시성은 부모의 collectedIds(제출 완료 후 갱신)로만 결정
   const itemsRef     = useRef(null)
   if (itemsRef.current === null) itemsRef.current = spawnSoundItems(sounds, zone)
+  const zoneRegions = itemsRef.current.regions
 
   const [collecting, setCollecting]= useState(null)
   // 현재 수집 진행 중(annotation 열려 있는 동안) 새 충돌 차단
@@ -902,7 +1017,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
         // 새 아이템 충돌 — annotation 열려 있으면 완전 차단
         if (!collectingRef.current) {
-          for (const item of itemsRef.current) {
+          for (const item of itemsRef.current.items) {
             if (collectedIds.has(item.id)) continue
             if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
@@ -920,7 +1035,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         // 정지 상태에서도 충돌 감지 (방향 전환 직후 첫 프레임 등)
         if (!collectingRef.current && !isAnnotatingRef.current) {
           const { x: sx, y: sy } = posRef.current
-          for (const item of itemsRef.current) {
+          for (const item of itemsRef.current.items) {
             if (collectedIds.has(item.id)) continue
             if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
@@ -958,8 +1073,8 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dir, collectedIds])
 
-  const remaining = itemsRef.current.filter(it => !collectedIds.has(it.id)).length
-  const total     = itemsRef.current.length
+  const remaining = itemsRef.current.items.filter(it => !collectedIds.has(it.id)).length
+  const total     = itemsRef.current.items.length
   const collected = total - remaining
 
   // 카메라: 플레이어 중심, 맵 경계에서 클램프
@@ -984,6 +1099,9 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           style={{ display:'block', position:'absolute', inset:0 }}
         >
           <defs>
+            <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation={TILE * 0.4}/>
+            </filter>
             {ASSET_READY.tiles ? (
               <pattern id={`ground_${zone}`} width={TILE} height={TILE} patternUnits="userSpaceOnUse">
                 <image href={ZONE_GROUND_TILE[zone]} width={TILE} height={TILE} style={{ imageRendering:'pixelated' }}/>
@@ -1023,11 +1141,19 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
           {/* 소리 아이템 — zone 전체가 한 화면에 있고, 잠긴 구역은 안개(회색 점)로,
               해제된 구역은 아이콘으로, 완료된 것은 톤다운된 채로 계속 보임 */}
-          {itemsRef.current.map(item => {
+          {itemsRef.current.items.map(item => {
             const state = collectedIds.has(item.id)
               ? 'done'
               : (item.sound.block || 1) <= blockNum ? 'active' : 'locked'
             return <SoundItem key={item.id} item={item} zone={zone} tick={tick} state={state}/>
+          })}
+
+          {/* 아직 열리지 않은 구역을 통째로 덮는 구름 — 그 안의 아이템이
+              어디에 분포되어 있는지는 은은하게 비쳐 보이되 상호작용은 불가 */}
+          {Object.entries(zoneRegions).map(([b, region]) => {
+            const bn = Number(b)
+            if (bn <= blockNum) return null
+            return <BlockCloud key={b} region={region} tick={tick} seed={bn}/>
           })}
 
           {/* 캐릭터 */}
