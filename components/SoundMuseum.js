@@ -509,10 +509,6 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
                           <span style={{ fontSize: '9px', color: '#A09080' }}>
                             👤 다른 참여자
                           </span>
-                          <span style={{ fontSize: '9px', color: '#A09080' }}>·</span>
-                          <span style={{ fontSize: '9px', color: '#A09080' }}>
-                            👍 {c.vote_count}표
-                          </span>
                         </div>
                       </div>
                     </div>
