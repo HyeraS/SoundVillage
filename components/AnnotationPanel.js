@@ -576,12 +576,19 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
 
   useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
 
-  if (!sound) return null;
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setVisible(false);
     setTimeout(() => onClose?.(), 300);
-  };
+  }, [onClose]);
+
+  // ESC — 전사 패널만 닫고 구역 화면으로 복귀 (마을 목록 화면으로 나가지 않음)
+  useEffect(() => {
+    const h = (e) => { if (e.key === 'Escape') handleClose(); };
+    window.addEventListener('keydown', h);
+    return () => window.removeEventListener('keydown', h);
+  }, [handleClose]);
+
+  if (!sound) return null;
 
   // Stage 1 제출 → 패널 슬라이드다운 후 뮤지엄 전환
   const handleStage1Submit = ({ expression_text }) => {

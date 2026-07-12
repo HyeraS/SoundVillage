@@ -990,7 +990,8 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // ESC + Enter
   useEffect(() => {
     const h = e => {
-      if (e.key === 'Escape') { onExit(); return }
+      // 전사 패널이 열려 있는 동안 ESC는 AnnotationPanel이 자체 처리 (마을 밖으로 나가지 않음)
+      if (e.key === 'Escape') { if (!isAnnotatingRef.current) onExit(); return }
       if (e.key === 'Enter' && collectingItemRef.current && !isAnnotatingRef.current) {
         const item = collectingItemRef.current
         collectingItemRef.current = null
