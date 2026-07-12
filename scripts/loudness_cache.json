@@ -1,0 +1,8002 @@
+{
+  "Animal_236044": {
+    "mean_volume_db": -19.6,
+    "max_volume_db": -4.9
+  },
+  "Animal_114435": {
+    "mean_volume_db": -34.7,
+    "max_volume_db": -16.7
+  },
+  "Animal_236281": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -11.7
+  },
+  "Animal_236108": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -3.8
+  },
+  "Animal_24642": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": 0.0
+  },
+  "Nature_50061": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -11.7
+  },
+  "Nature_196033": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -0.3
+  },
+  "Nature_340218": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -12.6
+  },
+  "Urban_26177": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -0.1
+  },
+  "Music_372661": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -9.2
+  },
+  "Lab_89060": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -0.3
+  },
+  "Lab_84701": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -4.2
+  },
+  "Lab_270587": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -0.2
+  },
+  "Lab_222991": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -4.4
+  },
+  "Lab_377667": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -0.8
+  },
+  "Lab_426372": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_11728": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.3
+  },
+  "Lab_24621": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -0.3
+  },
+  "Lab_24248": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -6.9
+  },
+  "Lab_201591": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -6.5
+  },
+  "Lab_90565": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -12.4
+  },
+  "Lab_24734": {
+    "mean_volume_db": -14.0,
+    "max_volume_db": -1.0
+  },
+  "Lab_127451": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -2.5
+  },
+  "Lab_69184": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -4.5
+  },
+  "Lab_85253": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -0.3
+  },
+  "Human_381194": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -0.1
+  },
+  "Human_377491": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -14.4
+  },
+  "Human_422762": {
+    "mean_volume_db": -34.0,
+    "max_volume_db": -6.3
+  },
+  "Human_39864": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -5.2
+  },
+  "Human_389640": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -8.8
+  },
+  "Human_318828": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -7.6
+  },
+  "Human_365704": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -4.4
+  },
+  "Human_30039": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -4.6
+  },
+  "Human_317479": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -0.1
+  },
+  "Human_162859": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -2.4
+  },
+  "Human_69205": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -0.2
+  },
+  "Human_210431": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -2.7
+  },
+  "Human_62291": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -0.2
+  },
+  "Human_252219": {
+    "mean_volume_db": -11.1,
+    "max_volume_db": -1.9
+  },
+  "Human_252241": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": -1.4
+  },
+  "Human_207829": {
+    "mean_volume_db": -6.7,
+    "max_volume_db": 0.0
+  },
+  "Human_69491": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -0.0
+  },
+  "Human_193911": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -2.3
+  },
+  "Human_10145": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -8.1
+  },
+  "Human_323446": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -3.0
+  },
+  "Human_411663": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -3.3
+  },
+  "Human_346792": {
+    "mean_volume_db": -31.7,
+    "max_volume_db": -1.9
+  },
+  "Human_151214": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -3.5
+  },
+  "Human_351996": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -6.0
+  },
+  "Human_216659": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -0.0
+  },
+  "Human_182095": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": 0.0
+  },
+  "Human_198374": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": 0.0
+  },
+  "Human_332310": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -11.0
+  },
+  "Human_101310": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -3.4
+  },
+  "Human_240760": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -0.4
+  },
+  "Human_408740": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -8.7
+  },
+  "Human_427160": {
+    "mean_volume_db": -15.6,
+    "max_volume_db": -3.5
+  },
+  "Human_377736": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -1.9
+  },
+  "ANI_379531": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -3.7
+  },
+  "ANI_236020": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -2.7
+  },
+  "ANI_74518": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -0.1
+  },
+  "ANI_164292": {
+    "mean_volume_db": -9.4,
+    "max_volume_db": -0.2
+  },
+  "ANI_121142": {
+    "mean_volume_db": -28.5,
+    "max_volume_db": -7.1
+  },
+  "ANI_69504": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -3.2
+  },
+  "ANI_62198": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -10.2
+  },
+  "ANI_414411": {
+    "mean_volume_db": -33.0,
+    "max_volume_db": -15.2
+  },
+  "ANI_273214": {
+    "mean_volume_db": -36.2,
+    "max_volume_db": -17.2
+  },
+  "ANI_27272": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -0.5
+  },
+  "ANI_232842": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -16.2
+  },
+  "ANI_140829": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -3.3
+  },
+  "ANI_166745": {
+    "mean_volume_db": -12.6,
+    "max_volume_db": -0.7
+  },
+  "ANI_372534": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -6.2
+  },
+  "ANI_366052": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -3.9
+  },
+  "ANI_208843": {
+    "mean_volume_db": -17.0,
+    "max_volume_db": -1.3
+  },
+  "NAT_101948": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": -0.3
+  },
+  "NAT_248110": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": 0.0
+  },
+  "NAT_391684": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -16.5
+  },
+  "NAT_327767": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -17.1
+  },
+  "NAT_319403": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -0.1
+  },
+  "NAT_243780": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -8.0
+  },
+  "NAT_432105": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.4
+  },
+  "NAT_104600": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -0.1
+  },
+  "NAT_382902": {
+    "mean_volume_db": -36.6,
+    "max_volume_db": -13.7
+  },
+  "NAT_175141": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -2.0
+  },
+  "NAT_98781": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -0.7
+  },
+  "NAT_51414": {
+    "mean_volume_db": -37.3,
+    "max_volume_db": -11.4
+  },
+  "NAT_147182": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.7
+  },
+  "NAT_320306": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -3.0
+  },
+  "NAT_252276": {
+    "mean_volume_db": -13.7,
+    "max_volume_db": -2.6
+  },
+  "NAT_151849": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -6.7
+  },
+  "NAT_420296": {
+    "mean_volume_db": -13.7,
+    "max_volume_db": -0.3
+  },
+  "NAT_212402": {
+    "mean_volume_db": -31.1,
+    "max_volume_db": 0.0
+  },
+  "URB_236904": {
+    "mean_volume_db": -37.7,
+    "max_volume_db": -12.1
+  },
+  "URB_237": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -0.4
+  },
+  "URB_147840": {
+    "mean_volume_db": -14.8,
+    "max_volume_db": -0.7
+  },
+  "URB_17910": {
+    "mean_volume_db": -15.6,
+    "max_volume_db": -0.1
+  },
+  "URB_87316": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -1.3
+  },
+  "URB_380320": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -0.3
+  },
+  "URB_77669": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -0.2
+  },
+  "URB_211667": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -0.5
+  },
+  "URB_82687": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -0.2
+  },
+  "URB_12698": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -0.3
+  },
+  "URB_149211": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -2.0
+  },
+  "URB_376697": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -6.0
+  },
+  "URB_315758": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -0.3
+  },
+  "URB_58371": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -10.8
+  },
+  "URB_415199": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -1.3
+  },
+  "URB_387698": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -2.2
+  },
+  "MUS_381293": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -0.0
+  },
+  "MUS_148756": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -4.9
+  },
+  "MUS_316903": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -14.6
+  },
+  "MUS_4283": {
+    "mean_volume_db": -12.1,
+    "max_volume_db": -0.2
+  },
+  "MUS_97630": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -1.3
+  },
+  "MUS_153981": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -8.7
+  },
+  "MUS_372389": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -14.7
+  },
+  "MUS_239720": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -0.4
+  },
+  "MUS_28435": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": -2.6
+  },
+  "MUS_47556": {
+    "mean_volume_db": -9.4,
+    "max_volume_db": -0.2
+  },
+  "MUS_323005": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": 0.0
+  },
+  "MUS_140663": {
+    "mean_volume_db": -35.2,
+    "max_volume_db": -2.0
+  },
+  "MUS_137505": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -3.4
+  },
+  "MUS_354688": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -12.7
+  },
+  "MUS_13433": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -4.9
+  },
+  "MUS_374526": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -5.8
+  },
+  "MUS_383645": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -7.8
+  },
+  "MUS_369292": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -11.7
+  },
+  "MUS_148514": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -0.3
+  },
+  "MUS_64760": {
+    "mean_volume_db": -18.8,
+    "max_volume_db": -6.3
+  },
+  "MUS_16399": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -4.9
+  },
+  "LAB_41337": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.1
+  },
+  "LAB_179173": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -0.3
+  },
+  "LAB_265638": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -8.2
+  },
+  "LAB_44159": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -10.3
+  },
+  "LAB_339812": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -0.1
+  },
+  "LAB_329893": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -1.4
+  },
+  "LAB_60811": {
+    "mean_volume_db": -31.1,
+    "max_volume_db": -3.4
+  },
+  "LAB_349826": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -0.6
+  },
+  "LAB_2510": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -1.0
+  },
+  "LAB_21410": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -0.1
+  },
+  "LAB_164646": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -3.6
+  },
+  "LAB_402204": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -3.4
+  },
+  "LAB_60024": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -10.9
+  },
+  "LAB_395266": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -6.0
+  },
+  "LAB_368344": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -14.9
+  },
+  "LAB_242444": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -1.3
+  },
+  "LAB_426259": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -3.9
+  },
+  "LAB_277300": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -5.9
+  },
+  "LAB_378270": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -4.5
+  },
+  "LAB_336202": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -6.9
+  },
+  "LAB_219491": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -6.2
+  },
+  "NAT_239492": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -2.3
+  },
+  "URB_191393": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -18.6
+  },
+  "URB_235962": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -14.2
+  },
+  "NAT_249806": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -10.7
+  },
+  "URB_36834": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -2.9
+  },
+  "Animal_116226": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -11.3
+  },
+  "Animal_243044": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -3.1
+  },
+  "Animal_32797": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -9.3
+  },
+  "Animal_114436": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -4.8
+  },
+  "Animal_360411": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -4.6
+  },
+  "Animal_236250": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -3.0
+  },
+  "Animal_62212": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -0.3
+  },
+  "Animal_236172": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -4.7
+  },
+  "Animal_103048": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -6.3
+  },
+  "Animal_111325": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -0.6
+  },
+  "Animal_100248": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -0.2
+  },
+  "Animal_60992": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": 0.0
+  },
+  "Animal_155577": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -8.2
+  },
+  "Animal_216934": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -8.0
+  },
+  "Animal_429691": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -4.8
+  },
+  "Animal_266354": {
+    "mean_volume_db": -32.4,
+    "max_volume_db": -16.0
+  },
+  "Animal_28110": {
+    "mean_volume_db": -34.0,
+    "max_volume_db": -12.7
+  },
+  "Animal_59293": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -2.3
+  },
+  "Animal_43778": {
+    "mean_volume_db": -33.0,
+    "max_volume_db": -0.3
+  },
+  "Animal_155322": {
+    "mean_volume_db": -15.3,
+    "max_volume_db": -0.3
+  },
+  "Animal_31578": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -11.6
+  },
+  "Animal_174203": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -6.2
+  },
+  "Animal_235881": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -20.2
+  },
+  "Animal_13738": {
+    "mean_volume_db": -28.4,
+    "max_volume_db": -9.3
+  },
+  "Animal_18663": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -11.1
+  },
+  "Animal_56761": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -7.8
+  },
+  "Animal_144017": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -15.8
+  },
+  "Animal_47604": {
+    "mean_volume_db": -34.0,
+    "max_volume_db": -20.6
+  },
+  "Animal_60759": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": -1.5
+  },
+  "Animal_49982": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -0.5
+  },
+  "Animal_161084": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -18.6
+  },
+  "Animal_152817": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -0.2
+  },
+  "Animal_50614": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -0.3
+  },
+  "Animal_52413": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -7.3
+  },
+  "Animal_321570": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": 0.0
+  },
+  "Animal_266592": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -7.8
+  },
+  "Animal_63261": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -0.3
+  },
+  "Animal_316915": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -1.0
+  },
+  "Animal_431746": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -0.0
+  },
+  "Animal_130034": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -15.6
+  },
+  "Animal_159426": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -4.8
+  },
+  "Animal_60938": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -1.3
+  },
+  "Animal_119641": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -1.4
+  },
+  "Animal_164476": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -11.1
+  },
+  "Animal_266352": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -7.0
+  },
+  "Animal_212812": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -0.6
+  },
+  "Animal_7907": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -2.1
+  },
+  "Animal_9328": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -14.3
+  },
+  "Animal_46256": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -6.3
+  },
+  "Animal_78324": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -1.2
+  },
+  "Animal_34325": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -1.1
+  },
+  "Animal_245024": {
+    "mean_volume_db": -36.2,
+    "max_volume_db": -8.3
+  },
+  "Animal_236200": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -5.1
+  },
+  "Animal_236268": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -7.0
+  },
+  "Animal_391273": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -5.8
+  },
+  "Animal_121888": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -1.5
+  },
+  "Animal_346318": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -11.7
+  },
+  "Animal_342347": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -3.0
+  },
+  "Animal_90208": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": 0.0
+  },
+  "Animal_62048": {
+    "mean_volume_db": -29.1,
+    "max_volume_db": -0.2
+  },
+  "Animal_24020": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -15.8
+  },
+  "Animal_333449": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": 0.0
+  },
+  "Animal_101799": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -2.0
+  },
+  "Animal_266424": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -10.4
+  },
+  "Animal_236258": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -18.9
+  },
+  "Animal_430508": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": -1.3
+  },
+  "Animal_341899": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -13.1
+  },
+  "Animal_50620": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -14.4
+  },
+  "Animal_22340": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -8.0
+  },
+  "Animal_233781": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -6.1
+  },
+  "Animal_353216": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -1.7
+  },
+  "Animal_100047": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -7.3
+  },
+  "Animal_9326": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -21.8
+  },
+  "Animal_251674": {
+    "mean_volume_db": -30.4,
+    "max_volume_db": -11.6
+  },
+  "Animal_216202": {
+    "mean_volume_db": -32.2,
+    "max_volume_db": -14.2
+  },
+  "Animal_341041": {
+    "mean_volume_db": -9.5,
+    "max_volume_db": -0.2
+  },
+  "Animal_156643": {
+    "mean_volume_db": -16.1,
+    "max_volume_db": -0.7
+  },
+  "Animal_255588": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -0.7
+  },
+  "Animal_361449": {
+    "mean_volume_db": -36.6,
+    "max_volume_db": -25.2
+  },
+  "Animal_192766": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -6.6
+  },
+  "Animal_100455": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -4.2
+  },
+  "Animal_220988": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.6
+  },
+  "Animal_348247": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -0.3
+  },
+  "Animal_10380": {
+    "mean_volume_db": -15.2,
+    "max_volume_db": -4.9
+  },
+  "Animal_253672": {
+    "mean_volume_db": -28.4,
+    "max_volume_db": -6.3
+  },
+  "Animal_236055": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -6.5
+  },
+  "Animal_236117": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -5.1
+  },
+  "Animal_269121": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.2
+  },
+  "Animal_55152": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -10.5
+  },
+  "Animal_99956": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -12.7
+  },
+  "Animal_83834": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -16.5
+  },
+  "Animal_20472": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -2.6
+  },
+  "Animal_216216": {
+    "mean_volume_db": -29.1,
+    "max_volume_db": -15.1
+  },
+  "Animal_127111": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -1.3
+  },
+  "Animal_64004": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -8.0
+  },
+  "Animal_414710": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -6.7
+  },
+  "Animal_389609": {
+    "mean_volume_db": -35.6,
+    "max_volume_db": -15.7
+  },
+  "Animal_389254": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -0.7
+  },
+  "Animal_194774": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -0.5
+  },
+  "Animal_111018": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -2.3
+  },
+  "Animal_54063": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -0.3
+  },
+  "Animal_372527": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -6.3
+  },
+  "Animal_18232": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -5.5
+  },
+  "Animal_236047": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -5.0
+  },
+  "Animal_330963": {
+    "mean_volume_db": -36.8,
+    "max_volume_db": -0.8
+  },
+  "Animal_236187": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -3.1
+  },
+  "Animal_236159": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -6.9
+  },
+  "Animal_404533": {
+    "mean_volume_db": -10.0,
+    "max_volume_db": 0.0
+  },
+  "Animal_111008": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -4.1
+  },
+  "Animal_85163": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -0.3
+  },
+  "Animal_75704": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -12.4
+  },
+  "Animal_268678": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -5.8
+  },
+  "Animal_51094": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -2.4
+  },
+  "Animal_103047": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -10.0
+  },
+  "Animal_58498": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -0.9
+  },
+  "Animal_411837": {
+    "mean_volume_db": -28.5,
+    "max_volume_db": -7.4
+  },
+  "Animal_410519": {
+    "mean_volume_db": -36.2,
+    "max_volume_db": -8.6
+  },
+  "Animal_342250": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -10.5
+  },
+  "Animal_236249": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -5.0
+  },
+  "Animal_96950": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -2.5
+  },
+  "Animal_155299": {
+    "mean_volume_db": -22.1,
+    "max_volume_db": -1.1
+  },
+  "Animal_222039": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -2.3
+  },
+  "Animal_216204": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -13.4
+  },
+  "Animal_371880": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -11.8
+  },
+  "Animal_216203": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -3.0
+  },
+  "Animal_70954": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -7.6
+  },
+  "Animal_37305": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -0.3
+  },
+  "Animal_155294": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -1.0
+  },
+  "Animal_168866": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -6.3
+  },
+  "Animal_56551": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -2.8
+  },
+  "Animal_397061": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": 0.0
+  },
+  "Animal_129355": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -5.7
+  },
+  "Animal_241995": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -3.6
+  },
+  "Animal_236066": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -4.7
+  },
+  "Animal_236274": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -6.0
+  },
+  "Animal_352789": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -2.9
+  },
+  "Animal_24018": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -17.9
+  },
+  "Animal_164913": {
+    "mean_volume_db": -31.6,
+    "max_volume_db": -7.0
+  },
+  "Animal_413544": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": -5.0
+  },
+  "Animal_158630": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -1.2
+  },
+  "Animal_236203": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -3.0
+  },
+  "Animal_34872": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -1.8
+  },
+  "Animal_95697": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -6.7
+  },
+  "Animal_236232": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -6.7
+  },
+  "Animal_236244": {
+    "mean_volume_db": -31.7,
+    "max_volume_db": -18.0
+  },
+  "Animal_33256": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -3.4
+  },
+  "Animal_70169": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -8.5
+  },
+  "Animal_270383": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -2.8
+  },
+  "Animal_390804": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -0.7
+  },
+  "Animal_75649": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -2.9
+  },
+  "Animal_155682": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -2.8
+  },
+  "Animal_163280": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -3.4
+  },
+  "Animal_58608": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": 0.0
+  },
+  "Animal_265366": {
+    "mean_volume_db": -10.7,
+    "max_volume_db": -0.2
+  },
+  "Animal_418155": {
+    "mean_volume_db": -29.6,
+    "max_volume_db": -11.4
+  },
+  "Animal_236204": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -4.3
+  },
+  "Animal_194244": {
+    "mean_volume_db": -34.9,
+    "max_volume_db": -18.1
+  },
+  "Animal_342254": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -0.2
+  },
+  "Animal_216208": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -13.5
+  },
+  "Animal_111014": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -3.4
+  },
+  "Animal_32244": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -6.8
+  },
+  "Animal_98642": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -2.0
+  },
+  "Animal_254340": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -2.1
+  },
+  "Animal_104932": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -12.1
+  },
+  "Animal_57656": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -9.5
+  },
+  "Animal_22758": {
+    "mean_volume_db": -10.8,
+    "max_volume_db": -0.0
+  },
+  "Animal_361899": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": -1.3
+  },
+  "Animal_64009": {
+    "mean_volume_db": -17.7,
+    "max_volume_db": -5.7
+  },
+  "Animal_213144": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -0.7
+  },
+  "Nature_50053": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -1.4
+  },
+  "Nature_237519": {
+    "mean_volume_db": -33.0,
+    "max_volume_db": -5.6
+  },
+  "Nature_85874": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.3
+  },
+  "Nature_208848": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -15.2
+  },
+  "Nature_349489": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -4.1
+  },
+  "Nature_106801": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -3.1
+  },
+  "Nature_248110": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": 0.0
+  },
+  "Nature_395207": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -18.7
+  },
+  "Nature_50368": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -0.3
+  },
+  "Nature_320166": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -16.6
+  },
+  "Nature_209443": {
+    "mean_volume_db": -34.1,
+    "max_volume_db": -10.8
+  },
+  "Nature_17059": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -0.8
+  },
+  "Nature_37352": {
+    "mean_volume_db": -34.1,
+    "max_volume_db": -14.1
+  },
+  "Nature_209028": {
+    "mean_volume_db": -34.3,
+    "max_volume_db": -10.6
+  },
+  "Nature_322503": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -0.2
+  },
+  "Nature_371817": {
+    "mean_volume_db": -32.6,
+    "max_volume_db": -11.0
+  },
+  "Nature_398814": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -7.5
+  },
+  "Nature_410335": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -15.3
+  },
+  "Nature_251364": {
+    "mean_volume_db": -37.3,
+    "max_volume_db": 0.0
+  },
+  "Nature_423399": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -5.2
+  },
+  "Nature_176163": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -3.7
+  },
+  "Nature_407024": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -5.6
+  },
+  "Nature_274056": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -0.0
+  },
+  "Nature_195877": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -0.7
+  },
+  "Nature_219519": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -0.0
+  },
+  "Nature_161545": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -5.3
+  },
+  "Nature_265623": {
+    "mean_volume_db": -14.3,
+    "max_volume_db": -0.1
+  },
+  "Nature_195985": {
+    "mean_volume_db": -29.1,
+    "max_volume_db": -0.1
+  },
+  "Nature_190101": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -12.8
+  },
+  "Nature_190672": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -7.3
+  },
+  "Nature_238360": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -3.3
+  },
+  "Nature_187772": {
+    "mean_volume_db": -35.9,
+    "max_volume_db": -8.5
+  },
+  "Nature_396890": {
+    "mean_volume_db": -16.4,
+    "max_volume_db": -0.5
+  },
+  "Nature_398719": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -6.4
+  },
+  "Nature_368919": {
+    "mean_volume_db": -35.7,
+    "max_volume_db": -19.6
+  },
+  "Nature_236996": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -3.6
+  },
+  "Nature_337477": {
+    "mean_volume_db": -36.4,
+    "max_volume_db": -6.3
+  },
+  "Nature_249809": {
+    "mean_volume_db": -28.4,
+    "max_volume_db": -9.2
+  },
+  "Nature_159686": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -9.8
+  },
+  "Nature_399870": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -7.5
+  },
+  "Nature_348816": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -1.0
+  },
+  "Nature_20438": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -3.2
+  },
+  "Nature_238798": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -9.5
+  },
+  "Nature_320483": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -0.0
+  },
+  "Nature_268680": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -0.8
+  },
+  "Nature_73268": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -8.0
+  },
+  "Nature_240791": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -1.6
+  },
+  "Nature_58251": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -0.6
+  },
+  "Nature_145228": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -0.7
+  },
+  "Nature_245676": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -0.3
+  },
+  "Nature_58273": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -2.3
+  },
+  "Nature_179903": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -7.2
+  },
+  "Nature_401013": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -0.3
+  },
+  "Nature_363935": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -17.2
+  },
+  "Nature_50364": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -0.4
+  },
+  "Nature_234093": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -12.2
+  },
+  "Nature_75643": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -5.3
+  },
+  "Nature_104670": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -0.4
+  },
+  "Nature_363937": {
+    "mean_volume_db": -31.6,
+    "max_volume_db": -12.7
+  },
+  "Nature_243965": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -5.8
+  },
+  "Nature_253610": {
+    "mean_volume_db": -33.8,
+    "max_volume_db": -7.0
+  },
+  "Nature_56695": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -6.0
+  },
+  "Nature_332114": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -1.5
+  },
+  "Nature_50932": {
+    "mean_volume_db": -35.9,
+    "max_volume_db": -12.5
+  },
+  "Nature_341333": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -3.9
+  },
+  "Nature_420293": {
+    "mean_volume_db": -12.6,
+    "max_volume_db": -0.3
+  },
+  "Nature_30341": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -0.3
+  },
+  "Nature_238803": {
+    "mean_volume_db": -12.0,
+    "max_volume_db": -0.1
+  },
+  "Nature_196343": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -3.2
+  },
+  "Nature_320481": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -18.6
+  },
+  "Nature_368977": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -13.7
+  },
+  "Nature_120352": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": 0.0
+  },
+  "Nature_359151": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -0.6
+  },
+  "Nature_245683": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -10.8
+  },
+  "Nature_399351": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -5.0
+  },
+  "Nature_85841": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": 0.0
+  },
+  "Nature_85883": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -0.4
+  },
+  "Nature_274877": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -3.0
+  },
+  "Nature_156329": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -6.7
+  },
+  "Nature_98855": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -0.1
+  },
+  "Nature_73315": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -1.0
+  },
+  "Nature_210044": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -6.7
+  },
+  "Nature_420296": {
+    "mean_volume_db": -13.7,
+    "max_volume_db": -0.3
+  },
+  "Nature_22928": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -11.8
+  },
+  "Nature_258376": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -0.2
+  },
+  "Nature_207572": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -1.4
+  },
+  "Nature_424136": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.5
+  },
+  "Nature_199955": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -0.3
+  },
+  "Nature_338091": {
+    "mean_volume_db": -14.1,
+    "max_volume_db": -0.4
+  },
+  "Nature_248116": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -0.5
+  },
+  "Nature_376797": {
+    "mean_volume_db": -13.6,
+    "max_volume_db": -1.3
+  },
+  "Nature_55060": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -5.1
+  },
+  "Nature_153331": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -7.1
+  },
+  "Nature_398704": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -2.4
+  },
+  "Nature_120699": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -1.6
+  },
+  "Nature_144906": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -0.8
+  },
+  "Nature_392980": {
+    "mean_volume_db": -35.4,
+    "max_volume_db": -10.0
+  },
+  "Nature_365540": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -0.8
+  },
+  "Nature_134831": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -12.3
+  },
+  "Nature_155833": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -6.7
+  },
+  "Nature_36270": {
+    "mean_volume_db": -36.7,
+    "max_volume_db": -7.4
+  },
+  "Nature_323398": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -11.8
+  },
+  "Nature_170750": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -0.2
+  },
+  "Nature_48511": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -1.8
+  },
+  "Nature_270440": {
+    "mean_volume_db": -31.8,
+    "max_volume_db": -0.0
+  },
+  "Nature_360638": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -7.0
+  },
+  "Nature_339449": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -1.7
+  },
+  "Nature_158987": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -2.9
+  },
+  "Nature_426208": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -0.4
+  },
+  "Nature_156334": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -0.6
+  },
+  "Nature_166707": {
+    "mean_volume_db": -22.1,
+    "max_volume_db": -3.9
+  },
+  "Nature_179905": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -0.3
+  },
+  "Nature_376841": {
+    "mean_volume_db": -31.7,
+    "max_volume_db": 0.0
+  },
+  "Nature_9332": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -4.7
+  },
+  "Nature_85834": {
+    "mean_volume_db": -14.8,
+    "max_volume_db": -0.5
+  },
+  "Nature_398718": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -3.2
+  },
+  "Nature_146008": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -6.2
+  },
+  "Nature_116090": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": 0.0
+  },
+  "Nature_151199": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -8.6
+  },
+  "Nature_324694": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -16.2
+  },
+  "Nature_128093": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -9.2
+  },
+  "Nature_339900": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": 0.0
+  },
+  "Nature_238791": {
+    "mean_volume_db": -9.6,
+    "max_volume_db": 0.0
+  },
+  "Nature_268658": {
+    "mean_volume_db": -35.7,
+    "max_volume_db": -7.7
+  },
+  "Nature_75982": {
+    "mean_volume_db": -22.1,
+    "max_volume_db": -6.2
+  },
+  "Nature_194914": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -11.3
+  },
+  "Nature_256862": {
+    "mean_volume_db": -10.5,
+    "max_volume_db": -0.2
+  },
+  "Nature_199757": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.3
+  },
+  "Nature_58416": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -0.2
+  },
+  "Nature_209925": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -18.9
+  },
+  "Nature_147182": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.7
+  },
+  "Nature_127978": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -1.4
+  },
+  "Nature_237259": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -0.4
+  },
+  "Nature_36271": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -14.6
+  },
+  "Nature_388970": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -0.1
+  },
+  "Nature_29678": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -0.0
+  },
+  "Nature_152983": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -0.2
+  },
+  "Nature_259180": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -1.9
+  },
+  "Nature_189556": {
+    "mean_volume_db": -30.0,
+    "max_volume_db": -11.3
+  },
+  "Nature_394934": {
+    "mean_volume_db": -31.3,
+    "max_volume_db": -7.1
+  },
+  "Nature_323781": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -1.5
+  },
+  "Nature_198319": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -1.7
+  },
+  "Nature_250725": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -2.3
+  },
+  "Nature_328173": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -8.7
+  },
+  "Nature_234528": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -0.2
+  },
+  "Nature_196326": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -3.8
+  },
+  "Nature_215707": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -0.0
+  },
+  "Nature_427551": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -3.5
+  },
+  "Nature_94251": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -0.5
+  },
+  "Nature_48495": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -4.8
+  },
+  "Nature_242015": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -5.6
+  },
+  "Nature_74470": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": -0.3
+  },
+  "Nature_195738": {
+    "mean_volume_db": -8.4,
+    "max_volume_db": 0.0
+  },
+  "Nature_199752": {
+    "mean_volume_db": -35.7,
+    "max_volume_db": -15.3
+  },
+  "Nature_45650": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -0.2
+  },
+  "Nature_367754": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": 0.0
+  },
+  "Nature_265369": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -0.5
+  },
+  "Nature_326026": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -1.1
+  },
+  "Urban_61838": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -2.1
+  },
+  "Urban_236324": {
+    "mean_volume_db": -13.1,
+    "max_volume_db": -0.0
+  },
+  "Urban_175416": {
+    "mean_volume_db": -37.7,
+    "max_volume_db": -23.3
+  },
+  "Urban_275164": {
+    "mean_volume_db": -36.6,
+    "max_volume_db": -14.3
+  },
+  "Urban_426817": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -0.3
+  },
+  "Urban_100856": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -1.8
+  },
+  "Urban_337656": {
+    "mean_volume_db": -3.7,
+    "max_volume_db": -0.2
+  },
+  "Urban_237152": {
+    "mean_volume_db": -16.0,
+    "max_volume_db": -1.9
+  },
+  "Urban_234175": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -8.8
+  },
+  "Urban_118972": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -6.2
+  },
+  "Urban_170248": {
+    "mean_volume_db": -11.0,
+    "max_volume_db": -0.2
+  },
+  "Urban_68660": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -2.5
+  },
+  "Urban_212534": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -0.4
+  },
+  "Urban_316558": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -8.6
+  },
+  "Urban_75828": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -1.3
+  },
+  "Urban_433860": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -21.1
+  },
+  "Urban_159755": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -7.5
+  },
+  "Urban_18066": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -2.6
+  },
+  "Urban_262203": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -0.1
+  },
+  "Urban_425526": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -9.2
+  },
+  "Urban_176904": {
+    "mean_volume_db": -14.0,
+    "max_volume_db": -0.1
+  },
+  "Urban_280204": {
+    "mean_volume_db": -36.9,
+    "max_volume_db": -18.0
+  },
+  "Urban_166265": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -0.8
+  },
+  "Urban_379373": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -3.5
+  },
+  "Urban_401330": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -0.2
+  },
+  "Urban_339703": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": -0.6
+  },
+  "Urban_145541": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -1.4
+  },
+  "Urban_379379": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -12.5
+  },
+  "Urban_109828": {
+    "mean_volume_db": -35.6,
+    "max_volume_db": -17.9
+  },
+  "Urban_79284": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -5.4
+  },
+  "Urban_163331": {
+    "mean_volume_db": -14.3,
+    "max_volume_db": -1.5
+  },
+  "Urban_74474": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -6.8
+  },
+  "Urban_253314": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -9.7
+  },
+  "Urban_256458": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -1.3
+  },
+  "Urban_165167": {
+    "mean_volume_db": -22.8,
+    "max_volume_db": -1.4
+  },
+  "Urban_186022": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -7.5
+  },
+  "Urban_339136": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -4.7
+  },
+  "Urban_148297": {
+    "mean_volume_db": -8.9,
+    "max_volume_db": 0.0
+  },
+  "Urban_151876": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -0.2
+  },
+  "Urban_254907": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -0.7
+  },
+  "Urban_364116": {
+    "mean_volume_db": -32.4,
+    "max_volume_db": -9.3
+  },
+  "Urban_34280": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -2.2
+  },
+  "Urban_87600": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -2.3
+  },
+  "Urban_113338": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -9.9
+  },
+  "Urban_195456": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": 0.0
+  },
+  "Urban_425383": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -3.5
+  },
+  "Urban_77658": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -11.2
+  },
+  "Urban_197166": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -18.3
+  },
+  "Urban_143970": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -0.7
+  },
+  "Urban_51747": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": -0.7
+  },
+  "Urban_43159": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": 0.0
+  },
+  "Urban_397159": {
+    "mean_volume_db": -7.4,
+    "max_volume_db": -0.3
+  },
+  "Urban_340670": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -4.9
+  },
+  "Urban_265977": {
+    "mean_volume_db": -15.1,
+    "max_volume_db": -1.1
+  },
+  "Urban_70166": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -10.3
+  },
+  "Urban_321073": {
+    "mean_volume_db": -13.6,
+    "max_volume_db": -1.8
+  },
+  "Urban_256436": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -4.7
+  },
+  "Urban_329896": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -0.6
+  },
+  "Urban_402858": {
+    "mean_volume_db": -35.2,
+    "max_volume_db": -10.4
+  },
+  "Urban_425860": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -5.7
+  },
+  "Urban_136": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -1.9
+  },
+  "Urban_103183": {
+    "mean_volume_db": -12.0,
+    "max_volume_db": 0.0
+  },
+  "Urban_204404": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -0.4
+  },
+  "Urban_389775": {
+    "mean_volume_db": -10.9,
+    "max_volume_db": -0.3
+  },
+  "Urban_87604": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -3.1
+  },
+  "Urban_125616": {
+    "mean_volume_db": -14.3,
+    "max_volume_db": -0.0
+  },
+  "Urban_113343": {
+    "mean_volume_db": -11.0,
+    "max_volume_db": -0.4
+  },
+  "Urban_205505": {
+    "mean_volume_db": -11.0,
+    "max_volume_db": -0.2
+  },
+  "Urban_398121": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -3.5
+  },
+  "Urban_324675": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -9.8
+  },
+  "Urban_145084": {
+    "mean_volume_db": -11.6,
+    "max_volume_db": -0.4
+  },
+  "Urban_276608": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -0.4
+  },
+  "Urban_350360": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -0.1
+  },
+  "Urban_58260": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -2.6
+  },
+  "Urban_3182": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -1.2
+  },
+  "Urban_51128": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -1.4
+  },
+  "Urban_352684": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -0.5
+  },
+  "Urban_15657": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -4.6
+  },
+  "Urban_393524": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.0
+  },
+  "Urban_89567": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -0.5
+  },
+  "Urban_340652": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -1.1
+  },
+  "Urban_162828": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -1.6
+  },
+  "Urban_25821": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -0.3
+  },
+  "Urban_425381": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -1.9
+  },
+  "Urban_117561": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -7.2
+  },
+  "Urban_128459": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -0.6
+  },
+  "Urban_268855": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -1.9
+  },
+  "Urban_33729": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -4.8
+  },
+  "Urban_345334": {
+    "mean_volume_db": -33.8,
+    "max_volume_db": -0.8
+  },
+  "Urban_35433": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -1.9
+  },
+  "Urban_340668": {
+    "mean_volume_db": -13.0,
+    "max_volume_db": -1.4
+  },
+  "Urban_271568": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": 0.0
+  },
+  "Urban_336896": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -13.2
+  },
+  "Urban_178820": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -6.6
+  },
+  "Urban_340703": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -0.1
+  },
+  "Urban_412038": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -0.2
+  },
+  "Urban_353526": {
+    "mean_volume_db": -34.0,
+    "max_volume_db": -13.6
+  },
+  "Urban_250007": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -5.6
+  },
+  "Urban_68953": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -0.8
+  },
+  "Urban_179301": {
+    "mean_volume_db": -9.1,
+    "max_volume_db": 0.0
+  },
+  "Urban_90193": {
+    "mean_volume_db": -13.1,
+    "max_volume_db": -4.2
+  },
+  "Urban_145265": {
+    "mean_volume_db": -27.0,
+    "max_volume_db": -3.3
+  },
+  "Urban_165397": {
+    "mean_volume_db": -14.1,
+    "max_volume_db": -0.1
+  },
+  "Urban_322130": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -0.1
+  },
+  "Urban_332502": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -5.6
+  },
+  "Urban_22882": {
+    "mean_volume_db": -22.0,
+    "max_volume_db": -3.5
+  },
+  "Urban_104098": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -1.2
+  },
+  "Urban_318910": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -1.1
+  },
+  "Urban_113184": {
+    "mean_volume_db": -12.7,
+    "max_volume_db": -0.3
+  },
+  "Urban_156547": {
+    "mean_volume_db": -7.3,
+    "max_volume_db": 0.0
+  },
+  "Urban_50770": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -0.6
+  },
+  "Urban_265644": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -2.1
+  },
+  "Urban_125362": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -4.2
+  },
+  "Urban_163114": {
+    "mean_volume_db": -9.4,
+    "max_volume_db": -0.1
+  },
+  "Urban_24248": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -6.9
+  },
+  "Urban_49177": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -9.7
+  },
+  "Urban_68938": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -0.8
+  },
+  "Urban_24929": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -8.4
+  },
+  "Urban_31236": {
+    "mean_volume_db": -31.0,
+    "max_volume_db": -13.7
+  },
+  "Urban_154954": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -0.3
+  },
+  "Urban_427068": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -11.2
+  },
+  "Urban_258177": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": 0.0
+  },
+  "Urban_418706": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -4.3
+  },
+  "Urban_426731": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -1.2
+  },
+  "Urban_202744": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -4.5
+  },
+  "Urban_380066": {
+    "mean_volume_db": -35.8,
+    "max_volume_db": -8.8
+  },
+  "Urban_215822": {
+    "mean_volume_db": -35.6,
+    "max_volume_db": -25.5
+  },
+  "Urban_165414": {
+    "mean_volume_db": -13.5,
+    "max_volume_db": 0.0
+  },
+  "Urban_79440": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -4.1
+  },
+  "Urban_24246": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -12.8
+  },
+  "Urban_383593": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -0.0
+  },
+  "Urban_403458": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -1.2
+  },
+  "Urban_162500": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -0.2
+  },
+  "Urban_395041": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -7.7
+  },
+  "Urban_250063": {
+    "mean_volume_db": -19.6,
+    "max_volume_db": -6.4
+  },
+  "Urban_405019": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -6.7
+  },
+  "Urban_178137": {
+    "mean_volume_db": -7.4,
+    "max_volume_db": 0.0
+  },
+  "Urban_106486": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -21.3
+  },
+  "Urban_63754": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": -0.3
+  },
+  "Urban_342554": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -19.0
+  },
+  "Urban_48702": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -0.1
+  },
+  "Urban_24644": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": 0.0
+  },
+  "Urban_186555": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -2.3
+  },
+  "Urban_165425": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -0.1
+  },
+  "Urban_143602": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -12.2
+  },
+  "Urban_329611": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -8.8
+  },
+  "Urban_384119": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -4.6
+  },
+  "Urban_113190": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -13.0
+  },
+  "Urban_3179": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -1.3
+  },
+  "Urban_267915": {
+    "mean_volume_db": -33.0,
+    "max_volume_db": 0.0
+  },
+  "Urban_58760": {
+    "mean_volume_db": -10.7,
+    "max_volume_db": -0.4
+  },
+  "Urban_428457": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -5.1
+  },
+  "Urban_66293": {
+    "mean_volume_db": -10.3,
+    "max_volume_db": -2.2
+  },
+  "Urban_161397": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -0.4
+  },
+  "Urban_415483": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -6.1
+  },
+  "Urban_386275": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": 0.0
+  },
+  "Urban_244932": {
+    "mean_volume_db": -11.4,
+    "max_volume_db": -0.2
+  },
+  "Urban_149757": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -2.0
+  },
+  "Urban_432442": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.2
+  },
+  "Urban_257931": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -11.9
+  },
+  "Urban_377462": {
+    "mean_volume_db": -34.2,
+    "max_volume_db": -0.1
+  },
+  "Urban_33747": {
+    "mean_volume_db": -13.7,
+    "max_volume_db": -2.1
+  },
+  "Urban_155773": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -3.6
+  },
+  "Urban_77912": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -4.5
+  },
+  "Urban_111905": {
+    "mean_volume_db": -14.0,
+    "max_volume_db": -0.0
+  },
+  "Urban_414263": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": 0.0
+  },
+  "Urban_9262": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -0.3
+  },
+  "Urban_151833": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -7.6
+  },
+  "Urban_109825": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -22.7
+  },
+  "Urban_398919": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -0.6
+  },
+  "Urban_168621": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -0.2
+  },
+  "Urban_160814": {
+    "mean_volume_db": -13.0,
+    "max_volume_db": -0.1
+  },
+  "Urban_393666": {
+    "mean_volume_db": -13.0,
+    "max_volume_db": -0.2
+  },
+  "Urban_53383": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -0.0
+  },
+  "Urban_166717": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -0.4
+  },
+  "Urban_113183": {
+    "mean_volume_db": -11.7,
+    "max_volume_db": -0.3
+  },
+  "Urban_186938": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -0.8
+  },
+  "Urban_332997": {
+    "mean_volume_db": -18.8,
+    "max_volume_db": -0.9
+  },
+  "Urban_258176": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": 0.0
+  },
+  "Urban_53807": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -10.8
+  },
+  "Urban_70118": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": -0.5
+  },
+  "Music_201211": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -1.1
+  },
+  "Music_153708": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -3.9
+  },
+  "Music_116376": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -5.6
+  },
+  "Music_119366": {
+    "mean_volume_db": -14.9,
+    "max_volume_db": -5.3
+  },
+  "Music_247931": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -15.2
+  },
+  "Music_415377": {
+    "mean_volume_db": -35.4,
+    "max_volume_db": -15.1
+  },
+  "Music_247742": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -11.9
+  },
+  "Music_221143": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -0.2
+  },
+  "Music_58045": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -2.8
+  },
+  "Music_255782": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -0.1
+  },
+  "Music_400896": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -0.3
+  },
+  "Music_330762": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -11.2
+  },
+  "Music_240138": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -3.3
+  },
+  "Music_85796": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -0.8
+  },
+  "Music_359860": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -9.7
+  },
+  "Music_399488": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -6.1
+  },
+  "Music_140535": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -10.5
+  },
+  "Music_153820": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -1.8
+  },
+  "Music_84073": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -2.2
+  },
+  "Music_356062": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -9.9
+  },
+  "Music_276563": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": 0.0
+  },
+  "Music_359530": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -8.5
+  },
+  "Music_160298": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": -0.2
+  },
+  "Music_136057": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -0.4
+  },
+  "Music_251091": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -0.5
+  },
+  "Music_432391": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": 0.0
+  },
+  "Music_357028": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -7.3
+  },
+  "Music_264047": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -3.9
+  },
+  "Music_239746": {
+    "mean_volume_db": -12.6,
+    "max_volume_db": -0.3
+  },
+  "Music_183764": {
+    "mean_volume_db": -14.4,
+    "max_volume_db": -1.1
+  },
+  "Music_246914": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -23.0
+  },
+  "Music_2637": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -15.1
+  },
+  "Music_246675": {
+    "mean_volume_db": -34.9,
+    "max_volume_db": -23.6
+  },
+  "Music_357321": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -11.9
+  },
+  "Music_240095": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": 0.0
+  },
+  "Music_355961": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -8.0
+  },
+  "Music_357591": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -13.3
+  },
+  "Music_137557": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -5.0
+  },
+  "Music_130420": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -0.4
+  },
+  "Music_137573": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -1.6
+  },
+  "Music_251135": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -0.6
+  },
+  "Music_153627": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -18.4
+  },
+  "Music_40414": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -3.2
+  },
+  "Music_140675": {
+    "mean_volume_db": -35.4,
+    "max_volume_db": -0.3
+  },
+  "Music_116380": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -5.6
+  },
+  "Music_195274": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -10.5
+  },
+  "Music_358622": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -17.9
+  },
+  "Music_359313": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -1.0
+  },
+  "Music_240097": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -2.6
+  },
+  "Music_10620": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -15.9
+  },
+  "Music_153653": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -9.5
+  },
+  "Music_5354": {
+    "mean_volume_db": -10.1,
+    "max_volume_db": -2.0
+  },
+  "Music_247523": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -13.3
+  },
+  "Music_64709": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -6.4
+  },
+  "Music_88655": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -5.3
+  },
+  "Music_162936": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.7
+  },
+  "Music_246702": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -17.3
+  },
+  "Music_355092": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -11.0
+  },
+  "Music_169945": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -0.4
+  },
+  "Music_130533": {
+    "mean_volume_db": -13.2,
+    "max_volume_db": -0.2
+  },
+  "Music_82929": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -1.2
+  },
+  "Music_354191": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -15.3
+  },
+  "Music_372686": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -9.2
+  },
+  "Music_333724": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -0.3
+  },
+  "Music_232717": {
+    "mean_volume_db": -15.9,
+    "max_volume_db": -3.2
+  },
+  "Music_276934": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -4.4
+  },
+  "Music_260380": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -2.6
+  },
+  "Music_357934": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -18.3
+  },
+  "Music_359801": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -6.3
+  },
+  "Music_373674": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -16.7
+  },
+  "Music_153670": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -11.4
+  },
+  "Music_372726": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -12.5
+  },
+  "Music_356532": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -9.4
+  },
+  "Music_135954": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -0.2
+  },
+  "Music_247288": {
+    "mean_volume_db": -22.0,
+    "max_volume_db": -11.1
+  },
+  "Music_354914": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -10.7
+  },
+  "Music_144790": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -0.3
+  },
+  "Music_357515": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -11.0
+  },
+  "Music_13474": {
+    "mean_volume_db": -17.5,
+    "max_volume_db": -5.8
+  },
+  "Music_357463": {
+    "mean_volume_db": -29.1,
+    "max_volume_db": -14.8
+  },
+  "Music_358744": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -8.2
+  },
+  "Music_247987": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -10.6
+  },
+  "Music_247490": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -16.5
+  },
+  "Music_152081": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -0.3
+  },
+  "Music_399496": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -4.7
+  },
+  "Music_138846": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -1.5
+  },
+  "Music_247074": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -2.8
+  },
+  "Music_252322": {
+    "mean_volume_db": -11.2,
+    "max_volume_db": 0.0
+  },
+  "Music_26655": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -2.8
+  },
+  "Music_11849": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -3.0
+  },
+  "Music_47301": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -0.0
+  },
+  "Music_373697": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -5.8
+  },
+  "Music_372378": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -15.4
+  },
+  "Music_151373": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -3.4
+  },
+  "Music_354493": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -8.8
+  },
+  "Music_153399": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -3.6
+  },
+  "Music_222271": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -9.8
+  },
+  "Music_3431": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -7.8
+  },
+  "Music_130410": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": -0.3
+  },
+  "Music_373599": {
+    "mean_volume_db": -36.7,
+    "max_volume_db": -22.2
+  },
+  "Music_222924": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -1.2
+  },
+  "Music_355296": {
+    "mean_volume_db": -22.1,
+    "max_volume_db": -10.7
+  },
+  "Music_86662": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -0.2
+  },
+  "Music_26468": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -0.2
+  },
+  "Music_58028": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -2.8
+  },
+  "Music_116942": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -6.5
+  },
+  "Music_101136": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -3.1
+  },
+  "Music_148582": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -0.3
+  },
+  "Music_64718": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -6.4
+  },
+  "Music_276057": {
+    "mean_volume_db": -15.3,
+    "max_volume_db": -1.7
+  },
+  "Music_397439": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -3.0
+  },
+  "Music_359081": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -1.9
+  },
+  "Music_13450": {
+    "mean_volume_db": -12.1,
+    "max_volume_db": -2.0
+  },
+  "Music_350888": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -0.4
+  },
+  "Music_119182": {
+    "mean_volume_db": -12.1,
+    "max_volume_db": -0.5
+  },
+  "Music_88437": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -0.0
+  },
+  "Music_412841": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -7.0
+  },
+  "Music_246788": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -5.0
+  },
+  "Music_48044": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": -8.6
+  },
+  "Music_21702": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -0.6
+  },
+  "Music_324053": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -12.8
+  },
+  "Music_352288": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -1.1
+  },
+  "Music_411575": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -2.1
+  },
+  "Music_15861": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -5.6
+  },
+  "Music_247758": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -15.2
+  },
+  "Music_11660": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -1.6
+  },
+  "Music_119296": {
+    "mean_volume_db": -14.5,
+    "max_volume_db": -1.0
+  },
+  "Music_106748": {
+    "mean_volume_db": -13.2,
+    "max_volume_db": -0.8
+  },
+  "Music_354336": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -9.4
+  },
+  "Music_138728": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -3.3
+  },
+  "Music_357596": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -8.6
+  },
+  "Music_119293": {
+    "mean_volume_db": -12.9,
+    "max_volume_db": -1.0
+  },
+  "Music_426032": {
+    "mean_volume_db": -14.9,
+    "max_volume_db": -0.2
+  },
+  "Music_126469": {
+    "mean_volume_db": -9.2,
+    "max_volume_db": -0.3
+  },
+  "Music_359573": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -3.1
+  },
+  "Music_38912": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": 0.0
+  },
+  "Music_239777": {
+    "mean_volume_db": -10.1,
+    "max_volume_db": -0.3
+  },
+  "Music_81653": {
+    "mean_volume_db": -28.4,
+    "max_volume_db": -0.7
+  },
+  "Music_275363": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -8.2
+  },
+  "Music_254566": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -2.7
+  },
+  "Music_248625": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -15.4
+  },
+  "Music_356933": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -8.2
+  },
+  "Music_426030": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -0.7
+  },
+  "Music_136017": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -4.1
+  },
+  "Music_383647": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -1.9
+  },
+  "Music_65720": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -1.8
+  },
+  "Music_359090": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -1.8
+  },
+  "Music_32003": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -7.0
+  },
+  "Music_196004": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -1.2
+  },
+  "Music_142278": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -0.2
+  },
+  "Music_148519": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -0.3
+  },
+  "Music_419028": {
+    "mean_volume_db": -17.0,
+    "max_volume_db": -0.1
+  },
+  "Music_116869": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -4.5
+  },
+  "Music_46703": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -12.0
+  },
+  "Music_357005": {
+    "mean_volume_db": -22.1,
+    "max_volume_db": -11.5
+  },
+  "Music_44971": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -1.1
+  },
+  "Music_119224": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": -1.7
+  },
+  "Music_26776": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": -0.3
+  },
+  "Music_246729": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -22.6
+  },
+  "Music_183071": {
+    "mean_volume_db": -31.3,
+    "max_volume_db": -1.0
+  },
+  "Music_154022": {
+    "mean_volume_db": -32.2,
+    "max_volume_db": -12.7
+  },
+  "Music_412456": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -8.8
+  },
+  "Music_13198": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": -0.3
+  },
+  "Music_40502": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -4.2
+  },
+  "Music_354329": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -7.4
+  },
+  "Music_259687": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": -0.2
+  },
+  "Music_142264": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -4.2
+  },
+  "Music_40496": {
+    "mean_volume_db": -17.5,
+    "max_volume_db": -4.9
+  },
+  "Music_247225": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -14.1
+  },
+  "Music_64743": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -6.6
+  },
+  "Music_256371": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -9.8
+  },
+  "Music_377349": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -0.7
+  },
+  "Music_355273": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -7.4
+  },
+  "Music_13455": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": -5.4
+  },
+  "Music_355277": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -5.7
+  },
+  "Music_154350": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -10.8
+  },
+  "Music_14303": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -6.6
+  },
+  "Music_247907": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -17.2
+  },
+  "Music_275367": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -6.4
+  },
+  "Music_354888": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -7.6
+  },
+  "Music_162941": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -4.6
+  },
+  "Music_248972": {
+    "mean_volume_db": -22.8,
+    "max_volume_db": -13.1
+  },
+  "Music_154352": {
+    "mean_volume_db": -12.9,
+    "max_volume_db": -5.9
+  },
+  "Music_143337": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -0.3
+  },
+  "Music_358759": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -2.5
+  },
+  "Music_248822": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -14.6
+  },
+  "Music_373600": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -19.8
+  },
+  "Music_138847": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -5.7
+  },
+  "Music_354485": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -14.6
+  },
+  "Music_19545": {
+    "mean_volume_db": -11.8,
+    "max_volume_db": -0.3
+  },
+  "Music_333747": {
+    "mean_volume_db": -7.3,
+    "max_volume_db": -0.3
+  },
+  "Music_248847": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -17.4
+  },
+  "Music_252320": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -0.2
+  },
+  "Music_195065": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -3.0
+  },
+  "Lab_211608": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": 0.0
+  },
+  "Lab_352958": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -0.5
+  },
+  "Lab_254723": {
+    "mean_volume_db": -35.6,
+    "max_volume_db": -0.8
+  },
+  "Lab_88820": {
+    "mean_volume_db": -32.3,
+    "max_volume_db": -5.6
+  },
+  "Lab_90975": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -15.9
+  },
+  "Lab_135699": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -5.6
+  },
+  "Lab_267290": {
+    "mean_volume_db": -12.0,
+    "max_volume_db": -1.2
+  },
+  "Lab_273891": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -2.2
+  },
+  "Lab_209310": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -0.7
+  },
+  "Lab_186925": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -3.8
+  },
+  "Lab_228611": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": 0.0
+  },
+  "Lab_377687": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -9.1
+  },
+  "Lab_377723": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": 0.0
+  },
+  "Lab_402521": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -3.6
+  },
+  "Lab_173605": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -0.0
+  },
+  "Lab_318967": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -0.7
+  },
+  "Lab_17872": {
+    "mean_volume_db": -13.2,
+    "max_volume_db": -0.2
+  },
+  "Lab_345844": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -0.5
+  },
+  "Lab_91187": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -0.3
+  },
+  "Lab_198345": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -1.1
+  },
+  "Lab_173558": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -0.0
+  },
+  "Lab_49168": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -0.3
+  },
+  "Lab_152888": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -0.1
+  },
+  "Lab_208696": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -1.5
+  },
+  "Lab_256438": {
+    "mean_volume_db": -21.8,
+    "max_volume_db": -0.5
+  },
+  "Lab_67479": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": -0.2
+  },
+  "Lab_40969": {
+    "mean_volume_db": -32.2,
+    "max_volume_db": -0.4
+  },
+  "Lab_259976": {
+    "mean_volume_db": -20.5,
+    "max_volume_db": -0.0
+  },
+  "Lab_204143": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -0.2
+  },
+  "Lab_179173": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -0.3
+  },
+  "Lab_179233": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -0.2
+  },
+  "Lab_186929": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.3
+  },
+  "Lab_2510": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -1.0
+  },
+  "Lab_211881": {
+    "mean_volume_db": -15.9,
+    "max_volume_db": -0.4
+  },
+  "Lab_89875": {
+    "mean_volume_db": -37.2,
+    "max_volume_db": -6.3
+  },
+  "Lab_67576": {
+    "mean_volume_db": -11.5,
+    "max_volume_db": -0.1
+  },
+  "Lab_144510": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_126878": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_220613": {
+    "mean_volume_db": -34.4,
+    "max_volume_db": -11.9
+  },
+  "Lab_136544": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -2.6
+  },
+  "Lab_62987": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -0.6
+  },
+  "Lab_369126": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_35866": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -0.5
+  },
+  "Lab_104367": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -0.0
+  },
+  "Lab_372917": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -3.3
+  },
+  "Lab_51709": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -3.5
+  },
+  "Lab_42113": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -5.8
+  },
+  "Lab_179230": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_242444": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -1.3
+  },
+  "Lab_73061": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -0.0
+  },
+  "Lab_377046": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -1.6
+  },
+  "Lab_80401": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_390718": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": 0.0
+  },
+  "Lab_50405": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -0.9
+  },
+  "Lab_416288": {
+    "mean_volume_db": -30.4,
+    "max_volume_db": -1.8
+  },
+  "Lab_11567": {
+    "mean_volume_db": -11.3,
+    "max_volume_db": 0.0
+  },
+  "Lab_319943": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -7.3
+  },
+  "Lab_65911": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": 0.0
+  },
+  "Lab_379407": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -1.3
+  },
+  "Lab_57464": {
+    "mean_volume_db": -14.4,
+    "max_volume_db": -0.4
+  },
+  "Lab_370916": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -9.9
+  },
+  "Lab_187534": {
+    "mean_volume_db": -16.1,
+    "max_volume_db": -0.7
+  },
+  "Lab_387349": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_186013": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": 0.0
+  },
+  "Lab_198351": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -0.1
+  },
+  "Lab_234178": {
+    "mean_volume_db": -34.2,
+    "max_volume_db": -3.6
+  },
+  "Lab_264135": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -21.9
+  },
+  "Lab_46263": {
+    "mean_volume_db": -14.0,
+    "max_volume_db": -1.1
+  },
+  "Lab_275100": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -0.8
+  },
+  "Lab_9679": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -0.6
+  },
+  "Lab_162361": {
+    "mean_volume_db": -13.6,
+    "max_volume_db": -0.1
+  },
+  "Lab_133851": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -13.0
+  },
+  "Lab_162258": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -2.2
+  },
+  "Lab_149268": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -0.1
+  },
+  "Lab_339809": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -0.8
+  },
+  "Lab_88958": {
+    "mean_volume_db": -34.7,
+    "max_volume_db": -6.4
+  },
+  "Lab_272480": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_434244": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -0.3
+  },
+  "Lab_128294": {
+    "mean_volume_db": -11.0,
+    "max_volume_db": 0.0
+  },
+  "Lab_238243": {
+    "mean_volume_db": -6.8,
+    "max_volume_db": 0.0
+  },
+  "Lab_186531": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -1.7
+  },
+  "Lab_214041": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -0.8
+  },
+  "Lab_201285": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -3.4
+  },
+  "Lab_113138": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -7.9
+  },
+  "Lab_193860": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -8.5
+  },
+  "Lab_322489": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -4.8
+  },
+  "Lab_209306": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -0.1
+  },
+  "Lab_37311": {
+    "mean_volume_db": -31.8,
+    "max_volume_db": -7.8
+  },
+  "Lab_397923": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -0.4
+  },
+  "Lab_260434": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -0.0
+  },
+  "Lab_51038": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -0.9
+  },
+  "Lab_147213": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -5.2
+  },
+  "Lab_126889": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -0.8
+  },
+  "Lab_360604": {
+    "mean_volume_db": -38.0,
+    "max_volume_db": -0.7
+  },
+  "Lab_90973": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -12.7
+  },
+  "Lab_62969": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -0.1
+  },
+  "Lab_89597": {
+    "mean_volume_db": -6.3,
+    "max_volume_db": -0.1
+  },
+  "Lab_396423": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -2.9
+  },
+  "Lab_390707": {
+    "mean_volume_db": -18.8,
+    "max_volume_db": 0.0
+  },
+  "Lab_366353": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -12.6
+  },
+  "Lab_54362": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -2.4
+  },
+  "Lab_411057": {
+    "mean_volume_db": -11.6,
+    "max_volume_db": -0.4
+  },
+  "Lab_53284": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -1.1
+  },
+  "Lab_399665": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.2
+  },
+  "Lab_67571": {
+    "mean_volume_db": -10.6,
+    "max_volume_db": 0.0
+  },
+  "Lab_51715": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -1.2
+  },
+  "Lab_404073": {
+    "mean_volume_db": -35.9,
+    "max_volume_db": -9.9
+  },
+  "Lab_162265": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -0.3
+  },
+  "Lab_426216": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -12.0
+  },
+  "Lab_245581": {
+    "mean_volume_db": -10.9,
+    "max_volume_db": 0.0
+  },
+  "Lab_179174": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -0.3
+  },
+  "Lab_91009": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -0.4
+  },
+  "Lab_365905": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -2.1
+  },
+  "Lab_320135": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -0.9
+  },
+  "Lab_219047": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -4.0
+  },
+  "Lab_122770": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -1.1
+  },
+  "Lab_35643": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -0.2
+  },
+  "Lab_346211": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -11.4
+  },
+  "Lab_173619": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -1.5
+  },
+  "Lab_426259": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -3.9
+  },
+  "Lab_145609": {
+    "mean_volume_db": -11.4,
+    "max_volume_db": 0.0
+  },
+  "Lab_91159": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -0.3
+  },
+  "Lab_9164": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": -0.3
+  },
+  "Lab_332628": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -2.6
+  },
+  "Lab_257551": {
+    "mean_volume_db": -20.5,
+    "max_volume_db": -2.2
+  },
+  "Lab_196378": {
+    "mean_volume_db": -34.4,
+    "max_volume_db": -5.2
+  },
+  "Lab_259974": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -2.3
+  },
+  "Lab_56954": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -0.1
+  },
+  "Lab_434273": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -0.3
+  },
+  "Lab_339648": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -17.5
+  },
+  "Lab_175261": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -0.3
+  },
+  "Lab_339445": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.2
+  },
+  "Lab_32799": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -4.6
+  },
+  "Lab_91182": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -0.2
+  },
+  "Lab_32214": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -6.2
+  },
+  "Lab_93845": {
+    "mean_volume_db": -14.2,
+    "max_volume_db": -0.2
+  },
+  "Lab_331913": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -0.2
+  },
+  "Lab_349820": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -1.1
+  },
+  "Lab_51464": {
+    "mean_volume_db": -7.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_25006": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -0.9
+  },
+  "Lab_377674": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -5.3
+  },
+  "Lab_173579": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": 0.0
+  },
+  "Lab_67581": {
+    "mean_volume_db": -8.8,
+    "max_volume_db": 0.0
+  },
+  "Lab_258180": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -4.0
+  },
+  "Lab_46330": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -4.3
+  },
+  "Lab_255622": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -0.9
+  },
+  "Lab_427613": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -6.4
+  },
+  "Lab_379288": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -0.3
+  },
+  "Lab_413105": {
+    "mean_volume_db": -12.9,
+    "max_volume_db": -0.5
+  },
+  "Lab_379130": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -13.6
+  },
+  "Lab_382805": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -11.2
+  },
+  "Lab_341412": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -12.8
+  },
+  "Lab_67593": {
+    "mean_volume_db": -13.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_91924": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -5.3
+  },
+  "Lab_315826": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": 0.0
+  },
+  "Lab_336011": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -0.2
+  },
+  "Lab_79434": {
+    "mean_volume_db": -31.8,
+    "max_volume_db": -5.0
+  },
+  "Lab_339647": {
+    "mean_volume_db": -37.5,
+    "max_volume_db": -20.1
+  },
+  "Lab_120200": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -16.9
+  },
+  "Lab_241644": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -1.3
+  },
+  "Lab_351905": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -0.8
+  },
+  "Lab_434257": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -0.2
+  },
+  "Lab_377648": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -7.5
+  },
+  "Lab_233606": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": 0.0
+  },
+  "Lab_27652": {
+    "mean_volume_db": -14.1,
+    "max_volume_db": -0.2
+  },
+  "Lab_163456": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -3.5
+  },
+  "Lab_255182": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -3.3
+  },
+  "Lab_268557": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -0.3
+  },
+  "Lab_93299": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_193855": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -1.7
+  },
+  "Lab_43551": {
+    "mean_volume_db": -35.6,
+    "max_volume_db": -0.9
+  },
+  "Lab_347119": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -3.6
+  },
+  "Human_390256": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -4.1
+  },
+  "Human_340965": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -8.6
+  },
+  "Human_403057": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -2.4
+  },
+  "Human_19152": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -5.3
+  },
+  "Human_60688": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -17.4
+  },
+  "Human_418831": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -9.4
+  },
+  "Human_150963": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -0.4
+  },
+  "Human_253533": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -0.3
+  },
+  "Human_394856": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -0.2
+  },
+  "Human_196087": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -1.2
+  },
+  "Human_9995": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -19.8
+  },
+  "Human_16357": {
+    "mean_volume_db": -23.5,
+    "max_volume_db": -3.5
+  },
+  "Human_344077": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": 0.0
+  },
+  "Human_272556": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -1.2
+  },
+  "Human_175046": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -0.5
+  },
+  "Human_274636": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -6.3
+  },
+  "Human_4237": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -3.2
+  },
+  "Human_172398": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -0.3
+  },
+  "Human_277022": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": 0.0
+  },
+  "Human_197271": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -3.8
+  },
+  "Human_434461": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -0.3
+  },
+  "Human_231896": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -2.3
+  },
+  "Human_294425": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -9.2
+  },
+  "Human_215333": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -10.0
+  },
+  "Human_323711": {
+    "mean_volume_db": -13.9,
+    "max_volume_db": -1.0
+  },
+  "Human_134720": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -6.9
+  },
+  "Human_197272": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -6.9
+  },
+  "Human_124025": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -11.8
+  },
+  "Human_61356": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -0.0
+  },
+  "Human_73087": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -6.4
+  },
+  "Human_109742": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -0.3
+  },
+  "Human_242867": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -4.7
+  },
+  "Human_171442": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": 0.0
+  },
+  "Human_69202": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -0.2
+  },
+  "Human_259608": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -0.1
+  },
+  "Human_63609": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -0.3
+  },
+  "Human_112257": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": 0.0
+  },
+  "Human_113521": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -12.0
+  },
+  "Human_389659": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -13.0
+  },
+  "Human_353320": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -2.3
+  },
+  "Human_399762": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -5.5
+  },
+  "Human_216570": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -0.3
+  },
+  "Human_273406": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -1.3
+  },
+  "Human_241546": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -2.7
+  },
+  "Human_2780": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -0.8
+  },
+  "Human_343984": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -4.1
+  },
+  "Human_361706": {
+    "mean_volume_db": -33.8,
+    "max_volume_db": -2.7
+  },
+  "Human_381362": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": 0.0
+  },
+  "Human_165492": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -7.3
+  },
+  "Human_361757": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -0.7
+  },
+  "Human_197718": {
+    "mean_volume_db": -16.4,
+    "max_volume_db": -0.3
+  },
+  "Human_278931": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -1.3
+  },
+  "Human_377025": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -0.2
+  },
+  "Human_142603": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -9.0
+  },
+  "Human_183692": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -15.0
+  },
+  "Human_364724": {
+    "mean_volume_db": -34.7,
+    "max_volume_db": -0.1
+  },
+  "Human_387962": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -10.0
+  },
+  "Human_198337": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -0.9
+  },
+  "Human_124023": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": 0.0
+  },
+  "Human_191911": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -5.0
+  },
+  "Human_412157": {
+    "mean_volume_db": -34.2,
+    "max_volume_db": -0.5
+  },
+  "Human_238819": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -4.8
+  },
+  "Human_194268": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -1.9
+  },
+  "Human_217667": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -0.3
+  },
+  "Human_140228": {
+    "mean_volume_db": -31.3,
+    "max_volume_db": -3.1
+  },
+  "Human_32868": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -0.5
+  },
+  "Human_63621": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -0.2
+  },
+  "Human_150964": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -4.6
+  },
+  "Human_361766": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -0.7
+  },
+  "Human_170332": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -0.2
+  },
+  "Human_428953": {
+    "mean_volume_db": -30.4,
+    "max_volume_db": -1.5
+  },
+  "Human_424866": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -7.9
+  },
+  "Human_395410": {
+    "mean_volume_db": -14.9,
+    "max_volume_db": -0.7
+  },
+  "Human_136480": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -0.2
+  },
+  "Human_139972": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -10.5
+  },
+  "Human_118486": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -1.4
+  },
+  "Human_330296": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -0.4
+  },
+  "Human_231891": {
+    "mean_volume_db": -27.0,
+    "max_volume_db": -2.2
+  },
+  "Human_75056": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -9.6
+  },
+  "Human_399750": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -4.4
+  },
+  "Human_342669": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -1.4
+  },
+  "Human_204703": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -1.3
+  },
+  "Human_169806": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.6
+  },
+  "Human_381818": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -0.2
+  },
+  "Human_428990": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -3.2
+  },
+  "Human_22733": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -19.7
+  },
+  "Human_326883": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -5.5
+  },
+  "Human_252231": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -1.3
+  },
+  "Human_333408": {
+    "mean_volume_db": -18.8,
+    "max_volume_db": -4.2
+  },
+  "Human_109740": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": 0.0
+  },
+  "Human_101154": {
+    "mean_volume_db": -33.8,
+    "max_volume_db": -15.8
+  },
+  "Human_67824": {
+    "mean_volume_db": -9.9,
+    "max_volume_db": 0.0
+  },
+  "Human_196072": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -9.1
+  },
+  "Human_340971": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -6.0
+  },
+  "Human_60803": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -10.5
+  },
+  "Human_274590": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -5.6
+  },
+  "Human_160137": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -0.5
+  },
+  "Human_338182": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -8.2
+  },
+  "Human_346520": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -7.3
+  },
+  "Human_428775": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -0.3
+  },
+  "Human_175536": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -0.0
+  },
+  "Human_371625": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": 0.0
+  },
+  "Human_19803": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -0.3
+  },
+  "Human_152904": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -0.1
+  },
+  "Human_343976": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -0.7
+  },
+  "Human_87512": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -1.8
+  },
+  "Human_47134": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -6.6
+  },
+  "Human_346804": {
+    "mean_volume_db": -34.4,
+    "max_volume_db": -7.2
+  },
+  "Human_58650": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -8.5
+  },
+  "Human_416703": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -3.7
+  },
+  "Human_239583": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -8.1
+  },
+  "Human_175048": {
+    "mean_volume_db": -34.1,
+    "max_volume_db": -0.7
+  },
+  "Human_246312": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -14.3
+  },
+  "Human_219768": {
+    "mean_volume_db": -36.8,
+    "max_volume_db": -20.6
+  },
+  "Human_232861": {
+    "mean_volume_db": -12.1,
+    "max_volume_db": 0.0
+  },
+  "Human_193467": {
+    "mean_volume_db": -15.3,
+    "max_volume_db": -0.3
+  },
+  "Human_273109": {
+    "mean_volume_db": -31.7,
+    "max_volume_db": -1.3
+  },
+  "Human_217669": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -0.7
+  },
+  "Human_395408": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -0.7
+  },
+  "Human_142605": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -5.2
+  },
+  "Human_63805": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -3.2
+  },
+  "Human_19119": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -10.2
+  },
+  "Human_273400": {
+    "mean_volume_db": -29.6,
+    "max_volume_db": -1.3
+  },
+  "Human_16580": {
+    "mean_volume_db": -16.0,
+    "max_volume_db": -0.2
+  },
+  "Human_76461": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -1.2
+  },
+  "Human_101159": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -4.7
+  },
+  "Human_323447": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -1.9
+  },
+  "Human_98935": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.3
+  },
+  "Human_101181": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -9.3
+  },
+  "Human_166048": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -2.7
+  },
+  "Human_35034": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -6.6
+  },
+  "Human_361710": {
+    "mean_volume_db": -34.1,
+    "max_volume_db": -2.3
+  },
+  "Human_253772": {
+    "mean_volume_db": -11.7,
+    "max_volume_db": -2.7
+  },
+  "Human_273407": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -1.3
+  },
+  "Human_19124": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -15.2
+  },
+  "Human_171118": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -14.4
+  },
+  "Human_18276": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -21.1
+  },
+  "Human_371303": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -1.1
+  },
+  "Human_62870": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -0.3
+  },
+  "Human_176866": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -5.5
+  },
+  "Human_253775": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -3.2
+  },
+  "Human_381357": {
+    "mean_volume_db": -14.5,
+    "max_volume_db": 0.0
+  },
+  "Human_238495": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -17.1
+  },
+  "Human_399623": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -6.7
+  },
+  "Human_364732": {
+    "mean_volume_db": -32.4,
+    "max_volume_db": 0.0
+  },
+  "Human_156844": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -3.2
+  },
+  "Human_242610": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": -2.0
+  },
+  "Human_67103": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -0.2
+  },
+  "Human_240689": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -2.0
+  },
+  "Human_361753": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -0.7
+  },
+  "Human_169802": {
+    "mean_volume_db": -21.8,
+    "max_volume_db": -5.7
+  },
+  "Human_196168": {
+    "mean_volume_db": -19.6,
+    "max_volume_db": -0.1
+  },
+  "Human_9985": {
+    "mean_volume_db": -31.1,
+    "max_volume_db": -15.6
+  },
+  "Human_272554": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -1.3
+  },
+  "Human_257919": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -4.0
+  },
+  "Human_399769": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -0.3
+  },
+  "Human_399463": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -1.4
+  },
+  "Human_235167": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -7.7
+  },
+  "Human_361745": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -0.4
+  },
+  "Human_367680": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": 0.0
+  },
+  "Human_161849": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.3
+  },
+  "Human_241473": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -3.1
+  },
+  "Human_124024": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -12.6
+  },
+  "Human_31605": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -16.5
+  },
+  "Human_430341": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -21.4
+  },
+  "Human_20738": {
+    "mean_volume_db": -6.5,
+    "max_volume_db": 0.0
+  },
+  "Human_28227": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -0.0
+  },
+  "Human_242239": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -3.7
+  },
+  "Human_334941": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -1.5
+  },
+  "Human_235099": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -2.6
+  },
+  "Human_361730": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -3.0
+  },
+  "Human_254281": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -1.8
+  },
+  "Human_31650": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -0.9
+  },
+  "Human_101153": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -0.8
+  },
+  "Human_277550": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -2.1
+  },
+  "Human_120755": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -0.1
+  },
+  "Human_257916": {
+    "mean_volume_db": -38.0,
+    "max_volume_db": -1.9
+  },
+  "Human_399758": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -10.6
+  },
+  "Animal_104604": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -4.8
+  },
+  "Animal_235865": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -4.9
+  },
+  "Animal_395883": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -2.1
+  },
+  "Animal_58981": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -6.0
+  },
+  "Animal_51095": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -0.3
+  },
+  "Animal_121375": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -15.1
+  },
+  "Animal_327138": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -0.1
+  },
+  "Animal_7454": {
+    "mean_volume_db": -35.4,
+    "max_volume_db": -10.5
+  },
+  "Animal_236275": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -13.5
+  },
+  "Animal_106953": {
+    "mean_volume_db": -10.5,
+    "max_volume_db": 0.0
+  },
+  "Animal_234259": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -0.1
+  },
+  "Animal_380350": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.2
+  },
+  "Animal_235913": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -1.3
+  },
+  "Animal_180052": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -6.2
+  },
+  "Animal_34688": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -1.5
+  },
+  "Animal_347259": {
+    "mean_volume_db": -33.9,
+    "max_volume_db": -13.4
+  },
+  "Animal_24925": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -2.0
+  },
+  "Animal_235869": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -5.0
+  },
+  "Animal_172143": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -1.5
+  },
+  "Animal_100041": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -0.1
+  },
+  "Animal_13597": {
+    "mean_volume_db": -34.7,
+    "max_volume_db": -9.0
+  },
+  "Animal_236261": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -17.9
+  },
+  "Animal_34694": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -1.9
+  },
+  "Animal_55065": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -4.0
+  },
+  "Animal_56765": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -3.2
+  },
+  "Animal_429120": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -1.5
+  },
+  "Animal_202407": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -8.3
+  },
+  "Animal_50136": {
+    "mean_volume_db": -31.0,
+    "max_volume_db": -13.7
+  },
+  "Animal_4917": {
+    "mean_volume_db": -13.1,
+    "max_volume_db": -1.1
+  },
+  "Animal_353450": {
+    "mean_volume_db": -15.9,
+    "max_volume_db": -1.7
+  },
+  "Animal_65598": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -0.6
+  },
+  "Animal_64401": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -5.5
+  },
+  "Animal_173913": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -6.3
+  },
+  "Animal_213138": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -0.9
+  },
+  "Animal_146343": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -0.2
+  },
+  "Animal_420449": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -0.4
+  },
+  "Animal_32247": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -3.7
+  },
+  "Animal_33641": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -0.7
+  },
+  "Animal_32592": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -4.2
+  },
+  "Animal_56511": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -5.1
+  },
+  "Animal_343927": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -4.4
+  },
+  "Animal_220018": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -6.2
+  },
+  "Animal_236061": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -9.9
+  },
+  "Animal_140327": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -7.5
+  },
+  "Animal_129678": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -16.0
+  },
+  "Animal_131478": {
+    "mean_volume_db": -36.9,
+    "max_volume_db": -15.8
+  },
+  "Animal_272364": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -10.3
+  },
+  "Animal_236226": {
+    "mean_volume_db": -24.3,
+    "max_volume_db": -3.7
+  },
+  "Animal_21890": {
+    "mean_volume_db": -30.9,
+    "max_volume_db": -11.8
+  },
+  "Animal_353308": {
+    "mean_volume_db": -14.4,
+    "max_volume_db": 0.0
+  },
+  "Animal_269111": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -0.1
+  },
+  "Animal_43358": {
+    "mean_volume_db": -30.4,
+    "max_volume_db": -7.4
+  },
+  "Animal_129264": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -11.8
+  },
+  "Animal_386663": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -15.0
+  },
+  "Animal_236185": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -4.4
+  },
+  "Animal_433698": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -1.2
+  },
+  "Animal_208850": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -12.7
+  },
+  "Animal_64013": {
+    "mean_volume_db": -21.8,
+    "max_volume_db": -3.4
+  },
+  "Animal_236230": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -5.3
+  },
+  "Animal_28284": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -2.2
+  },
+  "Animal_427871": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -0.0
+  },
+  "Animal_341896": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -4.0
+  },
+  "Animal_46128": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -6.0
+  },
+  "Animal_362426": {
+    "mean_volume_db": -15.2,
+    "max_volume_db": -3.4
+  },
+  "Animal_346933": {
+    "mean_volume_db": -32.3,
+    "max_volume_db": -12.1
+  },
+  "Animal_251670": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -11.7
+  },
+  "Animal_89503": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -23.4
+  },
+  "Animal_236197": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -8.5
+  },
+  "Animal_66248": {
+    "mean_volume_db": -17.7,
+    "max_volume_db": -0.6
+  },
+  "Animal_189546": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -6.4
+  },
+  "Animal_97381": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -6.2
+  },
+  "Animal_259169": {
+    "mean_volume_db": -16.1,
+    "max_volume_db": -0.3
+  },
+  "Animal_189521": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -5.5
+  },
+  "Animal_31830": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -3.1
+  },
+  "Animal_231922": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -0.2
+  },
+  "Animal_199631": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": -1.2
+  },
+  "Animal_83928": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -7.2
+  },
+  "Animal_34689": {
+    "mean_volume_db": -14.9,
+    "max_volume_db": -3.1
+  },
+  "Animal_71201": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -0.2
+  },
+  "Animal_236128": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -6.8
+  },
+  "Animal_360409": {
+    "mean_volume_db": -31.9,
+    "max_volume_db": -0.6
+  },
+  "Animal_11722": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -1.4
+  },
+  "Animal_397915": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -13.1
+  },
+  "Animal_236080": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -18.6
+  },
+  "Animal_89506": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -14.2
+  },
+  "Animal_164488": {
+    "mean_volume_db": -34.3,
+    "max_volume_db": -10.0
+  },
+  "Animal_34594": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -11.1
+  },
+  "Animal_169021": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -15.6
+  },
+  "Animal_59186": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -4.8
+  },
+  "Animal_366120": {
+    "mean_volume_db": -22.8,
+    "max_volume_db": -1.4
+  },
+  "Animal_350592": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -0.2
+  },
+  "Animal_18966": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -1.3
+  },
+  "Animal_35421": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -13.0
+  },
+  "Animal_67446": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -1.1
+  },
+  "Animal_61072": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -0.3
+  },
+  "Animal_130971": {
+    "mean_volume_db": -21.1,
+    "max_volume_db": -1.9
+  },
+  "Animal_121511": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -2.2
+  },
+  "Animal_418159": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -1.5
+  },
+  "Nature_395245": {
+    "mean_volume_db": -19.6,
+    "max_volume_db": -0.4
+  },
+  "Nature_94830": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -12.1
+  },
+  "Nature_27243": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -0.2
+  },
+  "Nature_213802": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -1.7
+  },
+  "Nature_4211": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": 0.0
+  },
+  "Nature_156318": {
+    "mean_volume_db": -33.6,
+    "max_volume_db": -0.3
+  },
+  "Nature_91514": {
+    "mean_volume_db": -22.8,
+    "max_volume_db": -1.4
+  },
+  "Nature_188572": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -9.4
+  },
+  "Nature_398716": {
+    "mean_volume_db": -30.0,
+    "max_volume_db": -7.8
+  },
+  "Nature_51032": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -2.6
+  },
+  "Nature_186924": {
+    "mean_volume_db": -5.6,
+    "max_volume_db": 0.0
+  },
+  "Nature_367318": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -1.4
+  },
+  "Nature_262053": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -4.0
+  },
+  "Nature_323046": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": 0.0
+  },
+  "Nature_321423": {
+    "mean_volume_db": -29.1,
+    "max_volume_db": -3.3
+  },
+  "Nature_237410": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -7.6
+  },
+  "Nature_57881": {
+    "mean_volume_db": -36.7,
+    "max_volume_db": -18.7
+  },
+  "Nature_95106": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -1.3
+  },
+  "Nature_237731": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -1.3
+  },
+  "Nature_103606": {
+    "mean_volume_db": -27.7,
+    "max_volume_db": -0.6
+  },
+  "Nature_174703": {
+    "mean_volume_db": -14.3,
+    "max_volume_db": -1.4
+  },
+  "Nature_207251": {
+    "mean_volume_db": -14.8,
+    "max_volume_db": -0.2
+  },
+  "Nature_339448": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -0.8
+  },
+  "Nature_37353": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -9.9
+  },
+  "Nature_199959": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -0.3
+  },
+  "Nature_216936": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -0.3
+  },
+  "Nature_50362": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -0.4
+  },
+  "Nature_13564": {
+    "mean_volume_db": -20.5,
+    "max_volume_db": -0.5
+  },
+  "Nature_166550": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -0.5
+  },
+  "Nature_207615": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -1.4
+  },
+  "Nature_104990": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -0.3
+  },
+  "Nature_338372": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -17.3
+  },
+  "Nature_49158": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -1.1
+  },
+  "Nature_386162": {
+    "mean_volume_db": -25.6,
+    "max_volume_db": -0.3
+  },
+  "Nature_156310": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -0.7
+  },
+  "Nature_393003": {
+    "mean_volume_db": -34.3,
+    "max_volume_db": -16.9
+  },
+  "Nature_158984": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -1.9
+  },
+  "Nature_65174": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -6.4
+  },
+  "Nature_369410": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": 0.0
+  },
+  "Nature_270852": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -10.5
+  },
+  "Nature_36269": {
+    "mean_volume_db": -12.2,
+    "max_volume_db": -1.0
+  },
+  "Nature_379905": {
+    "mean_volume_db": -10.3,
+    "max_volume_db": 0.0
+  },
+  "Nature_337500": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -6.3
+  },
+  "Nature_215712": {
+    "mean_volume_db": -15.2,
+    "max_volume_db": -0.6
+  },
+  "Nature_5997": {
+    "mean_volume_db": -32.6,
+    "max_volume_db": -10.7
+  },
+  "Nature_57968": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -3.9
+  },
+  "Nature_17921": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -0.4
+  },
+  "Nature_406761": {
+    "mean_volume_db": -39.0,
+    "max_volume_db": -2.0
+  },
+  "Nature_250317": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -3.4
+  },
+  "Nature_406762": {
+    "mean_volume_db": -38.3,
+    "max_volume_db": -1.9
+  },
+  "Nature_263154": {
+    "mean_volume_db": -34.4,
+    "max_volume_db": -7.6
+  },
+  "Nature_27738": {
+    "mean_volume_db": -12.6,
+    "max_volume_db": -0.1
+  },
+  "Nature_209027": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -0.2
+  },
+  "Nature_337488": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -6.3
+  },
+  "Nature_371717": {
+    "mean_volume_db": -37.1,
+    "max_volume_db": -17.8
+  },
+  "Nature_423889": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -0.3
+  },
+  "Nature_407011": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -12.7
+  },
+  "Nature_386033": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -1.4
+  },
+  "Nature_60850": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -3.8
+  },
+  "Nature_58501": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -3.9
+  },
+  "Nature_422741": {
+    "mean_volume_db": -43.3,
+    "max_volume_db": -1.5
+  },
+  "Nature_33246": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -2.7
+  },
+  "Nature_399220": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -6.5
+  },
+  "Nature_202150": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -1.4
+  },
+  "Nature_393076": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -0.3
+  },
+  "Nature_351746": {
+    "mean_volume_db": -22.0,
+    "max_volume_db": -2.7
+  },
+  "Nature_257743": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -1.6
+  },
+  "Nature_56963": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -1.4
+  },
+  "Nature_97386": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -6.8
+  },
+  "Nature_99085": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -1.0
+  },
+  "Nature_166951": {
+    "mean_volume_db": -37.5,
+    "max_volume_db": -2.0
+  },
+  "Nature_423893": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -0.2
+  },
+  "Nature_260844": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -1.8
+  },
+  "Nature_420310": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -2.7
+  },
+  "Nature_249872": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -0.6
+  },
+  "Nature_336418": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -1.5
+  },
+  "Nature_328172": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -1.0
+  },
+  "Nature_199946": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -1.6
+  },
+  "Nature_233136": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -8.2
+  },
+  "Nature_190667": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -6.3
+  },
+  "Nature_16751": {
+    "mean_volume_db": -38.9,
+    "max_volume_db": -2.0
+  },
+  "Nature_213583": {
+    "mean_volume_db": -17.8,
+    "max_volume_db": -1.0
+  },
+  "Nature_423493": {
+    "mean_volume_db": -25.5,
+    "max_volume_db": -1.3
+  },
+  "Nature_71190": {
+    "mean_volume_db": -52.7,
+    "max_volume_db": -23.0
+  },
+  "Nature_20433": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -10.8
+  },
+  "Nature_16748": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -2.4
+  },
+  "Nature_170899": {
+    "mean_volume_db": -28.4,
+    "max_volume_db": -1.9
+  },
+  "Nature_349440": {
+    "mean_volume_db": -35.0,
+    "max_volume_db": -13.0
+  },
+  "Nature_160910": {
+    "mean_volume_db": -14.5,
+    "max_volume_db": -0.3
+  },
+  "Nature_156340": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -1.5
+  },
+  "Nature_56286": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -1.5
+  },
+  "Nature_86769": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -0.6
+  },
+  "Nature_337485": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": 0.0
+  },
+  "Nature_77722": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -4.2
+  },
+  "Nature_329909": {
+    "mean_volume_db": -21.8,
+    "max_volume_db": -4.6
+  },
+  "Nature_262754": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -1.5
+  },
+  "Urban_204466": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -1.5
+  },
+  "Urban_245693": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -3.3
+  },
+  "Urban_36835": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -6.0
+  },
+  "Urban_169165": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -4.8
+  },
+  "Urban_96159": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -0.1
+  },
+  "Urban_337257": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -15.5
+  },
+  "Urban_127555": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -3.3
+  },
+  "Urban_18068": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -2.5
+  },
+  "Urban_265755": {
+    "mean_volume_db": -29.9,
+    "max_volume_db": -2.0
+  },
+  "Urban_315734": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -0.2
+  },
+  "Urban_231448": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -9.5
+  },
+  "Urban_71740": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": -0.3
+  },
+  "Urban_71087": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -9.7
+  },
+  "Urban_50896": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -0.7
+  },
+  "Urban_324120": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -1.4
+  },
+  "Urban_232274": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -17.9
+  },
+  "Urban_83704": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -4.9
+  },
+  "Urban_345421": {
+    "mean_volume_db": -8.4,
+    "max_volume_db": -0.1
+  },
+  "Urban_117922": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -2.1
+  },
+  "Urban_104095": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -0.3
+  },
+  "Urban_317525": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -1.5
+  },
+  "Urban_386260": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -1.5
+  },
+  "Urban_434660": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -0.4
+  },
+  "Urban_49099": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -0.1
+  },
+  "Urban_366197": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -1.9
+  },
+  "Urban_51049": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -2.7
+  },
+  "Urban_270493": {
+    "mean_volume_db": -36.4,
+    "max_volume_db": -4.9
+  },
+  "Urban_253313": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -8.6
+  },
+  "Urban_353711": {
+    "mean_volume_db": -36.4,
+    "max_volume_db": -4.5
+  },
+  "Urban_232301": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -10.5
+  },
+  "Urban_125102": {
+    "mean_volume_db": -14.4,
+    "max_volume_db": -5.3
+  },
+  "Urban_24585": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -1.3
+  },
+  "Urban_156831": {
+    "mean_volume_db": -32.4,
+    "max_volume_db": -15.3
+  },
+  "Urban_387807": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -2.2
+  },
+  "Urban_19982": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -8.0
+  },
+  "Urban_118971": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -0.0
+  },
+  "Urban_183604": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -3.8
+  },
+  "Urban_174826": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -0.8
+  },
+  "Urban_409040": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -14.6
+  },
+  "Urban_44762": {
+    "mean_volume_db": -14.7,
+    "max_volume_db": -0.1
+  },
+  "Urban_186939": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -16.7
+  },
+  "Urban_250526": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -5.5
+  },
+  "Urban_349171": {
+    "mean_volume_db": -6.9,
+    "max_volume_db": -0.7
+  },
+  "Urban_351542": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -9.2
+  },
+  "Urban_216005": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -1.4
+  },
+  "Urban_147148": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -0.2
+  },
+  "Urban_274999": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -3.5
+  },
+  "Urban_193960": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -0.5
+  },
+  "Urban_427015": {
+    "mean_volume_db": -22.7,
+    "max_volume_db": -6.5
+  },
+  "Urban_352667": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -4.3
+  },
+  "Urban_207751": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -0.5
+  },
+  "Urban_96157": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -0.2
+  },
+  "Urban_113342": {
+    "mean_volume_db": -15.3,
+    "max_volume_db": -3.5
+  },
+  "Urban_332385": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -8.4
+  },
+  "Urban_69552": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -0.8
+  },
+  "Urban_216816": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": -0.9
+  },
+  "Urban_273466": {
+    "mean_volume_db": -35.7,
+    "max_volume_db": -6.8
+  },
+  "Urban_93020": {
+    "mean_volume_db": -9.1,
+    "max_volume_db": -0.2
+  },
+  "Urban_87393": {
+    "mean_volume_db": -12.7,
+    "max_volume_db": -3.3
+  },
+  "Urban_83488": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": 0.0
+  },
+  "Urban_386263": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -1.0
+  },
+  "Urban_113217": {
+    "mean_volume_db": -13.7,
+    "max_volume_db": -1.9
+  },
+  "Urban_180672": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -2.8
+  },
+  "Urban_101328": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -0.3
+  },
+  "Urban_152657": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -3.8
+  },
+  "Urban_254714": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -5.5
+  },
+  "Urban_71738": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -1.3
+  },
+  "Urban_267903": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": 0.0
+  },
+  "Urban_216126": {
+    "mean_volume_db": -36.2,
+    "max_volume_db": -0.0
+  },
+  "Urban_361404": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -0.1
+  },
+  "Urban_370277": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -1.7
+  },
+  "Urban_339518": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -14.7
+  },
+  "Urban_46918": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -0.4
+  },
+  "Urban_379377": {
+    "mean_volume_db": -31.0,
+    "max_volume_db": -9.9
+  },
+  "Urban_39514": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -4.0
+  },
+  "Urban_56671": {
+    "mean_volume_db": -35.2,
+    "max_volume_db": -18.3
+  },
+  "Urban_44086": {
+    "mean_volume_db": -15.3,
+    "max_volume_db": -0.7
+  },
+  "Urban_392742": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -16.0
+  },
+  "Urban_36920": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -3.6
+  },
+  "Urban_271069": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -1.3
+  },
+  "Urban_138407": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": 0.0
+  },
+  "Urban_332000": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -0.3
+  },
+  "Urban_399449": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -0.4
+  },
+  "Urban_51126": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -1.1
+  },
+  "Urban_345557": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -10.1
+  },
+  "Urban_151594": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -0.6
+  },
+  "Urban_353265": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -8.1
+  },
+  "Urban_102449": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -0.0
+  },
+  "Urban_423606": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -10.1
+  },
+  "Urban_404100": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -11.4
+  },
+  "Urban_20839": {
+    "mean_volume_db": -11.5,
+    "max_volume_db": -0.1
+  },
+  "Urban_377469": {
+    "mean_volume_db": -32.2,
+    "max_volume_db": 0.0
+  },
+  "Urban_342664": {
+    "mean_volume_db": -12.1,
+    "max_volume_db": -1.4
+  },
+  "Urban_151591": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -0.2
+  },
+  "Urban_425529": {
+    "mean_volume_db": -26.2,
+    "max_volume_db": -3.4
+  },
+  "Urban_68954": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -1.0
+  },
+  "Urban_18773": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": -0.2
+  },
+  "Urban_255193": {
+    "mean_volume_db": -12.4,
+    "max_volume_db": -1.5
+  },
+  "Urban_125093": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -0.5
+  },
+  "Urban_391215": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -5.5
+  },
+  "Urban_125090": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -4.2
+  },
+  "Urban_79639": {
+    "mean_volume_db": -17.5,
+    "max_volume_db": -0.1
+  },
+  "Music_239714": {
+    "mean_volume_db": -14.1,
+    "max_volume_db": -0.3
+  },
+  "Music_65653": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -1.8
+  },
+  "Music_355290": {
+    "mean_volume_db": -19.7,
+    "max_volume_db": -10.3
+  },
+  "Music_372775": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -6.8
+  },
+  "Music_239986": {
+    "mean_volume_db": -11.1,
+    "max_volume_db": -0.3
+  },
+  "Music_373798": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -8.5
+  },
+  "Music_358114": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -13.1
+  },
+  "Music_97188": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -5.8
+  },
+  "Music_153925": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -8.7
+  },
+  "Music_119287": {
+    "mean_volume_db": -17.0,
+    "max_volume_db": -4.2
+  },
+  "Music_12765": {
+    "mean_volume_db": -15.8,
+    "max_volume_db": -0.3
+  },
+  "Music_175455": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -6.0
+  },
+  "Music_373903": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -1.5
+  },
+  "Music_356176": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -7.2
+  },
+  "Music_246752": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -4.1
+  },
+  "Music_152267": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -0.2
+  },
+  "Music_357485": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -1.5
+  },
+  "Music_359500": {
+    "mean_volume_db": -26.4,
+    "max_volume_db": -12.0
+  },
+  "Music_222326": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -1.1
+  },
+  "Music_431355": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -0.8
+  },
+  "Music_264783": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -0.2
+  },
+  "Music_239782": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -0.3
+  },
+  "Music_357657": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -15.3
+  },
+  "Music_418745": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -1.6
+  },
+  "Music_372619": {
+    "mean_volume_db": -26.7,
+    "max_volume_db": -12.5
+  },
+  "Music_98494": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -2.8
+  },
+  "Music_346521": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -0.7
+  },
+  "Music_116357": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -6.7
+  },
+  "Music_350221": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -5.7
+  },
+  "Music_152240": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -0.2
+  },
+  "Music_246980": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": -6.8
+  },
+  "Music_97627": {
+    "mean_volume_db": -17.5,
+    "max_volume_db": -1.3
+  },
+  "Music_18495": {
+    "mean_volume_db": -36.7,
+    "max_volume_db": -26.5
+  },
+  "Music_383558": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -9.6
+  },
+  "Music_356046": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -8.3
+  },
+  "Music_354917": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -11.4
+  },
+  "Music_247009": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -24.9
+  },
+  "Music_247662": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -13.5
+  },
+  "Music_360001": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -16.2
+  },
+  "Music_26097": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": -3.2
+  },
+  "Music_357652": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -3.7
+  },
+  "Music_372643": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -16.2
+  },
+  "Music_116877": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -6.0
+  },
+  "Music_246620": {
+    "mean_volume_db": -5.7,
+    "max_volume_db": -0.2
+  },
+  "Music_40209": {
+    "mean_volume_db": -20.2,
+    "max_volume_db": -11.8
+  },
+  "Music_421": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -3.4
+  },
+  "Music_77712": {
+    "mean_volume_db": -26.8,
+    "max_volume_db": -3.3
+  },
+  "Music_119361": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -3.9
+  },
+  "Music_382502": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -0.3
+  },
+  "Music_354259": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -24.8
+  },
+  "Music_14299": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -7.1
+  },
+  "Music_255690": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -2.2
+  },
+  "Music_153792": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -6.0
+  },
+  "Music_132991": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -9.5
+  },
+  "Music_271512": {
+    "mean_volume_db": -34.4,
+    "max_volume_db": -23.9
+  },
+  "Music_232715": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -5.8
+  },
+  "Music_26140": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -9.1
+  },
+  "Music_10649": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -20.8
+  },
+  "Music_116348": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -6.6
+  },
+  "Music_348885": {
+    "mean_volume_db": -31.5,
+    "max_volume_db": -0.4
+  },
+  "Music_354975": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -16.6
+  },
+  "Music_372674": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -12.7
+  },
+  "Music_357612": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -11.1
+  },
+  "Music_355218": {
+    "mean_volume_db": -19.1,
+    "max_volume_db": -8.2
+  },
+  "Music_355085": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -14.8
+  },
+  "Music_10608": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -4.4
+  },
+  "Music_119322": {
+    "mean_volume_db": -5.0,
+    "max_volume_db": -0.0
+  },
+  "Music_357767": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -13.5
+  },
+  "Music_247360": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -9.7
+  },
+  "Music_358356": {
+    "mean_volume_db": -31.1,
+    "max_volume_db": -15.4
+  },
+  "Music_359831": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -4.4
+  },
+  "Music_253310": {
+    "mean_volume_db": -13.8,
+    "max_volume_db": -0.3
+  },
+  "Music_200527": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": -0.3
+  },
+  "Music_359459": {
+    "mean_volume_db": -25.0,
+    "max_volume_db": -8.7
+  },
+  "Music_373574": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -1.6
+  },
+  "Music_23946": {
+    "mean_volume_db": -17.0,
+    "max_volume_db": -7.6
+  },
+  "Music_357582": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": -1.5
+  },
+  "Music_175464": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -6.3
+  },
+  "Music_136960": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -2.6
+  },
+  "Music_99248": {
+    "mean_volume_db": -12.0,
+    "max_volume_db": 0.0
+  },
+  "Music_415380": {
+    "mean_volume_db": -36.6,
+    "max_volume_db": -15.8
+  },
+  "Music_373344": {
+    "mean_volume_db": -36.2,
+    "max_volume_db": -20.5
+  },
+  "Music_48685": {
+    "mean_volume_db": -16.1,
+    "max_volume_db": -0.3
+  },
+  "Music_148480": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -0.3
+  },
+  "Music_247254": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -13.9
+  },
+  "Music_48365": {
+    "mean_volume_db": -17.2,
+    "max_volume_db": -4.7
+  },
+  "Music_64708": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -6.3
+  },
+  "Music_208275": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -0.3
+  },
+  "Music_372618": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -12.8
+  },
+  "Music_388687": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -3.8
+  },
+  "Music_357517": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -9.2
+  },
+  "Music_357046": {
+    "mean_volume_db": -23.3,
+    "max_volume_db": -10.7
+  },
+  "Music_399085": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -5.9
+  },
+  "Music_247962": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -17.6
+  },
+  "Music_29830": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -7.0
+  },
+  "Music_355973": {
+    "mean_volume_db": -17.3,
+    "max_volume_db": -3.3
+  },
+  "Music_97635": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -1.3
+  },
+  "Music_355165": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -10.9
+  },
+  "Lab_83690": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -1.1
+  },
+  "Lab_88933": {
+    "mean_volume_db": -40.7,
+    "max_volume_db": -1.6
+  },
+  "Lab_329546": {
+    "mean_volume_db": -31.6,
+    "max_volume_db": -15.0
+  },
+  "Lab_255668": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": 0.0
+  },
+  "Lab_181377": {
+    "mean_volume_db": -8.6,
+    "max_volume_db": 0.0
+  },
+  "Lab_27619": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -0.2
+  },
+  "Lab_325667": {
+    "mean_volume_db": -24.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_88928": {
+    "mean_volume_db": -34.1,
+    "max_volume_db": -1.7
+  },
+  "Lab_408233": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -10.8
+  },
+  "Lab_408218": {
+    "mean_volume_db": -36.4,
+    "max_volume_db": -7.4
+  },
+  "Lab_368352": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -7.4
+  },
+  "Lab_362487": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": -3.3
+  },
+  "Lab_113749": {
+    "mean_volume_db": -12.9,
+    "max_volume_db": -0.0
+  },
+  "Lab_141680": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_89809": {
+    "mean_volume_db": -36.7,
+    "max_volume_db": -2.3
+  },
+  "Lab_434231": {
+    "mean_volume_db": -30.8,
+    "max_volume_db": -0.2
+  },
+  "Lab_216878": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -5.7
+  },
+  "Lab_326291": {
+    "mean_volume_db": -17.9,
+    "max_volume_db": -1.2
+  },
+  "Lab_133889": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -12.5
+  },
+  "Lab_333575": {
+    "mean_volume_db": -36.9,
+    "max_volume_db": -7.2
+  },
+  "Lab_162169": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -1.1
+  },
+  "Lab_352669": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -4.6
+  },
+  "Lab_339646": {
+    "mean_volume_db": -35.8,
+    "max_volume_db": -11.9
+  },
+  "Lab_434269": {
+    "mean_volume_db": -34.5,
+    "max_volume_db": -0.7
+  },
+  "Lab_156615": {
+    "mean_volume_db": -17.6,
+    "max_volume_db": -3.5
+  },
+  "Lab_198334": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": 0.0
+  },
+  "Lab_347311": {
+    "mean_volume_db": -25.1,
+    "max_volume_db": -4.4
+  },
+  "Lab_204697": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -0.3
+  },
+  "Lab_233486": {
+    "mean_volume_db": -14.4,
+    "max_volume_db": -3.1
+  },
+  "Lab_400385": {
+    "mean_volume_db": -18.8,
+    "max_volume_db": -1.1
+  },
+  "Lab_94683": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -0.6
+  },
+  "Lab_250103": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": 0.0
+  },
+  "Lab_108842": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -1.4
+  },
+  "Lab_62940": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -0.6
+  },
+  "Lab_151837": {
+    "mean_volume_db": -26.0,
+    "max_volume_db": -5.0
+  },
+  "Lab_277721": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -5.5
+  },
+  "Lab_427598": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_211157": {
+    "mean_volume_db": -30.3,
+    "max_volume_db": -0.2
+  },
+  "Lab_401609": {
+    "mean_volume_db": -27.2,
+    "max_volume_db": -1.8
+  },
+  "Lab_378853": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -0.6
+  },
+  "Lab_86820": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -0.2
+  },
+  "Lab_193968": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -1.7
+  },
+  "Lab_164571": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -6.2
+  },
+  "Lab_15548": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -0.3
+  },
+  "Lab_41348": {
+    "mean_volume_db": -21.7,
+    "max_volume_db": -0.0
+  },
+  "Lab_174865": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -1.5
+  },
+  "Lab_219048": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -3.7
+  },
+  "Lab_164328": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_216276": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -3.5
+  },
+  "Lab_242376": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": -0.5
+  },
+  "Lab_204465": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -1.2
+  },
+  "Lab_23499": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -6.8
+  },
+  "Lab_45643": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -0.4
+  },
+  "Lab_69511": {
+    "mean_volume_db": -27.0,
+    "max_volume_db": -10.8
+  },
+  "Lab_67574": {
+    "mean_volume_db": -11.7,
+    "max_volume_db": -0.1
+  },
+  "Lab_35799": {
+    "mean_volume_db": -12.2,
+    "max_volume_db": 0.0
+  },
+  "Lab_406719": {
+    "mean_volume_db": -35.8,
+    "max_volume_db": -1.8
+  },
+  "Lab_344063": {
+    "mean_volume_db": -9.2,
+    "max_volume_db": -3.7
+  },
+  "Lab_264142": {
+    "mean_volume_db": -32.1,
+    "max_volume_db": -14.9
+  },
+  "Lab_219551": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": 0.0
+  },
+  "Lab_90553": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -1.7
+  },
+  "Lab_180675": {
+    "mean_volume_db": -23.1,
+    "max_volume_db": -1.6
+  },
+  "Lab_394128": {
+    "mean_volume_db": -9.8,
+    "max_volume_db": -0.1
+  },
+  "Lab_151065": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -11.1
+  },
+  "Lab_161969": {
+    "mean_volume_db": -17.5,
+    "max_volume_db": -0.3
+  },
+  "Lab_163731": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -1.7
+  },
+  "Lab_259671": {
+    "mean_volume_db": -33.4,
+    "max_volume_db": -2.3
+  },
+  "Animal_352983": {
+    "mean_volume_db": -21.5,
+    "max_volume_db": -1.1
+  },
+  "Animal_235878": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -7.8
+  },
+  "Animal_253680": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -6.2
+  },
+  "Animal_44526": {
+    "mean_volume_db": -13.9,
+    "max_volume_db": 0.0
+  },
+  "Animal_56868": {
+    "mean_volume_db": -23.9,
+    "max_volume_db": -7.2
+  },
+  "Animal_61259": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.3
+  },
+  "Animal_100892": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -0.2
+  },
+  "Animal_372523": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -0.8
+  },
+  "Animal_390502": {
+    "mean_volume_db": -23.2,
+    "max_volume_db": -1.5
+  },
+  "Animal_235915": {
+    "mean_volume_db": -35.3,
+    "max_volume_db": -8.0
+  },
+  "Animal_195871": {
+    "mean_volume_db": -30.1,
+    "max_volume_db": -10.1
+  },
+  "Animal_76196": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -1.2
+  },
+  "Animal_325466": {
+    "mean_volume_db": -22.2,
+    "max_volume_db": -9.8
+  },
+  "Animal_344678": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -4.4
+  },
+  "Animal_268018": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -21.2
+  },
+  "Animal_152815": {
+    "mean_volume_db": -22.5,
+    "max_volume_db": -1.5
+  },
+  "Animal_231550": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -1.1
+  },
+  "Animal_417713": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -24.5
+  },
+  "Animal_120960": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -3.3
+  },
+  "Animal_236081": {
+    "mean_volume_db": -29.5,
+    "max_volume_db": -17.4
+  },
+  "Animal_75656": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -5.9
+  },
+  "Animal_191433": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -1.5
+  },
+  "Animal_7973": {
+    "mean_volume_db": -30.2,
+    "max_volume_db": -1.1
+  },
+  "Animal_316917": {
+    "mean_volume_db": -28.2,
+    "max_volume_db": -1.4
+  },
+  "Animal_261336": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -3.6
+  },
+  "Animal_246013": {
+    "mean_volume_db": -14.9,
+    "max_volume_db": -1.4
+  },
+  "Animal_236272": {
+    "mean_volume_db": -28.7,
+    "max_volume_db": -7.2
+  },
+  "Animal_17161": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -2.0
+  },
+  "Animal_4912": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -0.3
+  },
+  "Animal_55133": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -22.5
+  },
+  "Animal_427085": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -10.3
+  },
+  "Animal_180941": {
+    "mean_volume_db": -24.1,
+    "max_volume_db": -1.0
+  },
+  "Animal_196127": {
+    "mean_volume_db": -31.3,
+    "max_volume_db": -8.9
+  },
+  "Animal_365179": {
+    "mean_volume_db": -27.0,
+    "max_volume_db": -2.1
+  },
+  "Animal_66763": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -3.0
+  },
+  "Animal_54058": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -4.3
+  },
+  "Animal_71012": {
+    "mean_volume_db": -31.2,
+    "max_volume_db": -11.0
+  },
+  "Animal_34593": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -4.5
+  },
+  "Animal_59343": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -1.9
+  },
+  "Animal_95568": {
+    "mean_volume_db": -16.4,
+    "max_volume_db": -1.3
+  },
+  "Animal_236263": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -9.9
+  },
+  "Animal_43822": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -0.8
+  },
+  "Nature_399218": {
+    "mean_volume_db": -35.8,
+    "max_volume_db": -6.5
+  },
+  "Nature_378636": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -1.4
+  },
+  "Nature_320300": {
+    "mean_volume_db": -32.6,
+    "max_volume_db": -10.8
+  },
+  "Nature_166817": {
+    "mean_volume_db": -37.6,
+    "max_volume_db": -8.1
+  },
+  "Nature_18047": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -0.3
+  },
+  "Nature_395222": {
+    "mean_volume_db": -22.4,
+    "max_volume_db": -5.0
+  },
+  "Nature_250646": {
+    "mean_volume_db": -21.6,
+    "max_volume_db": -0.6
+  },
+  "Nature_47988": {
+    "mean_volume_db": -32.9,
+    "max_volume_db": -1.1
+  },
+  "Nature_190661": {
+    "mean_volume_db": -13.3,
+    "max_volume_db": 0.0
+  },
+  "Nature_394406": {
+    "mean_volume_db": -32.0,
+    "max_volume_db": 0.0
+  },
+  "Nature_156327": {
+    "mean_volume_db": -34.3,
+    "max_volume_db": -0.7
+  },
+  "Nature_33943": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -0.0
+  },
+  "Nature_212787": {
+    "mean_volume_db": -16.0,
+    "max_volume_db": 0.0
+  },
+  "Nature_75642": {
+    "mean_volume_db": -16.7,
+    "max_volume_db": -0.3
+  },
+  "Nature_371915": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -5.3
+  },
+  "Nature_152676": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -0.9
+  },
+  "Nature_194558": {
+    "mean_volume_db": -20.0,
+    "max_volume_db": -3.8
+  },
+  "Nature_279007": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -1.9
+  },
+  "Nature_424787": {
+    "mean_volume_db": -24.5,
+    "max_volume_db": -1.5
+  },
+  "Nature_248236": {
+    "mean_volume_db": -34.8,
+    "max_volume_db": -0.4
+  },
+  "Nature_110323": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -8.3
+  },
+  "Nature_189504": {
+    "mean_volume_db": -33.7,
+    "max_volume_db": -1.6
+  },
+  "Nature_78796": {
+    "mean_volume_db": -25.7,
+    "max_volume_db": -0.3
+  },
+  "Nature_216269": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -7.1
+  },
+  "Nature_186540": {
+    "mean_volume_db": -34.3,
+    "max_volume_db": -1.0
+  },
+  "Nature_218067": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -0.6
+  },
+  "Nature_20787": {
+    "mean_volume_db": -29.2,
+    "max_volume_db": -9.7
+  },
+  "Nature_134963": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -1.2
+  },
+  "Nature_433602": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -1.1
+  },
+  "Nature_94179": {
+    "mean_volume_db": -25.8,
+    "max_volume_db": -1.0
+  },
+  "Nature_207571": {
+    "mean_volume_db": -30.7,
+    "max_volume_db": -1.3
+  },
+  "Nature_182711": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -0.0
+  },
+  "Nature_404762": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -15.5
+  },
+  "Nature_201507": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -19.5
+  },
+  "Nature_353954": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -1.3
+  },
+  "Nature_320050": {
+    "mean_volume_db": -12.3,
+    "max_volume_db": 0.0
+  },
+  "Nature_337475": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -6.3
+  },
+  "Nature_233412": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -1.4
+  },
+  "Nature_137258": {
+    "mean_volume_db": -33.3,
+    "max_volume_db": -5.0
+  },
+  "Nature_176724": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -1.5
+  },
+  "Nature_216392": {
+    "mean_volume_db": -34.2,
+    "max_volume_db": -13.3
+  },
+  "Nature_405135": {
+    "mean_volume_db": -17.7,
+    "max_volume_db": -1.5
+  },
+  "Nature_133846": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -1.3
+  },
+  "Nature_420314": {
+    "mean_volume_db": -16.6,
+    "max_volume_db": -3.2
+  },
+  "Nature_262582": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -7.0
+  },
+  "Nature_363868": {
+    "mean_volume_db": -27.6,
+    "max_volume_db": -1.3
+  },
+  "Nature_371839": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -14.1
+  },
+  "Nature_212826": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -0.7
+  },
+  "Nature_238059": {
+    "mean_volume_db": -37.0,
+    "max_volume_db": -3.2
+  },
+  "Nature_274308": {
+    "mean_volume_db": -26.9,
+    "max_volume_db": -1.5
+  },
+  "Nature_79866": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -1.3
+  },
+  "Nature_156308": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -0.6
+  },
+  "Urban_162836": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -3.2
+  },
+  "Urban_9218": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": 0.0
+  },
+  "Urban_92741": {
+    "mean_volume_db": -18.5,
+    "max_volume_db": -1.8
+  },
+  "Urban_264156": {
+    "mean_volume_db": -33.2,
+    "max_volume_db": -18.0
+  },
+  "Urban_165420": {
+    "mean_volume_db": -12.2,
+    "max_volume_db": -0.1
+  },
+  "Urban_270291": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -9.2
+  },
+  "Urban_335248": {
+    "mean_volume_db": -18.0,
+    "max_volume_db": -0.3
+  },
+  "Urban_412772": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -0.3
+  },
+  "Urban_399677": {
+    "mean_volume_db": -20.7,
+    "max_volume_db": -0.2
+  },
+  "Urban_233464": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -6.2
+  },
+  "Urban_242741": {
+    "mean_volume_db": -10.4,
+    "max_volume_db": -0.3
+  },
+  "Urban_431841": {
+    "mean_volume_db": -33.8,
+    "max_volume_db": -21.4
+  },
+  "Urban_250048": {
+    "mean_volume_db": -20.6,
+    "max_volume_db": -14.8
+  },
+  "Urban_152661": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -0.3
+  },
+  "Urban_203720": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -9.7
+  },
+  "Urban_29558": {
+    "mean_volume_db": -28.1,
+    "max_volume_db": -11.5
+  },
+  "Urban_259582": {
+    "mean_volume_db": -22.3,
+    "max_volume_db": -1.3
+  },
+  "Urban_377521": {
+    "mean_volume_db": -23.6,
+    "max_volume_db": -1.8
+  },
+  "Urban_322475": {
+    "mean_volume_db": -27.9,
+    "max_volume_db": -9.5
+  },
+  "Urban_353178": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -0.2
+  },
+  "Urban_62589": {
+    "mean_volume_db": -27.3,
+    "max_volume_db": -0.3
+  },
+  "Urban_212397": {
+    "mean_volume_db": -16.2,
+    "max_volume_db": -1.3
+  },
+  "Urban_50415": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -0.1
+  },
+  "Urban_250008": {
+    "mean_volume_db": -28.3,
+    "max_volume_db": -2.1
+  },
+  "Urban_165396": {
+    "mean_volume_db": -14.8,
+    "max_volume_db": -0.2
+  },
+  "Urban_324579": {
+    "mean_volume_db": -3.3,
+    "max_volume_db": -0.2
+  },
+  "Urban_369049": {
+    "mean_volume_db": -28.6,
+    "max_volume_db": -19.5
+  },
+  "Urban_134791": {
+    "mean_volume_db": -27.1,
+    "max_volume_db": -2.1
+  },
+  "Urban_410851": {
+    "mean_volume_db": -14.6,
+    "max_volume_db": -1.7
+  },
+  "Music_183055": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -3.5
+  },
+  "Music_138791": {
+    "mean_volume_db": -28.0,
+    "max_volume_db": -3.2
+  },
+  "Music_110414": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": -0.2
+  },
+  "Music_381178": {
+    "mean_volume_db": -18.2,
+    "max_volume_db": -3.1
+  },
+  "Music_229346": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -9.1
+  },
+  "Music_145997": {
+    "mean_volume_db": -27.0,
+    "max_volume_db": -0.3
+  },
+  "Music_175502": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": -6.2
+  },
+  "Music_24840": {
+    "mean_volume_db": -28.5,
+    "max_volume_db": -0.5
+  },
+  "Music_76657": {
+    "mean_volume_db": -21.8,
+    "max_volume_db": -1.3
+  },
+  "Music_145948": {
+    "mean_volume_db": -33.0,
+    "max_volume_db": -2.5
+  },
+  "Music_355077": {
+    "mean_volume_db": -26.3,
+    "max_volume_db": -13.5
+  },
+  "Music_210669": {
+    "mean_volume_db": -26.1,
+    "max_volume_db": -3.0
+  },
+  "Music_142069": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -0.3
+  },
+  "Music_426035": {
+    "mean_volume_db": -19.3,
+    "max_volume_db": -0.7
+  },
+  "Music_58657": {
+    "mean_volume_db": -14.2,
+    "max_volume_db": -3.2
+  },
+  "Music_53860": {
+    "mean_volume_db": -24.7,
+    "max_volume_db": -1.5
+  },
+  "Music_245064": {
+    "mean_volume_db": -11.2,
+    "max_volume_db": -1.6
+  },
+  "Music_374097": {
+    "mean_volume_db": -20.4,
+    "max_volume_db": -1.6
+  },
+  "Music_35084": {
+    "mean_volume_db": -10.4,
+    "max_volume_db": 0.0
+  },
+  "Lab_238245": {
+    "mean_volume_db": -6.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_261391": {
+    "mean_volume_db": -35.1,
+    "max_volume_db": -3.8
+  },
+  "Lab_434423": {
+    "mean_volume_db": -14.3,
+    "max_volume_db": -0.3
+  },
+  "Lab_233605": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.0
+  },
+  "Lab_65294": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -0.5
+  },
+  "Lab_372346": {
+    "mean_volume_db": -19.8,
+    "max_volume_db": -4.9
+  },
+  "Lab_114042": {
+    "mean_volume_db": -25.9,
+    "max_volume_db": -6.3
+  },
+  "Lab_120528": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -1.4
+  },
+  "Lab_104000": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -5.0
+  },
+  "Lab_268826": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -1.1
+  },
+  "Human_156839": {
+    "mean_volume_db": -24.9,
+    "max_volume_db": -1.4
+  },
+  "Human_19113": {
+    "mean_volume_db": -21.0,
+    "max_volume_db": -1.4
+  },
+  "Human_743356": {
+    "mean_volume_db": -20.5,
+    "max_volume_db": -0.3
+  },
+  "Human_155904": {
+    "mean_volume_db": -35.1,
+    "max_volume_db": -6.4
+  },
+  "Human_44277": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -0.8
+  },
+  "Human_399624": {
+    "mean_volume_db": -18.9,
+    "max_volume_db": -0.2
+  },
+  "Human_254466": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": 0.0
+  },
+  "Human_381371": {
+    "mean_volume_db": -23.4,
+    "max_volume_db": -1.6
+  },
+  "Human_317439": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -1.4
+  },
+  "Human_554230": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -10.6
+  },
+  "Human_554226": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": -10.6
+  },
+  "Human_554225": {
+    "mean_volume_db": -26.6,
+    "max_volume_db": -9.6
+  },
+  "Human_619075": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -0.2
+  },
+  "Human_95530": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -0.0
+  },
+  "Human_360460": {
+    "mean_volume_db": -26.5,
+    "max_volume_db": -0.3
+  },
+  "Human_204604": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": 0.0
+  },
+  "Human_172188": {
+    "mean_volume_db": -17.4,
+    "max_volume_db": 0.0
+  },
+  "Human_108017": {
+    "mean_volume_db": -19.9,
+    "max_volume_db": -2.5
+  },
+  "Human_181171": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -6.9
+  },
+  "Human_218411": {
+    "mean_volume_db": -18.1,
+    "max_volume_db": 0.0
+  },
+  "Human_826257": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -2.3
+  },
+  "Human_124795": {
+    "mean_volume_db": -45.4,
+    "max_volume_db": -29.5
+  },
+  "Human_219903": {
+    "mean_volume_db": -44.8,
+    "max_volume_db": -27.7
+  },
+  "Human_363582": {
+    "mean_volume_db": -40.5,
+    "max_volume_db": -23.6
+  },
+  "Human_353649": {
+    "mean_volume_db": -41.4,
+    "max_volume_db": -20.3
+  },
+  "Human_130037": {
+    "mean_volume_db": -42.2,
+    "max_volume_db": -2.1
+  },
+  "Human_353154": {
+    "mean_volume_db": -40.7,
+    "max_volume_db": -20.4
+  },
+  "Human_241905": {
+    "mean_volume_db": -40.4,
+    "max_volume_db": -8.7
+  },
+  "Human_407688": {
+    "mean_volume_db": -44.8,
+    "max_volume_db": -20.3
+  },
+  "Human_274349": {
+    "mean_volume_db": -47.6,
+    "max_volume_db": -31.1
+  },
+  "Human_367737": {
+    "mean_volume_db": -65.7,
+    "max_volume_db": -41.7
+  },
+  "Human_85536": {
+    "mean_volume_db": -42.4,
+    "max_volume_db": -13.5
+  },
+  "Human_406647": {
+    "mean_volume_db": -67.0,
+    "max_volume_db": -40.3
+  },
+  "Human_218185": {
+    "mean_volume_db": -38.2,
+    "max_volume_db": -15.5
+  },
+  "Human_364451": {
+    "mean_volume_db": -24.8,
+    "max_volume_db": -0.3
+  },
+  "Human_132814": {
+    "mean_volume_db": -41.0,
+    "max_volume_db": -16.3
+  },
+  "Human_272440": {
+    "mean_volume_db": -48.4,
+    "max_volume_db": -9.1
+  },
+  "Human_154681": {
+    "mean_volume_db": -50.3,
+    "max_volume_db": -17.3
+  },
+  "Human_393010": {
+    "mean_volume_db": -44.3,
+    "max_volume_db": -24.1
+  },
+  "Human_138338": {
+    "mean_volume_db": -51.6,
+    "max_volume_db": -28.9
+  },
+  "Human_319019": {
+    "mean_volume_db": -45.7,
+    "max_volume_db": -22.3
+  },
+  "Human_36346": {
+    "mean_volume_db": -55.9,
+    "max_volume_db": -24.5
+  },
+  "Human_377056": {
+    "mean_volume_db": -40.8,
+    "max_volume_db": -13.2
+  },
+  "Human_427722": {
+    "mean_volume_db": -42.8,
+    "max_volume_db": -24.0
+  },
+  "Human_198263": {
+    "mean_volume_db": -47.7,
+    "max_volume_db": -30.5
+  },
+  "Human_377054": {
+    "mean_volume_db": -42.8,
+    "max_volume_db": -13.2
+  },
+  "Human_19189": {
+    "mean_volume_db": -13.4,
+    "max_volume_db": -0.1
+  },
+  "Human_167578": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -4.0
+  },
+  "Human_170623": {
+    "mean_volume_db": -16.9,
+    "max_volume_db": -0.4
+  },
+  "Human_176913": {
+    "mean_volume_db": -46.4,
+    "max_volume_db": -33.4
+  },
+  "Human_323696": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -12.6
+  },
+  "Human_151255": {
+    "mean_volume_db": -32.8,
+    "max_volume_db": -6.5
+  },
+  "Human_196084": {
+    "mean_volume_db": -30.6,
+    "max_volume_db": -10.2
+  },
+  "Human_215322": {
+    "mean_volume_db": -17.1,
+    "max_volume_db": -2.0
+  },
+  "Human_315940": {
+    "mean_volume_db": -24.0,
+    "max_volume_db": -0.3
+  },
+  "Human_215368": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -4.5
+  },
+  "Human_411170": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -3.3
+  },
+  "Human_198256": {
+    "mean_volume_db": -35.5,
+    "max_volume_db": -15.3
+  },
+  "Human_348749": {
+    "mean_volume_db": -31.8,
+    "max_volume_db": -4.1
+  },
+  "Human_341282": {
+    "mean_volume_db": -18.6,
+    "max_volume_db": -5.1
+  },
+  "Human_154689": {
+    "mean_volume_db": -51.1,
+    "max_volume_db": -30.1
+  },
+  "Human_88707": {
+    "mean_volume_db": -29.8,
+    "max_volume_db": -3.1
+  },
+  "Human_30035": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -1.3
+  },
+  "Human_343987": {
+    "mean_volume_db": -15.4,
+    "max_volume_db": -1.2
+  },
+  "Human_377395": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.3
+  },
+  "Human_22722": {
+    "mean_volume_db": -30.4,
+    "max_volume_db": -16.6
+  },
+  "Human_387406": {
+    "mean_volume_db": -18.7,
+    "max_volume_db": -9.2
+  },
+  "Human_399765": {
+    "mean_volume_db": -27.5,
+    "max_volume_db": -6.8
+  },
+  "Human_53663": {
+    "mean_volume_db": -33.5,
+    "max_volume_db": -7.2
+  },
+  "Human_216127": {
+    "mean_volume_db": -43.7,
+    "max_volume_db": -0.0
+  },
+  "Human_416920": {
+    "mean_volume_db": -39.2,
+    "max_volume_db": -8.7
+  },
+  "Human_325371": {
+    "mean_volume_db": -30.5,
+    "max_volume_db": -10.7
+  },
+  "Human_87797": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -0.2
+  },
+  "Human_369834": {
+    "mean_volume_db": -25.3,
+    "max_volume_db": -3.6
+  },
+  "Human_187910": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -6.9
+  },
+  "Human_201655": {
+    "mean_volume_db": -23.8,
+    "max_volume_db": -2.4
+  },
+  "Human_46372": {
+    "mean_volume_db": -36.0,
+    "max_volume_db": -2.3
+  },
+  "Human_381355": {
+    "mean_volume_db": -15.1,
+    "max_volume_db": 0.0
+  },
+  "Human_232664": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -8.3
+  },
+  "Human_47135": {
+    "mean_volume_db": -27.4,
+    "max_volume_db": 0.0
+  },
+  "Human_416510": {
+    "mean_volume_db": -22.9,
+    "max_volume_db": -0.1
+  },
+  "Human_252223": {
+    "mean_volume_db": -9.5,
+    "max_volume_db": -0.7
+  },
+  "Human_343478": {
+    "mean_volume_db": -20.8,
+    "max_volume_db": -1.1
+  },
+  "Human_250936": {
+    "mean_volume_db": -18.4,
+    "max_volume_db": 0.0
+  },
+  "Human_253603": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -0.8
+  },
+  "Human_201733": {
+    "mean_volume_db": -16.8,
+    "max_volume_db": 0.0
+  },
+  "Human_343943": {
+    "mean_volume_db": -19.0,
+    "max_volume_db": -0.5
+  },
+  "Human_19115": {
+    "mean_volume_db": -21.2,
+    "max_volume_db": -1.7
+  },
+  "Human_213209": {
+    "mean_volume_db": -21.3,
+    "max_volume_db": -0.3
+  },
+  "Human_351994": {
+    "mean_volume_db": -24.4,
+    "max_volume_db": -5.9
+  },
+  "Human_347231": {
+    "mean_volume_db": -34.0,
+    "max_volume_db": -0.2
+  },
+  "Human_109625": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -7.4
+  },
+  "Human_333267": {
+    "mean_volume_db": -19.2,
+    "max_volume_db": -0.5
+  },
+  "Human_323448": {
+    "mean_volume_db": -19.5,
+    "max_volume_db": -1.6
+  },
+  "Human_242905": {
+    "mean_volume_db": -16.5,
+    "max_volume_db": -1.3
+  },
+  "Human_21183": {
+    "mean_volume_db": -40.5,
+    "max_volume_db": -10.7
+  },
+  "Human_9982": {
+    "mean_volume_db": -37.8,
+    "max_volume_db": -21.5
+  },
+  "Human_150955": {
+    "mean_volume_db": -15.0,
+    "max_volume_db": -0.4
+  },
+  "Human_404544": {
+    "mean_volume_db": -28.9,
+    "max_volume_db": -2.0
+  },
+  "Human_316948": {
+    "mean_volume_db": -20.3,
+    "max_volume_db": -3.6
+  },
+  "Human_216369": {
+    "mean_volume_db": -29.4,
+    "max_volume_db": -6.8
+  },
+  "Human_81087": {
+    "mean_volume_db": -15.7,
+    "max_volume_db": -0.2
+  },
+  "Human_32939": {
+    "mean_volume_db": -36.1,
+    "max_volume_db": -10.1
+  },
+  "Human_108513": {
+    "mean_volume_db": -21.4,
+    "max_volume_db": -1.3
+  },
+  "Human_406645": {
+    "mean_volume_db": -58.7,
+    "max_volume_db": -32.1
+  },
+  "Human_257915": {
+    "mean_volume_db": -42.1,
+    "max_volume_db": -1.3
+  },
+  "Human_150969": {
+    "mean_volume_db": -13.1,
+    "max_volume_db": -0.6
+  },
+  "Human_184879": {
+    "mean_volume_db": -51.2,
+    "max_volume_db": -32.2
+  },
+  "Human_157038": {
+    "mean_volume_db": -32.7,
+    "max_volume_db": -2.0
+  },
+  "Human_273111": {
+    "mean_volume_db": -33.1,
+    "max_volume_db": -1.3
+  },
+  "Human_82800": {
+    "mean_volume_db": -13.9,
+    "max_volume_db": 0.0
+  },
+  "Human_277552": {
+    "mean_volume_db": -22.8,
+    "max_volume_db": -1.0
+  },
+  "Human_404546": {
+    "mean_volume_db": -27.8,
+    "max_volume_db": -1.3
+  },
+  "Human_182017": {
+    "mean_volume_db": -43.9,
+    "max_volume_db": -22.4
+  },
+  "Human_88691": {
+    "mean_volume_db": -42.2,
+    "max_volume_db": -3.7
+  },
+  "Human_194260": {
+    "mean_volume_db": -20.9,
+    "max_volume_db": -1.0
+  },
+  "Human_346795": {
+    "mean_volume_db": -37.4,
+    "max_volume_db": -8.4
+  },
+  "Human_267159": {
+    "mean_volume_db": -38.0,
+    "max_volume_db": -14.6
+  },
+  "Human_60801": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -9.8
+  },
+  "Human_273112": {
+    "mean_volume_db": -38.5,
+    "max_volume_db": -1.3
+  },
+  "Human_241896": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -5.2
+  },
+  "Human_335233": {
+    "mean_volume_db": -36.3,
+    "max_volume_db": -22.7
+  },
+  "Human_231893": {
+    "mean_volume_db": -34.6,
+    "max_volume_db": -0.5
+  },
+  "Human_101157": {
+    "mean_volume_db": -29.7,
+    "max_volume_db": -9.0
+  },
+  "Human_254474": {
+    "mean_volume_db": -19.4,
+    "max_volume_db": -0.2
+  },
+  "Human_15390": {
+    "mean_volume_db": -29.0,
+    "max_volume_db": -0.4
+  },
+  "Human_273409": {
+    "mean_volume_db": -23.7,
+    "max_volume_db": -1.3
+  },
+  "Lab_372091": {
+    "mean_volume_db": -42.3,
+    "max_volume_db": -21.4
+  },
+  "Lab_238420": {
+    "mean_volume_db": -39.2,
+    "max_volume_db": -12.2
+  },
+  "Lab_216290": {
+    "mean_volume_db": -46.8,
+    "max_volume_db": -7.0
+  },
+  "Lab_90545": {
+    "mean_volume_db": -53.8,
+    "max_volume_db": -24.3
+  },
+  "Lab_193955": {
+    "mean_volume_db": -44.8,
+    "max_volume_db": -10.5
+  },
+  "Lab_193973": {
+    "mean_volume_db": -45.7,
+    "max_volume_db": -0.5
+  },
+  "Lab_339638": {
+    "mean_volume_db": -42.1,
+    "max_volume_db": -16.8
+  },
+  "Lab_140617": {
+    "mean_volume_db": -49.7,
+    "max_volume_db": -30.0
+  },
+  "Lab_334963": {
+    "mean_volume_db": -58.4,
+    "max_volume_db": -32.0
+  },
+  "Lab_341420": {
+    "mean_volume_db": -39.7,
+    "max_volume_db": -14.2
+  },
+  "Lab_14363": {
+    "mean_volume_db": -42.6,
+    "max_volume_db": -19.1
+  },
+  "Lab_10441": {
+    "mean_volume_db": -50.0,
+    "max_volume_db": -20.9
+  },
+  "Lab_268575": {
+    "mean_volume_db": -48.4,
+    "max_volume_db": -14.5
+  },
+  "Lab_382823": {
+    "mean_volume_db": -51.9,
+    "max_volume_db": -29.9
+  },
+  "Lab_193975": {
+    "mean_volume_db": -43.2,
+    "max_volume_db": -12.0
+  },
+  "Lab_110459": {
+    "mean_volume_db": -41.7,
+    "max_volume_db": -0.2
+  },
+  "Lab_216299": {
+    "mean_volume_db": -44.7,
+    "max_volume_db": -7.6
+  },
+  "Lab_90547": {
+    "mean_volume_db": -50.7,
+    "max_volume_db": -23.0
+  },
+  "Lab_153339": {
+    "mean_volume_db": -49.6,
+    "max_volume_db": -23.3
+  },
+  "Lab_389702": {
+    "mean_volume_db": -51.9,
+    "max_volume_db": -24.0
+  },
+  "Lab_75153": {
+    "mean_volume_db": -41.7,
+    "max_volume_db": -4.2
+  },
+  "Lab_339654": {
+    "mean_volume_db": -43.1,
+    "max_volume_db": -25.1
+  },
+  "Lab_264136": {
+    "mean_volume_db": -39.0,
+    "max_volume_db": -23.4
+  },
+  "Lab_235463": {
+    "mean_volume_db": -44.4,
+    "max_volume_db": -25.1
+  },
+  "Lab_366179": {
+    "mean_volume_db": -39.1,
+    "max_volume_db": -7.4
+  },
+  "Lab_216286": {
+    "mean_volume_db": -42.3,
+    "max_volume_db": -6.9
+  },
+  "Lab_88922": {
+    "mean_volume_db": -39.5,
+    "max_volume_db": -7.1
+  },
+  "Lab_162431": {
+    "mean_volume_db": -16.4,
+    "max_volume_db": 0.0
+  },
+  "Lab_410888": {
+    "mean_volume_db": -28.8,
+    "max_volume_db": -0.2
+  },
+  "Lab_51711": {
+    "mean_volume_db": -24.6,
+    "max_volume_db": -0.3
+  },
+  "Lab_203380": {
+    "mean_volume_db": -21.9,
+    "max_volume_db": -2.9
+  },
+  "Lab_90557": {
+    "mean_volume_db": -43.1,
+    "max_volume_db": -15.8
+  },
+  "Lab_383988": {
+    "mean_volume_db": -25.4,
+    "max_volume_db": -3.3
+  },
+  "Lab_184651": {
+    "mean_volume_db": -10.0,
+    "max_volume_db": 0.0
+  },
+  "Lab_216277": {
+    "mean_volume_db": -32.5,
+    "max_volume_db": -4.3
+  },
+  "Lab_349786": {
+    "mean_volume_db": -25.2,
+    "max_volume_db": -2.4
+  },
+  "Lab_235254": {
+    "mean_volume_db": -39.5,
+    "max_volume_db": -13.9
+  },
+  "Lab_377640": {
+    "mean_volume_db": -20.5,
+    "max_volume_db": 0.0
+  },
+  "Lab_145206": {
+    "mean_volume_db": -16.3,
+    "max_volume_db": 0.0
+  },
+  "Lab_341413": {
+    "mean_volume_db": -29.3,
+    "max_volume_db": -8.5
+  },
+  "Lab_267302": {
+    "mean_volume_db": -20.1,
+    "max_volume_db": -0.4
+  },
+  "Lab_434228": {
+    "mean_volume_db": -36.5,
+    "max_volume_db": -0.4
+  },
+  "Lab_23090": {
+    "mean_volume_db": -22.6,
+    "max_volume_db": -2.2
+  },
+  "Lab_238241": {
+    "mean_volume_db": -6.7,
+    "max_volume_db": 0.0
+  },
+  "Lab_180676": {
+    "mean_volume_db": -43.0,
+    "max_volume_db": -20.2
+  },
+  "Lab_57479": {
+    "mean_volume_db": -15.5,
+    "max_volume_db": -0.3
+  },
+  "Lab_352065": {
+    "mean_volume_db": -23.0,
+    "max_volume_db": -1.2
+  },
+  "Lab_90969": {
+    "mean_volume_db": -44.3,
+    "max_volume_db": -21.7
+  },
+  "Lab_90551": {
+    "mean_volume_db": -44.1,
+    "max_volume_db": -17.4
+  },
+  "Lab_434427": {
+    "mean_volume_db": -12.8,
+    "max_volume_db": -0.3
+  },
+  "Lab_365073": {
+    "mean_volume_db": -35.7,
+    "max_volume_db": -6.5
+  },
+  "Lab_140222": {
+    "mean_volume_db": -31.4,
+    "max_volume_db": -2.3
+  },
+  "Lab_67560": {
+    "mean_volume_db": -18.3,
+    "max_volume_db": -4.3
+  }
+}
