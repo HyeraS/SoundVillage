@@ -7,6 +7,7 @@ import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
 import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
+import { isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -28,22 +29,20 @@ function buildZoneMap(sounds) {
 }
 const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 
-// User study용 전체 접근 참여자 ID — 이 ID로 입장하면 그룹/마을/블록 잠금을 모두 무시
-const RESEARCHER_ID = 'RESEARCHER'
-
-// 그룹 필터: groupId가 없거나 unrestricted면 전체, 있으면 해당 그룹만
-function getGroupSounds(zone, groupId, unrestricted = false) {
+// 그룹 필터: groupId가 없으면 전체, 있으면 해당 그룹만
+// 연구용 접근 ID를 쓰면 모든 소리를 바로 볼 수 있도록 우회한다.
+function getGroupSounds(zone, groupId, studyMode = false) {
   const all = ZONE_SOUND_MAP[zone] || []
-  if (unrestricted || !groupId) return all
+  if (studyMode || !groupId) return all
   const g = groupId.trim().toUpperCase().replace(/^G/i, '')  // "G1"→"1", "A"→"A"
   const label = g === '1' ? 'A' : g === '2' ? 'B' : g      // 그룹 번호 → 라벨 변환
   return all.filter(s => !s.group || s.group === label)
 }
 
 // Museum용: 다른 그룹 사운드 전체 목록
-function getOtherGroupSounds(groupId, unrestricted = false) {
+function getOtherGroupSounds(groupId, studyMode = false) {
   const all = soundMetadata.sounds || []
-  if (unrestricted || !groupId) return all
+  if (studyMode || !groupId) return all
   const g = groupId.trim().toUpperCase().replace(/^G/i, '')
   const myLabel    = g === '1' ? 'A' : g === '2' ? 'B' : g
   if (!myLabel) return all
@@ -63,9 +62,6 @@ export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
-
-  // User study 전체 접근 모드 — RESEARCHER_ID로 입장 시 그룹/마을/블록 잠금 무시
-  const isResearcher = participantId === RESEARCHER_ID
 
   const [activeZone,    setActiveZone]    = useState(null)
   const [activeSound,   setActiveSound]   = useState(null)
@@ -92,6 +88,7 @@ export default function HomePage() {
   // 카운트
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
+  const studyAccessEnabled = isStudyAccessParticipantId(participantId)
 
   /* ── 카운트 갱신 (현재 참여자 + 그룹 기준) ── */
   const refreshCounts = useCallback(async () => {
@@ -101,14 +98,14 @@ export default function HomePage() {
       setTotalCount(total)
       const entries = await Promise.all(
         ZONES.map(async z => {
-          const zoneMax = getGroupSounds(z, groupId, isResearcher).length || 100
+          const zoneMax = getGroupSounds(z, groupId, studyAccessEnabled).length || 100
           const count   = await getCountByZone(z, participantId)
           return [z, Math.min(count / zoneMax, 1)]
         })
       )
       setZoneProgress(Object.fromEntries(entries))
     } catch {}
-  }, [participantId, groupId, isResearcher])
+  }, [participantId, groupId, studyAccessEnabled])
 
   useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
 
@@ -121,9 +118,10 @@ export default function HomePage() {
 
   /* ── StartPanel → WorldMap ── */
   const handleStart = (pid, gid) => {
+    const enabled = isStudyAccessParticipantId(pid)
     setParticipantId(pid)
     setGroupId(gid)
-    if (pid === RESEARCHER_ID) setVillagesUnlocked(true)
+    setVillagesUnlocked(enabled)
     setScreen('world')
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
@@ -141,7 +139,11 @@ export default function HomePage() {
 
   /* ── Music 구역 1 전사 완료 여부 확인 → 나머지 마을 잠금 해제 ── */
   const checkVillagesUnlocked = useCallback(async () => {
-    if (!participantId || isResearcher) return
+    if (!participantId) return
+    if (studyAccessEnabled) {
+      setVillagesUnlocked(true)
+      return
+    }
     try {
       const dbIds = await getAnnotatedByParticipantZone(participantId, FIRST_ZONE)
       const all   = soundMetadata.sounds
@@ -150,7 +152,7 @@ export default function HomePage() {
         const found = findSoundByDbId(dbId, all)
         if (found) annotatedSet.add(found.sound_id)
       }
-      const firstZoneSounds = getGroupSounds(FIRST_ZONE, groupId)
+      const firstZoneSounds = getGroupSounds(FIRST_ZONE, groupId, studyAccessEnabled)
       const block1 = firstZoneSounds.filter(s => (s.block || 1) === 1)
       if (block1.length > 0 && block1.every(s => annotatedSet.has(s.sound_id))) {
         setVillagesUnlocked(true)
@@ -158,7 +160,7 @@ export default function HomePage() {
     } catch (e) {
       console.error('[Village] 잠금 상태 확인 오류:', e)
     }
-  }, [participantId, groupId, isResearcher, findSoundByDbId])
+  }, [participantId, groupId, studyAccessEnabled, findSoundByDbId])
 
   useEffect(() => { if (participantId) checkVillagesUnlocked() }, [participantId, checkVillagesUnlocked])
 
@@ -193,16 +195,18 @@ export default function HomePage() {
       }
 
       // 현재 언락된 블록 계산 (완료된 블록의 다음 블록)
-      const zoneSounds = getGroupSounds(zone, groupId, isResearcher)
+      const zoneSounds = getGroupSounds(zone, groupId, studyAccessEnabled)
       const maxBlock   = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
-      let currentBlock = 1
-      for (let b = 1; b <= maxBlock; b++) {
-        const bs = zoneSounds.filter(s => (s.block || 1) === b)
-        if (bs.length > 0 && bs.every(s => annotatedSet.has(s.sound_id))) {
-          currentBlock = b + 1
-        } else break
+      let currentBlock = studyAccessEnabled ? maxBlock : 1
+      if (!studyAccessEnabled) {
+        for (let b = 1; b <= maxBlock; b++) {
+          const bs = zoneSounds.filter(s => (s.block || 1) === b)
+          if (bs.length > 0 && bs.every(s => annotatedSet.has(s.sound_id))) {
+            currentBlock = b + 1
+          } else break
+        }
+        currentBlock = Math.min(currentBlock, maxBlock)
       }
-      currentBlock = isResearcher ? maxBlock : Math.min(currentBlock, maxBlock)
 
       setUnlockedBlock(prev => ({ ...prev, [zone]: currentBlock }))
       setCollectedIds(annotatedSet)
@@ -213,7 +217,7 @@ export default function HomePage() {
     }
     setZoneLoading(false)
     setScreen('zone')
-  }, [participantId, groupId, isResearcher, findSoundByDbId])
+  }, [participantId, groupId, studyAccessEnabled, findSoundByDbId])
 
   /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
   const handleExitZone = useCallback(() => {
@@ -235,7 +239,7 @@ export default function HomePage() {
     if (!all || all.length === 0) return
 
     // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
-    const otherGroupSounds = getOtherGroupSounds(groupId, isResearcher)
+    const otherGroupSounds = getOtherGroupSounds(groupId, studyAccessEnabled)
     const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
 
     let sound = null
@@ -270,7 +274,7 @@ export default function HomePage() {
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
-  }, [groupId, participantId, isResearcher, findSoundByDbId, resolveSoundFromDbId])
+  }, [groupId, participantId, studyAccessEnabled, findSoundByDbId, resolveSoundFromDbId])
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
   const handleAnnotateComplete = useCallback(() => {
@@ -280,7 +284,7 @@ export default function HomePage() {
     // 블록 완료 여부 체크
     if (activeSound && activeZone) {
       const currentBlock = unlockedBlock[activeZone] || 1
-      const zoneSounds   = getGroupSounds(activeZone, groupId, isResearcher)
+      const zoneSounds   = getGroupSounds(activeZone, groupId, studyAccessEnabled)
       const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
       const blockSounds  = zoneSounds.filter(s => (s.block || 1) === currentBlock)
       const allDone      = blockSounds.every(s => newCollected.has(s.sound_id))
@@ -302,7 +306,7 @@ export default function HomePage() {
     setMyExpression('')
     setScreen('zone')
     refreshCounts()
-  }, [activeSound, activeZone, collectedIds, groupId, isResearcher, unlockedBlock, villagesUnlocked, refreshCounts])
+  }, [activeSound, activeZone, collectedIds, groupId, studyAccessEnabled, unlockedBlock, villagesUnlocked, refreshCounts])
 
   /* ── SoundMuseum 완료 → WorldMap 복귀 (+ "오늘은 여기까지" 토스트) ── */
   const handleMuseumDone = useCallback(() => {
@@ -351,7 +355,7 @@ export default function HomePage() {
           onEnterMuseum={handleEnterMuseum}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
-          lockedZones={(villagesUnlocked || isResearcher) ? [] : ZONES_LOCKED_AT_START}
+          lockedZones={studyAccessEnabled || villagesUnlocked ? [] : ZONES_LOCKED_AT_START}
         />
         {/* Zone 진입 로딩 */}
         {zoneLoading && (
@@ -441,7 +445,7 @@ export default function HomePage() {
   // 4. Zone 내부 맵 (+ annotation 오버레이)
   if (screen === 'zone' || screen === 'annotate') {
     const currentBlock = unlockedBlock[activeZone] || 1
-    const zoneSounds   = getGroupSounds(activeZone, groupId, isResearcher)
+    const zoneSounds   = getGroupSounds(activeZone, groupId, studyAccessEnabled)
     const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
     return (
       <>

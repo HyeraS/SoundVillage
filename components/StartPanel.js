@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
 
 /* ─────────────────────────────────────────────
    Phase 2 StartPanel — Cozy 낮 감성, 마을 테마
@@ -8,6 +9,7 @@ export default function StartPanel({ onStart }) {
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
   const [focused,       setFocused]       = useState(null)
+  const studyAccessPreview = isStudyAccessParticipantId(participantId)
 
   function handleStart() {
     if (!participantId.trim() || !groupId.trim()) return
@@ -165,6 +167,23 @@ export default function StartPanel({ onStart }) {
             <option value="A">그룹 A</option>
             <option value="B">그룹 B</option>
           </select>
+        </div>
+
+        <div style={{
+          marginBottom: '16px',
+          padding: '10px 12px',
+          borderRadius: '10px',
+          background: studyAccessPreview ? '#E8F5D6' : '#FFF7E6',
+          border: `1px solid ${studyAccessPreview ? '#7BC850' : '#E2C58A'}`,
+          color: '#5A4A2A',
+          fontSize: '11px',
+          lineHeight: 1.6,
+        }}>
+          {studyAccessPreview ? (
+            <><strong>연구용 전체 접근 모드</strong><br/>모든 구역과 음원에 바로 진입합니다.</>
+          ) : (
+            <>연구용 전체 접근 ID: <strong>ALLAUDIO</strong> 또는 <strong>ACCESS-ALL</strong><br/>입력하면 모든 음원에 접근할 수 있어요.</>
+          )}
         </div>
 
         {/* 시작 버튼 — 나무 간판 스타일 */}
