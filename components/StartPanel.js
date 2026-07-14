@@ -169,22 +169,22 @@ export default function StartPanel({ onStart }) {
           </select>
         </div>
 
-        <div style={{
-          marginBottom: '16px',
-          padding: '10px 12px',
-          borderRadius: '10px',
-          background: studyAccessPreview ? '#E8F5D6' : '#FFF7E6',
-          border: `1px solid ${studyAccessPreview ? '#7BC850' : '#E2C58A'}`,
-          color: '#5A4A2A',
-          fontSize: '11px',
-          lineHeight: 1.6,
-        }}>
-          {studyAccessPreview ? (
-            <><strong>연구용 전체 접근 모드</strong><br/>모든 구역과 음원에 바로 진입합니다.</>
-          ) : (
-            <>연구용 전체 접근 ID: <strong>ALLAUDIO</strong> 또는 <strong>ACCESS-ALL</strong><br/>입력하면 모든 음원에 접근할 수 있어요.</>
-          )}
-        </div>
+        {/* 연구용 접근 모드일 때만 확인용으로 표시 — ID 목록 자체는 절대 노출하지 않는다
+            (일반 참여자 화면에 힌트가 보이면 그룹/마을 잠금 설계가 무력화됨) */}
+        {studyAccessPreview && (
+          <div style={{
+            marginBottom: '16px',
+            padding: '10px 12px',
+            borderRadius: '10px',
+            background: '#E8F5D6',
+            border: '1px solid #7BC850',
+            color: '#5A4A2A',
+            fontSize: '11px',
+            lineHeight: 1.6,
+          }}>
+            <strong>연구용 전체 접근 모드</strong><br/>모든 구역과 음원에 바로 진입합니다.
+          </div>
+        )}
 
         {/* 시작 버튼 — 나무 간판 스타일 */}
         <button
