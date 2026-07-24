@@ -15,7 +15,7 @@
 - 소리를 수집하면 **AnnotationPanel**(Stage 1)이 열려 의성어 표현 + 자신감(현재는 슬라이더)을 제출한다.
 - Stage 1 제출 후에는 ZoneMap이 아니라 **Sound Museum**(도서관 테마 풀스크린 룸)으로 이동해, 다른 그룹이 남긴 표현에 투표할 수도 있다.
 - 월드맵에서 **Sound Museum에 직접 입장**할 수도 있으며, 이때는 자신이 속하지 않은 그룹의 소리 중 표현이 5개 이상 쌓인 것만 후보로 노출된다.
-- 특별 참여자 ID(`ALLAUDIO`, `ACCESS-ALL` 등)를 입력하면 **연구용 전체 접근 모드**로 모든 마을·블록·소리에 즉시 접근한다.
+- 특별 참여자 ID(`ALLAUDIO_A`/`ALLAUDIO_B`, `ACCESS-ALL` 등)를 입력하면 **연구용 전체 접근 모드**로 모든 마을·블록·소리에 즉시 접근한다. `ALLAUDIO_A`/`ALLAUDIO_B`는 해당 그룹으로 고정되어 실제 그룹 A/B 참여자와 동일한 소리 목록·아이템 배치를 보여준다(그룹 무관 접근 ID는 A+B 전체를 보여주므로 배치가 실제 참여자와 다를 수 있음).
 - 결과는 Supabase `annotations`, `votes` 테이블에 저장된다.
 
 ---
@@ -103,7 +103,7 @@ start
 ### 5.1 시작 화면 (`StartPanel`)
 - 참여자 ID + 그룹 ID(A/B 드롭다운) 입력, 참여자 ID는 **자동으로 대문자 정규화**(`p1`→`P1`, Supabase 상 동일 참여자로 인식되도록).
 - 플레이스홀더가 `P01~P05 / Q01~Q05` 스킴으로 표기됨(최근 커밋).
-- 연구용 접근 ID(`ALLAUDIO`, `ALL-AUDIO`, `STUDYALL`, `STUDY-ALL`, `ACCESSALL`, `ACCESS-ALL`, `AUDIOTEST`, `AUDIO-TEST`)를 입력하면 실시간으로 "연구용 전체 접근 모드" 안내가 표시됨(`lib/studyAccess.mjs`).
+- 연구용 접근 ID(`ALLAUDIO_A`, `ALLAUDIO_B`, `STUDYALL`, `STUDY-ALL`, `ACCESSALL`, `ACCESS-ALL`, `AUDIOTEST`, `AUDIO-TEST`, `RESEARCHER`)를 입력하면 실시간으로 "연구용 전체 접근 모드" 안내가 표시됨(`lib/studyAccess.mjs`). `ALLAUDIO_A`/`ALLAUDIO_B`는 그룹이 ID에 고정되어 `app/page.js`에서 그룹 필터를 우회하지 않고 A/B로만 필터링하므로, 실제 그룹 참여자와 동일한 아이템 배치를 보게 된다.
 
 ### 5.2 월드맵 (`WorldMap`)
 - 방향키/WASD/모바일 D-Pad 이동, 최근 커밋에서 **모바일 Zone 진입 버그 수정** 및 **와이드 스크린 렌더링 좌측 쏠림 버그 수정** 완료.

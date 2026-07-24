@@ -92,33 +92,40 @@ export const CHARACTERS = {
    · Kenney Roguelike Pack 추천 (200+ 아이콘)
 ───────────────────────────────────────────── */
 export const ITEMS = {
-  Forest: [
-    '/assets/items/forest_sound_01.png',
-    '/assets/items/forest_sound_02.png',
-    '/assets/items/forest_sound_03.png',
-    '/assets/items/forest_sound_04.png',
-    '/assets/items/forest_sound_05.png',
+  Animal: [
+    '/assets/items/animal_sound_01.png',
+    '/assets/items/animal_sound_02.png',
+    '/assets/items/animal_sound_03.png',
+    '/assets/items/animal_sound_04.png',
+    '/assets/items/animal_sound_05.png',
   ],
-  Creek: [
-    '/assets/items/creek_sound_01.png',
-    '/assets/items/creek_sound_02.png',
-    '/assets/items/creek_sound_03.png',
-    '/assets/items/creek_sound_04.png',
-    '/assets/items/creek_sound_05.png',
+  Human: [
+    '/assets/items/human_sound_01.png',
+    '/assets/items/human_sound_02.png',
+    '/assets/items/human_sound_03.png',
+    '/assets/items/human_sound_04.png',
+    '/assets/items/human_sound_05.png',
   ],
-  City: [
-    '/assets/items/city_sound_01.png',
-    '/assets/items/city_sound_02.png',
-    '/assets/items/city_sound_03.png',
-    '/assets/items/city_sound_04.png',
-    '/assets/items/city_sound_05.png',
+  Nature: [
+    '/assets/items/nature_sound_01.png',
+    '/assets/items/nature_sound_02.png',
+    '/assets/items/nature_sound_03.png',
+    '/assets/items/nature_sound_04.png',
+    '/assets/items/nature_sound_05.png',
   ],
-  Stage: [
-    '/assets/items/stage_sound_01.png',
-    '/assets/items/stage_sound_02.png',
-    '/assets/items/stage_sound_03.png',
-    '/assets/items/stage_sound_04.png',
-    '/assets/items/stage_sound_05.png',
+  Urban: [
+    '/assets/items/urban_sound_01.png',
+    '/assets/items/urban_sound_02.png',
+    '/assets/items/urban_sound_03.png',
+    '/assets/items/urban_sound_04.png',
+    '/assets/items/urban_sound_05.png',
+  ],
+  Music: [
+    '/assets/items/music_sound_01.png',
+    '/assets/items/music_sound_02.png',
+    '/assets/items/music_sound_03.png',
+    '/assets/items/music_sound_04.png',
+    '/assets/items/music_sound_05.png',
   ],
   Lab: [
     '/assets/items/lab_sound_01.png',
@@ -145,9 +152,10 @@ export const ASSET_READY = {
    Zone별 타일 매핑
 ───────────────────────────────────────────── */
 export const ZONE_GROUND_TILE = {
-  Forest: TILES.grass,
-  Creek:  TILES.water,
-  City:   TILES.dirt,
-  Stage:  TILES.purple_floor,
+  Animal: TILES.grass,
+  Human:  TILES.dirt,
+  Nature: TILES.water,
+  Urban:  TILES.dirt,
+  Music:  TILES.purple_floor,
   Lab:    TILES.dark_floor,
 }
