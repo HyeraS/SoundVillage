@@ -84,6 +84,7 @@ export default function HomePage() {
   const [unlockedBlock,   setUnlockedBlock]   = useState({})  // { zone: blockNum }
   const [blockUnlockInfo, setBlockUnlockInfo] = useState(null) // { block, zone } 완료 오버레이용
   const [zoneLoading,     setZoneLoading]     = useState(false)
+  const [museumLoading,   setMuseumLoading]   = useState(false)
 
   // 마을 잠금 상태 — Music 구역 1을 전사 완료해야 나머지 마을이 열림
   const [villagesUnlocked, setVillagesUnlocked] = useState(false)
@@ -241,8 +242,9 @@ export default function HomePage() {
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
   const handleEnterMuseum = useCallback(async () => {
     setMuseumEmpty(false)
+    setMuseumLoading(true)
     const all = soundMetadata.sounds
-    if (!all || all.length === 0) return
+    if (!all || all.length === 0) { setMuseumLoading(false); return }
 
     // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
     const otherGroupSounds = getOtherGroupSounds(effectiveGroupId, bypassGroupFilter)
@@ -278,10 +280,12 @@ export default function HomePage() {
       console.error('[Museum] 진입 오류:', e)
     }
     if (!sound) {
+      setMuseumLoading(false)
       setMuseumEmpty(true)
       return
     }
 
+    setMuseumLoading(false)
     setActiveSound(sound)
     setActiveZone(sound.game_zone || 'Lab')
     setMyExpression('')
@@ -382,6 +386,22 @@ export default function HomePage() {
             }}>
               <div style={{ fontSize:'24px', marginBottom:'8px' }}>🎧</div>
               <div style={{ fontSize:'13px', fontWeight:700, color:'#3A2A14' }}>소리 목록 불러오는 중...</div>
+            </div>
+          </div>
+        )}
+
+        {/* Museum 진입 로딩 — ENTER를 누른 즉시 반응이 보이도록(안 그러면 응답 없는 것처럼 느껴짐) */}
+        {museumLoading && (
+          <div style={{
+            position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center',
+            background:'#00000055', zIndex:200, fontFamily:'Nunito, sans-serif',
+          }}>
+            <div style={{
+              background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:'16px',
+              padding:'24px 36px', textAlign:'center',
+            }}>
+              <div style={{ fontSize:'24px', marginBottom:'8px' }}>🏛</div>
+              <div style={{ fontSize:'13px', fontWeight:700, color:'#3A2A14' }}>전시 확인하는 중...</div>
             </div>
           </div>
         )}
