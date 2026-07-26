@@ -39,30 +39,41 @@ const MUSEUM_CENTER = { x: MUSEUM.tx + MUSEUM.w/2, y: MUSEUM.ty + MUSEUM.h/2 }
    맵 확장(2배) 몫은 중심에서의 "거리"에만 곱해서 포털은 예전보다 훨씬 멀리 떨어뜨리고,
    포털 크기는 살짝만(×1.3) 키운다 — 그래야 카메라 창 안에서 건물이 화면을 뒤덮지 않는다.
 ───────────────────────────────────────────── */
+// 결정론적 의사난수 — 동물의 숲류 코지 게임의 "완벽 대칭이 아닌" 손으로 배치한 듯한
+// 느낌을 내는 데 여러 군데(포털 위치 지터, 연못 모양, 잔디 얼룩)에서 재사용한다.
+function seedRand(i) {
+  const a = Math.sin(i * 12.9898 + 78.233) * 43758.5453
+  return a - Math.floor(a)
+}
+
 const OLD_CENTER = { x: 30, y: 22.5 }
 const NEW_CENTER = { x: 60, y: 45 }
 const DIST_SCALE  = 2
 const SIZE_SCALE  = 1.3
-function placePortal(zone, oldTx, oldTy, oldW, oldH) {
+// 완벽한 정육각형 배치는 "게임판" 같아 보여서, 포털마다 손으로 살짝 어긋나게(지터) 잡아
+// 동물의 숲처럼 자연스럽게 자리 잡은 마을 느낌을 낸다.
+function placePortal(zone, oldTx, oldTy, oldW, oldH, jx = 0, jy = 0) {
   const oldCx = oldTx + oldW/2, oldCy = oldTy + oldH/2
-  const cx = NEW_CENTER.x + (oldCx - OLD_CENTER.x) * DIST_SCALE
-  const cy = NEW_CENTER.y + (oldCy - OLD_CENTER.y) * DIST_SCALE
+  const cx = NEW_CENTER.x + (oldCx - OLD_CENTER.x) * DIST_SCALE + jx
+  const cy = NEW_CENTER.y + (oldCy - OLD_CENTER.y) * DIST_SCALE + jy
   const w = Math.round(oldW * SIZE_SCALE), h = Math.round(oldH * SIZE_SCALE)
   return { zone, tx: Math.round(cx - w/2), ty: Math.round(cy - h/2), w, h }
 }
 const PORTALS = [
-  placePortal('Animal', 33, 5,  9, 9),  // top-right  (60°)
-  placePortal('Lab',    18, 5,  9, 9),  // top-left  (120°)
-  placePortal('Urban',  42, 18, 8, 9),  // right       (0°)
-  placePortal('Nature', 9,  18, 8, 9),  // left       (180°)
-  placePortal('Music',  33, 32, 9, 9),  // bottom-right (300°)
-  placePortal('Human',  18, 32, 9, 9),  // bottom-left (240°)
+  placePortal('Animal', 33, 5,  9, 9,  -4,  3),  // top-right  (60°)
+  placePortal('Lab',    18, 5,  9, 9,   3, -2),  // top-left  (120°)
+  placePortal('Urban',  42, 18, 8, 9,   2,  5),  // right       (0°)
+  placePortal('Nature', 9,  18, 8, 9,  -3, -4),  // left       (180°)
+  placePortal('Music',  33, 32, 9, 9,   5, -3),  // bottom-right (300°)
+  placePortal('Human',  18, 32, 9, 9,  -2,  4),  // bottom-left (240°)
 ]
 const portalByZone = Object.fromEntries(PORTALS.map(p => [p.zone, p]))
 
 /* ─────────────────────────────────────────────
-   경로 타일 — Museum 중심에서 각 포털까지 L자(수평+수직)로 잇는다.
+   경로 타일 — Museum 중심에서 각 포털까지 잇는다.
    폭은 고정 SPOKE_W 타일이라 맵이 넓어져도 광장/길이 화면을 뒤덮지 않고, 길이만 늘어난다.
+   직각 L자 하나 대신 수평-수직-수평 3구간으로 살짝 꺾어서, 사진 속 코지 게임처럼
+   길이 자로 잰 듯 곧게 뻗지 않고 완만하게 휘어지는 느낌을 낸다.
 ───────────────────────────────────────────── */
 function band(tx0, tx1, ty0, ty1, plaza = false) {
   const out = []
@@ -72,13 +83,16 @@ function band(tx0, tx1, ty0, ty1, plaza = false) {
   return out
 }
 const SPOKE_W = 6
-function spoke(x0, y0, x1, y1, width = SPOKE_W) {
+function spoke(x0, y0, x1, y1, width = SPOKE_W, bend = 0.5) {
   const w2 = Math.floor(width / 2)
+  const midX = Math.round(x0 + (x1 - x0) * bend)
   const out = []
-  out.push(...band(Math.min(x0,x1), Math.max(x0,x1), y0 - w2, y0 + w2))
-  out.push(...band(x1 - w2, x1 + w2, Math.min(y0,y1), Math.max(y0,y1)))
+  out.push(...band(Math.min(x0,midX), Math.max(x0,midX), y0 - w2, y0 + w2))
+  out.push(...band(midX - w2, midX + w2, Math.min(y0,y1), Math.max(y0,y1)))
+  out.push(...band(Math.min(midX,x1), Math.max(midX,x1), y1 - w2, y1 + w2))
   return out
 }
+const SPOKE_BENDS = { Animal: 0.4, Lab: 0.6, Urban: 0.45, Nature: 0.55, Music: 0.6, Human: 0.4 }
 
 const PATH_TILES = [
   // Museum 앞마당 (건물 발치를 감싸는 자갈 광장)
@@ -86,14 +100,28 @@ const PATH_TILES = [
   ...PORTALS.flatMap(p => spoke(
     Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
     Math.round(p.tx + p.w/2),    Math.round(p.ty + p.h/2),
+    SPOKE_W, SPOKE_BENDS[p.zone],
   )),
 ]
 
 const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
-// Nature 포털 옆 작은 연못 — 시트의 물 오토타일을 실제로 써먹기 위한 포인트
+// Nature 포털 옆 작은 연못 — 완전한 직사각형 대신 타원+노이즈로 가장자리를 울퉁불퉁하게
+// 깎아서 사진 속 자연스러운 연못처럼 보이게 한다 (오토타일이 그 울퉁불퉁한 경계를 따라 그려짐).
+function organicBlob(cx, cy, rx, ry, seedOffset = 0, threshold = 0.82) {
+  const out = []
+  for (let tx = Math.floor(cx - rx); tx <= Math.ceil(cx + rx); tx++) {
+    for (let ty = Math.floor(cy - ry); ty <= Math.ceil(cy + ry); ty++) {
+      const nx = (tx - cx) / rx, ny = (ty - cy) / ry
+      const d = nx*nx + ny*ny
+      const noise = (seedRand(tx * 13 + ty * 7 + seedOffset) - 0.5) * 0.4
+      if (d + noise < threshold) out.push({ tx, ty })
+    }
+  }
+  return out
+}
 const NATURE_P = portalByZone.Nature
-const WATER_TILES = band(NATURE_P.tx - 10, NATURE_P.tx - 5, NATURE_P.ty + 3, NATURE_P.ty + 6)
+const WATER_TILES = organicBlob(NATURE_P.tx - 7, NATURE_P.ty + 5, 5, 4, 91)
 const WATER_SET = new Set(WATER_TILES.map(w => `${w.tx},${w.ty}`))
 
 // Portal 영역 타일 셋
@@ -178,9 +206,26 @@ const BENCHES = [
   ...scatterNear('Urban', 8, 10, 5, 9, 53),
   ...scatterNear('Human', 8, 10, 9, 5, 59),
 ]
+// 마을 "앞마당" 울타리 — 건물 발치를 완전히 둘러싸는 대신, 안내판이 있는 쪽(진입로 반대편)
+// 한 변만 살짝 둘러서 동물의 숲 주민 집처럼 "개인 마당"이 있는 느낌을 낸다. 가운데는
+// 길로 통하는 틈을 남겨 게이트처럼 보이게 한다.
+function yardFence(p, gapFrac = 0.45) {
+  const y = p.ty + p.h + 1
+  const gapStart = p.tx + Math.floor(p.w * (0.5 - gapFrac / 2))
+  const gapEnd   = p.tx + Math.ceil (p.w * (0.5 + gapFrac / 2))
+  const out = []
+  for (let tx = p.tx - 1; tx <= p.tx + p.w; tx++) {
+    if (tx >= gapStart && tx <= gapEnd) continue
+    if (!isFree(tx, y)) continue
+    out.push({ tx, ty: y })
+  }
+  return out
+}
+
 const FENCES = [
-  ...scatterNear('Urban', 22, 12, 7, 13, 61),
-  ...scatterNear('Human', 14, 12, 13, 7, 67),
+  ...scatterNear('Urban', 14, 12, 7, 13, 61),
+  ...scatterNear('Human', 8,  12, 13, 7, 67),
+  ...PORTALS.flatMap(p => yardFence(p)),
 ]
 
 /* ─────────────────────────────────────────────
@@ -190,10 +235,6 @@ const FENCES = [
    낮은 투명도로 낮은 빈도로 깔아서, 사진 속 초원처럼 밝고 어두운 풀색이 자연스럽게
    이어지는 느낌만 낸다 — 픽셀아트 톤을 해치지 않도록 블러 강도는 약하게 유지.
 ───────────────────────────────────────────── */
-function seedRand(i) {
-  const a = Math.sin(i * 12.9898 + 78.233) * 43758.5453
-  return a - Math.floor(a)
-}
 const GRASS_BASE = '#7FA24A'
 const GRASS_BLOTCH_COLORS = ['#93B85E', '#6C8F3D']
 const GRASS_BLOTCHES = Array.from({ length: Math.round((MAP_W * MAP_H) / 70) }, (_, i) => ({
@@ -566,31 +607,46 @@ function MuseumIsland({ hovered }) {
   const px = MUSEUM.tx * TILE, py = MUSEUM.ty * TILE
   const pw = MUSEUM.w  * TILE, ph = MUSEUM.h  * TILE
   const cx = px + pw / 2
+  const useRealBuilding = ASSET_READY.world && WORLD_BUILDINGS.Museum
 
   return (
     <g>
       <ellipse cx={cx+4} cy={py+ph+8} rx={pw*0.5} ry={10} fill="#00000033"/>
-      <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
-        fill="#C8B870"
-        stroke={hovered ? '#C8A96E' : '#A89050'}
-        strokeWidth={hovered ? 3 : 1.5}
-        style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
-      />
-      <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#D8C880" opacity="0.6"/>
-      <rect x={cx-pw*0.2} y={py+ph-4} width={pw*0.4} height={12} rx="2" fill="#C8B880"/>
-      {[-1.2,-0.4,0.4,1.2].map((dx,i) => (
-        <g key={i} transform={`translate(${cx+dx*pw*0.18},${py+ph*0.18})`}>
-          <rect x="-4" y="0" width="8" height={ph*0.52} rx="2" fill="#E8D8B0"/>
-          <rect x="-6" y="-4" width="12" height="6" rx="1" fill="#D4C4A0"/>
-          <rect x="-6" y={ph*0.52-1} width="12" height="6" rx="1" fill="#D4C4A0"/>
-        </g>
-      ))}
-      <polygon
-        points={`${px+6},${py+ph*0.22} ${cx},${py+4} ${px+pw-6},${py+ph*0.22}`}
-        fill="#D4B870" stroke="#B89A50" strokeWidth="1.5"
-      />
-      <text x={cx} y={py+ph*0.7} textAnchor="middle" fontSize="22" style={{userSelect:'none'}}>🏛</text>
-      <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#D4C870" opacity="0.5"/>
+      {useRealBuilding ? (
+        <>
+          <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
+            fill="none"
+            stroke={hovered ? '#C8A96E' : 'transparent'}
+            strokeWidth={hovered ? 2.5 : 0}
+            style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
+          />
+          <BuildingSprite zone="Museum" px={px} py={py} pw={pw} ph={ph}/>
+        </>
+      ) : (
+        <>
+          <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
+            fill="#C8B870"
+            stroke={hovered ? '#C8A96E' : '#A89050'}
+            strokeWidth={hovered ? 3 : 1.5}
+            style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
+          />
+          <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#D8C880" opacity="0.6"/>
+          <rect x={cx-pw*0.2} y={py+ph-4} width={pw*0.4} height={12} rx="2" fill="#C8B880"/>
+          {[-1.2,-0.4,0.4,1.2].map((dx,i) => (
+            <g key={i} transform={`translate(${cx+dx*pw*0.18},${py+ph*0.18})`}>
+              <rect x="-4" y="0" width="8" height={ph*0.52} rx="2" fill="#E8D8B0"/>
+              <rect x="-6" y="-4" width="12" height="6" rx="1" fill="#D4C4A0"/>
+              <rect x="-6" y={ph*0.52-1} width="12" height="6" rx="1" fill="#D4C4A0"/>
+            </g>
+          ))}
+          <polygon
+            points={`${px+6},${py+ph*0.22} ${cx},${py+4} ${px+pw-6},${py+ph*0.22}`}
+            fill="#D4B870" stroke="#B89A50" strokeWidth="1.5"
+          />
+          <text x={cx} y={py+ph*0.7} textAnchor="middle" fontSize="22" style={{userSelect:'none'}}>🏛</text>
+          <rect x={px-4} y={py+ph+2} width={pw+8} height={4} rx="2" fill="#D4C870" opacity="0.5"/>
+        </>
+      )}
       <rect x={cx-46} y={py-26} width={92} height={22} rx="7"
         fill={hovered ? '#C8A96E' : '#000000bb'}
         stroke="#C8A96E" strokeWidth="1.5"

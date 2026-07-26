@@ -195,6 +195,8 @@ export const WORLD_TILESET = {
      Music: town full의 "Arcade!" — 네온 간판이 Farm의 별장식 오두막보다 훨씬 음악/엔터 느낌
      Lab: town full의 "Public Library" — 학구적·미스터리한 분위기가 온실보다 더 잘 맞음
      Nature: fishing_full의 파란 지붕 "Fish Shop" — 연못 옆에 물가 건물이라 자연스러움
+     Museum: town full의 원형 로톤다 — 창문 안에 액자 그림이 걸려있어 "전시관" 느낌이 나서
+       Sound Museum(수집한 소리를 전시)에 가장 잘 어울림. 예전엔 SVG로 손그린 사각 건물이었음.
 ───────────────────────────────────────────── */
 const FARM_BUILDINGS_SHEET    = { src: '/assets/world/buildings.png',         sheetW: 1503, sheetH: 1072 }
 const TOWN_BUILDINGS_SHEET    = { src: '/assets/world/town_buildings.png',    sheetW: 1152, sheetH: 1216 }
@@ -207,6 +209,7 @@ export const WORLD_BUILDINGS = {
   Music:  { ...TOWN_BUILDINGS_SHEET,    x: 3, y: 92,  w: 92,  h: 85  },
   Lab:    { ...TOWN_BUILDINGS_SHEET,    x: 8, y: 650, w: 145, h: 100 },
   Nature: { ...FISHING_BUILDINGS_SHEET, x: 2, y: 3,   w: 76,  h: 62  },
+  Museum: { ...TOWN_BUILDINGS_SHEET,    x: 2, y: 849, w: 93,  h: 90  },
 }
 
 /* ─────────────────────────────────────────────
