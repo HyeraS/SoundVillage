@@ -5,38 +5,64 @@ import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS
 import { autotileShape } from '@/lib/autotile'
 
 /* ─────────────────────────────────────────────
-   맵 크기
+   맵 크기 — 이전 60×45 레이아웃 대비 사용자 요청으로 2배 확장.
+   아래 PORTALS/PATH_TILES/WATER_TILES는 전부 그 60×45 좌표에 *2를 곱한 값
+   (구조는 동일, 타일 격자 자체가 두 배 넓어짐).
 ───────────────────────────────────────────── */
-const MAP_W  = 60
-const MAP_H  = 45
-const PX_W   = MAP_W * TILE   // 1920
-const PX_H   = MAP_H * TILE   // 1440
+const S      = 2
+const MAP_W  = 60 * S
+const MAP_H  = 45 * S
+const PX_W   = MAP_W * TILE
+const PX_H   = MAP_H * TILE
 const CHAR_W = 72
 const CHAR_H = 88
 const HUD_H  = 56
 
-/* ─────────────────────────────────────────────
-   Sound Museum — 맵 중앙
-───────────────────────────────────────────── */
-const MUSEUM = { tx: 23, ty: 17, w: 15, h: 12 }
+// 카메라 뷰포트 — 맵이 2배로 넓어진 만큼, 화면엔 항상 전체 맵을 다 보여주는 대신
+// 캐릭터를 따라다니는 창(예전 60×45 맵의 절반 크기)만 보여준다. 그러면 같은 화면에
+// 건물·나무가 실제로 2배 크게 보이면서("맵 크기를 2배 키워달라"는 요청), 넓어진 맵을
+// 돌아다니며 탐험하는 맛도 살아난다.
+const VIEW_TW = 30
+const VIEW_TH = 22
+const VIEW_W  = VIEW_TW * TILE
+const VIEW_H  = VIEW_TH * TILE
 
 /* ─────────────────────────────────────────────
-   Zone 포털 — Museum 중심 정육각형 배치
-   flat-top hexagon, radius ≈ 15 tiles (기존 40×30 맵 대비 1.5배 스케일)
+   Sound Museum — 맵 중앙. 카메라 뷰(30×22타일)에 꽉 차지 않도록 건물 자체 크기는
+   예전 15×12 대비 소폭만 키운다 — 맵이 넓어진 몫은 "포털까지 거리"로 표현한다.
 ───────────────────────────────────────────── */
+const MUSEUM = { tx: 50, ty: 38, w: 20, h: 15 }
+const MUSEUM_CENTER = { x: MUSEUM.tx + MUSEUM.w/2, y: MUSEUM.ty + MUSEUM.h/2 }
+
+/* ─────────────────────────────────────────────
+   Zone 포털 — Museum 중심 정육각형 배치.
+   맵 확장(2배) 몫은 중심에서의 "거리"에만 곱해서 포털은 예전보다 훨씬 멀리 떨어뜨리고,
+   포털 크기는 살짝만(×1.3) 키운다 — 그래야 카메라 창 안에서 건물이 화면을 뒤덮지 않는다.
+───────────────────────────────────────────── */
+const OLD_CENTER = { x: 30, y: 22.5 }
+const NEW_CENTER = { x: 60, y: 45 }
+const DIST_SCALE  = 2
+const SIZE_SCALE  = 1.3
+function placePortal(zone, oldTx, oldTy, oldW, oldH) {
+  const oldCx = oldTx + oldW/2, oldCy = oldTy + oldH/2
+  const cx = NEW_CENTER.x + (oldCx - OLD_CENTER.x) * DIST_SCALE
+  const cy = NEW_CENTER.y + (oldCy - OLD_CENTER.y) * DIST_SCALE
+  const w = Math.round(oldW * SIZE_SCALE), h = Math.round(oldH * SIZE_SCALE)
+  return { zone, tx: Math.round(cx - w/2), ty: Math.round(cy - h/2), w, h }
+}
 const PORTALS = [
-  { zone: 'Animal', tx: 33, ty:  5, w: 9, h: 9 },  // top-right  (60°)
-  { zone: 'Lab',    tx: 18, ty:  5, w: 9, h: 9 },  // top-left  (120°)
-  { zone: 'Urban',  tx: 42, ty: 18, w: 8, h: 9 },  // right       (0°)
-  { zone: 'Nature', tx:  9, ty: 18, w: 8, h: 9 },  // left       (180°)
-  { zone: 'Music',  tx: 33, ty: 32, w: 9, h: 9 },  // bottom-right (300°)
-  { zone: 'Human',  tx: 18, ty: 32, w: 9, h: 9 },  // bottom-left (240°)
+  placePortal('Animal', 33, 5,  9, 9),  // top-right  (60°)
+  placePortal('Lab',    18, 5,  9, 9),  // top-left  (120°)
+  placePortal('Urban',  42, 18, 8, 9),  // right       (0°)
+  placePortal('Nature', 9,  18, 8, 9),  // left       (180°)
+  placePortal('Music',  33, 32, 9, 9),  // bottom-right (300°)
+  placePortal('Human',  18, 32, 9, 9),  // bottom-left (240°)
 ]
+const portalByZone = Object.fromEntries(PORTALS.map(p => [p.zone, p]))
 
 /* ─────────────────────────────────────────────
-   경로 타일 — 박물관에서 6 방향 방사형 스포크
-   band(tx0,tx1,ty0,ty1)로 사각 구간을 채워서, 기존 40×30 레이아웃과 동일한
-   구조를 1.5배 스케일로 재구성한다 (모든 좌표에 *1.5 규칙 적용).
+   경로 타일 — Museum 중심에서 각 포털까지 L자(수평+수직)로 잇는다.
+   폭은 고정 SPOKE_W 타일이라 맵이 넓어져도 광장/길이 화면을 뒤덮지 않고, 길이만 늘어난다.
 ───────────────────────────────────────────── */
 function band(tx0, tx1, ty0, ty1, plaza = false) {
   const out = []
@@ -45,36 +71,29 @@ function band(tx0, tx1, ty0, ty1, plaza = false) {
       out.push({ tx, ty, plaza })
   return out
 }
+const SPOKE_W = 6
+function spoke(x0, y0, x1, y1, width = SPOKE_W) {
+  const w2 = Math.floor(width / 2)
+  const out = []
+  out.push(...band(Math.min(x0,x1), Math.max(x0,x1), y0 - w2, y0 + w2))
+  out.push(...band(x1 - w2, x1 + w2, Math.min(y0,y1), Math.max(y0,y1)))
+  return out
+}
 
 const PATH_TILES = [
-  // Museum 중앙 광장
-  ...band(24, 36, 18, 27, true),
-  // 위쪽 스포크 (ty 12→17)
-  ...band(27, 33, 12, 17),
-  // 위-오른쪽 → Animal
-  ...band(33, 41, 12, 12),
-  // 위-왼쪽 → Lab
-  ...band(18, 27, 12, 12),
-  // 오른쪽 스포크 → Urban
-  ...band(36, 42, 23, 23),
-  ...band(42, 42, 20, 26),
-  // 왼쪽 스포크 → Nature
-  ...band(17, 24, 23, 23),
-  ...band(17, 17, 20, 26),
-  // 아래쪽 스포크 (ty 29→32)
-  ...band(27, 33, 29, 32),
-  // 아래-오른쪽 → Music
-  ...band(33, 41, 32, 32),
-  ...band(41, 41, 33, 35),
-  // 아래-왼쪽 → Human
-  ...band(18, 27, 32, 32),
-  ...band(18, 18, 33, 35),
+  // Museum 앞마당 (건물 발치를 감싸는 자갈 광장)
+  ...band(MUSEUM.tx - 2, MUSEUM.tx + MUSEUM.w + 1, MUSEUM.ty - 2, MUSEUM.ty + MUSEUM.h + 1, true),
+  ...PORTALS.flatMap(p => spoke(
+    Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
+    Math.round(p.tx + p.w/2),    Math.round(p.ty + p.h/2),
+  )),
 ]
 
 const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
 // Nature 포털 옆 작은 연못 — 시트의 물 오토타일을 실제로 써먹기 위한 포인트
-const WATER_TILES = band(4, 6, 19, 20)
+const NATURE_P = portalByZone.Nature
+const WATER_TILES = band(NATURE_P.tx - 10, NATURE_P.tx - 5, NATURE_P.ty + 3, NATURE_P.ty + 6)
 const WATER_SET = new Set(WATER_TILES.map(w => `${w.tx},${w.ty}`))
 
 // Portal 영역 타일 셋
@@ -109,8 +128,6 @@ function terrainAt(tx, ty) {
    존별 테마 장식 — 전체 맵에 고르게 뿌리는 대신, 포털 주변 반경에만
    그 존 분위기에 맞는 소품을 모아서 배치한다.
 ───────────────────────────────────────────── */
-const portalByZone = Object.fromEntries(PORTALS.map(p => [p.zone, p]))
-
 function scatterNear(zone, count, radius, mulA, mulB, seed = 0) {
   const p = portalByZone[zone]
   const cx = p.tx + p.w / 2, cy = p.ty + p.h / 2
@@ -132,34 +149,71 @@ const BORDER_TREES = [
 
 // Animal: 나무·수풀 빽빽하게 / Nature: 나무 + 연못가 돌 / Urban: 울타리·벤치 위주, 나무 적게
 // Human: 울타리·벤치 + 꽃 / Music·Lab: 이 팩엔 테마 소품이 없어 나무·꽃만 은은하게
+// 맵이 2배로 넓어진 만큼 포털 반경(radius)도 2배, 개수도 밀도 유지를 위해 넉넉히 늘렸다.
 const TREES = [
   ...BORDER_TREES,
-  ...scatterNear('Animal', 14, 7, 5, 7, 3).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Nature', 8,  6, 7, 5, 11).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Music',  4,  6, 9, 4, 17).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Lab',    4,  6, 4, 9, 19).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Animal', 30, 14, 5, 7, 3).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Nature', 18, 12, 7, 5, 11).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Music',  10, 12, 9, 4, 17).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Lab',    10, 12, 4, 9, 19).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Human',  8,  11, 15, 6, 71).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Urban',  6,  11, 6, 15, 73).map((t,i) => ({ ...t, variant: i % 3 })),
 ]
 const BUSHES = [
-  ...scatterNear('Animal', 8, 5, 3, 8, 23),
-  ...scatterNear('Nature', 5, 5, 8, 3, 29),
+  ...scatterNear('Animal', 18, 10, 3, 8, 23),
+  ...scatterNear('Nature', 12, 10, 8, 3, 29),
+  ...scatterNear('Human',  6,  9,  5, 12, 79),
 ]
 const FLOWERS = [
-  ...scatterNear('Human', 10, 6, 6, 11, 31),
-  ...scatterNear('Music', 10, 6, 11, 6, 37),
-  ...scatterNear('Animal', 6, 5, 13, 7, 41),
+  ...scatterNear('Human', 22, 12, 6, 11, 31),
+  ...scatterNear('Music', 22, 12, 11, 6, 37),
+  ...scatterNear('Animal', 14, 10, 13, 7, 41),
+  ...scatterNear('Nature', 10, 10, 9, 13, 83),
 ].map((f,i) => ({ ...f, type: i % 4 }))
 const ROCKS = [
-  ...scatterNear('Nature', 8, 6, 17, 9, 43),
-  ...scatterNear('Lab',    6, 6, 9, 17, 47),
+  ...scatterNear('Nature', 18, 12, 17, 9, 43),
+  ...scatterNear('Lab',    14, 12, 9, 17, 47),
 ]
 const BENCHES = [
-  ...scatterNear('Urban', 4, 5, 5, 9, 53),
-  ...scatterNear('Human', 4, 5, 9, 5, 59),
+  ...scatterNear('Urban', 8, 10, 5, 9, 53),
+  ...scatterNear('Human', 8, 10, 9, 5, 59),
 ]
 const FENCES = [
-  ...scatterNear('Urban', 10, 6, 7, 13, 61),
-  ...scatterNear('Human', 6,  6, 13, 7, 67),
+  ...scatterNear('Urban', 22, 12, 7, 13, 61),
+  ...scatterNear('Human', 14, 12, 13, 7, 67),
 ]
+
+/* ─────────────────────────────────────────────
+   잔디 색상 얼룩 — 구매한 시트의 "잔디" 조각은 전부 독립된 섬(hedge autotile) 형태라
+   그대로 반복 타일링하면 각 타일 모서리의 둥근 여백이 그대로 격자무늬로 드러난다
+   (사용자가 "흙 같다"고 지적한 원인). 그 대신 단색 바탕 위에 부드럽게 번지는 색 얼룩을
+   낮은 투명도로 낮은 빈도로 깔아서, 사진 속 초원처럼 밝고 어두운 풀색이 자연스럽게
+   이어지는 느낌만 낸다 — 픽셀아트 톤을 해치지 않도록 블러 강도는 약하게 유지.
+───────────────────────────────────────────── */
+function seedRand(i) {
+  const a = Math.sin(i * 12.9898 + 78.233) * 43758.5453
+  return a - Math.floor(a)
+}
+const GRASS_BASE = '#7FA24A'
+const GRASS_BLOTCH_COLORS = ['#93B85E', '#6C8F3D']
+const GRASS_BLOTCHES = Array.from({ length: Math.round((MAP_W * MAP_H) / 70) }, (_, i) => ({
+  cx: seedRand(i * 4 + 1) * PX_W,
+  cy: seedRand(i * 4 + 2) * PX_H,
+  r:  60 + seedRand(i * 4 + 3) * 110,
+  color: GRASS_BLOTCH_COLORS[i % 2],
+  opacity: 0.22 + seedRand(i * 4 + 4) * 0.14,
+}))
+
+function GrassBlotches() {
+  return (
+    <g style={{ filter: 'url(#grassBlur)' }}>
+      {GRASS_BLOTCHES.map((b, i) => (
+        <ellipse key={i} cx={b.cx} cy={b.cy} rx={b.r} ry={b.r * 0.72}
+          fill={b.color} opacity={b.opacity}/>
+      ))}
+    </g>
+  )
+}
 
 /* ─────────────────────────────────────────────
    헬퍼
@@ -656,16 +710,13 @@ function PixelChar({ dir, moving }) {
 ───────────────────────────────────────────── */
 function GroundPatterns() {
   if (ASSET_READY.world) {
-    const { src, sheetW, sheetH, tile, grass } = WORLD_TILESET
     return (
       <defs>
-        <pattern id="grass" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
-          <svg width={TILE} height={TILE} viewBox={`${grass.x} ${grass.y} ${tile} ${tile}`}>
-            <image href={src} width={sheetW} height={sheetH} style={{ imageRendering:'pixelated' }}/>
-          </svg>
-        </pattern>
         <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="2.2"/>
+        </filter>
+        <filter id="grassBlur" x="-30%" y="-30%" width="160%" height="160%">
+          <feGaussianBlur stdDeviation="14"/>
         </filter>
       </defs>
     )
@@ -885,21 +936,25 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
     return () => window.removeEventListener('keydown', h)
   }, [nearZone, nearMuseum, onEnterZone, onEnterMuseum, lockedSet])
 
+  const camX = Math.max(0, Math.min(PX_W - VIEW_W, pos.x + CHAR_W/2 - VIEW_W/2))
+  const camY = Math.max(0, Math.min(PX_H - VIEW_H, pos.y + CHAR_H/2 - VIEW_H/2))
+
   return (
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
       <HUD totalCount={totalCount} zoneProgress={zoneProgress}/>
 
       <div style={{
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
-        background:'#5A9A3A', overflow:'hidden', cursor:'none',
+        background: ASSET_READY.world ? GRASS_BASE : '#5A9A3A', overflow:'hidden', cursor:'none',
       }}>
         <svg width="100%" height="100%"
-          viewBox={`0 0 ${PX_W} ${PX_H}`}
+          viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
           preserveAspectRatio="xMidYMid meet"
           style={{ display:'block', position:'absolute', inset:0 }}
         >
           <GroundPatterns/>
-          <rect width={PX_W} height={PX_H} fill="url(#grass)"/>
+          <rect width={PX_W} height={PX_H} fill={ASSET_READY.world ? GRASS_BASE : 'url(#grass)'}/>
+          {ASSET_READY.world && <GrassBlotches/>}
 
           {ASSET_READY.world ? (
             <>
