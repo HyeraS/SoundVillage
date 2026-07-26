@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
+import { getCountsByZone, getAnnotationCountsBySoundId, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
 
@@ -102,15 +102,13 @@ export default function HomePage() {
   const refreshCounts = useCallback(async () => {
     if (!participantId) return
     try {
-      const total = await getTotalCount(participantId)
+      const { total, byZone } = await getCountsByZone(participantId)
       setTotalCount(total)
-      const entries = await Promise.all(
-        ZONES.map(async z => {
-          const zoneMax = getGroupSounds(z, effectiveGroupId, bypassGroupFilter).length || 100
-          const count   = await getCountByZone(z, participantId)
-          return [z, Math.min(count / zoneMax, 1)]
-        })
-      )
+      const entries = ZONES.map(z => {
+        const zoneMax = getGroupSounds(z, effectiveGroupId, bypassGroupFilter).length || 100
+        const count   = byZone[z] || 0
+        return [z, Math.min(count / zoneMax, 1)]
+      })
       setZoneProgress(Object.fromEntries(entries))
     } catch {}
   }, [participantId, effectiveGroupId, bypassGroupFilter])
@@ -252,23 +250,30 @@ export default function HomePage() {
 
     let sound = null
     try {
-      const [annotatedIds, votedIds] = await Promise.all([
-        getAnnotatedSoundIds(),
+      const [rawCounts, votedIds] = await Promise.all([
+        getAnnotationCountsBySoundId(),
         getVotedSoundIdsByParticipant(participantId),
       ])
       const votedSet = new Set(votedIds)
 
-      // 후보: 다른 그룹 소리이면서, 내가 이 소리에 대해 아직 Stage 2 투표를 안 한 것만
-      // (한 번 투표한 소리는 다시 뜨지 않게)
-      const candidates = annotatedIds
-        .map(dbId => resolveSoundFromDbId(dbId, all))
-        .filter(found => found && otherIds.has(found.sound_id) && !votedSet.has(found.sound_id))
+      // 구버전 sound_id 포맷(Forest_066514 등)이 섞여 있을 수 있어서, 같은 소리를
+      // 가리키는 raw id들의 개수를 canonical sound_id 기준으로 합산한다.
+      const canonicalCounts = {}
+      for (const [rawId, cnt] of Object.entries(rawCounts)) {
+        const found = findSoundByDbId(rawId, all)
+        const key = found ? found.sound_id : rawId
+        canonicalCounts[key] = (canonicalCounts[key] || 0) + cnt
+      }
+
+      // 후보: 표현이 5개 이상 쌓였고, 다른 그룹 소리이면서, 내가 이 소리에 대해
+      // 아직 Stage 2 투표를 안 한 것만 (한 번 투표한 소리는 다시 뜨지 않게)
+      const candidates = Object.entries(canonicalCounts)
+        .filter(([soundId, cnt]) => cnt >= 5 && otherIds.has(soundId) && !votedSet.has(soundId))
+        .map(([soundId]) => resolveSoundFromDbId(soundId, all))
+        .filter(Boolean)
 
       const shuffled = [...candidates].sort(() => Math.random() - 0.5)
-      for (const found of shuffled) {
-        const count = await getAnnotationCountForSound(found.sound_id)
-        if (count >= 5) { sound = found; break }
-      }
+      sound = shuffled[0] || null
     } catch (e) {
       console.error('[Museum] 진입 오류:', e)
     }
