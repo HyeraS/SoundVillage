@@ -1,86 +1,81 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ASSET_READY } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER } from '@/components/AssetRegistry'
+import { autotileShape } from '@/lib/autotile'
 
 /* ─────────────────────────────────────────────
    맵 크기
 ───────────────────────────────────────────── */
-const MAP_W  = 40
-const MAP_H  = 30
-const PX_W   = MAP_W * TILE   // 1280
-const PX_H   = MAP_H * TILE   // 960
-const CHAR_W = 22
-const CHAR_H = 28
+const MAP_W  = 60
+const MAP_H  = 45
+const PX_W   = MAP_W * TILE   // 1920
+const PX_H   = MAP_H * TILE   // 1440
+const CHAR_W = 72
+const CHAR_H = 88
 const HUD_H  = 56
 
 /* ─────────────────────────────────────────────
    Sound Museum — 맵 중앙
 ───────────────────────────────────────────── */
-const MUSEUM = { tx: 15, ty: 11, w: 10, h: 8 }
+const MUSEUM = { tx: 23, ty: 17, w: 15, h: 12 }
 
 /* ─────────────────────────────────────────────
    Zone 포털 — Museum 중심 정육각형 배치
-   flat-top hexagon, radius ≈ 10 tiles
+   flat-top hexagon, radius ≈ 15 tiles (기존 40×30 맵 대비 1.5배 스케일)
 ───────────────────────────────────────────── */
 const PORTALS = [
-  { zone: 'Animal', tx: 22, ty:  3, w: 6, h: 6 },  // top-right  (60°)
-  { zone: 'Lab',    tx: 12, ty:  3, w: 6, h: 6 },  // top-left  (120°)
-  { zone: 'Urban',  tx: 28, ty: 12, w: 5, h: 6 },  // right       (0°)
-  { zone: 'Nature', tx:  6, ty: 12, w: 5, h: 6 },  // left       (180°)
-  { zone: 'Music',  tx: 22, ty: 21, w: 6, h: 6 },  // bottom-right (300°)
-  { zone: 'Human',  tx: 12, ty: 21, w: 6, h: 6 },  // bottom-left (240°)
+  { zone: 'Animal', tx: 33, ty:  5, w: 9, h: 9 },  // top-right  (60°)
+  { zone: 'Lab',    tx: 18, ty:  5, w: 9, h: 9 },  // top-left  (120°)
+  { zone: 'Urban',  tx: 42, ty: 18, w: 8, h: 9 },  // right       (0°)
+  { zone: 'Nature', tx:  9, ty: 18, w: 8, h: 9 },  // left       (180°)
+  { zone: 'Music',  tx: 33, ty: 32, w: 9, h: 9 },  // bottom-right (300°)
+  { zone: 'Human',  tx: 18, ty: 32, w: 9, h: 9 },  // bottom-left (240°)
 ]
 
 /* ─────────────────────────────────────────────
    경로 타일 — 박물관에서 6 방향 방사형 스포크
+   band(tx0,tx1,ty0,ty1)로 사각 구간을 채워서, 기존 40×30 레이아웃과 동일한
+   구조를 1.5배 스케일로 재구성한다 (모든 좌표에 *1.5 규칙 적용).
 ───────────────────────────────────────────── */
+function band(tx0, tx1, ty0, ty1, plaza = false) {
+  const out = []
+  for (let tx = tx0; tx <= tx1; tx++)
+    for (let ty = ty0; ty <= ty1; ty++)
+      out.push({ tx, ty, plaza })
+  return out
+}
+
 const PATH_TILES = [
   // Museum 중앙 광장
-  ...[16,17,18,19,20,21,22,23,24].flatMap(tx =>
-    [12,13,14,15,16,17,18].map(ty => ({ tx, ty, plaza: true }))
-  ),
-  // 위쪽 스포크 (ty 8→11)
-  ...[18,19,20,21,22].flatMap(tx => [8,9,10,11].map(ty => ({ tx, ty }))),
+  ...band(24, 36, 18, 27, true),
+  // 위쪽 스포크 (ty 12→17)
+  ...band(27, 33, 12, 17),
   // 위-오른쪽 → Animal
-  ...[22,23,24,25,26,27].map(tx => ({ tx, ty: 8 })),
+  ...band(33, 41, 12, 12),
   // 위-왼쪽 → Lab
-  ...[12,13,14,15,16,17,18].map(tx => ({ tx, ty: 8 })),
+  ...band(18, 27, 12, 12),
   // 오른쪽 스포크 → Urban
-  ...[24,25,26,27,28].map(tx => ({ tx, ty: 15 })),
-  ...[13,14,15,16,17].map(ty => ({ tx: 28, ty })),
+  ...band(36, 42, 23, 23),
+  ...band(42, 42, 20, 26),
   // 왼쪽 스포크 → Nature
-  ...[11,12,13,14,15,16].map(tx => ({ tx, ty: 15 })),
-  ...[13,14,15,16,17].map(ty => ({ tx: 11, ty })),
-  // 아래쪽 스포크 (ty 19→21)
-  ...[18,19,20,21,22].flatMap(tx => [19,20,21].map(ty => ({ tx, ty }))),
+  ...band(17, 24, 23, 23),
+  ...band(17, 17, 20, 26),
+  // 아래쪽 스포크 (ty 29→32)
+  ...band(27, 33, 29, 32),
   // 아래-오른쪽 → Music
-  ...[22,23,24,25,26,27].map(tx => ({ tx, ty: 21 })),
-  ...[22,23].map(ty => ({ tx: 27, ty })),
+  ...band(33, 41, 32, 32),
+  ...band(41, 41, 33, 35),
   // 아래-왼쪽 → Human
-  ...[12,13,14,15,16,17,18].map(tx => ({ tx, ty: 21 })),
-  ...[22,23].map(ty => ({ tx: 12, ty })),
+  ...band(18, 27, 32, 32),
+  ...band(18, 18, 33, 35),
 ]
 
 const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
-/* ─────────────────────────────────────────────
-   나무 배치
-───────────────────────────────────────────── */
-const RAW_TREES = [
-  // 테두리
-  ...Array.from({length:18}, (_,i) => ({ tx: 1+i*2, ty: 1,  variant: i%3 })),
-  ...Array.from({length:18}, (_,i) => ({ tx: 1+i*2, ty: 28, variant: (i+1)%3 })),
-  ...Array.from({length:10}, (_,i) => ({ tx: 1,  ty: 3+i*2, variant: i%2 })),
-  ...Array.from({length:10}, (_,i) => ({ tx: 38, ty: 3+i*2, variant: (i+1)%2 })),
-  // 스포크 사이 빈 공간 채우기
-  {tx:26,ty:9},{tx:27,ty:9},{tx:27,ty:10},{tx:28,ty:10},{tx:29,ty:9},
-  {tx:26,ty:17},{tx:27,ty:17},{tx:27,ty:18},{tx:28,ty:18},{tx:29,ty:17},
-  {tx:18,ty:23},{tx:20,ty:23},{tx:22,ty:23},{tx:20,ty:25},{tx:20,ty:26},
-  {tx:11,ty:17},{tx:11,ty:18},{tx:10,ty:18},{tx:10,ty:17},{tx:9,ty:17},
-  {tx:11,ty:9},{tx:11,ty:10},{tx:10,ty:10},{tx:10,ty:9},{tx:9,ty:9},
-  {tx:18,ty:5},{tx:20,ty:5},{tx:22,ty:5},{tx:20,ty:6},{tx:20,ty:7},
-]
+// Nature 포털 옆 작은 연못 — 시트의 물 오토타일을 실제로 써먹기 위한 포인트
+const WATER_TILES = band(4, 6, 19, 20)
+const WATER_SET = new Set(WATER_TILES.map(w => `${w.tx},${w.ty}`))
 
 // Portal 영역 타일 셋
 const PORTAL_SET = new Set(
@@ -96,27 +91,127 @@ const MUSEUM_SET = new Set(
   ).flat()
 )
 
-const TREES = RAW_TREES.filter(t => {
-  const k = `${t.tx},${t.ty}`
-  return !PATH_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
-})
+// 길/물/포털/박물관과 안 겹치는 타일인지 — 모든 장식물 배치가 공통으로 쓰는 필터
+function isFree(tx, ty) {
+  const k = `${tx},${ty}`
+  return !PATH_SET.has(k) && !WATER_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
+}
+
+// 지형 조회 — GroundLayer(오토타일 렌더링)와 스폰 로직이 공유
+function terrainAt(tx, ty) {
+  const k = `${tx},${ty}`
+  if (WATER_SET.has(k)) return 'water'
+  if (PATH_SET.has(k))  return 'dirt'
+  return 'grass'
+}
 
 /* ─────────────────────────────────────────────
-   꽃 배치
+   존별 테마 장식 — 전체 맵에 고르게 뿌리는 대신, 포털 주변 반경에만
+   그 존 분위기에 맞는 소품을 모아서 배치한다.
 ───────────────────────────────────────────── */
-const FLOWERS = Array.from({length:30}, (_,i) => ({
-  tx: 3 + (i*73)%34,
-  ty: 3 + (i*47)%24,
-  type: i % 4,
-})).filter(f => {
-  const k = `${f.tx},${f.ty}`
-  return !PATH_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
-})
+const portalByZone = Object.fromEntries(PORTALS.map(p => [p.zone, p]))
+
+function scatterNear(zone, count, radius, mulA, mulB, seed = 0) {
+  const p = portalByZone[zone]
+  const cx = p.tx + p.w / 2, cy = p.ty + p.h / 2
+  return Array.from({ length: count }, (_, i) => ({
+    tx: Math.round(cx + (((i * mulA + seed) % (radius * 2)) - radius)),
+    ty: Math.round(cy + (((i * mulB + seed) % (radius * 2)) - radius)),
+  })).filter(t => t.tx >= 2 && t.tx < MAP_W - 2 && t.ty >= 2 && t.ty < MAP_H - 2 && isFree(t.tx, t.ty))
+}
+
+// 테두리 나무 — 맵 크기에 비례해서 자동으로 개수가 늘어나도록 공식화 (존 무관, 액자 역할)
+const borderTreeCount = Math.floor((MAP_W - 4) / 2)
+const sideTreeCount    = Math.floor((MAP_H - 6) / 2)
+const BORDER_TREES = [
+  ...Array.from({length: borderTreeCount}, (_,i) => ({ tx: 1+i*2, ty: 1,        variant: i%3 })),
+  ...Array.from({length: borderTreeCount}, (_,i) => ({ tx: 1+i*2, ty: MAP_H-2,  variant: (i+1)%3 })),
+  ...Array.from({length: sideTreeCount},   (_,i) => ({ tx: 1,       ty: 3+i*2,  variant: i%2 })),
+  ...Array.from({length: sideTreeCount},   (_,i) => ({ tx: MAP_W-2, ty: 3+i*2,  variant: (i+1)%2 })),
+].filter(t => isFree(t.tx, t.ty))
+
+// Animal: 나무·수풀 빽빽하게 / Nature: 나무 + 연못가 돌 / Urban: 울타리·벤치 위주, 나무 적게
+// Human: 울타리·벤치 + 꽃 / Music·Lab: 이 팩엔 테마 소품이 없어 나무·꽃만 은은하게
+const TREES = [
+  ...BORDER_TREES,
+  ...scatterNear('Animal', 14, 7, 5, 7, 3).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Nature', 8,  6, 7, 5, 11).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Music',  4,  6, 9, 4, 17).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...scatterNear('Lab',    4,  6, 4, 9, 19).map((t,i) => ({ ...t, variant: i % 3 })),
+]
+const BUSHES = [
+  ...scatterNear('Animal', 8, 5, 3, 8, 23),
+  ...scatterNear('Nature', 5, 5, 8, 3, 29),
+]
+const FLOWERS = [
+  ...scatterNear('Human', 10, 6, 6, 11, 31),
+  ...scatterNear('Music', 10, 6, 11, 6, 37),
+  ...scatterNear('Animal', 6, 5, 13, 7, 41),
+].map((f,i) => ({ ...f, type: i % 4 }))
+const ROCKS = [
+  ...scatterNear('Nature', 8, 6, 17, 9, 43),
+  ...scatterNear('Lab',    6, 6, 9, 17, 47),
+]
+const BENCHES = [
+  ...scatterNear('Urban', 4, 5, 5, 9, 53),
+  ...scatterNear('Human', 4, 5, 9, 5, 59),
+]
+const FENCES = [
+  ...scatterNear('Urban', 10, 6, 7, 13, 61),
+  ...scatterNear('Human', 6,  6, 13, 7, 67),
+]
 
 /* ─────────────────────────────────────────────
    헬퍼
 ───────────────────────────────────────────── */
+// 시트(WORLD_TILESET)에서 임의의 srcX/srcY,w×h 영역만 잘라 (x,y)에 그리는 범용 크롭 컴포넌트.
+// 중첩 <svg>의 viewBox가 그 자체로 클리핑 뷰포트 역할을 해서 별도 clipPath 없이 잘림.
+// rotate를 주면 크롭 영역의 중심을 기준으로 소스 이미지를 회전시켜서(오토타일 회전 재사용) 그린다.
+// autotileShape의 rotate(0=S,90=W,180=N,270=E 경계)에 맞춰 그 변에 짧고 부드러운
+// 하이라이트 선을 그린다 — 시트 자체의 톱니 경계 위에 겹쳐서 전환을 더 또렷하게 보이게 함.
+function EdgeGlow({ tx, ty, rotate, color }) {
+  const x0 = tx * TILE, y0 = ty * TILE
+  const lines = {
+    0:   [x0, y0 + TILE, x0 + TILE, y0 + TILE], // S
+    90:  [x0, y0, x0, y0 + TILE],                // W
+    180: [x0, y0, x0 + TILE, y0],                // N
+    270: [x0 + TILE, y0, x0 + TILE, y0 + TILE],  // E
+  }
+  const [x1, y1, x2, y2] = lines[rotate] || lines[0]
+  return (
+    <line x1={x1} y1={y1} x2={x2} y2={y2}
+      stroke={color} strokeWidth="6" strokeLinecap="round" opacity="0.8"/>
+  )
+}
+
+// srcX/srcY/w/h는 시트 안 크롭 영역(소스 좌표계), renderW/renderH를 따로 주면 그 크기로
+// 확대·축소해서 그린다(기본은 크롭 크기 그대로). rotate는 크롭 중심을 기준으로 회전.
+function SheetSprite({ x, y, srcX, srcY, w = TILE, h = TILE, renderW, renderH, rotate = 0, sheet = WORLD_TILESET }) {
+  const { src, sheetW, sheetH } = sheet
+  const cx = srcX + w / 2, cy = srcY + h / 2
+  return (
+    <svg x={x} y={y} width={renderW ?? w} height={renderH ?? h}
+      viewBox={`${srcX} ${srcY} ${w} ${h}`} style={{ overflow: 'hidden' }}>
+      <g transform={rotate ? `rotate(${rotate} ${cx} ${cy})` : undefined}>
+        <image href={src} width={sheetW} height={sheetH} style={{ imageRendering: 'pixelated' }}/>
+      </g>
+    </svg>
+  )
+}
+
+// 포털 섬 안에 실제 건물 스프라이트를 비율 유지한 채 최대한 크게, 가운데 정렬해서 그림
+function BuildingSprite({ zone, px, py, pw, ph }) {
+  const b = WORLD_BUILDINGS[zone]
+  if (!b) return null
+  const scale = Math.min(pw / b.w, ph / b.h) * 0.92
+  const w = b.w * scale, h = b.h * scale
+  const x = px + (pw - w) / 2, y = py + (ph - h) / 2 + ph * 0.03
+  return <SheetSprite x={x} y={y} srcX={b.x} srcY={b.y} w={b.w} h={b.h}
+    renderW={w} renderH={h} sheet={b}/>
+}
+
 const TREE_SRCS = [OBJECTS.tree_01, OBJECTS.tree_02, OBJECTS.tree_03]
+const WORLD_TREE_SRCS = [WORLD_TILESET.decor.tree1, WORLD_TILESET.decor.tree2, WORLD_TILESET.decor.pine]
 const TREE_COLORS = [
   { trunk: '#7A5230', canopy: '#2D7A2D', shadow: '#1F5C1F' },
   { trunk: '#8B5E3C', canopy: '#3A8C2F', shadow: '#2A6B22' },
@@ -124,6 +219,10 @@ const TREE_COLORS = [
 ]
 
 function PixelTree({ x, y, variant = 0 }) {
+  if (ASSET_READY.world) {
+    const s = WORLD_TREE_SRCS[variant % 3]
+    return <SheetSprite x={x} y={y - TILE * 0.5} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
   if (ASSET_READY.objects) {
     return (
       <image href={TREE_SRCS[variant % 3]} x={x} y={y} width={TILE} height={TILE*1.5}
@@ -143,11 +242,23 @@ function PixelTree({ x, y, variant = 0 }) {
   )
 }
 
+const FLOWER_SRCS = [OBJECTS.flower_yellow, OBJECTS.flower_pink, OBJECTS.flower_blue, OBJECTS.flower_white]
 const FLOWER_COLORS = [
   ['#F4D03F','#F39C12'], ['#E8A0C0','#D4608A'],
   ['#A8D8EA','#6DB5D4'], ['#F0F0AA','#D4D444'],
 ]
+const WORLD_FLOWER_SRCS = [WORLD_TILESET.decor.flower1, WORLD_TILESET.decor.flower2, WORLD_TILESET.decor.flower3]
 function PixelFlower({ x, y, type }) {
+  if (ASSET_READY.world) {
+    const s = WORLD_FLOWER_SRCS[type % 3]
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
+  if (ASSET_READY.objects) {
+    return (
+      <image href={FLOWER_SRCS[type % 4]} x={x} y={y} width={TILE} height={TILE}
+        style={{ imageRendering: 'pixelated' }}/>
+    )
+  }
   const [p, c] = FLOWER_COLORS[type % 4]
   return (
     <g transform={`translate(${x+6},${y+10})`}>
@@ -158,11 +269,95 @@ function PixelFlower({ x, y, type }) {
   )
 }
 
+function PixelBush({ x, y, variant = 0 }) {
+  const s = variant % 2 === 0 ? WORLD_TILESET.decor.bush1 : WORLD_TILESET.decor.bush2
+  if (ASSET_READY.world) {
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
+  const c = TREE_COLORS[variant % 3]
+  return (
+    <g transform={`translate(${x+3},${y+8})`}>
+      <ellipse cx="13" cy="20" rx="12" ry="3" fill="#00000022"/>
+      <circle cx="13" cy="12" r="11" fill={c.canopy}/>
+      <circle cx="7" cy="15" r="7" fill={c.shadow} opacity="0.6"/>
+    </g>
+  )
+}
+
+function PixelRock({ x, y }) {
+  if (ASSET_READY.world) {
+    const s = WORLD_TILESET.decor.rock
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
+  if (ASSET_READY.objects) {
+    return (
+      <image href={OBJECTS.rock} x={x} y={y} width={TILE} height={TILE}
+        style={{ imageRendering: 'pixelated' }}/>
+    )
+  }
+  return (
+    <g transform={`translate(${x+4},${y+10})`}>
+      <ellipse cx="12" cy="18" rx="11" ry="3" fill="#00000022"/>
+      <path d="M2,16 Q1,8 9,6 Q17,3 22,10 Q24,16 18,18 Q10,20 2,16Z" fill="#9A948A"/>
+      <path d="M4,15 Q5,9 11,7 Q16,5 20,10" fill="none" stroke="#B4AEA0" strokeWidth="1.5" opacity="0.7"/>
+      <path d="M6,17 Q12,19 18,16" fill="none" stroke="#6E6860" strokeWidth="1.5" opacity="0.6"/>
+    </g>
+  )
+}
+
+function PixelBench({ x, y }) {
+  if (ASSET_READY.world) {
+    const s = WORLD_TILESET.decor.bench1
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
+  if (ASSET_READY.objects) {
+    return (
+      <image href={OBJECTS.bench} x={x} y={y} width={TILE} height={TILE}
+        style={{ imageRendering: 'pixelated' }}/>
+    )
+  }
+  return (
+    <g transform={`translate(${x+2},${y+10})`}>
+      <ellipse cx="14" cy="19" rx="13" ry="3" fill="#00000022"/>
+      <rect x="1"  y="6"  width="3" height="13" rx="1" fill="#6B4423"/>
+      <rect x="24" y="6"  width="3" height="13" rx="1" fill="#6B4423"/>
+      <rect x="0"  y="4"  width="28" height="4" rx="1.5" fill="#8B5E3C"/>
+      <rect x="0"  y="13" width="28" height="4" rx="1.5" fill="#8B5E3C"/>
+    </g>
+  )
+}
+
+function PixelFence({ x, y }) {
+  if (ASSET_READY.world) {
+    const s = WORLD_TILESET.decor.fence
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
+  }
+  if (ASSET_READY.objects) {
+    return (
+      <image href={OBJECTS.fence} x={x} y={y} width={TILE} height={TILE}
+        style={{ imageRendering: 'pixelated' }}/>
+    )
+  }
+  return (
+    <g transform={`translate(${x+2},${y+8})`}>
+      <rect x="0"  y="8" width="4" height="14" rx="1" fill="#B89A6E"/>
+      <rect x="10" y="8" width="4" height="14" rx="1" fill="#B89A6E"/>
+      <rect x="20" y="8" width="4" height="14" rx="1" fill="#B89A6E"/>
+      <rect x="-2" y="10" width="28" height="3" rx="1" fill="#C8AE7E"/>
+      <rect x="-2" y="17" width="28" height="3" rx="1" fill="#C8AE7E"/>
+    </g>
+  )
+}
+
 /* ─────────────────────────────────────────────
    Zone 빌딩 SVG 폴백 (각 zone 테마 맞춤)
 ───────────────────────────────────────────── */
 function ZoneBuilding({ zone, px, py, pw, ph }) {
   const cx = px + pw / 2
+
+  if (ASSET_READY.world && WORLD_BUILDINGS[zone]) {
+    return <BuildingSprite zone={zone} px={px} py={py} pw={pw} ph={ph}/>
+  }
 
   if (zone === 'Animal') return (
     <g>
@@ -246,17 +441,32 @@ function PortalIsland({ portal, hovered, progress, locked }) {
   const prog = Math.min(Math.max(progress || 0, 0), 1)
   const accent = locked ? '#8A8A8A' : meta.color
 
+  // 실제 건물 스프라이트가 있으면 잔디 위에 그냥 자연스럽게 올려놓고, 예전처럼 건물
+  // 뒤에 초록 사각 "언덕 대지"를 깔지 않는다 — hover 표시는 은은한 테두리 선으로만.
+  const useRealBuilding = ASSET_READY.world && WORLD_BUILDINGS[portal.zone]
+
   return (
     <g opacity={locked ? 0.6 : 1} style={{ filter: locked ? 'grayscale(0.8)' : 'none', transition:'all 0.25s' }}>
       <ellipse cx={px+pw/2+4} cy={py+ph+8} rx={pw*0.52} ry={10} fill="#00000033"/>
-      <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
-        fill="#3A6B2A"
-        stroke={hovered ? accent : '#2A5A1A'}
-        strokeWidth={hovered ? 2.5 : 1}
-        style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
-      />
-      <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#4A8B3A" opacity="0.7"/>
-      <rect x={px+pw/2-8} y={py+ph-4} width={16} height={12} rx="2" fill="#C8B89A"/>
+      {useRealBuilding ? (
+        <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
+          fill="none"
+          stroke={hovered ? accent : 'transparent'}
+          strokeWidth={hovered ? 2.5 : 0}
+          style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
+        />
+      ) : (
+        <>
+          <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
+            fill="#3A6B2A"
+            stroke={hovered ? accent : '#2A5A1A'}
+            strokeWidth={hovered ? 2.5 : 1}
+            style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
+          />
+          <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#4A8B3A" opacity="0.7"/>
+          <rect x={px+pw/2-8} y={py+ph-4} width={16} height={12} rx="2" fill="#C8B89A"/>
+        </>
+      )}
 
       <ZoneBuilding zone={portal.zone} px={px} py={py} pw={pw} ph={ph}/>
 
@@ -360,6 +570,27 @@ function PixelChar({ dir, moving }) {
   const tick  = Math.floor(Date.now() / 160) % 2
   const frame = moving ? tick : 0
 
+  if (ASSET_READY.world) {
+    const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
+    const row = rows[dir] ?? rows.down
+    const srcX = cols[frame] * fs, srcY = row * fs
+    // 중첩된 svg의 viewBox 암시적 클리핑이 foreignObject 안에서는 이전 프레임 일부가
+    // 새어나오는 경우가 있어서(특히 CHAR_W/H가 32x32 프레임과 비율이 다를 때), 기존
+    // player_sheet 폴백과 같은 방식으로 명시적 clipPath를 써서 확실하게 자른다.
+    return (
+      <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${fs} ${fs}`}
+        style={{ overflow:'hidden', imageRendering:'pixelated' }}>
+        <defs>
+          <clipPath id="playerClip"><rect width={fs} height={fs}/></clipPath>
+        </defs>
+        {layers.map((L,i) => (
+          <image key={i} href={L.src} x={-srcX} y={-srcY} width={L.sheetW} height={L.sheetH}
+            clipPath="url(#playerClip)" style={{ imageRendering:'pixelated' }}/>
+        ))}
+      </svg>
+    )
+  }
+
   if (ASSET_READY.characters && CHARACTERS.player_sheet) {
     const frameOffsets = CHAR_CFG[dir] || CHAR_CFG.down
     const frameX = frameOffsets[frame] ?? frameOffsets[0]
@@ -424,6 +655,21 @@ function PixelChar({ dir, moving }) {
    바닥 패턴
 ───────────────────────────────────────────── */
 function GroundPatterns() {
+  if (ASSET_READY.world) {
+    const { src, sheetW, sheetH, tile, grass } = WORLD_TILESET
+    return (
+      <defs>
+        <pattern id="grass" width={TILE} height={TILE} patternUnits="userSpaceOnUse">
+          <svg width={TILE} height={TILE} viewBox={`${grass.x} ${grass.y} ${tile} ${tile}`}>
+            <image href={src} width={sheetW} height={sheetH} style={{ imageRendering:'pixelated' }}/>
+          </svg>
+        </pattern>
+        <filter id="edgeGlow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.2"/>
+        </filter>
+      </defs>
+    )
+  }
   if (ASSET_READY.tiles) {
     return (
       <defs>
@@ -655,22 +901,54 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
           <GroundPatterns/>
           <rect width={PX_W} height={PX_H} fill="url(#grass)"/>
 
-          {PATH_TILES.map((p,i) => (
-            <rect key={i}
-              x={p.tx*TILE} y={p.ty*TILE} width={TILE} height={TILE}
-              fill={p.plaza ? "url(#plaza_tile)" : "url(#path_tile)"}
-              stroke={ASSET_READY.tiles ? 'none' : '#B8A88A'} strokeWidth="0.3"
-            />
-          ))}
+          {ASSET_READY.world ? (
+            <>
+              {PATH_TILES.map((p,i) => {
+                const { shape, rotate } = autotileShape(p.tx, p.ty, terrainAt, 'dirt')
+                const s = WORLD_TILESET.dirt[shape]
+                return <SheetSprite key={i} x={p.tx*TILE} y={p.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
+              })}
+              {WATER_TILES.map((w,i) => {
+                const { shape, rotate } = autotileShape(w.tx, w.ty, terrainAt, 'water')
+                const s = WORLD_TILESET.water[shape]
+                return <SheetSprite key={i} x={w.tx*TILE} y={w.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
+              })}
+              {/* 시트 자체의 톱니 경계가 은은해서, 그 위에 짧은 크림색 glow 선을 겹쳐 그려
+                  레퍼런스 이미지처럼 잔디↔길·잔디↔물 경계가 눈에 뚜렷하게 들어오게 보강 */}
+              {PATH_TILES.map((p,i) => {
+                const { shape, rotate } = autotileShape(p.tx, p.ty, terrainAt, 'dirt')
+                if (shape !== 'edge') return null
+                return <EdgeGlow key={i} tx={p.tx} ty={p.ty} rotate={rotate} color="#F5E6BE"/>
+              })}
+              {WATER_TILES.map((w,i) => {
+                const { shape, rotate } = autotileShape(w.tx, w.ty, terrainAt, 'water')
+                if (shape !== 'edge') return null
+                return <EdgeGlow key={i} tx={w.tx} ty={w.ty} rotate={rotate} color="#EAF7F5"/>
+              })}
+            </>
+          ) : (
+            <>
+              {PATH_TILES.map((p,i) => (
+                <rect key={i}
+                  x={p.tx*TILE} y={p.ty*TILE} width={TILE} height={TILE}
+                  fill={p.plaza ? "url(#plaza_tile)" : "url(#path_tile)"}
+                  stroke={ASSET_READY.tiles ? 'none' : '#B8A88A'} strokeWidth="0.3"
+                />
+              ))}
+              {!ASSET_READY.tiles && PATH_TILES.filter(p=>p.plaza).map((p,i) => (
+                <rect key={i}
+                  x={p.tx*TILE+2} y={p.ty*TILE+2} width={TILE-4} height={TILE-4}
+                  rx="3" fill="#D8C8AA" stroke="#B8A88A" strokeWidth="0.5"
+                />
+              ))}
+            </>
+          )}
 
-          {!ASSET_READY.tiles && PATH_TILES.filter(p=>p.plaza).map((p,i) => (
-            <rect key={i}
-              x={p.tx*TILE+2} y={p.ty*TILE+2} width={TILE-4} height={TILE-4}
-              rx="3" fill="#D8C8AA" stroke="#B8A88A" strokeWidth="0.5"
-            />
-          ))}
-
+          {BUSHES.map((b,i) => <PixelBush key={i} x={b.tx*TILE} y={b.ty*TILE} variant={i}/>)}
           {FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} type={f.type}/>)}
+          {ROCKS.map((r,i) => <PixelRock key={i} x={r.tx*TILE} y={r.ty*TILE}/>)}
+          {BENCHES.map((b,i) => <PixelBench key={i} x={b.tx*TILE} y={b.ty*TILE}/>)}
+          {FENCES.map((f,i) => <PixelFence key={i} x={f.tx*TILE} y={f.ty*TILE}/>)}
           {TREES.map((t,i) => <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
 
           {PORTALS.map(p => (

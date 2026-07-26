@@ -4,3 +4,13 @@ node_modules
 .next/
 .env.local
 scripts/download_errors.csv
+.DS_Store
+
+# 구매한 itch.io 에셋 번들 원본 (수천 개 파일 — 필요한 부분만 public/assets/에 골라 복사해서 사용)
+full version/
+town full/
+interior full/
+nature full/
+fishing_full/
+winter full/
+Character v.2/

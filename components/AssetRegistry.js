@@ -146,6 +146,85 @@ export const ASSET_READY = {
   objects:    false,   // true로 바꾸면 PNG 오브젝트 사용
   characters: false,   // true로 바꾸면 PNG 캐릭터 사용
   items:      false,   // true로 바꾸면 PNG 아이템 사용
+  world:      true,   // true로 바꾸면 WorldMap 오토타일 지면 + 실제 장식 스프라이트 사용
+}
+
+/* ─────────────────────────────────────────────
+   WorldMap 전용 — 구매한 "Cozy Farm" 타일시트 (shubibubi)
+   원본: full version/tiles/tiles.png → public/assets/world/terrain.png
+   타일 크기 32px = 이 프로젝트 TILE 상수와 동일(리사이즈 불필요), 좌표 단위 px.
+   edge는 픽셀 색상 샘플링(python 스크립트로 4분면 색을 찍어서 확인)으로 찾은
+   "N/E/W는 안쪽, S만 다른 지형(크림색 경계)" 모양 — lib/autotile.js가 회전시켜 재사용.
+───────────────────────────────────────────── */
+export const WORLD_TILESET = {
+  src: '/assets/world/terrain.png',
+  sheetW: 864,
+  sheetH: 800,
+  tile: 32,
+  grass: { x: 0, y: 0 },
+  dirt: {
+    full: { x: 96, y: 352 },
+    edge: { x: 96, y: 96  },
+  },
+  water: {
+    full: { x: 96, y: 224 },
+    edge: { x: 96, y: 192 },
+  },
+  decor: {
+    tree1:  { x: 0,   y: 384, w: 32, h: 64 },
+    tree2:  { x: 32,  y: 384, w: 32, h: 64 },
+    pine:   { x: 64,  y: 384, w: 32, h: 64 },
+    bush1:  { x: 96,  y: 416, w: 32, h: 32 },
+    bush2:  { x: 128, y: 416, w: 32, h: 32 },
+    bench1: { x: 192, y: 416, w: 32, h: 32 },
+    bench2: { x: 224, y: 416, w: 32, h: 32 },
+    fence:  { x: 0,   y: 480, w: 32, h: 32 },
+    rock:   { x: 192, y: 480, w: 32, h: 32 },
+    flower1: { x: 96,  y: 448, w: 32, h: 32 },
+    flower2: { x: 128, y: 448, w: 32, h: 32 },
+    flower3: { x: 160, y: 448, w: 32, h: 32 },
+  },
+}
+
+/* ─────────────────────────────────────────────
+   WorldMap 포털 건물 — 6개 구매 팩(Farm/Town/Fishing/Nature/Interior/Winter) 전부 열어보고
+   존 테마에 가장 잘 맞는 걸로 하나씩 고름. 좌표는 스캔라인으로 여백을 찾아 픽셀 단위로
+   직접 잰 값(격자 아님, 건물마다 크기 다름). 항목마다 자기 시트(src/sheetW/sheetH)를 따로 가짐.
+     Human/Animal: full version(Cozy Farm) — 코티지/헛간, 그대로도 잘 어울림
+     Urban: town full의 "Pub" (사용자가 레퍼런스로 보내준 것)
+     Music: town full의 "Arcade!" — 네온 간판이 Farm의 별장식 오두막보다 훨씬 음악/엔터 느낌
+     Lab: town full의 "Public Library" — 학구적·미스터리한 분위기가 온실보다 더 잘 맞음
+     Nature: fishing_full의 파란 지붕 "Fish Shop" — 연못 옆에 물가 건물이라 자연스러움
+───────────────────────────────────────────── */
+const FARM_BUILDINGS_SHEET    = { src: '/assets/world/buildings.png',         sheetW: 1503, sheetH: 1072 }
+const TOWN_BUILDINGS_SHEET    = { src: '/assets/world/town_buildings.png',    sheetW: 1152, sheetH: 1216 }
+const FISHING_BUILDINGS_SHEET = { src: '/assets/world/fishing_buildings.png', sheetW: 368,  sheetH: 256 }
+
+export const WORLD_BUILDINGS = {
+  Human:  { ...FARM_BUILDINGS_SHEET,    x: 0, y: 36,  w: 66,  h: 78  },
+  Animal: { ...FARM_BUILDINGS_SHEET,    x: 5, y: 115, w: 70,  h: 76  },
+  Urban:  { ...TOWN_BUILDINGS_SHEET,    x: 7, y: 0,   w: 85,  h: 80  },
+  Music:  { ...TOWN_BUILDINGS_SHEET,    x: 3, y: 92,  w: 92,  h: 85  },
+  Lab:    { ...TOWN_BUILDINGS_SHEET,    x: 8, y: 650, w: 145, h: 100 },
+  Nature: { ...FISHING_BUILDINGS_SHEET, x: 2, y: 3,   w: 76,  h: 62  },
+}
+
+/* ─────────────────────────────────────────────
+   플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(몸/옷/머리)를 같은 32×32
+   격자에 겹쳐 그리는 레이어 시스템 — 각 시트가 "walk" 블록만 잘라낸 256×128(8열×4행).
+   info.txt 확인 결과 행 = 방향(0:Down, 1:Up, 2:Left, 3:Right), 열 = 걷기 프레임(0~7).
+   자연스러운 2프레임 걸음만 쓰면 되니 열 0(중립)·4(중간 스트라이드)만 사용.
+   옷/머리 원본 파일은 색상 10~14종이 가로로 이어붙어 있는데, 첫 번째(x:0~256)만 사용.
+───────────────────────────────────────────── */
+export const WORLD_CHARACTER = {
+  frame: 32,
+  rows: { down: 0, up: 1, left: 3, right: 2 },
+  cols: [0, 4],
+  layers: [
+    { src: '/assets/world/player_body.png',    sheetW: 256, sheetH: 128 },
+    { src: '/assets/world/player_clothes.png', sheetW: 256, sheetH: 128 },
+    { src: '/assets/world/player_hair.png',    sheetW: 256, sheetH: 128 },
+  ],
 }
 
 /* ─────────────────────────────────────────────
