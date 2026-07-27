@@ -213,6 +213,25 @@ export const WORLD_BUILDINGS = {
 }
 
 /* ─────────────────────────────────────────────
+   Lab("미지의 소리 마을") 존 전용 장식 — interior full 팩의 액자 포스터/러그 시트에서
+   가져옴. ALIEN·BAT·해골·유령·악마 포스터는 decorations.png의 벽걸이 액자 줄에서,
+   호박(잭오랜턴)·박쥐 실루엣은 rugs.png 맨 아래 계절 아이콘 줄에서 좌표를 픽셀 단위로
+   직접 재서 잘랐다 (마을 자체 컨셉 "미지의 소리"에 맞춘 으스스한/미스터리 분위기).
+───────────────────────────────────────────── */
+const LAB_DECOR_SHEET = { src: '/assets/lab/decorations.png', sheetW: 960, sheetH: 624 }
+const LAB_RUGS_SHEET  = { src: '/assets/lab/rugs.png',        sheetW: 512, sheetH: 288 }
+
+export const LAB_DECOR = {
+  posterAlien:    { ...LAB_DECOR_SHEET, x: 209, y: 272, w: 15, h: 20 },
+  posterBat:      { ...LAB_DECOR_SHEET, x: 113, y: 272, w: 15, h: 20 },
+  posterGhost:    { ...LAB_DECOR_SHEET, x: 16,  y: 272, w: 15, h: 20 },
+  posterSkeleton: { ...LAB_DECOR_SHEET, x: 81,  y: 272, w: 15, h: 20 },
+  posterDemon:    { ...LAB_DECOR_SHEET, x: 97,  y: 272, w: 15, h: 20 },
+  pumpkin:        { ...LAB_RUGS_SHEET,  x: 64,  y: 260, w: 33, h: 28 },
+  bat:            { ...LAB_RUGS_SHEET,  x: 97,  y: 264, w: 33, h: 20 },
+}
+
+/* ─────────────────────────────────────────────
    플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(몸/옷/머리)를 같은 32×32
    격자에 겹쳐 그리는 레이어 시스템 — 각 시트가 "walk" 블록만 잘라낸 256×128(8열×4행).
    info.txt 확인 결과 행 = 방향(0:Down, 1:Up, 2:Left, 3:Right), 열 = 걷기 프레임(0~7).

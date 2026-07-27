@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, LAB_DECOR } from '@/components/AssetRegistry'
 
 /* ─────────────────────────────────────────────
    맵 크기
@@ -50,9 +50,11 @@ const ZONE_THEME = {
     sky: 'linear-gradient(180deg, #2A1A5A 0%, #8A4AB0 100%)',
   },
   Lab:    {
-    ground: '#3A2A5A', groundDark: '#2A1A4A', path: '#8A7AA0',
-    border: '#1A0A3A', water: null,
-    sky: 'linear-gradient(180deg, #0A0A2A 0%, #3A1A5A 100%)',
+    // "미지의 소리 마을" — 코지 에셋의 할로윈풍 액자(ALIEN/BAT/해골 포스터)·호박·박쥐로
+    // 꾸미면서, 배경도 마법사풍 보라색 대신 사진 속 어두운 방 느낌(그을린 벽돌/나무)으로.
+    ground: '#2A2230', groundDark: '#1E1822', path: '#6A5548',
+    border: '#120E18', water: null,
+    sky: 'linear-gradient(180deg, #140E1C 0%, #3A2028 100%)',
   },
 }
 
@@ -218,19 +220,38 @@ function buildZoneObjects(zone) {
   }
 
   if (zone === 'Lab') {
+    // "미지의 소리 마을" — 참고 사진(할로윈풍 코지 인테리어) 분위기를 내는 진짜 스프라이트
+    // 장식이 주인공. 마법 크리스탈/제단은 소품 정도로만 남겨서 "미지의" 느낌은 유지한다.
+    const posterKeys = ['posterAlien','posterBat','posterGhost','posterSkeleton','posterDemon']
+    for (let i=0;i<12;i++) {
+      objs.push({ type:'poster', tx: 3+i*3.8, ty: 1.5, sprite: LAB_DECOR[posterKeys[i%5]] })
+    }
+    for (let i=0;i<8;i++) {
+      objs.push({ type:'poster', tx: 4+i*5.5, ty: 33.5, sprite: LAB_DECOR[posterKeys[(i+2)%5]] })
+    }
+    for (let i=0;i<22;i++) objs.push({ type:'pumpkin', tx:2+(i*67)%44, ty:5+(i*41)%26 })
+    for (let i=0;i<14;i++) objs.push({ type:'bat_deco', tx:1+(i*59)%46, ty:2+(i*37)%32 })
+
     const crystalPos = [
-      {tx:s(2),ty:s(2)},{tx:s(4),ty:s(3)},{tx:s(19),ty:s(2)},{tx:s(21),ty:s(3)},
-      {tx:s(2),ty:s(13)},{tx:s(4),ty:s(14)},{tx:s(19),ty:s(13)},{tx:s(21),ty:s(14)},
-      {tx:s(10),ty:s(2)},{tx:s(13),ty:s(2)},{tx:s(10),ty:s(14)},{tx:s(13),ty:s(14)},
-      {tx:30,ty:18},{tx:36,ty:20},{tx:10,ty:26},{tx:40,ty:28},{tx:24,ty:30},
+      {tx:s(2),ty:s(13)},{tx:s(21),ty:s(13)},{tx:30,ty:18},{tx:10,ty:26},{tx:40,ty:28},{tx:24,ty:30},
     ]
     crystalPos.forEach((c,i) => objs.push({ type:'crystal', ...c, variant:i%5 }))
-    for (let i=0;i<36;i++) objs.push({ type:'star', tx:1+(i*73)%46, ty:1+(i*53)%34 })
-    objs.push({ type:'altar', tx:cx-2, ty:s(3) })
-    objs.push({ type:'altar', tx:30,   ty:26   })
+    for (let i=0;i<18;i++) objs.push({ type:'star', tx:1+(i*73)%46, ty:1+(i*53)%34 })
+    objs.push({ type:'altar', tx:cx-2, ty:s(8) })
   }
 
   return objs
+}
+
+// 시트에서 srcX/srcY,w×h 영역만 잘라 그리는 범용 크롭 컴포넌트 (WorldMap의 SheetSprite와 동일 기법).
+function LabSprite({ x, y, sprite, scale = 2 }) {
+  const { src, sheetW, sheetH, x: srcX, y: srcY, w, h } = sprite
+  return (
+    <svg x={x} y={y} width={w * scale} height={h * scale}
+      viewBox={`${srcX} ${srcY} ${w} ${h}`} style={{ overflow: 'hidden' }}>
+      <image href={src} width={sheetW} height={sheetH} style={{ imageRendering: 'pixelated' }}/>
+    </svg>
+  )
 }
 
 /* ─────────────────────────────────────────────
@@ -487,6 +508,36 @@ function ZoneObject({ obj, zone, tick }) {
             </g>
           )
         })}
+      </g>
+    )
+  }
+
+  // "미지의 소리 마을"(Lab) 전용 — 코지 에셋의 할로윈풍 액자/장식으로 으스스한 분위기를 낸다.
+  if (obj.type === 'poster') {
+    const bobY = Math.sin(tick * 0.03 + obj.tx * 0.9) * 1.5
+    return (
+      <g transform={`translate(0, ${bobY})`}>
+        <ellipse cx={x + T*0.5} cy={y + T*0.92} rx={T*0.42} ry={4} fill="#00000055"/>
+        <LabSprite x={x} y={y} sprite={obj.sprite} scale={2.1}/>
+      </g>
+    )
+  }
+  if (obj.type === 'pumpkin') {
+    const glow = 0.6 + Math.sin(tick * 0.06 + obj.tx) * 0.25
+    return (
+      <g>
+        <ellipse cx={x + T*0.5} cy={y + T*0.9} rx={T*0.4} ry={5} fill="#00000044"/>
+        <circle cx={x + T*0.5} cy={y + T*0.45} r={T*0.55} fill="#FF8A2A" opacity={glow * 0.35}/>
+        <LabSprite x={x} y={y} sprite={LAB_DECOR.pumpkin} scale={1.7}/>
+      </g>
+    )
+  }
+  if (obj.type === 'bat_deco') {
+    const fx = Math.sin(tick * 0.025 + obj.tx * 1.3) * 10
+    const fy = Math.cos(tick * 0.02 + obj.ty * 1.1) * 6
+    return (
+      <g transform={`translate(${fx},${fy})`} opacity="0.9">
+        <LabSprite x={x} y={y} sprite={LAB_DECOR.bat} scale={1.5}/>
       </g>
     )
   }
