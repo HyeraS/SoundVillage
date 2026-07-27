@@ -683,7 +683,11 @@ function PixelChar({ dir, moving }) {
   if (ASSET_READY.world) {
     const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
     const row = rows[dir] ?? rows.down
-    const srcX = cols[frame] * fs, srcY = row * fs
+    // 시트 info.txt에 "WALK FR: 100, Cell Size 256x128(8열)"라고 적혀있는, 8프레임짜리
+    // 완전한 걷기 사이클(오른발 스텝 0~3 + 왼발 스텝 4~7)이라 100ms마다 한 칸씩 순서대로
+    // 돌려야 자연스럽다 — 예전엔 0번/4번 프레임만 번갈아 써서 제자리 씰룩임처럼 보였다.
+    const walkTick = Math.floor(Date.now() / 100) % cols.length
+    const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
     // 중첩된 svg의 viewBox 암시적 클리핑이 foreignObject 안에서는 이전 프레임 일부가
     // 새어나오는 경우가 있어서(특히 CHAR_W/H가 32x32 프레임과 비율이 다를 때), 기존
     // player_sheet 폴백과 같은 방식으로 명시적 clipPath를 써서 확실하게 자른다.

@@ -222,7 +222,9 @@ export const WORLD_BUILDINGS = {
 export const WORLD_CHARACTER = {
   frame: 32,
   rows: { down: 0, up: 1, left: 3, right: 2 },
-  cols: [0, 4],
+  // 시트 info.txt: "WALK FR: 100, Cell Size: 256x128" — 8열 전체가 한 걸음 주기
+  // (0~3: 오른발 스텝, 4~7: 왼발 스텝)라 전부 순서대로 재생해야 걷는 모션이 된다.
+  cols: [0, 1, 2, 3, 4, 5, 6, 7],
   layers: [
     { src: '/assets/world/player_body.png',    sheetW: 256, sheetH: 128 },
     { src: '/assets/world/player_clothes.png', sheetW: 256, sheetH: 128 },
