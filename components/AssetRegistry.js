@@ -218,8 +218,11 @@ export const WORLD_BUILDINGS = {
    호박(잭오랜턴)·박쥐 실루엣은 rugs.png 맨 아래 계절 아이콘 줄에서 좌표를 픽셀 단위로
    직접 재서 잘랐다 (마을 자체 컨셉 "미지의 소리"에 맞춘 으스스한/미스터리 분위기).
 ───────────────────────────────────────────── */
-const LAB_DECOR_SHEET = { src: '/assets/lab/decorations.png', sheetW: 960, sheetH: 624 }
-const LAB_RUGS_SHEET  = { src: '/assets/lab/rugs.png',        sheetW: 512, sheetH: 288 }
+const LAB_DECOR_SHEET  = { src: '/assets/lab/decorations.png', sheetW: 960, sheetH: 624 }
+const LAB_RUGS_SHEET   = { src: '/assets/lab/rugs.png',        sheetW: 512, sheetH: 288 }
+const LAB_STORAGE_SHEET = { src: '/assets/lab/storage.png',    sheetW: 448, sheetH: 576 }
+const LAB_TABLES_SHEET  = { src: '/assets/lab/tables.png',     sheetW: 448, sheetH: 352 }
+const LAB_CHAIRS_SHEET  = { src: '/assets/lab/chairs.png',     sheetW: 768, sheetH: 208 }
 
 export const LAB_DECOR = {
   posterAlien:    { ...LAB_DECOR_SHEET, x: 209, y: 272, w: 15, h: 20 },
@@ -229,6 +232,12 @@ export const LAB_DECOR = {
   posterDemon:    { ...LAB_DECOR_SHEET, x: 97,  y: 272, w: 15, h: 20 },
   pumpkin:        { ...LAB_RUGS_SHEET,  x: 64,  y: 260, w: 33, h: 28 },
   bat:            { ...LAB_RUGS_SHEET,  x: 97,  y: 264, w: 33, h: 20 },
+  // 실제 방 배치용 가구 — 참고 사진처럼 벽에 등을 붙인 가구+러그 조합을 만드는 데 쓴다.
+  tv:        { ...LAB_DECOR_SHEET,    x: 548, y: 178, w: 25, h: 14 },
+  rug:       { ...LAB_RUGS_SHEET,     x: 289, y: 32,  w: 30, h: 32 },
+  wardrobe:  { ...LAB_STORAGE_SHEET,  x: 384, y: 1,   w: 31, h: 30 },
+  table:     { ...LAB_TABLES_SHEET,   x: 1,   y: 1,   w: 30, h: 32 },
+  chair:     { ...LAB_CHAIRS_SHEET,   x: 1,   y: 10,  w: 13, h: 35 },
 }
 
 /* ─────────────────────────────────────────────

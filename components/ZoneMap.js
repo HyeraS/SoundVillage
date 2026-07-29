@@ -50,10 +50,11 @@ const ZONE_THEME = {
     sky: 'linear-gradient(180deg, #2A1A5A 0%, #8A4AB0 100%)',
   },
   Lab:    {
-    // "미지의 소리 마을" — 코지 에셋의 할로윈풍 액자(ALIEN/BAT/해골 포스터)·호박·박쥐로
-    // 꾸미면서, 배경도 마법사풍 보라색 대신 사진 속 어두운 방 느낌(그을린 벽돌/나무)으로.
-    ground: '#2A2230', groundDark: '#1E1822', path: '#6A5548',
-    border: '#120E18', water: null,
+    // "미지의 소리 마을" — 코지 에셋의 할로윈풍 액자(ALIEN/BAT/해골 포스터)·가구·호박·박쥐로
+    // 꾸미면서, 배경도 마법사풍 보라색 대신 사진 속 방 느낌(어두운 나무 바닥 + 그을린 벽돌
+    // 벽)으로 — 색상은 interior full 팩의 실제 벽돌/원목 wallpaper 스와치에서 샘플링.
+    ground: '#5A4030', groundDark: '#432E20', path: '#6A5548',
+    border: '#4A2530', water: null,
     sky: 'linear-gradient(180deg, #140E1C 0%, #3A2028 100%)',
   },
 }
@@ -220,24 +221,51 @@ function buildZoneObjects(zone) {
   }
 
   if (zone === 'Lab') {
-    // "미지의 소리 마을" — 참고 사진(할로윈풍 코지 인테리어) 분위기를 내는 진짜 스프라이트
-    // 장식이 주인공. 마법 크리스탈/제단은 소품 정도로만 남겨서 "미지의" 느낌은 유지한다.
+    // "미지의 소리 마을" — 참고 사진(할로윈풍 코지 인테리어)처럼 소품을 흩뿌리는 대신
+    // 실제 방처럼 벽에 등을 붙인 가구 세트 4개(미디어 코너/서재 코너/식탁 코너/창고 코너)를
+    // 네 모서리에 배치하고, 그 위 벽엔 액자를 건다. 입구(맵 중앙 하단)는 비워둔다.
     const posterKeys = ['posterAlien','posterBat','posterGhost','posterSkeleton','posterDemon']
-    for (let i=0;i<12;i++) {
-      objs.push({ type:'poster', tx: 3+i*3.8, ty: 1.5, sprite: LAB_DECOR[posterKeys[i%5]] })
-    }
-    for (let i=0;i<8;i++) {
-      objs.push({ type:'poster', tx: 4+i*5.5, ty: 33.5, sprite: LAB_DECOR[posterKeys[(i+2)%5]] })
-    }
-    for (let i=0;i<22;i++) objs.push({ type:'pumpkin', tx:2+(i*67)%44, ty:5+(i*41)%26 })
-    for (let i=0;i<14;i++) objs.push({ type:'bat_deco', tx:1+(i*59)%46, ty:2+(i*37)%32 })
+    let pk = 0
+    const poster = (tx, ty) => objs.push({ type:'poster', tx, ty, sprite: LAB_DECOR[posterKeys[pk++ % posterKeys.length]] })
 
-    const crystalPos = [
-      {tx:s(2),ty:s(13)},{tx:s(21),ty:s(13)},{tx:30,ty:18},{tx:10,ty:26},{tx:40,ty:28},{tx:24,ty:30},
+    // 미디어 코너 (TV + 러그) — 북서쪽
+    poster(5, 1.3); poster(13, 1.3)
+    objs.push({ type:'tv',  tx:8, ty:3 })
+    objs.push({ type:'rug', tx:6, ty:7 })
+
+    // 서재/수납 코너 (옷장 2개) — 북동쪽
+    poster(34, 1.3); poster(43, 1.3)
+    objs.push({ type:'wardrobe', tx:36, ty:3 })
+    objs.push({ type:'wardrobe', tx:41, ty:3 })
+    objs.push({ type:'rug',      tx:37, ty:8 })
+
+    // 식탁 코너 (테이블 + 의자 2개) — 남서쪽
+    poster(4, 33.3)
+    objs.push({ type:'table', tx:6, ty:27 })
+    objs.push({ type:'chair', tx:5, ty:31 })
+    objs.push({ type:'chair', tx:9, ty:31 })
+    objs.push({ type:'rug',   tx:6, ty:30 })
+
+    // 창고 코너 (옷장 + 호박 더미) — 남동쪽
+    poster(42, 33.3)
+    objs.push({ type:'wardrobe', tx:38, ty:27 })
+    objs.push({ type:'rug',      tx:39, ty:31 })
+
+    // 입구 앞 마중 나온 호박, 천장 부근을 나는 박쥐 — 방 전체에 흩뿌리지 않고 소량만
+    const pumpkinPos = [
+      {tx:20,ty:31},{tx:29,ty:31},{tx:18,ty:17},{tx:29,ty:17},{tx:23,ty:22},{tx:26,ty:12},
     ]
+    pumpkinPos.forEach(p => objs.push({ type:'pumpkin', ...p }))
+    const batPos = [
+      {tx:18,ty:4},{tx:30,ty:4},{tx:22,ty:9},{tx:14,ty:20},{tx:34,ty:20},{tx:24,ty:6},
+    ]
+    batPos.forEach(p => objs.push({ type:'bat_deco', ...p }))
+
+    // 마법 크리스탈/별은 소품 정도로만 남겨서 "미지의" 느낌 유지
+    const crystalPos = [{tx:22,ty:16},{tx:27,ty:23}]
     crystalPos.forEach((c,i) => objs.push({ type:'crystal', ...c, variant:i%5 }))
-    for (let i=0;i<18;i++) objs.push({ type:'star', tx:1+(i*73)%46, ty:1+(i*53)%34 })
-    objs.push({ type:'altar', tx:cx-2, ty:s(8) })
+    for (let i=0;i<10;i++) objs.push({ type:'star', tx:5+(i*73)%38, ty:12+(i*53)%18 })
+    objs.push({ type:'altar', tx:cx-2, ty:14 })
   }
 
   return objs
@@ -538,6 +566,21 @@ function ZoneObject({ obj, zone, tick }) {
     return (
       <g transform={`translate(${fx},${fy})`} opacity="0.9">
         <LabSprite x={x} y={y} sprite={LAB_DECOR.bat} scale={1.5}/>
+      </g>
+    )
+  }
+  // 방 가구 — 러그는 바닥에 깔리므로 그림자 없이, 나머지 가구는 발밑에 옅은 그림자를 깔아
+  // "바닥 위에 놓여있다"는 입체감을 준다.
+  if (obj.type === 'rug') {
+    return <LabSprite x={x} y={y} sprite={LAB_DECOR.rug} scale={2.2}/>
+  }
+  if (obj.type === 'tv' || obj.type === 'wardrobe' || obj.type === 'table' || obj.type === 'chair') {
+    const sprite = LAB_DECOR[obj.type]
+    const scale = obj.type === 'chair' ? 1.8 : 2.2
+    return (
+      <g>
+        <ellipse cx={x + (sprite.w*scale)/2} cy={y + sprite.h*scale - 2} rx={sprite.w*scale*0.4} ry={4} fill="#00000055"/>
+        <LabSprite x={x} y={y} sprite={sprite} scale={scale}/>
       </g>
     )
   }
@@ -1206,11 +1249,26 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           {/* 바닥 */}
           <rect width={PX_W} height={PX_H} fill={`url(#ground_${zone})`}/>
 
-          {/* 경계 울타리 */}
-          <rect x="0" y="0" width={PX_W} height={PX_H}
-            fill="none" stroke={theme.border} strokeWidth="6"/>
-          <rect x="3" y="3" width={PX_W-6} height={PX_H-6}
-            fill="none" stroke={`${meta.color}44`} strokeWidth="2" strokeDasharray="8 4"/>
+          {/* 경계 울타리 — Lab은 "방 안" 느낌을 내려고 얇은 선 대신 두꺼운 벽돌 벽 띠를 두른다 */}
+          {zone === 'Lab' ? (
+            <>
+              <rect x="0" y="0" width={PX_W} height={TILE*2} fill={theme.border}/>
+              {/* 남쪽 벽은 입구(맵 중앙 하단) 자리를 문처럼 뚫어둔다 */}
+              <rect x="0" y={PX_H-TILE*2} width={PX_W/2-TILE*3} height={TILE*2} fill={theme.border}/>
+              <rect x={PX_W/2+TILE*3} y={PX_H-TILE*2} width={PX_W/2-TILE*3} height={TILE*2} fill={theme.border}/>
+              <rect x="0" y="0" width={TILE*2} height={PX_H} fill={theme.border}/>
+              <rect x={PX_W-TILE*2} y="0" width={TILE*2} height={PX_H} fill={theme.border}/>
+              <rect x={TILE*2} y={TILE*2} width={PX_W-TILE*4} height={PX_H-TILE*4}
+                fill="none" stroke="#00000055" strokeWidth="3"/>
+            </>
+          ) : (
+            <>
+              <rect x="0" y="0" width={PX_W} height={PX_H}
+                fill="none" stroke={theme.border} strokeWidth="6"/>
+              <rect x="3" y="3" width={PX_W-6} height={PX_H-6}
+                fill="none" stroke={`${meta.color}44`} strokeWidth="2" strokeDasharray="8 4"/>
+            </>
+          )}
 
           {/* 경로 타일 */}
           {pathTiles.current.map((p, i) => (
