@@ -241,6 +241,25 @@ export const LAB_DECOR = {
 }
 
 /* ─────────────────────────────────────────────
+   슬라임 — Farm 팩 enemies/slime * 폴더의 색상별 개별 시트. 각 파일이 걷기/공격/사망
+   애니메이션을 담고 있는 80×256 시트인데, 여기선 장식용으로 첫 대기 프레임(16×16 셀,
+   좌상단)만 쓴다. WorldMap에서 미지의 소리 마을(Lab) 포털 주변을 어슬렁거리는
+   작은 생물 장식으로 배치.
+───────────────────────────────────────────── */
+const SLIME_FRAME = { x: 0, y: 0, w: 16, h: 16 }
+export const WORLD_SLIMES = [
+  { color: 'red',     ...SLIME_FRAME, src: '/assets/world/slimes/slime_red.png',     sheetW: 80, sheetH: 256 },
+  { color: 'orange',  ...SLIME_FRAME, src: '/assets/world/slimes/slime_orange.png',  sheetW: 80, sheetH: 256 },
+  { color: 'yellow',  ...SLIME_FRAME, src: '/assets/world/slimes/slime_yellow.png',  sheetW: 80, sheetH: 256 },
+  { color: 'green',   ...SLIME_FRAME, src: '/assets/world/slimes/slime_green.png',   sheetW: 80, sheetH: 256 },
+  { color: 'blue',    ...SLIME_FRAME, src: '/assets/world/slimes/slime_blue.png',    sheetW: 80, sheetH: 256 },
+  { color: 'purple',  ...SLIME_FRAME, src: '/assets/world/slimes/slime_purple.png',  sheetW: 80, sheetH: 256 },
+  { color: 'pink',    ...SLIME_FRAME, src: '/assets/world/slimes/slime_pink.png',    sheetW: 80, sheetH: 256 },
+  { color: 'black',   ...SLIME_FRAME, src: '/assets/world/slimes/slime_black.png',   sheetW: 80, sheetH: 256 },
+  { color: 'rainbow', ...SLIME_FRAME, src: '/assets/world/slimes/slime_rainbow.png', sheetW: 80, sheetH: 256 },
+]
+
+/* ─────────────────────────────────────────────
    플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(몸/옷/머리)를 같은 32×32
    격자에 겹쳐 그리는 레이어 시스템 — 각 시트가 "walk" 블록만 잘라낸 256×128(8열×4행).
    info.txt 확인 결과 행 = 방향(0:Down, 1:Up, 2:Left, 3:Right), 열 = 걷기 프레임(0~7).

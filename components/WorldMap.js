@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES } from '@/components/AssetRegistry'
 import { autotileShape } from '@/lib/autotile'
 
 /* ─────────────────────────────────────────────
@@ -228,6 +228,10 @@ const FENCES = [
   ...PORTALS.flatMap(p => yardFence(p)),
 ]
 
+// 미지의 소리 마을(Lab) 포털 주변을 어슬렁거리는 슬라임들 — 사용자가 레퍼런스로 준
+// Farm 팩 슬라임 색상(rainbow 포함 9종)을 그대로 순서대로 배정해서 다양하게 보이게 한다.
+const SLIMES = scatterNear('Lab', 9, 11, 8, 5, 89).map((s, i) => ({ ...s, slime: WORLD_SLIMES[i % WORLD_SLIMES.length] }))
+
 /* ─────────────────────────────────────────────
    잔디 색상 얼룩 — 구매한 시트의 "잔디" 조각은 전부 독립된 섬(hedge autotile) 형태라
    그대로 반복 타일링하면 각 타일 모서리의 둥근 여백이 그대로 격자무늬로 드러난다
@@ -396,6 +400,18 @@ function PixelRock({ x, y }) {
       <path d="M2,16 Q1,8 9,6 Q17,3 22,10 Q24,16 18,18 Q10,20 2,16Z" fill="#9A948A"/>
       <path d="M4,15 Q5,9 11,7 Q16,5 20,10" fill="none" stroke="#B4AEA0" strokeWidth="1.5" opacity="0.7"/>
       <path d="M6,17 Q12,19 18,16" fill="none" stroke="#6E6860" strokeWidth="1.5" opacity="0.6"/>
+    </g>
+  )
+}
+
+// 미지의 소리 마을 포털 근처를 어슬렁거리는 슬라임 장식
+function SlimeDeco({ x, y, slime }) {
+  const scale = 1.6
+  return (
+    <g>
+      <ellipse cx={x + slime.w*scale/2} cy={y + slime.h*scale - 2} rx={slime.w*scale*0.38} ry={3} fill="#00000030"/>
+      <SheetSprite x={x} y={y} srcX={slime.x} srcY={slime.y} w={slime.w} h={slime.h}
+        renderW={slime.w*scale} renderH={slime.h*scale} sheet={slime}/>
     </g>
   )
 }
@@ -1065,6 +1081,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
           {BENCHES.map((b,i) => <PixelBench key={i} x={b.tx*TILE} y={b.ty*TILE}/>)}
           {FENCES.map((f,i) => <PixelFence key={i} x={f.tx*TILE} y={f.ty*TILE}/>)}
           {TREES.map((t,i) => <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
+          {ASSET_READY.world && SLIMES.map((s,i) => <SlimeDeco key={i} x={s.tx*TILE} y={s.ty*TILE} slime={s.slime}/>)}
 
           {PORTALS.map(p => (
             <PortalIsland key={p.zone} portal={p}
