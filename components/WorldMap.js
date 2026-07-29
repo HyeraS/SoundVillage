@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES, WORLD_NATURE, WORLD_PROPS } from '@/components/AssetRegistry'
 import { autotileShape } from '@/lib/autotile'
 
 /* ─────────────────────────────────────────────
@@ -82,7 +82,9 @@ function band(tx0, tx1, ty0, ty1, plaza = false) {
       out.push({ tx, ty, plaza })
   return out
 }
-const SPOKE_W = 6
+// 예전엔 6타일 폭의 그냥 넓은 흙바닥이라 "길"이라기보단 공터처럼 보였다 — 폭을 줄이고
+// (아래 STREETLIGHTS가) 가로등으로 길 양옆에 정체성을 준다.
+const SPOKE_W = 4
 function spoke(x0, y0, x1, y1, width = SPOKE_W, bend = 0.5) {
   const w2 = Math.floor(width / 2)
   const midX = Math.round(x0 + (x1 - x0) * bend)
@@ -153,19 +155,74 @@ function terrainAt(tx, ty) {
 }
 
 /* ─────────────────────────────────────────────
-   존별 테마 장식 — 전체 맵에 고르게 뿌리는 대신, 포털 주변 반경에만
-   그 존 분위기에 맞는 소품을 모아서 배치한다.
+   마을 "마당" — 모든 오브젝트 배치가 "왜 여기 있는가"에 답할 수 있어야 한다는 원칙으로
+   재설계. 종류(나무/울타리/상자) 기준 무작위 스캐터를 걷어내고, 포털마다 실제 구획
+   (마당)을 하나씩 두고 그 구획 기준으로 울타리/배경 나무/발치 장식/내부 소품을 배치한다.
 ───────────────────────────────────────────── */
-function scatterNear(zone, count, radius, mulA, mulB, seed = 0) {
-  const p = portalByZone[zone]
-  const cx = p.tx + p.w / 2, cy = p.ty + p.h / 2
-  return Array.from({ length: count }, (_, i) => ({
-    tx: Math.round(cx + (((i * mulA + seed) % (radius * 2)) - radius)),
-    ty: Math.round(cy + (((i * mulB + seed) % (radius * 2)) - radius)),
-  })).filter(t => t.tx >= 2 && t.tx < MAP_W - 2 && t.ty >= 2 && t.ty < MAP_H - 2 && isFree(t.tx, t.ty))
+const YARD_MARGIN = 3
+function yardBounds(p) {
+  return { x0: p.tx - YARD_MARGIN, y0: p.ty - YARD_MARGIN, x1: p.tx + p.w - 1 + YARD_MARGIN, y1: p.ty + p.h - 1 + YARD_MARGIN }
+}
+// 박물관 쪽을 향한 변을 "입구"로 정한다 — 스포크 길이 실제로 그 방향에서 들어오므로
+// 게이트 위치와 길이 자연스럽게 이어진다.
+function gateSide(p) {
+  const dx = (p.tx + p.w / 2) - MUSEUM_CENTER.x
+  const dy = (p.ty + p.h / 2) - MUSEUM_CENTER.y
+  return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'west' : 'east') : (dy > 0 ? 'north' : 'south')
+}
+// 마당을 4면 울타리로 완전히 둘러싼다. 게이트는 따로 계산하지 않고 isFree()에게 맡긴다 —
+// 길(PATH_SET)이 지나가는 자리는 자동으로 빠지므로, 문이 항상 실제 길과 정확히 겹치는
+// 자리에 생긴다(별도로 "입구 변 중앙 40%"처럼 근사하면 실제 길 위치와 어긋나 울타리가
+// 두 군데서 끊어져 보이는 문제가 있었음).
+function yardFencePerimeter(p) {
+  const { x0, y0, x1, y1 } = yardBounds(p)
+  const out = []
+  for (let tx = x0; tx <= x1; tx++) { out.push({ tx, ty: y0 }); out.push({ tx, ty: y1 }) }
+  for (let ty = y0; ty <= y1; ty++) { out.push({ tx: x0, ty }); out.push({ tx: x1, ty }) }
+  return out.filter(t => isFree(t.tx, t.ty))
+}
+// 마당 담장 바로 바깥, 입구 반대쪽에 나무를 몰아서 "건물을 감싸는 배경 숲" 역할을 준다.
+function backdropCluster(p, count, sprites, seed) {
+  const { x0, y0, x1, y1 } = yardBounds(p)
+  const side = gateSide(p)
+  const out = []
+  for (let i = 0; i < count; i++) {
+    const t = seedRand(seed + i * 3)
+    const depth = 1 + Math.floor(seedRand(seed + i * 3 + 1) * 3)
+    let tx, ty
+    if (side === 'south')      { tx = Math.round(x0 + t * (x1 - x0)); ty = y0 - depth }
+    else if (side === 'north') { tx = Math.round(x0 + t * (x1 - x0)); ty = y1 + depth }
+    else if (side === 'east')  { ty = Math.round(y0 + t * (y1 - y0)); tx = x0 - depth }
+    else                       { ty = Math.round(y0 + t * (y1 - y0)); tx = x1 + depth }
+    if (isFree(tx, ty)) out.push({ tx, ty, sprite: sprites[i % sprites.length] })
+  }
+  return out
+}
+// 건물 발치(마당 안, 담장 바로 앞) 스커팅 — 잔디에서 건물로 바로 이어지지 않고
+// 덤불/꽃/돌 한 줄이 전환부 역할을 한다.
+function footprintSkirt(p, sprites, seed, everyOther = true) {
+  const ring = []
+  for (let tx = p.tx - 1; tx <= p.tx + p.w; tx++) ring.push({ tx, ty: p.ty + p.h })
+  for (let ty = p.ty; ty < p.ty + p.h; ty++) { ring.push({ tx: p.tx - 1, ty }); ring.push({ tx: p.tx + p.w, ty }) }
+  return ring
+    .filter((t, i) => !everyOther || i % 2 === seed % 2)
+    .filter(t => isFree(t.tx, t.ty))
+    .map((t, i) => ({ ...t, sprite: sprites[(i + seed) % sprites.length] }))
+}
+// 마당 내부(담장 안쪽)에 그 마을 컨셉에 맞는 소품을 채운다 — "이 소품이 왜 여기 있는가"에
+// 항상 "이 마을 마당 안이라서"로 답할 수 있도록 좌표 범위를 마당 경계로 못박는다.
+function scatterInYard(p, count, seed, margin = 2) {
+  const { x0, y0, x1, y1 } = yardBounds(p)
+  const out = []
+  for (let i = 0; i < count; i++) {
+    const tx = Math.round(x0 + margin + seedRand(seed + i * 2) * (x1 - x0 - margin * 2))
+    const ty = Math.round(y0 + margin + seedRand(seed + i * 2 + 1) * (y1 - y0 - margin * 2))
+    if (isFree(tx, ty)) out.push({ tx, ty })
+  }
+  return out
 }
 
-// 테두리 나무 — 맵 크기에 비례해서 자동으로 개수가 늘어나도록 공식화 (존 무관, 액자 역할)
+// 테두리 나무 — 맵 가장자리를 두르는 액자 역할(존 무관). 맵 크기에 비례해서 개수 자동 계산.
 const borderTreeCount = Math.floor((MAP_W - 4) / 2)
 const sideTreeCount    = Math.floor((MAP_H - 6) / 2)
 const BORDER_TREES = [
@@ -175,62 +232,104 @@ const BORDER_TREES = [
   ...Array.from({length: sideTreeCount},   (_,i) => ({ tx: MAP_W-2, ty: 3+i*2,  variant: (i+1)%2 })),
 ].filter(t => isFree(t.tx, t.ty))
 
-// Animal: 나무·수풀 빽빽하게 / Nature: 나무 + 연못가 돌 / Urban: 울타리·벤치 위주, 나무 적게
-// Human: 울타리·벤치 + 꽃 / Music·Lab: 이 팩엔 테마 소품이 없어 나무·꽃만 은은하게
-// 맵이 2배로 넓어진 만큼 포털 반경(radius)도 2배, 개수도 밀도 유지를 위해 넉넉히 늘렸다.
+// 나무 배리에이션 — 기존엔 tree1/tree2/pine 3종뿐이었는데, "100 Nature Things" 팩의
+// 10종(사과/오렌지/자작/소나무/단풍/등근수관/벚꽃/분홍벚꽃/저주받은나무/고사목)을 섞어서
+// 같은 "배경 숲" 클러스터 안에서도 단조롭지 않게 한다.
+const NATURE_TREES = WORLD_NATURE.trees
+const ORCHARD_TREES = [NATURE_TREES[0], NATURE_TREES[1], NATURE_TREES[4]] // 사과/오렌지/단풍 — Animal 농장 배경
+const FOREST_TREES   = [NATURE_TREES[2], NATURE_TREES[3], NATURE_TREES[9]] // 자작/소나무/고사목 — Nature 숲 배경
+const BLOSSOM_TREES  = [NATURE_TREES[6], NATURE_TREES[7], NATURE_TREES[5]] // 벚꽃/분홍벚꽃/등근수관 — Human 정원 배경
+const MYSTIC_TREES    = [NATURE_TREES[8], NATURE_TREES[3]]                 // 저주받은나무/소나무 — Lab 배경
+
+// 마을마다: 마당을 두르는 울타리(3면+게이트) + 담장 바깥 배경 나무 클러스터 + 발치 스커팅.
+// "어떤 오브젝트든 소속 마을 마당과 연결되지 않으면 배치하지 않는다"는 원칙을 그대로 코드로 옮긴 것.
+const FENCES = PORTALS.flatMap(p => yardFencePerimeter(p))
+
 const TREES = [
   ...BORDER_TREES,
-  ...scatterNear('Animal', 30, 14, 5, 7, 3).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Nature', 18, 12, 7, 5, 11).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Music',  10, 12, 9, 4, 17).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Lab',    10, 12, 4, 9, 19).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Human',  8,  11, 15, 6, 71).map((t,i) => ({ ...t, variant: i % 3 })),
-  ...scatterNear('Urban',  6,  11, 6, 15, 73).map((t,i) => ({ ...t, variant: i % 3 })),
+  ...backdropCluster(portalByZone.Animal, 8, ORCHARD_TREES, 101),
+  ...backdropCluster(portalByZone.Nature, 8, FOREST_TREES,  103),
+  ...backdropCluster(portalByZone.Human,  6, BLOSSOM_TREES, 107),
+  ...backdropCluster(portalByZone.Lab,    5, MYSTIC_TREES,  109),
+  ...backdropCluster(portalByZone.Music,  5, BLOSSOM_TREES, 113),
+  ...backdropCluster(portalByZone.Urban,  4, FOREST_TREES,  127),
+].map((t,i) => t.sprite ? t : ({ ...t, variant: t.variant ?? i % 3 }))
+
+// 발치 스커팅 — 마을 성격에 맞는 소재로: Animal은 덤불, Nature는 버섯(숲 바닥), Human/Music은
+// 꽃, Urban은 돌(포장 느낌), Lab은 크리스탈(신비로운 정원).
+const SKIRTS = [
+  ...footprintSkirt(portalByZone.Animal, [WORLD_TILESET.decor.bush1, WORLD_TILESET.decor.bush2], 1),
+  ...footprintSkirt(portalByZone.Nature, WORLD_NATURE.mushrooms, 2),
+  ...footprintSkirt(portalByZone.Human,  WORLD_NATURE.flowers,   3),
+  ...footprintSkirt(portalByZone.Music,  WORLD_NATURE.flowers,   4),
+  ...footprintSkirt(portalByZone.Urban,  WORLD_NATURE.rocks,     5),
+  ...footprintSkirt(portalByZone.Lab,    WORLD_NATURE.crystals,  6),
 ]
+
+// 마당 내부 소품 — 마을 컨셉별로 하나씩:
+//   Animal = 농장(사일로 + 덤불) / Nature = 숲 바닥(버섯+바위, 풍차는 연못 옆 랜드마크로 별도)
+//   Human = 정원(꽃+벤치) / Urban = 작은 광장(벤치+가로등) / Music = 화단 / Lab = 크리스탈 정원
+// 사일로는 1개뿐이라 무작위 시도 1회로 뽑으면 isFree() 검사에 걸려 통째로 사라질 위험이
+// 있어서(실제로 그랬음), 건물 바로 옆 마당 안 고정 위치에 결정론적으로 둔다.
+const SILOS = (() => {
+  const p = portalByZone.Animal
+  const spot = { tx: p.tx + p.w + 1, ty: p.ty + p.h - 2 }
+  return isFree(spot.tx, spot.ty) ? [{ ...spot, sprite: WORLD_PROPS.silo }] : []
+})()
 const BUSHES = [
-  ...scatterNear('Animal', 18, 10, 3, 8, 23),
-  ...scatterNear('Nature', 12, 10, 8, 3, 29),
-  ...scatterNear('Human',  6,  9,  5, 12, 79),
+  ...scatterInYard(portalByZone.Animal, 6, 137).map((t,i) => ({ ...t, sprite: (i%2? WORLD_TILESET.decor.bush1 : WORLD_TILESET.decor.bush2) })),
 ]
+const MUSHROOMS = scatterInYard(portalByZone.Nature, 8, 139).map((t,i) => ({ ...t, sprite: WORLD_NATURE.mushrooms[i % 10] }))
+const YARD_ROCKS = scatterInYard(portalByZone.Nature, 5, 149).map((t,i) => ({ ...t, sprite: WORLD_NATURE.rocks[i % 10] }))
 const FLOWERS = [
-  ...scatterNear('Human', 22, 12, 6, 11, 31),
-  ...scatterNear('Music', 22, 12, 11, 6, 37),
-  ...scatterNear('Animal', 14, 10, 13, 7, 41),
-  ...scatterNear('Nature', 10, 10, 9, 13, 83),
-].map((f,i) => ({ ...f, type: i % 4 }))
-const ROCKS = [
-  ...scatterNear('Nature', 18, 12, 17, 9, 43),
-  ...scatterNear('Lab',    14, 12, 9, 17, 47),
+  ...scatterInYard(portalByZone.Human, 10, 151).map((t,i) => ({ ...t, sprite: WORLD_NATURE.flowers[i % 10] })),
+  ...scatterInYard(portalByZone.Music, 10, 157).map((t,i) => ({ ...t, sprite: WORLD_NATURE.flowers[(i+5) % 10] })),
 ]
+const CRYSTALS = scatterInYard(portalByZone.Lab, 7, 163).map((t,i) => ({ ...t, sprite: WORLD_NATURE.crystals[i % 10] }))
 const BENCHES = [
-  ...scatterNear('Urban', 8, 10, 5, 9, 53),
-  ...scatterNear('Human', 8, 10, 9, 5, 59),
+  ...scatterInYard(portalByZone.Urban, 3, 167, 3),
+  ...scatterInYard(portalByZone.Human, 2, 173, 3),
 ]
-// 마을 "앞마당" 울타리 — 건물 발치를 완전히 둘러싸는 대신, 안내판이 있는 쪽(진입로 반대편)
-// 한 변만 살짝 둘러서 동물의 숲 주민 집처럼 "개인 마당"이 있는 느낌을 낸다. 가운데는
-// 길로 통하는 틈을 남겨 게이트처럼 보이게 한다.
-function yardFence(p, gapFrac = 0.45) {
-  const y = p.ty + p.h + 1
-  const gapStart = p.tx + Math.floor(p.w * (0.5 - gapFrac / 2))
-  const gapEnd   = p.tx + Math.ceil (p.w * (0.5 + gapFrac / 2))
+// 풍차 — Nature 연못 바로 옆 랜드마크(물레방아 느낌), 마당 담장 밖 별도 배치
+const WINDMILL = (() => {
+  const t = { tx: NATURE_P.tx - 4, ty: NATURE_P.ty + 1 }
+  return isFree(t.tx, t.ty) ? [{ ...t, sprite: WORLD_PROPS.windmill }] : []
+})()
+
+// 가로등 — 스포크 길 중심선을 따라 일정 간격으로 좌우에 세워서 "그냥 넓은 흙바닥"이 아니라
+// 실제 가로수길처럼 정체성을 준다.
+function spokeCenterline(x0, y0, x1, y1, bend) {
+  const midX = Math.round(x0 + (x1 - x0) * bend)
+  const pts = []
+  const s1 = x0 <= midX ? 1 : -1
+  for (let tx = x0; tx !== midX + s1; tx += s1) pts.push({ tx, ty: y0, dir: 'h' })
+  const s2 = y0 <= y1 ? 1 : -1
+  for (let ty = y0; ty !== y1 + s2; ty += s2) pts.push({ tx: midX, ty, dir: 'v' })
+  const s3 = midX <= x1 ? 1 : -1
+  for (let tx = midX; tx !== x1 + s3; tx += s3) pts.push({ tx, ty: y1, dir: 'h' })
+  return pts
+}
+const STREETLIGHTS = PORTALS.flatMap(p => {
+  const pts = spokeCenterline(
+    Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
+    Math.round(p.tx + p.w/2),    Math.round(p.ty + p.h/2),
+    SPOKE_BENDS[p.zone],
+  )
+  const offset = SPOKE_W/2 + 2
   const out = []
-  for (let tx = p.tx - 1; tx <= p.tx + p.w; tx++) {
-    if (tx >= gapStart && tx <= gapEnd) continue
-    if (!isFree(tx, y)) continue
-    out.push({ tx, ty: y })
+  for (let i = 5; i < pts.length - 3; i += 9) {
+    const pt = pts[i]
+    const a = pt.dir === 'h' ? { tx: pt.tx, ty: pt.ty - offset } : { tx: pt.tx - offset, ty: pt.ty }
+    const b = pt.dir === 'h' ? { tx: pt.tx, ty: pt.ty + offset } : { tx: pt.tx + offset, ty: pt.ty }
+    if (isFree(a.tx, a.ty)) out.push(a)
+    if (isFree(b.tx, b.ty)) out.push(b)
   }
   return out
-}
+})
 
-const FENCES = [
-  ...scatterNear('Urban', 14, 12, 7, 13, 61),
-  ...scatterNear('Human', 8,  12, 13, 7, 67),
-  ...PORTALS.flatMap(p => yardFence(p)),
-]
-
-// 미지의 소리 마을(Lab) 포털 주변을 어슬렁거리는 슬라임들 — 사용자가 레퍼런스로 준
+// 미지의 소리 마을(Lab) 마당 안을 어슬렁거리는 슬라임들 — 사용자가 레퍼런스로 준
 // Farm 팩 슬라임 색상(rainbow 포함 9종)을 그대로 순서대로 배정해서 다양하게 보이게 한다.
-const SLIMES = scatterNear('Lab', 9, 11, 8, 5, 89).map((s, i) => ({ ...s, slime: WORLD_SLIMES[i % WORLD_SLIMES.length] }))
+const SLIMES = scatterInYard(portalByZone.Lab, 6, 181, 3).map((s, i) => ({ ...s, slime: WORLD_SLIMES[i % WORLD_SLIMES.length] }))
 
 /* ─────────────────────────────────────────────
    잔디 색상 얼룩 — 구매한 시트의 "잔디" 조각은 전부 독립된 섬(hedge autotile) 형태라
@@ -309,6 +408,19 @@ function BuildingSprite({ zone, px, py, pw, ph }) {
     renderW={w} renderH={h} sheet={b}/>
 }
 
+// 범용 소품 렌더러 — WORLD_NATURE/WORLD_PROPS의 스프라이트를 발밑 그림자와 함께 그린다.
+// 마당 스커팅/내부 소품(버섯·크리스탈·사일로·풍차·가로등)이 전부 이걸 공유한다.
+function PropSprite({ x, y, sprite, scale = 2 }) {
+  const w = sprite.w * scale, h = sprite.h * scale
+  return (
+    <g>
+      <ellipse cx={x + w/2} cy={y + h - 3} rx={w*0.36} ry={4} fill="#00000030"/>
+      <SheetSprite x={x} y={y} srcX={sprite.x} srcY={sprite.y} w={sprite.w} h={sprite.h}
+        renderW={w} renderH={h} sheet={sprite}/>
+    </g>
+  )
+}
+
 const TREE_SRCS = [OBJECTS.tree_01, OBJECTS.tree_02, OBJECTS.tree_03]
 const WORLD_TREE_SRCS = [WORLD_TILESET.decor.tree1, WORLD_TILESET.decor.tree2, WORLD_TILESET.decor.pine]
 const TREE_COLORS = [
@@ -317,7 +429,13 @@ const TREE_COLORS = [
   { trunk: '#6B4423', canopy: '#4A9E38', shadow: '#336E27' },
 ]
 
-function PixelTree({ x, y, variant = 0 }) {
+function PixelTree({ x, y, variant = 0, sprite }) {
+  // "100 Nature Things" 팩 나무(32×32)는 기존 tree1/2/pine(32×64)보다 낮고 넓어서,
+  // 같은 발치 기준으로 정렬되도록 별도 스케일/오프셋을 준다.
+  if (sprite) {
+    const scale = 1.4
+    return <PropSprite x={x - (sprite.w*scale - TILE)/2} y={y - sprite.h*scale + TILE} sprite={sprite} scale={scale}/>
+  }
   if (ASSET_READY.world) {
     const s = WORLD_TREE_SRCS[variant % 3]
     return <SheetSprite x={x} y={y - TILE * 0.5} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
@@ -347,7 +465,8 @@ const FLOWER_COLORS = [
   ['#A8D8EA','#6DB5D4'], ['#F0F0AA','#D4D444'],
 ]
 const WORLD_FLOWER_SRCS = [WORLD_TILESET.decor.flower1, WORLD_TILESET.decor.flower2, WORLD_TILESET.decor.flower3]
-function PixelFlower({ x, y, type }) {
+function PixelFlower({ x, y, type, sprite }) {
+  if (sprite) return <PropSprite x={x} y={y} sprite={sprite} scale={2}/>
   if (ASSET_READY.world) {
     const s = WORLD_FLOWER_SRCS[type % 3]
     return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
@@ -368,8 +487,8 @@ function PixelFlower({ x, y, type }) {
   )
 }
 
-function PixelBush({ x, y, variant = 0 }) {
-  const s = variant % 2 === 0 ? WORLD_TILESET.decor.bush1 : WORLD_TILESET.decor.bush2
+function PixelBush({ x, y, variant = 0, sprite }) {
+  const s = sprite ?? (variant % 2 === 0 ? WORLD_TILESET.decor.bush1 : WORLD_TILESET.decor.bush2)
   if (ASSET_READY.world) {
     return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
   }
@@ -379,27 +498,6 @@ function PixelBush({ x, y, variant = 0 }) {
       <ellipse cx="13" cy="20" rx="12" ry="3" fill="#00000022"/>
       <circle cx="13" cy="12" r="11" fill={c.canopy}/>
       <circle cx="7" cy="15" r="7" fill={c.shadow} opacity="0.6"/>
-    </g>
-  )
-}
-
-function PixelRock({ x, y }) {
-  if (ASSET_READY.world) {
-    const s = WORLD_TILESET.decor.rock
-    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h}/>
-  }
-  if (ASSET_READY.objects) {
-    return (
-      <image href={OBJECTS.rock} x={x} y={y} width={TILE} height={TILE}
-        style={{ imageRendering: 'pixelated' }}/>
-    )
-  }
-  return (
-    <g transform={`translate(${x+4},${y+10})`}>
-      <ellipse cx="12" cy="18" rx="11" ry="3" fill="#00000022"/>
-      <path d="M2,16 Q1,8 9,6 Q17,3 22,10 Q24,16 18,18 Q10,20 2,16Z" fill="#9A948A"/>
-      <path d="M4,15 Q5,9 11,7 Q16,5 20,10" fill="none" stroke="#B4AEA0" strokeWidth="1.5" opacity="0.7"/>
-      <path d="M6,17 Q12,19 18,16" fill="none" stroke="#6E6860" strokeWidth="1.5" opacity="0.6"/>
     </g>
   )
 }
@@ -1075,12 +1173,20 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
             </>
           )}
 
-          {BUSHES.map((b,i) => <PixelBush key={i} x={b.tx*TILE} y={b.ty*TILE} variant={i}/>)}
-          {FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} type={f.type}/>)}
-          {ROCKS.map((r,i) => <PixelRock key={i} x={r.tx*TILE} y={r.ty*TILE}/>)}
+          {SKIRTS.map((s,i) => <PropSprite key={i} x={s.tx*TILE} y={s.ty*TILE} sprite={s.sprite} scale={1.8}/>)}
+          {BUSHES.map((b,i) => <PixelBush key={i} x={b.tx*TILE} y={b.ty*TILE} sprite={b.sprite}/>)}
+          {FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} sprite={f.sprite}/>)}
+          {MUSHROOMS.map((m,i) => <PropSprite key={i} x={m.tx*TILE} y={m.ty*TILE} sprite={m.sprite} scale={1.8}/>)}
+          {YARD_ROCKS.map((r,i) => <PropSprite key={i} x={r.tx*TILE} y={r.ty*TILE} sprite={r.sprite} scale={1.8}/>)}
+          {CRYSTALS.map((c,i) => <PropSprite key={i} x={c.tx*TILE} y={c.ty*TILE} sprite={c.sprite} scale={1.8}/>)}
+          {SILOS.map((s,i) => <PropSprite key={i} x={s.tx*TILE} y={s.ty*TILE} sprite={s.sprite} scale={1.3}/>)}
+          {WINDMILL.map((w,i) => <PropSprite key={i} x={w.tx*TILE} y={w.ty*TILE} sprite={w.sprite} scale={1.15}/>)}
+          {STREETLIGHTS.map((s,i) => <PropSprite key={i} x={s.tx*TILE} y={s.ty*TILE} sprite={WORLD_PROPS.streetlight} scale={1.4}/>)}
           {BENCHES.map((b,i) => <PixelBench key={i} x={b.tx*TILE} y={b.ty*TILE}/>)}
           {FENCES.map((f,i) => <PixelFence key={i} x={f.tx*TILE} y={f.ty*TILE}/>)}
-          {TREES.map((t,i) => <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
+          {TREES.map((t,i) => t.sprite
+            ? <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} sprite={t.sprite}/>
+            : <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
           {ASSET_READY.world && SLIMES.map((s,i) => <SlimeDeco key={i} x={s.tx*TILE} y={s.ty*TILE} slime={s.slime}/>)}
 
           {PORTALS.map(p => (

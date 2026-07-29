@@ -213,6 +213,40 @@ export const WORLD_BUILDINGS = {
 }
 
 /* ─────────────────────────────────────────────
+   "100 Nature Things" 팩 — WorldMap 장식이 나무 3종/덤불 2종/꽃 3종뿐이라 배리에이션이
+   부족했던 문제를 해결하려고 도입. 10종류 카테고리가 균일 그리드로 들어있음:
+   나무만 5열×2행(32×32), 나머지(덤불/꽃/버섯/바위/크리스탈)는 10열×1행(16×16) —
+   알파 채널 스캔으로 그리드 경계를 확인함(균일 16px라고 어림짐작했다가 실제로는
+   카테고리별로 32px/16px가 섞여있어서 여러 번 잘못 잘랐던 시행착오 끝에 확정한 값).
+───────────────────────────────────────────── */
+const NATURE_SHEET = { src: '/assets/world/nature.png', sheetW: 160, sheetH: 208 }
+function natureRow(y, count, w = 16, h = 16) {
+  return Array.from({ length: count }, (_, i) => ({ ...NATURE_SHEET, x: i * w, y, w, h }))
+}
+export const WORLD_NATURE = {
+  // 사과/오렌지/자작/소나무/단풍(1행), 등근수관/벚꽃(분홍)/저주받은나무(검정)/고사목(2행)
+  trees:     [...natureRow(0, 5, 32, 32), ...natureRow(32, 5, 32, 32)],
+  bushes:    natureRow(96, 10),
+  flowers:   natureRow(112, 10),
+  mushrooms: natureRow(128, 10),
+  rocks:     natureRow(144, 10),
+  crystals:  natureRow(160, 10),
+}
+
+/* ─────────────────────────────────────────────
+   랜드마크 소품 — 특정 존에만 어울리는 큼직한 단일 오브젝트.
+   실루엣/사일로/풍차는 Farm 팩 Buildings 시트(이미 포털 건물용으로 복사해 둔
+   buildings.png) 안에서 추가로 찾은 것 — 새 파일 복사 없이 좌표만 추가.
+   가로등(streelight_flicker.gif 첫 프레임)은 원래 애니메이션 gif라 정적 PNG로
+   추출해서 별도 복사.
+───────────────────────────────────────────── */
+export const WORLD_PROPS = {
+  silo:       { ...FARM_BUILDINGS_SHEET, x: 982, y: 124, w: 42,  h: 68  },
+  windmill:   { ...FARM_BUILDINGS_SHEET, x: 931, y: 280, w: 90,  h: 104 },
+  streetlight: { src: '/assets/world/streetlight.png', sheetW: 16, sheetH: 48, x: 0, y: 0, w: 16, h: 48 },
+}
+
+/* ─────────────────────────────────────────────
    Lab("미지의 소리 마을") 존 전용 장식 — interior full 팩의 액자 포스터/러그 시트에서
    가져옴. ALIEN·BAT·해골·유령·악마 포스터는 decorations.png의 벽걸이 액자 줄에서,
    호박(잭오랜턴)·박쥐 실루엣은 rugs.png 맨 아래 계절 아이콘 줄에서 좌표를 픽셀 단위로
