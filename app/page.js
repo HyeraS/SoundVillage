@@ -243,18 +243,17 @@ export default function HomePage() {
     setScreen('annotate')
   }, [])
 
-  /* ── WorldMap에서 Sound Museum 직접 진입 ── */
-  const handleEnterMuseum = useCallback(async () => {
-    setMuseumEmpty(false)
-    setMuseumLoading(true)
+  /* ── Museum에 올릴 사운드 후보 선정 — 최초 진입("ENTER")과 투표 한 번 끝난 뒤
+     "다음 사운드 이어보기" 둘 다 이 함수를 공유한다. 매번 DB에서 다시 조회하므로
+     방금 투표한 sound_id는 votedSet에 자동으로 반영돼 후보에서 빠진다. ── */
+  const pickMuseumSound = useCallback(async () => {
     const all = soundMetadata.sounds
-    if (!all || all.length === 0) { setMuseumLoading(false); return }
+    if (!all || all.length === 0) return null
 
     // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
     const otherGroupSounds = getOtherGroupSounds(effectiveGroupId, bypassGroupFilter)
     const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
 
-    let sound = null
     try {
       const [rawCounts, votedIds] = await Promise.all([
         getAnnotationCountsBySoundId(),
@@ -279,23 +278,29 @@ export default function HomePage() {
         .filter(Boolean)
 
       const shuffled = [...candidates].sort(() => Math.random() - 0.5)
-      sound = shuffled[0] || null
+      return shuffled[0] || null
     } catch (e) {
-      console.error('[Museum] 진입 오류:', e)
+      console.error('[Museum] 사운드 선택 오류:', e)
+      return null
     }
+  }, [effectiveGroupId, bypassGroupFilter, participantId, findSoundByDbId, resolveSoundFromDbId])
+
+  /* ── WorldMap에서 Sound Museum 직접 진입 ── */
+  const handleEnterMuseum = useCallback(async () => {
+    setMuseumEmpty(false)
+    setMuseumLoading(true)
+    const sound = await pickMuseumSound()
+    setMuseumLoading(false)
     if (!sound) {
-      setMuseumLoading(false)
       setMuseumEmpty(true)
       return
     }
-
-    setMuseumLoading(false)
     setActiveSound(sound)
     setActiveZone(sound.game_zone || 'Lab')
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
-  }, [effectiveGroupId, bypassGroupFilter, participantId, findSoundByDbId, resolveSoundFromDbId])
+  }, [pickMuseumSound])
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
   const handleAnnotateComplete = useCallback(() => {
@@ -329,14 +334,23 @@ export default function HomePage() {
     refreshCounts()
   }, [activeSound, activeZone, collectedIds, effectiveGroupId, bypassGroupFilter, unlockedBlock, villagesUnlocked, refreshCounts])
 
-  /* ── SoundMuseum 완료 → WorldMap 복귀 (+ "오늘은 여기까지" 토스트) ── */
-  const handleMuseumDone = useCallback(() => {
-    setActiveSound(null)
+  /* ── SoundMuseum 투표 하나 완료 → 다음 후보가 있으면 바로 이어서 보여주고,
+     더 없을 때만 WorldMap으로 복귀(+ "오늘은 여기까지" 토스트) ── */
+  const handleMuseumDone = useCallback(async () => {
     setMyExpression('')
+    setMuseumLoading(true)
+    const next = await pickMuseumSound()
+    setMuseumLoading(false)
+    if (next) {
+      setActiveSound(next)
+      setActiveZone(next.game_zone || 'Lab')
+      return
+    }
+    setActiveSound(null)
     setMuseumSource(null)
     setScreen('world')
     setMuseumDoneToast(true)
-  }, [])
+  }, [pickMuseumSound])
 
   /* ── SoundMuseum에서 월드맵 직접 이동 ── */
   const handleMuseumExit = useCallback(() => {
@@ -466,7 +480,11 @@ export default function HomePage() {
   if (screen === 'museum' && activeSound) {
     return (
       <>
+        {/* key로 sound_id를 줘서, 투표 후 다음 사운드로 넘어갈 때 컴포넌트를 완전히
+            새로 마운트한다 — 안 그러면 pick/confidence/재생 상태가 이전 사운드
+            것 그대로 남아있는 채로 다음 사운드 화면이 뜬다. */}
         <SoundMuseum
+          key={activeSound.sound_id}
           sound={activeSound}
           zone={activeZone}
           myExpression={myExpression}
