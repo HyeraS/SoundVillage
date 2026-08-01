@@ -19,6 +19,10 @@ const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 const FIRST_ZONE          = 'Music'
 const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
 
+// Sound Museum에 올라가려면 오디오 하나당 이 인원수만큼 전사가 완료돼야 한다.
+// 원래는 그룹당 5명 기준이었는데, P/Q 그룹에 결원이 생겨 4명으로 낮춤(2026-08-01).
+const MUSEUM_MIN_ANNOTATIONS = 4
+
 function buildZoneMap(sounds) {
   const map = {}
   ZONES.forEach(z => { map[z] = [] })
@@ -267,10 +271,10 @@ export default function HomePage() {
         canonicalCounts[key] = (canonicalCounts[key] || 0) + cnt
       }
 
-      // 후보: 표현이 5개 이상 쌓였고, 다른 그룹 소리이면서, 내가 이 소리에 대해
-      // 아직 Stage 2 투표를 안 한 것만 (한 번 투표한 소리는 다시 뜨지 않게)
+      // 후보: 표현이 MUSEUM_MIN_ANNOTATIONS개 이상 쌓였고, 다른 그룹 소리이면서, 내가 이 소리에
+      // 대해 아직 Stage 2 투표를 안 한 것만 (한 번 투표한 소리는 다시 뜨지 않게)
       const candidates = Object.entries(canonicalCounts)
-        .filter(([soundId, cnt]) => cnt >= 5 && otherIds.has(soundId) && !votedSet.has(soundId))
+        .filter(([soundId, cnt]) => cnt >= MUSEUM_MIN_ANNOTATIONS && otherIds.has(soundId) && !votedSet.has(soundId))
         .map(([soundId]) => resolveSoundFromDbId(soundId, all))
         .filter(Boolean)
 
