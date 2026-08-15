@@ -1,7 +1,9 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { getTodayQuestSummary } from '@/lib/dailyQuests'
+import { getAttendanceStatus } from '@/lib/attendance'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES, WORLD_NATURE, WORLD_PROPS } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES, WORLD_NATURE, WORLD_PROPS, LIBRARY_YARD } from '@/components/AssetRegistry'
 import { autotileShape } from '@/lib/autotile'
 
 /* ─────────────────────────────────────────────
@@ -82,9 +84,9 @@ function band(tx0, tx1, ty0, ty1, plaza = false) {
       out.push({ tx, ty, plaza })
   return out
 }
-// 예전엔 6타일 폭의 그냥 넓은 흙바닥이라 "길"이라기보단 공터처럼 보였다 — 폭을 줄이고
-// (아래 STREETLIGHTS가) 가로등으로 길 양옆에 정체성을 준다.
-const SPOKE_W = 4
+// 예전엔 폭이 좁아 "길"이라기보단 실선처럼 보인다는 피드백으로 4 → 6타일로 확장.
+// (아래 STREETLIGHTS의 offset이 SPOKE_W를 그대로 참조하므로 가로등도 자동으로 같이 벌어진다.)
+const SPOKE_W = 6
 function spoke(x0, y0, x1, y1, width = SPOKE_W, bend = 0.5) {
   const w2 = Math.floor(width / 2)
   const midX = Math.round(x0 + (x1 - x0) * bend)
@@ -96,15 +98,40 @@ function spoke(x0, y0, x1, y1, width = SPOKE_W, bend = 0.5) {
 }
 const SPOKE_BENDS = { Animal: 0.4, Lab: 0.6, Urban: 0.45, Nature: 0.55, Music: 0.6, Human: 0.4 }
 
-const PATH_TILES = [
-  // Museum 앞마당 (건물 발치를 감싸는 자갈 광장)
-  ...band(MUSEUM.tx - 2, MUSEUM.tx + MUSEUM.w + 1, MUSEUM.ty - 2, MUSEUM.ty + MUSEUM.h + 1, true),
+// 마을(zone) 간 직접 연결 통로 — 기존엔 모든 길이 박물관 허브를 거쳐야만 하는 방사형
+// (허브+바퀴살) 구조뿐이었다. 인접한 포털끼리도 서로 바로 잇는 "링" 통로를 추가해서
+// 박물관을 거치지 않고 옆 마을로 바로 넘어갈 수 있게 한다. 연결 순서는 placePortal
+// 주석에 적힌 실제 배치 각도(0°→300°) 순서를 그대로 따른다.
+const RING_ORDER = ['Urban', 'Animal', 'Lab', 'Nature', 'Human', 'Music']
+const RING_BEND = 0.5
+const RING_TILES = RING_ORDER.flatMap((zone, i) => {
+  const a = portalByZone[zone]
+  const b = portalByZone[RING_ORDER[(i + 1) % RING_ORDER.length]]
+  return spoke(
+    Math.round(a.tx + a.w/2), Math.round(a.ty + a.h/2),
+    Math.round(b.tx + b.w/2), Math.round(b.ty + b.h/2),
+    SPOKE_W, RING_BEND,
+  )
+})
+
+const RAW_PATH_TILES = [
+  // Museum 앞마당 (건물 발치를 감싸는 자갈 광장) — 길이 넓어진 만큼 여백도 살짝 키움
+  ...band(MUSEUM.tx - 3, MUSEUM.tx + MUSEUM.w + 2, MUSEUM.ty - 3, MUSEUM.ty + MUSEUM.h + 2, true),
   ...PORTALS.flatMap(p => spoke(
     Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
     Math.round(p.tx + p.w/2),    Math.round(p.ty + p.h/2),
     SPOKE_W, SPOKE_BENDS[p.zone],
   )),
+  ...RING_TILES,
 ]
+// 광장/바퀴살/링 통로가 포털 근처에서 서로 겹치는 타일이 나올 수 있어 좌표 기준으로
+// 한 번만 남긴다 — 안 그러면 오토타일·글로우 효과가 같은 자리에 중복으로 그려진다.
+const pathTileMap = new Map()
+for (const t of RAW_PATH_TILES) {
+  const k = `${t.tx},${t.ty}`
+  if (!pathTileMap.has(k)) pathTileMap.set(k, t)
+}
+const PATH_TILES = [...pathTileMap.values()]
 
 const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
@@ -144,6 +171,26 @@ const MUSEUM_SET = new Set(
 function isFree(tx, ty) {
   const k = `${tx},${ty}`
   return !PATH_SET.has(k) && !WATER_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
+}
+
+// 캐릭터 이동 가능 타일 — 길 + 포털/박물관 부지(건물 진입 지점까지는 자연스럽게 걸어
+// 들어갈 수 있어야 함). 잔디(나무·꽃 등 장식이 있는 isFree 타일)와 물은 제외해서,
+// 방향키로 아무 데나(잔디 위) 못 가고 길로만 다니게 한다.
+const WALKABLE_SET = new Set([...PATH_SET, ...PORTAL_SET, ...MUSEUM_SET])
+
+// 발밑 충돌 판정 — 캐릭터 스프라이트 전체(머리·몸통 포함)가 아니라 발끝 부분의 작은
+// 박스만 검사한다. 그래야 스프라이트가 시각적으로 길 가장자리에 살짝 걸쳐 보여도
+// 실제 판정은 발이 딛는 자리 기준으로 자연스럽게 맞는다.
+const FOOT_W = 28, FOOT_H = 16
+function isWalkable(px, py) {
+  const fx0 = px + (CHAR_W - FOOT_W) / 2
+  const fy0 = py + CHAR_H - FOOT_H
+  const tx0 = Math.floor(fx0 / TILE), tx1 = Math.floor((fx0 + FOOT_W - 1) / TILE)
+  const ty0 = Math.floor(fy0 / TILE), ty1 = Math.floor((fy0 + FOOT_H - 1) / TILE)
+  for (let tx = tx0; tx <= tx1; tx++)
+    for (let ty = ty0; ty <= ty1; ty++)
+      if (!WALKABLE_SET.has(`${tx},${ty}`)) return false
+  return true
 }
 
 // 지형 조회 — GroundLayer(오토타일 렌더링)와 스폰 로직이 공유
@@ -331,6 +378,121 @@ const STREETLIGHTS = PORTALS.flatMap(p => {
 // Farm 팩 슬라임 색상(rainbow 포함 9종)을 그대로 순서대로 배정해서 다양하게 보이게 한다.
 const SLIMES = scatterInYard(portalByZone.Lab, 6, 181, 3).map((s, i) => ({ ...s, slime: WORLD_SLIMES[i % WORLD_SLIMES.length] }))
 
+// Sound Museum(월드맵 중앙 허브, UI 라벨 "도서관") 마당 — Public Library 건물을 여기로
+// 옮기면서(사용자가 원한 대상이 Lab이 아니라 이쪽이었음, 확인 완료) 묘비/흰 펜스도 같이
+// 옮겨왔다. Museum은 6개 마을로 뻗는 스포크 길이 전부 모이는 교차로라 다른 존과 같은
+// margin(3)까지는 100% 포장 광장이라 울타리 놓을 잔디가 전혀 없다(실측: margin 0~3 자유
+// 타일 0개) — margin 4까지 나가야 첫 잔디 링이 나온다(실측: 55칸). 그래서 Museum만 margin
+// 4를 쓰고, 6방향 스포크가 지나는 자리는 그대로 isFree()가 걸러내 여러 출입구가 자연스럽게
+// 생기게 둔다 — 허브는 게이트 1개로 막을 수 없으므로 오히려 이 편이 맞다.
+const MUSEUM_YARD_MARGIN = 4
+const MUSEUM_YARD = {
+  x0: MUSEUM.tx - MUSEUM_YARD_MARGIN, y0: MUSEUM.ty - MUSEUM_YARD_MARGIN,
+  x1: MUSEUM.tx + MUSEUM.w - 1 + MUSEUM_YARD_MARGIN, y1: MUSEUM.ty + MUSEUM.h - 1 + MUSEUM_YARD_MARGIN,
+}
+// 가로등(STREETLIGHTS)은 스포크 중심선에서 5칸 떨어진 자리에, 펜스는 건물에서 margin 4
+// 떨어진 자리에 각각 독립적으로 계산되는데 우연히 같은 거리대라 3곳(46,41)(46,51)(67,56)에서
+// 겹쳤다(실측 확인) — 가로등 좌표를 셋으로 만들어 그 칸만 펜스 배치에서 제외한다. 겹치는
+// 칸만 스킵하고 나머지 펜스 배치 로직은 그대로 둔다(사용자 확정: (a)안).
+const STREETLIGHT_SET = new Set(STREETLIGHTS.map(s => `${s.tx},${s.ty}`))
+function museumYardFence() {
+  const { x0, y0, x1, y1 } = MUSEUM_YARD
+  const out = []
+  for (let tx = x0; tx <= x1; tx++) {
+    const role = (tx === x0 || tx === x1) ? 'corner' : 'rail'
+    out.push({ tx, ty: y0, role })
+    out.push({ tx, ty: y1, role })
+  }
+  for (let ty = y0 + 1; ty < y1; ty++) {
+    out.push({ tx: x0, ty, role: 'post' })
+    out.push({ tx: x1, ty, role: 'post' })
+  }
+  return out.filter(t => isFree(t.tx, t.ty) && !STREETLIGHT_SET.has(`${t.tx},${t.ty}`))
+}
+const MUSEUM_FENCE = museumYardFence()
+function inMuseumYard(tx, ty) {
+  return tx >= MUSEUM_YARD.x0 && tx <= MUSEUM_YARD.x1 && ty >= MUSEUM_YARD.y0 && ty <= MUSEUM_YARD.y1
+}
+// 돌바닥 경계 — 처음엔 organicBlob()으로 타원+노이즈 들쭉날쭉한 경계를 시도했었지만,
+// 최종 확정은 "지금 돌이 깔린 범위의 바운딩 박스" 그대로 꽉 채운 사각형으로 결정됨(사용자
+// 확정: 작은 사각형 타일들로 큰 사각형을 만드는 형태). organicBlob 결과물의 최소/최대
+// tx,ty로 사각형 경계를 잡고 그 안의 길 타일을 전부 돌로 채운다. 건물 발자국(MUSEUM_SET)도
+// 포함해서 채운다 — 건물 스프라이트가 자기 타일 칸(20×15)보다 작게(비율 유지 축소) 그려져서
+// 그 여백에 흙바닥이 삐져나와 보이는 문제가 있었음(사용자 스크린샷으로 확인). 건물 스프라이트가
+// 그 위에 그려지므로 실제로 덮이는 자리는 안 보이고, 여백만 돌로 채워져 자연스럽게 이어진다.
+const STONE_BLOB = organicBlob(
+  MUSEUM.tx + MUSEUM.w / 2, MUSEUM.ty + MUSEUM.h / 2,
+  MUSEUM.w / 2 + MUSEUM_YARD_MARGIN, MUSEUM.h / 2 + MUSEUM_YARD_MARGIN,
+  211,
+)
+const STONE_RECT = STONE_BLOB.reduce((acc, t) => ({
+  x0: Math.min(acc.x0, t.tx), x1: Math.max(acc.x1, t.tx),
+  y0: Math.min(acc.y0, t.ty), y1: Math.max(acc.y1, t.ty),
+}), { x0: Infinity, x1: -Infinity, y0: Infinity, y1: -Infinity })
+const STONE_SET = new Set(
+  PATH_TILES
+    .filter(t => t.tx >= STONE_RECT.x0 && t.tx <= STONE_RECT.x1 &&
+                 t.ty >= STONE_RECT.y0 && t.ty <= STONE_RECT.y1)
+    .map(t => `${t.tx},${t.ty}`)
+)
+function inMuseumStonePlaza(tx, ty) {
+  return STONE_SET.has(`${tx},${ty}`)
+}
+// 돌↔잔디 경계 스캐터 — 돌 칸(구멍 채움 포함) 중 "바로 옆이 잔디인" 칸을 찾아, 그 잔디
+// 쪽에 덤불/꽃/버섯을 과하지 않게(4칸당 1번 정도만 시도) 심어서 전환부를 자연스럽게 한다.
+const STONE_TILES = [...STONE_SET].map(k => {
+  const [tx, ty] = k.split(',').map(Number)
+  return { tx, ty }
+})
+const STONE_EDGE_SPOTS = (() => {
+  const seen = new Set()
+  const out = []
+  for (const t of STONE_TILES) {
+    for (const [dx, dy] of [[1,0],[-1,0],[0,1],[0,-1]]) {
+      const nx = t.tx + dx, ny = t.ty + dy
+      const k = `${nx},${ny}`
+      if (seen.has(k) || STONE_SET.has(k)) continue
+      if (!isFree(nx, ny)) continue
+      seen.add(k)
+      out.push({ tx: nx, ty: ny })
+    }
+  }
+  return out
+})()
+const STONE_EDGE_DECOR = STONE_EDGE_SPOTS
+  .filter((t, i) => seedRand(t.tx * 31 + t.ty * 17 + 233) < 0.25)
+  .map((t, i) => {
+    const roll = seedRand(t.tx * 19 + t.ty * 23 + 241)
+    const sprite = roll < 0.4 ? WORLD_NATURE.bushes[i % 10]
+      : roll < 0.7 ? WORLD_NATURE.flowers[i % 10]
+      : WORLD_NATURE.mushrooms[i % 10]
+    return { ...t, sprite }
+  })
+// 묘비 6개(좌우 3개씩) — 첫 잔디 링(margin 4)에서 스포크에 안 걸리는 걸 실측 확인한
+// 서쪽/동쪽 변(46/73열, y 34~42 구간)에 결정론적으로 배치(SILOS와 같은 이유 — 무작위
+// 1회 시도로는 이렇게 좁은 자유 구간을 못 맞힐 위험이 큼).
+const GRAVESTONE_SPOTS = [
+  { tx: MUSEUM_YARD.x0, ty: MUSEUM_YARD.y0 + 2 },
+  { tx: MUSEUM_YARD.x0, ty: MUSEUM_YARD.y0 + 4 },
+  { tx: MUSEUM_YARD.x0, ty: MUSEUM_YARD.y0 + 6 },
+  { tx: MUSEUM_YARD.x1, ty: MUSEUM_YARD.y0 + 2 },
+  { tx: MUSEUM_YARD.x1, ty: MUSEUM_YARD.y0 + 4 },
+  { tx: MUSEUM_YARD.x1, ty: MUSEUM_YARD.y0 + 6 },
+]
+const GRAVESTONES = GRAVESTONE_SPOTS
+  .filter(t => isFree(t.tx, t.ty))
+  .map((t, i) => ({ ...t, sprite: LIBRARY_YARD.gravestones[i % LIBRARY_YARD.gravestones.length] }))
+const LIBRARY_FLOWER_SPOTS = [
+  { tx: MUSEUM_YARD.x0 + 1,  ty: MUSEUM_YARD.y0 },
+  { tx: MUSEUM_YARD.x0 + 13, ty: MUSEUM_YARD.y0 },
+  { tx: MUSEUM_YARD.x0 + 24, ty: MUSEUM_YARD.y0 },
+  { tx: MUSEUM_YARD.x0,      ty: MUSEUM_YARD.y0 + 18 },
+  { tx: MUSEUM_YARD.x0 + 3,  ty: MUSEUM_YARD.y1 },
+]
+const LIBRARY_FLOWERS = LIBRARY_FLOWER_SPOTS
+  .filter(t => isFree(t.tx, t.ty))
+  .map((t, i) => ({ ...t, sprite: WORLD_NATURE.flowers[(i+2) % 10] }))
+
 /* ─────────────────────────────────────────────
    잔디 색상 얼룩 — 구매한 시트의 "잔디" 조각은 전부 독립된 섬(hedge autotile) 형태라
    그대로 반복 타일링하면 각 타일 모서리의 둥근 여백이 그대로 격자무늬로 드러난다
@@ -398,10 +560,10 @@ function SheetSprite({ x, y, srcX, srcY, w = TILE, h = TILE, renderW, renderH, r
 }
 
 // 포털 섬 안에 실제 건물 스프라이트를 비율 유지한 채 최대한 크게, 가운데 정렬해서 그림
-function BuildingSprite({ zone, px, py, pw, ph }) {
+function BuildingSprite({ zone, px, py, pw, ph, scaleMul = 1 }) {
   const b = WORLD_BUILDINGS[zone]
   if (!b) return null
-  const scale = Math.min(pw / b.w, ph / b.h) * 0.92
+  const scale = Math.min(pw / b.w, ph / b.h) * 0.92 * scaleMul
   const w = b.w * scale, h = b.h * scale
   const x = px + (pw - w) / 2, y = py + (ph - h) / 2 + ph * 0.03
   return <SheetSprite x={x} y={y} srcX={b.x} srcY={b.y} w={b.w} h={b.h}
@@ -446,17 +608,9 @@ function PixelTree({ x, y, variant = 0, sprite }) {
         style={{ imageRendering: 'pixelated' }}/>
     )
   }
-  const c = TREE_COLORS[variant % 3]
-  const s = TILE - 4
-  return (
-    <g transform={`translate(${x+2},${y})`}>
-      <ellipse cx={s/2} cy={s-3} rx={s*0.32} ry={5} fill="#00000022"/>
-      <rect x={s*0.38} y={s*0.55} width={s*0.24} height={s*0.44} rx="2" fill={c.trunk}/>
-      <rect x={s*0.08} y={s*0.34} width={s*0.84} height={s*0.28} rx="5" fill={c.shadow}/>
-      <rect x={s*0.16} y={s*0.08} width={s*0.68} height={s*0.32} rx="6" fill={c.canopy}/>
-      <rect x={s*0.26} y={s*0.1}  width={s*0.2}  height={s*0.1}  rx="3" fill="white" opacity="0.22"/>
-    </g>
-  )
+  // 프로시저럴(rect/ellipse 손그림) 나무 폴백은 삭제 — 실제 스프라이트가 없으면
+  // 도형을 그려 흉내내는 대신 아무것도 그리지 않는다(현재 설정상 여기까지 오지 않음).
+  return null
 }
 
 const FLOWER_SRCS = [OBJECTS.flower_yellow, OBJECTS.flower_pink, OBJECTS.flower_blue, OBJECTS.flower_white]
@@ -554,6 +708,45 @@ function PixelFence({ x, y }) {
       <rect x="20" y="8" width="4" height="14" rx="1" fill="#B89A6E"/>
       <rect x="-2" y="10" width="28" height="3" rx="1" fill="#C8AE7E"/>
       <rect x="-2" y="17" width="28" height="3" rx="1" fill="#C8AE7E"/>
+    </g>
+  )
+}
+
+// Sound Museum 도서관 마당 전용 크림색 피켓펜스 — role(rail/post/corner)에 따라 다른 조각을 그린다.
+// rail 조각은 8px 폭이라 한 타일(32px)을 채우려면 4번 반복(이음매 없음, 5장 반복 테스트로 확인).
+// post는 세로가 TILE보다 길어(47px) 바닥 기준으로 앉히고 위로 살짝 튀어나오게 둔다(나무/건물처럼
+// 이 프로젝트에서 이미 쓰는 방식과 동일 — 타일보다 큰 소품은 발밑을 앵커로 삼는다).
+function LibraryFenceSprite({ x, y, role }) {
+  if (!ASSET_READY.world) return <PixelFence x={x} y={y}/>
+  if (role === 'corner') {
+    const s = LIBRARY_YARD.fenceCorner
+    return <SheetSprite x={x} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h} renderW={TILE} renderH={TILE} sheet={s}/>
+  }
+  if (role === 'post') {
+    const s = LIBRARY_YARD.fencePost
+    return <SheetSprite x={x + (TILE - s.w) / 2} y={y + TILE - s.h} srcX={s.x} srcY={s.y} w={s.w} h={s.h} sheet={s}/>
+  }
+  const s = LIBRARY_YARD.fenceRail
+  const reps = Math.round(TILE / s.w)
+  return (
+    <>
+      {Array.from({ length: reps }, (_, i) => (
+        <SheetSprite key={i} x={x + i * s.w} y={y} srcX={s.x} srcY={s.y} w={s.w} h={s.h} sheet={s}/>
+      ))}
+    </>
+  )
+}
+
+// Museum 마당 묘비 — 소스가 14~18px 높이라 캐릭터 발치 소품(꽃/버섯 등)과 같은 PropSprite
+// 배율(2배)을 쓰면 다른 소품들과 크기 균형이 맞는다.
+function GravestoneSprite({ x, y, sprite }) {
+  const scale = 2
+  const w = sprite.w * scale, h = sprite.h * scale
+  const px = x + (TILE - w) / 2, py = y + TILE - h
+  return (
+    <g>
+      <ellipse cx={px + w/2} cy={py + h - 2} rx={w*0.38} ry={4} fill="#00000030"/>
+      <SheetSprite x={px} y={py} srcX={sprite.x} srcY={sprite.y} w={sprite.w} h={sprite.h} renderW={w} renderH={h} sheet={sprite}/>
     </g>
   )
 }
@@ -656,7 +849,6 @@ function PortalIsland({ portal, hovered, progress, locked }) {
 
   return (
     <g opacity={locked ? 0.6 : 1} style={{ filter: locked ? 'grayscale(0.8)' : 'none', transition:'all 0.25s' }}>
-      <ellipse cx={px+pw/2+4} cy={py+ph+8} rx={pw*0.52} ry={10} fill="#00000033"/>
       {useRealBuilding ? (
         <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
           fill="none"
@@ -725,7 +917,6 @@ function MuseumIsland({ hovered }) {
 
   return (
     <g>
-      <ellipse cx={cx+4} cy={py+ph+8} rx={pw*0.5} ry={10} fill="#00000033"/>
       {useRealBuilding ? (
         <>
           <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
@@ -734,7 +925,7 @@ function MuseumIsland({ hovered }) {
             strokeWidth={hovered ? 2.5 : 0}
             style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
           />
-          <BuildingSprite zone="Museum" px={px} py={py} pw={pw} ph={ph}/>
+          <BuildingSprite zone="Museum" px={px} py={py} pw={pw} ph={ph} scaleMul={0.8}/>
         </>
       ) : (
         <>
@@ -770,7 +961,7 @@ function MuseumIsland({ hovered }) {
         fontFamily="Nunito, sans-serif"
         fill={hovered ? '#fff' : '#C8A96E'}
         style={{ userSelect:'none', transition:'fill 0.2s' }}>
-        🏛 Sound Museum
+        🏛 도서관
       </text>
       {hovered && (
         <g>
@@ -790,7 +981,7 @@ function MuseumIsland({ hovered }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-function PixelChar({ dir, moving }) {
+function PixelChar({ dir, moving, outfitSrc }) {
   const tick  = Math.floor(Date.now() / 160) % 2
   const frame = moving ? tick : 0
 
@@ -811,10 +1002,14 @@ function PixelChar({ dir, moving }) {
         <defs>
           <clipPath id="playerClip"><rect width={fs} height={fs}/></clipPath>
         </defs>
-        {layers.map((L,i) => (
-          <image key={i} href={L.src} x={-srcX} y={-srcY} width={L.sheetW} height={L.sheetH}
-            clipPath="url(#playerClip)" style={{ imageRendering:'pixelated' }}/>
-        ))}
+        {layers.map((L,i) => {
+          // 옷(clothes) 레이어(인덱스 1)만 상점에서 장착한 outfit으로 교체 — body/hair 고정.
+          const href = (i === 1 && outfitSrc) ? outfitSrc : L.src
+          return (
+            <image key={i} href={href} x={-srcX} y={-srcY} width={L.sheetW} height={L.sheetH}
+              clipPath="url(#playerClip)" style={{ imageRendering:'pixelated' }}/>
+          )
+        })}
       </svg>
     )
   }
@@ -927,7 +1122,7 @@ function GroundPatterns() {
 /* ─────────────────────────────────────────────
    HUD
 ───────────────────────────────────────────── */
-function HUD({ totalCount, zoneProgress }) {
+function HUD({ totalCount, zoneProgress, balance = 0, onOpenQuests, onOpenAttendance }) {
   const zones = Object.keys(ZONE_META)
   const totalProgress = Object.values(zoneProgress).reduce((s,v)=>s+v,0) / zones.length
   const pct = Math.round(totalProgress * 100)
@@ -964,6 +1159,32 @@ function HUD({ totalCount, zoneProgress }) {
           <div style={{ fontSize:'9px', color:'#8B6A3A' }}>수집한 소리</div>
         </div>
       </div>
+      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <div style={{ display:'flex', alignItems:'center', gap:'4px' }} title="상점에서 쓸 수 있는 화폐">
+        <span style={{ fontSize:'20px' }}>🪙</span>
+        <div>
+          <div style={{ fontSize:'16px', fontWeight:800, color:'#B8860B', lineHeight:1 }}>{balance}</div>
+          <div style={{ fontSize:'9px', color:'#8B6A3A' }}>보유 화폐</div>
+        </div>
+      </div>
+      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <button onClick={onOpenQuests} title="오늘의 퀘스트" style={{
+        display:'flex', flexDirection:'column', alignItems:'center', gap:'1px',
+        background:'transparent', border:'none', cursor:'pointer', padding:'2px 6px',
+        borderRadius:'8px', fontFamily:'Nunito, sans-serif',
+      }}>
+        <span style={{ fontSize:'19px', lineHeight:1 }}>📋</span>
+        <span style={{ fontSize:'9px', color:'#8B6A3A', fontWeight:700 }}>퀘스트</span>
+      </button>
+      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <button onClick={onOpenAttendance} title="출석 보상" style={{
+        display:'flex', flexDirection:'column', alignItems:'center', gap:'1px',
+        background:'transparent', border:'none', cursor:'pointer', padding:'2px 6px',
+        borderRadius:'8px', fontFamily:'Nunito, sans-serif',
+      }}>
+        <span style={{ fontSize:'19px', lineHeight:1 }}>📅</span>
+        <span style={{ fontSize:'9px', color:'#8B6A3A', fontWeight:700 }}>출석</span>
+      </button>
       <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
       <div style={{ display:'flex', gap:'4px', alignItems:'center' }}>
         {zones.map(zone => (
@@ -1003,7 +1224,7 @@ function ObjectivePanel({ nearZone, nearMuseum, nearZoneLocked }) {
       </div>
       <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14', marginBottom:'4px' }}>
         {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} ${nearZoneLocked ? '(잠김)' : '진입'}`
-          : isNearMuseum ? '🏛 Sound Museum 진입'
+          : isNearMuseum ? '🏛 도서관 진입'
           : '마을 탐험하기'}
       </div>
       <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5, marginBottom:'6px' }}>
@@ -1056,9 +1277,236 @@ function EnterPrompt({ emoji, label, color, locked }) {
 }
 
 /* ─────────────────────────────────────────────
+   일일 퀘스트 패널 — HUD 체크리스트 아이콘 클릭 시 펼쳐짐.
+   완전히 격리된 부가 기능: lib/dailyQuests.js에서만 데이터를 읽고
+   annotations/votes/블록잠금/기존 화폐 로직은 전혀 건드리지 않는다.
+   조회 실패해도 "불러오지 못했어요" 안내만 뜰 뿐 게임 진행에 영향 없음.
+───────────────────────────────────────────── */
+function QuestRow({ label, sub, current, target, completed, reward }) {
+  return (
+    <div style={{
+      display:'flex', alignItems:'center', gap:'10px',
+      padding:'9px 11px', borderRadius:'10px',
+      background: completed ? '#5B9E3A18' : '#00000006',
+      border: completed ? '1.5px solid #5B9E3A55' : '1.5px solid #C8A96E33',
+    }}>
+      <div style={{
+        width:'21px', height:'21px', borderRadius:'50%', flexShrink:0,
+        display:'flex', alignItems:'center', justifyContent:'center',
+        background: completed ? '#5B9E3A' : '#F5EDD8',
+        border: completed ? 'none' : '2px solid #C8A96E',
+        color:'#fff', fontSize:'12px', fontWeight:900,
+      }}>
+        {completed ? '✓' : ''}
+      </div>
+      <div style={{ flex:1, minWidth:0 }}>
+        <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14' }}>{label}</div>
+        {sub && <div style={{ fontSize:'10px', color:'#8B6A3A', marginTop:'1px' }}>{sub}</div>}
+        {target != null && (
+          <div style={{ fontSize:'10px', color:'#8B6A3A', marginTop:'2px', fontVariantNumeric:'tabular-nums' }}>
+            {current}/{target}
+          </div>
+        )}
+      </div>
+      <div style={{ fontSize:'11px', fontWeight:800, color:'#B8860B', whiteSpace:'nowrap', flexShrink:0 }}>+{reward}🪙</div>
+    </div>
+  )
+}
+
+function QuestSection({ title, children }) {
+  return (
+    <div>
+      <div style={{ fontSize:'10px', fontWeight:800, color:'#8B6A3A', letterSpacing:'1px', textTransform:'uppercase', marginBottom:'6px' }}>
+        {title}
+      </div>
+      <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function QuestPanel({ participantId, onClose }) {
+  const [quests, setQuests] = useState(null) // null = 로딩 중
+
+  useEffect(() => {
+    let alive = true
+    getTodayQuestSummary(participantId).then(data => { if (alive) setQuests(data) })
+    return () => { alive = false }
+  }, [participantId])
+
+  const milestones = (quests || [])
+    .filter(q => q.template?.type === 'collect_milestone')
+    .sort((a, b) => a.template.tier_index - b.template.tier_index)
+  const nextTier = milestones.find(m => !m.completed)
+  const lastTier = milestones[milestones.length - 1]
+  const milestoneCurrent = nextTier ? nextTier.progress_count : (lastTier?.progress_count ?? 0)
+  const milestoneTarget  = nextTier ? nextTier.template.target_count : (lastTier?.template.target_count ?? 0)
+  const milestonePct = milestoneTarget ? Math.min(milestoneCurrent / milestoneTarget, 1) * 100 : 0
+  const allMilestonesDone = milestones.length > 0 && milestones.every(m => m.completed)
+
+  const visitZone = (quests || []).find(q => q.template?.type === 'visit_zone')
+  const category  = (quests || []).find(q => q.template?.type === 'category_participate')
+  const vote      = (quests || []).find(q => q.template?.type === 'vote_n_times')
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:120, background:'transparent' }}/>
+      <div style={{
+        position:'absolute', top:`${HUD_H + 10}px`, right:'16px', width:'300px',
+        maxHeight:'70vh', overflowY:'auto',
+        background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:'16px',
+        boxShadow:'0 10px 40px #00000055', zIndex:121,
+        fontFamily:'Nunito, sans-serif', padding:'14px',
+      }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'10px' }}>
+          <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14' }}>📋 오늘의 퀘스트</div>
+          <button onClick={onClose} style={{
+            background:'#00000010', border:'none', borderRadius:'50%',
+            width:'22px', height:'22px', cursor:'pointer', color:'#8B6A3A', fontSize:'12px',
+          }}>✕</button>
+        </div>
+
+        {quests === null ? (
+          <div style={{ fontSize:'11px', color:'#8B6A3A', textAlign:'center', padding:'16px' }}>불러오는 중...</div>
+        ) : quests.length === 0 ? (
+          <div style={{ fontSize:'11px', color:'#8B6A3A', textAlign:'center', padding:'16px' }}>퀘스트를 불러오지 못했어요.</div>
+        ) : (
+          <div style={{ display:'flex', flexDirection:'column', gap:'14px' }}>
+
+            <QuestSection title="🌾 채집 마일스톤">
+              <div style={{ fontSize:'11px', color:'#3A2A14', fontWeight:700, marginBottom:'2px' }}>
+                {allMilestonesDone
+                  ? '오늘 마일스톤 모두 달성! 🎉'
+                  : `채집 ${milestoneCurrent}/${milestoneTarget} · 다음 보상까지 ${Math.max(milestoneTarget - milestoneCurrent, 0)}개`}
+              </div>
+              <div style={{ height:'8px', background:'#D4C4A0', borderRadius:'4px', overflow:'hidden', marginBottom:'2px' }}>
+                <div style={{ height:'100%', borderRadius:'4px', background:'linear-gradient(90deg,#5B9E3A,#7BC850)', width:`${milestonePct}%`, transition:'width 0.5s ease' }}/>
+              </div>
+              {milestones.map(m => (
+                <QuestRow key={m.id}
+                  label={m.template.description}
+                  current={m.progress_count} target={m.template.target_count}
+                  completed={m.completed} reward={m.template.reward_currency}
+                />
+              ))}
+            </QuestSection>
+
+            <QuestSection title="🧭 다양성 과제">
+              {visitZone && (
+                <QuestRow label={visitZone.template.description}
+                  completed={visitZone.completed} reward={visitZone.template.reward_currency}/>
+              )}
+              {category && (
+                <QuestRow label={category.template.description}
+                  sub={category.target_sub_category ? `대상 카테고리: ${category.target_sub_category}` : undefined}
+                  completed={category.completed} reward={category.template.reward_currency}/>
+              )}
+            </QuestSection>
+
+            <QuestSection title="🗳 투표">
+              {vote && (
+                <QuestRow label={vote.template.description}
+                  current={vote.progress_count} target={vote.template.target_count}
+                  completed={vote.completed} reward={vote.template.reward_currency}/>
+              )}
+            </QuestSection>
+          </div>
+        )}
+      </div>
+    </>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   출석 보상 패널 — HUD 📅 아이콘 클릭 시 펼쳐짐.
+   완전히 격리된 부가 기능: lib/attendance.js에서만 데이터를 읽고
+   annotations/votes/블록잠금/기존 화폐·퀘스트 로직은 전혀 건드리지
+   않는다. 실제 체크인(+보상 지급)은 앱 진입 시 app/page.js가 이미
+   해뒀다는 전제 — 이 패널은 그 결과를 보여주기만 한다.
+───────────────────────────────────────────── */
+function AttendancePanel({ participantId, onClose }) {
+  const [status, setStatus] = useState(null) // null = 로딩 중
+
+  useEffect(() => {
+    let alive = true
+    getAttendanceStatus(participantId).then(data => { if (alive) setStatus(data) })
+    return () => { alive = false }
+  }, [participantId])
+
+  const streakDay = status?.today?.streak_day ?? 0
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position:'fixed', inset:0, zIndex:120, background:'transparent' }}/>
+      <div style={{
+        position:'absolute', top:`${HUD_H + 10}px`, right:'16px', width:'300px',
+        background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:'16px',
+        boxShadow:'0 10px 40px #00000055', zIndex:121,
+        fontFamily:'Nunito, sans-serif', padding:'14px',
+      }}>
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:'10px' }}>
+          <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14' }}>📅 출석 보상</div>
+          <button onClick={onClose} style={{
+            background:'#00000010', border:'none', borderRadius:'50%',
+            width:'22px', height:'22px', cursor:'pointer', color:'#8B6A3A', fontSize:'12px',
+          }}>✕</button>
+        </div>
+
+        {status === null ? (
+          <div style={{ fontSize:'11px', color:'#8B6A3A', textAlign:'center', padding:'16px' }}>불러오는 중...</div>
+        ) : status.templates.length === 0 ? (
+          <div style={{ fontSize:'11px', color:'#8B6A3A', textAlign:'center', padding:'16px' }}>출석 정보를 불러오지 못했어요.</div>
+        ) : (
+          <>
+            <div style={{ fontSize:'11px', color:'#3A2A14', fontWeight:700, marginBottom:'10px' }}>
+              {streakDay > 0
+                ? `오늘 출석 완료! 연속 ${streakDay}일차 🔥`
+                : '오늘은 아직 출석 전이에요'}
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', gap:'6px' }}>
+              {status.templates.map(t => {
+                const done = t.day_index <= streakDay
+                const isToday = t.day_index === streakDay
+                return (
+                  <div key={t.day_index} style={{
+                    display:'flex', alignItems:'center', gap:'10px',
+                    padding:'9px 11px', borderRadius:'10px',
+                    background: isToday ? '#5B9E3A18' : done ? '#00000006' : '#00000003',
+                    border: isToday ? '1.5px solid #5B9E3A55' : '1.5px solid #C8A96E33',
+                    opacity: done || isToday ? 1 : 0.6,
+                  }}>
+                    <div style={{
+                      width:'21px', height:'21px', borderRadius:'50%', flexShrink:0,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      background: done ? '#5B9E3A' : '#F5EDD8',
+                      border: done ? 'none' : '2px solid #C8A96E',
+                      color:'#fff', fontSize:'12px', fontWeight:900,
+                    }}>
+                      {done ? '✓' : ''}
+                    </div>
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14' }}>{t.description}</div>
+                    </div>
+                    <div style={{ fontSize:'11px', fontWeight:800, color:'#B8860B', whiteSpace:'nowrap', flexShrink:0 }}>+{t.reward_currency}🪙</div>
+                  </div>
+                )
+              })}
+            </div>
+            <div style={{ fontSize:'10px', color:'#8B6A3A', marginTop:'10px', lineHeight:1.5 }}>
+              💡 하루라도 건너뛰면 1일차부터 다시 시작해요. 7일차를 채우면 다음 날 다시 1일차부터!
+            </div>
+          </>
+        )}
+      </div>
+    </>
+  )
+}
+
+/* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
-export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, participantId = '', lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', lockedZones = [] }) {
   const { keys, press, release } = useKeys()
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
 
@@ -1067,6 +1515,8 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
   const [moving,     setMoving]     = useState(false)
   const [nearZone,   setNearZone]   = useState(null)
   const [nearMuseum, setNearMuseum] = useState(false)
+  const [questOpen,  setQuestOpen]  = useState(false)
+  const [attendanceOpen, setAttendanceOpen] = useState(false)
   const posRef = useRef(pos)
   const rafRef = useRef(null)
 
@@ -1078,12 +1528,17 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
       let { x, y } = posRef.current
       let moved = false, newDir = dir
       const spd = SPEED * dt
-      if (k.up)    { y -= spd; newDir = 'up';    moved = true }
-      if (k.down)  { y += spd; newDir = 'down';  moved = true }
-      if (k.left)  { x -= spd; newDir = 'left';  moved = true }
-      if (k.right) { x += spd; newDir = 'right'; moved = true }
-      x = Math.max(0, Math.min(PX_W - CHAR_W, x))
-      y = Math.max(0, Math.min(PX_H - CHAR_H, y))
+      let dx = 0, dy = 0
+      if (k.up)    { dy -= spd; newDir = 'up';    moved = true }
+      if (k.down)  { dy += spd; newDir = 'down';  moved = true }
+      if (k.left)  { dx -= spd; newDir = 'left';  moved = true }
+      if (k.right) { dx += spd; newDir = 'right'; moved = true }
+      const nx = Math.max(0, Math.min(PX_W - CHAR_W, x + dx))
+      const ny = Math.max(0, Math.min(PX_H - CHAR_H, y + dy))
+      // 축을 따로 검사 — 대각선 이동 중 한쪽 축만 길 밖으로 막혀도 다른 축은
+      // 계속 진행되어(길을 따라 미끄러지듯) 자연스럽다.
+      if (dx !== 0 && isWalkable(nx, y)) x = nx
+      if (dy !== 0 && isWalkable(x, ny)) y = ny
       if (moved) {
         posRef.current = { x, y }; setPos({ x, y })
         if (newDir !== dir) setDir(newDir)
@@ -1115,11 +1570,15 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
 
   return (
     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
-      <HUD totalCount={totalCount} zoneProgress={zoneProgress}/>
+      <HUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance}
+        onOpenQuests={() => setQuestOpen(o => !o)}
+        onOpenAttendance={() => setAttendanceOpen(o => !o)}/>
+      {questOpen && <QuestPanel participantId={participantId} onClose={() => setQuestOpen(false)}/>}
+      {attendanceOpen && <AttendancePanel participantId={participantId} onClose={() => setAttendanceOpen(false)}/>}
 
       <div style={{
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
-        background: ASSET_READY.world ? GRASS_BASE : '#5A9A3A', overflow:'hidden', cursor:'none',
+        background: ASSET_READY.world ? GRASS_BASE : '#5A9A3A', overflow:'hidden',
       }}>
         <svg width="100%" height="100%"
           viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
@@ -1133,6 +1592,19 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
           {ASSET_READY.world ? (
             <>
               {PATH_TILES.map((p,i) => {
+                // Museum 마당(Public Library 건물 주변) 안쪽 길 중 돌 블롭(STONE_SET, 타원+
+                // 노이즈로 들쭉날쭉하게 깎은 범위) 안에 든 것만 회색 판석으로 — 블롭 밖으로
+                // 밀려난 길 타일과 그 바깥 스포크 길/다른 존 플라자는 기존 흙길 그대로.
+                if (inMuseumStonePlaza(p.tx, p.ty)) {
+                  // 32×32 순정 크롭(스케일=1)으로 바꿔도 초록 줄이 남아있었음 — 원인은 이
+                  // 타일만의 문제가 아니라 게임 전체가 공유하는 뷰포트(VIEW_W/H → 실제 창
+                  // 크기) 비정수 배율 확대 때문에 타일별 개별 <svg> 클립 경계마다 생기는
+                  // 서브픽셀 틈(기존 흙길에도 옅게 있음, 실측 확인). 카메라 스케일링 자체를
+                  // 고치는 건 6개 존이 공유하는 코드라 범위 밖 — 대신 돌 타일마다 1px씩
+                  // 서로 살짝 겹치게 그려서(33×33로 늘리고 중심은 유지) 그 틈을 가린다.
+                  const s = LIBRARY_YARD.stonePath
+                  return <SheetSprite key={i} x={p.tx*TILE - 0.5} y={p.ty*TILE - 0.5} srcX={s.x} srcY={s.y} w={s.w} h={s.h} renderW={TILE+1} renderH={TILE+1} sheet={s}/>
+                }
                 const { shape, rotate } = autotileShape(p.tx, p.ty, terrainAt, 'dirt')
                 const s = WORLD_TILESET.dirt[shape]
                 return <SheetSprite key={i} x={p.tx*TILE} y={p.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
@@ -1143,8 +1615,10 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
                 return <SheetSprite key={i} x={w.tx*TILE} y={w.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
               })}
               {/* 시트 자체의 톱니 경계가 은은해서, 그 위에 짧은 크림색 glow 선을 겹쳐 그려
-                  레퍼런스 이미지처럼 잔디↔길·잔디↔물 경계가 눈에 뚜렷하게 들어오게 보강 */}
+                  레퍼런스 이미지처럼 잔디↔길·잔디↔물 경계가 눈에 뚜렷하게 들어오게 보강.
+                  Museum 마당 안 판석 구간은 흙길 오토타일이 아니라서 glow 대상에서 제외. */}
               {PATH_TILES.map((p,i) => {
+                if (inMuseumStonePlaza(p.tx, p.ty)) return null
                 const { shape, rotate } = autotileShape(p.tx, p.ty, terrainAt, 'dirt')
                 if (shape !== 'edge') return null
                 return <EdgeGlow key={i} tx={p.tx} ty={p.ty} rotate={rotate} color="#F5E6BE"/>
@@ -1179,11 +1653,15 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
           {MUSHROOMS.map((m,i) => <PropSprite key={i} x={m.tx*TILE} y={m.ty*TILE} sprite={m.sprite} scale={1.8}/>)}
           {YARD_ROCKS.map((r,i) => <PropSprite key={i} x={r.tx*TILE} y={r.ty*TILE} sprite={r.sprite} scale={1.8}/>)}
           {CRYSTALS.map((c,i) => <PropSprite key={i} x={c.tx*TILE} y={c.ty*TILE} sprite={c.sprite} scale={1.8}/>)}
+          {ASSET_READY.world && GRAVESTONES.map((g,i) => <GravestoneSprite key={i} x={g.tx*TILE} y={g.ty*TILE} sprite={g.sprite}/>)}
+          {ASSET_READY.world && LIBRARY_FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} sprite={f.sprite}/>)}
+          {ASSET_READY.world && STONE_EDGE_DECOR.map((d,i) => <PropSprite key={i} x={d.tx*TILE} y={d.ty*TILE} sprite={d.sprite} scale={1.8}/>)}
           {SILOS.map((s,i) => <PropSprite key={i} x={s.tx*TILE} y={s.ty*TILE} sprite={s.sprite} scale={1.3}/>)}
           {WINDMILL.map((w,i) => <PropSprite key={i} x={w.tx*TILE} y={w.ty*TILE} sprite={w.sprite} scale={1.15}/>)}
           {STREETLIGHTS.map((s,i) => <PropSprite key={i} x={s.tx*TILE} y={s.ty*TILE} sprite={WORLD_PROPS.streetlight} scale={1.4}/>)}
           {BENCHES.map((b,i) => <PixelBench key={i} x={b.tx*TILE} y={b.ty*TILE}/>)}
           {FENCES.map((f,i) => <PixelFence key={i} x={f.tx*TILE} y={f.ty*TILE}/>)}
+          {MUSEUM_FENCE.map((f,i) => <LibraryFenceSprite key={i} x={f.tx*TILE} y={f.ty*TILE} role={f.role}/>)}
           {TREES.map((t,i) => t.sprite
             ? <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} sprite={t.sprite}/>
             : <PixelTree key={i} x={t.tx*TILE} y={t.ty*TILE} variant={t.variant ?? i%3}/>)}
@@ -1201,7 +1679,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
 
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}>
-              <PixelChar dir={dir} moving={moving}/>
+              <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc}/>
             </div>
           </foreignObject>
         </svg>
@@ -1219,7 +1697,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
       )}
 
       {!nearZone && nearMuseum && (
-        <EnterPrompt emoji="🏛" label="Sound Museum" color="#C8A96E"/>
+        <EnterPrompt emoji="🏛" label="도서관" color="#C8A96E"/>
       )}
 
       <DPad press={press} release={release}

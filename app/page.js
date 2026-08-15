@@ -7,6 +7,9 @@ import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
 import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
+import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
+import { ensureTodayCheckIn } from '@/lib/attendance'
+import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
 
@@ -18,6 +21,10 @@ const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 // 처음엔 Music 마을만 열려있고, Music 구역 1을 전사 완료해야 나머지가 열림
 const FIRST_ZONE          = 'Music'
 const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
+
+// Sound Museum에 올라가려면 오디오 하나당 이 인원수만큼 전사가 완료돼야 한다.
+// 원래는 그룹당 5명 기준이었는데, P/Q 그룹에 결원이 생겨 4명으로 낮춤(2026-07-31).
+const MUSEUM_MIN_ANNOTATIONS = 4
 
 function buildZoneMap(sounds) {
   const map = {}
@@ -76,6 +83,7 @@ export default function HomePage() {
   const [feedbackZone,  setFeedbackZone]  = useState('')
   const [museumEmpty,   setMuseumEmpty]   = useState(false)  // Museum: 5개 미달 알림
   const [museumDoneToast, setMuseumDoneToast] = useState(false) // Museum 관람 완료 후 안내 토스트
+  const [attendanceToast, setAttendanceToast] = useState(null) // 출석 체크인 완료 토스트 { streakDay, reward }
 
   // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
@@ -91,6 +99,12 @@ export default function HomePage() {
   // 카운트
   const [totalCount,    setTotalCount]    = useState(0)
   const [zoneProgress,  setZoneProgress]  = useState({})
+  // 전시 현황 탭용 — zoneProgress(비율)와 같은 루프에서 분자/분모를 함께 보관.
+  // 새 쿼리 아님 — 이미 zoneProgress 계산에 쓰는 count/zoneMax를 그대로 노출만 함.
+  const [zoneCounts,    setZoneCounts]    = useState({})
+  // 화폐 시스템 — WorldMap HUD 잔액 + 장착 중인 outfit(캐릭터 렌더링용)
+  const [balance,          setBalance]          = useState(0)
+  const [equippedOutfitId, setEquippedOutfitId] = useState(null)
   const studyAccessEnabled = isStudyAccessParticipantId(participantId)
   // ALLAUDIO_A/ALLAUDIO_B처럼 그룹이 ID에 고정된 접근이면 그 그룹으로, 아니면
   // 입력받은 groupId를 그대로 쓴다. RESEARCHER 등 그룹 무관 접근만 완전히 우회한다.
@@ -108,14 +122,37 @@ export default function HomePage() {
         ZONES.map(async z => {
           const zoneMax = getGroupSounds(z, effectiveGroupId, bypassGroupFilter).length || 100
           const count   = await getCountByZone(z, participantId)
-          return [z, Math.min(count / zoneMax, 1)]
+          return [z, count, zoneMax]
         })
       )
-      setZoneProgress(Object.fromEntries(entries))
+      setZoneProgress(Object.fromEntries(entries.map(([z, count, zoneMax]) => [z, Math.min(count / zoneMax, 1)])))
+      setZoneCounts(Object.fromEntries(entries.map(([z, count, zoneMax]) => [z, { collected: count, total: zoneMax }])))
+    } catch {}
+
+    try {
+      const [bal, outfitId] = await Promise.all([
+        getCurrencyBalance(participantId),
+        getEquippedOutfit(participantId),
+      ])
+      setBalance(bal)
+      setEquippedOutfitId(outfitId)
     } catch {}
   }, [participantId, effectiveGroupId, bypassGroupFilter])
 
   useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
+
+  // 출석 체크인 — 오늘 처음 월드에 들어왔을 때 한 번만 자동 지급.
+  // lib/attendance.js가 "이미 오늘 체크인했음"을 자체적으로 판별하므로
+  // 여기서는 그냥 참여자가 정해질 때마다 호출하기만 하면 됨(멱등).
+  useEffect(() => {
+    if (!participantId) return
+    ensureTodayCheckIn(participantId).then(({ row, isNew }) => {
+      if (isNew && row) {
+        setAttendanceToast({ streakDay: row.streak_day, reward: row.reward_currency })
+        refreshCounts()
+      }
+    })
+  }, [participantId, refreshCounts])
 
   // Museum 관람 완료 토스트 자동 닫힘
   useEffect(() => {
@@ -123,6 +160,13 @@ export default function HomePage() {
     const t = setTimeout(() => setMuseumDoneToast(false), 3200)
     return () => clearTimeout(t)
   }, [museumDoneToast])
+
+  // 출석 토스트 자동 닫힘
+  useEffect(() => {
+    if (!attendanceToast) return
+    const t = setTimeout(() => setAttendanceToast(null), 3800)
+    return () => clearTimeout(t)
+  }, [attendanceToast])
 
   /* ── StartPanel → WorldMap ── */
   const handleStart = (pid, gid) => {
@@ -267,7 +311,7 @@ export default function HomePage() {
       const shuffled = [...candidates].sort(() => Math.random() - 0.5)
       for (const found of shuffled) {
         const count = await getAnnotationCountForSound(found.sound_id)
-        if (count >= 5) { sound = found; break }
+        if (count >= MUSEUM_MIN_ANNOTATIONS) { sound = found; break }
       }
     } catch (e) {
       console.error('[Museum] 진입 오류:', e)
@@ -363,7 +407,10 @@ export default function HomePage() {
           onEnterMuseum={handleEnterMuseum}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
+          balance={balance}
+          outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
           lockedZones={studyAccessEnabled || villagesUnlocked ? [] : ZONES_LOCKED_AT_START}
+          participantId={participantId}
         />
         {/* Zone 진입 로딩 */}
         {zoneLoading && (
@@ -397,7 +444,7 @@ export default function HomePage() {
               </div>
               <div style={{ fontSize:'12px', color:'#8B6A3A', lineHeight:1.6 }}>
                 다른 그룹 참여자들이 소리를 더 수집하면<br/>
-                Sound Museum에서 만날 수 있어요 ✨
+                도서관에서 만날 수 있어요 ✨
               </div>
               <div style={{ marginTop:'16px', fontSize:'11px', color:'#A09080' }}>
                 화면을 클릭하면 닫힙니다
@@ -429,6 +476,29 @@ export default function HomePage() {
             </div>
           </div>
         )}
+
+        {/* 출석 체크인 완료 토스트 */}
+        {attendanceToast && (
+          <div onClick={() => setAttendanceToast(null)} style={{
+            position:'fixed', left:'50%', bottom:'28px', transform:'translateX(-50%)',
+            zIndex:200, cursor:'pointer',
+          }}>
+            <div style={{
+              background:'#F5EDD8ee', border:'2px solid #C8A96E', borderRadius:'16px',
+              padding:'14px 22px', textAlign:'center', fontFamily:'Nunito, sans-serif',
+              boxShadow:'0 8px 28px #00000044', backdropFilter:'blur(6px)',
+              animation:'slideUp 0.35s cubic-bezier(0.34,1.56,0.64,1)',
+              maxWidth:'320px',
+            }}>
+              <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14', marginBottom:'4px' }}>
+                📅 출석 완료! 연속 {attendanceToast.streakDay}일차
+              </div>
+              <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5 }}>
+                +{attendanceToast.reward}🪙 획득했어요
+              </div>
+            </div>
+          </div>
+        )}
       </>
     )
   }
@@ -443,6 +513,8 @@ export default function HomePage() {
           myExpression={myExpression}
           participantId={participantId}
           sessionId={groupId}
+          zoneCounts={zoneCounts}
+          onCurrencyChange={refreshCounts}
           onDone={handleMuseumDone}
           onExit={handleMuseumExit}
         />

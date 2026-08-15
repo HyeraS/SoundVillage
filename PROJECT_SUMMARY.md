@@ -1,13 +1,13 @@
 # SoundMimic Village — 프로젝트 요약
 
 > 소리를 탐험하고, 의성어로 표현하고, 다른 참여자의 표현에 공감 투표하는 웹 기반 사운드 어노테이션 연구용 게임.
-> 요약 작성 기준: 2026-07-29 (`main` 커밋 `79adf70` / `asset-swap` 커밋 `c4ff259`, 두 브랜치 상태를 함께 정리)
+> 요약 작성 기준: 2026-08-05 (`main` 커밋 `79adf70` / `asset-swap` 커밋 `ca5d129` + 미커밋 WIP, 두 브랜치 상태를 함께 정리)
 
 `docs/notion/` 아래 2026-06-05 기준 상세 문서 7편이 있으나, 이후 커밋(Sound Museum, 블록 퀘스트, 그룹 A/B, 마을 잠금, 연구용 접근 ID, 실 접속자 장애 대응, WorldMap 비주얼 전면 개편 등)으로 Zone 체계·흐름·비주얼이 크게 바뀌었다. 이 문서는 **현재 코드 기준**으로 다시 정리한 것이다.
 
 **브랜치 상태가 두 갈래로 갈라져 있음 — 중요:**
 - `main`: 실제 실험 참여자들이 접속하는 배포 브랜치. 게임플레이/백엔드 로직(1~11장 내용)은 이 브랜치 기준.
-- `asset-swap`: `main`의 `fabc721`에서 분기, 아직 push/merge 전인 **로컬 전용 WIP 브랜치**. WorldMap·Lab 존을 구매한 itch.io 픽셀 에셋으로 전면 리스킨하는 작업만 담겨 있다(12장 참고). **`main`에만 있는 커밋 2개(`fb2fb1c`, `79adf70` — 접속 장애 수정, Museum 로딩 인디케이터)가 `asset-swap`에는 없으므로**, 이후 `main`에 merge하거나 `main`을 다시 베이스로 rebase할 때 반드시 반영 확인 필요.
+- `asset-swap`: `main`의 `fabc721`에서 분기, 아직 push/merge 전인 **로컬 전용 WIP 브랜치**. WorldMap·Lab 존을 구매한 itch.io 픽셀 에셋으로 전면 리스킨하는 작업에 더해, 현재는 **동물 마을(Animal) 길 버그 수정**과 **자연 마을(Nature) 존 전면 교체**까지 진행 중이다(12장 참고). 이 두 항목은 아직 커밋되지 않은 워킹 트리 변경사항(`app/page.js`, `components/AssetRegistry.js`, `components/WorldMap.js`, `components/ZoneMap.js`)이다. **`main`에만 있는 커밋 2개(`fb2fb1c`, `79adf70` — 접속 장애 수정, Museum 로딩 인디케이터)가 `asset-swap`에는 없으므로**, 이후 `main`에 merge하거나 `main`을 다시 베이스로 rebase할 때 반드시 반영 확인 필요.
 
 ---
 
@@ -159,13 +159,13 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 | `app/layout.js` | 루트 레이아웃(한국어), 메타데이터 |
 | `app/globals.css` | Nunito 폰트, 전역 리셋, 애니메이션 |
 | `components/StartPanel.js` | 참여자/그룹 입력, 연구용 접근 미리보기 |
-| `components/WorldMap.js` | 월드맵, Zone 포털 + Museum 입구, HUD (`asset-swap`: 1162줄로 대폭 확장 — 오토타일 지형·카메라·건물 스프라이트 렌더링 포함, 12장 참고) |
-| `components/ZoneMap.js` (`main` 1291줄 / `asset-swap` 1401줄, 최대 파일) | 블록 격자 계산, 소리 아이템 스폰, 충돌, 잠금 연출 (`asset-swap`: Lab 존 전용 가구/포스터 오브젝트 타입 추가) |
+| `components/WorldMap.js` | 월드맵, Zone 포털 + Museum 입구, HUD (`asset-swap`: 1310줄로 대폭 확장 — 오토타일 지형·카메라·건물 스프라이트 렌더링 + 역할 기반 마을 오브젝트 배치 포함, 12장 참고) |
+| `components/ZoneMap.js` (`main` 1291줄 / `asset-swap` 2305줄, 최대 파일) | 블록 격자 계산, 소리 아이템 스폰, 충돌, 잠금 연출 (`asset-swap`: Lab 존 전용 가구/포스터 오브젝트 타입, Animal 존 길 렌더링, Nature 존 전면 재구현(`buildNatureZone`) 추가, 12.5·12.6절 참고) |
 | `components/AnnotationPanel.js` | Stage 1 표현/자신감 제출 |
 | `components/SoundMuseum.js` (614줄, 신규) | Stage 2 성격의 투표 룸, Zone별 테마/NPC |
 | `components/FeedbackPanel.js` | 완료 토스트 |
 | `components/GameEngine.js` | 공용 상수(`TILE`,`SPEED`), `ZONE_META`, `useKeys`, `overlaps` |
-| `components/AssetRegistry.js` | 에셋 경로/스프라이트 좌표 중앙 관리, `ASSET_READY` 플래그로 없으면 SVG 폴백. `main`은 Kenney 타일 위주로 간단. `asset-swap`은 291줄로 대폭 확장 — `WORLD_TILESET`(오토타일 지형), `WORLD_BUILDINGS`(Zone별 실제 건물 스프라이트, Museum 포함), `WORLD_CHARACTER`(레이어드 캐릭터 8프레임 걷기), `LAB_DECOR`(Lab 존 포스터/가구), `WORLD_SLIMES`(장식용 슬라임) 등 |
+| `components/AssetRegistry.js` | 에셋 경로/스프라이트 좌표 중앙 관리, `ASSET_READY` 플래그로 없으면 SVG 폴백. `main`은 Kenney 타일 위주로 간단. `asset-swap`은 467줄로 대폭 확장 — `WORLD_TILESET`(오토타일 지형), `WORLD_BUILDINGS`(Zone별 실제 건물 스프라이트, Museum 포함), `WORLD_CHARACTER`(레이어드 캐릭터 8프레임 걷기), `LAB_DECOR`(Lab 존 포스터/가구), `WORLD_SLIMES`(장식용 슬라임), `ANIMAL_ZONE_TILESET`, `NATURE_VILLAGE_TILESET`(자연 마을 집 5채·울타리·연못·다리·벤치) 등 |
 | `lib/autotile.js` (신규, `asset-swap`) | 4비트 블롭 오토타일 — N/E/S/W 이웃 비트마스크 → `{shape, rotate}` 변환. WorldMap 지형(길/물) 렌더링에 사용 |
 | `components/VillageScene.js` | 카드형 Zone 선택 UI — 여전히 미사용 |
 | `lib/audioManager.js` | Howler 재생/일시정지/재생 진행률/청취 시간 추적 |
@@ -216,6 +216,9 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 
 | 커밋 | 내용 |
 |---|---|
+| *(미커밋 WIP)* | 동물 마을(Animal) 길 노이즈·끊김 버그 수정 + 직선 경로 전환, 자연 마을(Nature) 존 전면 재구현(집 5채·울타리·연못+다리·장식) — 12.5·12.6절 |
+| `ca5d129` | WorldMap 오브젝트를 무작위 스캐터 대신 역할 기반 마을 레이아웃으로 재구성 |
+| `569a123` | PROJECT_SUMMARY.md 갱신(main 최신 수정사항 + asset-swap 개편 반영) |
 | `c4ff259` | 미지의 소리 마을(Lab) 포털 주변에 슬라임 장식 9색 추가 |
 | `ecbb024` | Lab 존을 소품 흩뿌리기 대신 벽/가구가 있는 실제 방 구조로 재구성 |
 | `1d69de4` | Lab 존을 할로윈풍 코지 인테리어 에셋(포스터/호박/박쥐)으로 장식 |
@@ -239,6 +242,7 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 | 개인/전역 진행도 혼재 | **개선됨** — 블록 퀘스트와 카운트 모두 `participantId` 기준으로 조회하도록 변경 |
 | ESLint 오류 10건(2026-06-05 시점) | 재검증 필요 — `asset-swap`에서는 `WorldMap.js`(`Date.now()` impure-render 2건) / `ZoneMap.js`(ref-during-render 13건) 등 `react-hooks` 규칙 위반이 확인됨. 전부 `main`에도 이미 있던 기존 코드 패턴이며 이번 비주얼 작업으로 새로 생긴 건 아님(각 커밋 시점에 `git stash` 비교로 확인) — 그러나 수정은 아직 안 됨 |
 | `asset-swap`이 `main`에 없는 프로덕션 수정 2건을 못 받고 있음 | **신규** — `main`은 `fabc721` 이후 `fb2fb1c`(커넥션 풀 고갈 수정)·`79adf70`(Museum 로딩 인디케이터)가 추가됐지만 `asset-swap`은 `fabc721`에서 분기한 뒤 그대로라 이 두 수정이 없음. `asset-swap`을 `main`에 합칠 계획이면 rebase나 merge로 반드시 반영해야 함 |
+| anon 키만으로 `participant_currency.balance`를 임의 조작 가능(화폐 시스템, 신규) | **신규, 기존 패턴 계승** — 브라우저에 노출되는 건 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 하나뿐이고 서버 측 검증 계층이 없어서, 이 키로 `increment_currency_balance` RPC나 `currency_transactions` insert를 직접 호출하면 서버 로직(`calculateReward` 고정값 5/2)을 거치지 않고 임의 금액을 자기 잔액에 얹을 수 있다. 새로 만든 문제가 아니라 **`annotations`/`votes`가 이미 처음부터 이 구조**였다는 걸 실측으로 확인함(anon 키 SELECT count가 service_role과 완전히 동일, `increment_vote_count`도 anon이 별도 GRANT 없이 EXECUTE 가능 — `scripts/currency_schema.sql` 상단 주석 참고) — 즉 참여자가 마음만 먹으면 지금도 자기 annotation을 무한정 위조 제출하거나 `vote_count`를 직접 올릴 수 있는 것과 동일한 신뢰 모델. `currency_transactions`에 `UNIQUE(participant_id, related_id, type)` 제약을 걸어 "같은 소리/투표에 대한 중복 지급"만은 DB 레벨에서 막아뒀지만, 애초에 존재하지 않는 `related_id`로 여러 번 호출하는 것 자체는 못 막는다. 근본 해결은 지급 판단을 서버(Edge Function 등)로 옮기고 클라이언트는 결과만 받는 구조가 필요하지만, 지금 화폐 시스템은 UI 이전 데이터 계층 단계라 범위 밖 — 참여자 실험 데이터 자체의 신뢰도가 이미 같은 전제 위에 있다는 점만 명시해둠 |
 | `asset-swap`이 로컬에만 있고 원격에 push되지 않음 | **신규** — 사용자 확인 없이 push하지 않는 게 지금까지의 작업 방침. 머지 전 원본 구매 에셋 폴더(`full version/`, `town full/`, `interior full/`, `nature full/`, `fishing_full/`, `winter full/`)가 `.gitignore`에 걸려있는지, `public/assets/`에 복사된 파일만 커밋됐는지 재확인 필요 |
 
 ---
@@ -284,3 +288,34 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 ### 12.4 검증 방식
 
 전용 CLI 도구가 없어 매 변경마다 `/tmp/node_modules`에 설치한 `playwright-core`로 헤드리스 Chrome을 띄워 실제 화면을 스크린샷 찍어 확인(연구용 접근 ID `RESEARCHER`로 잠금 우회 후 각 포털/코너까지 걸어가며 촬영). 매번 `console`/`pageerror` 리스너로 런타임 에러 0건 확인, ESLint는 `git stash` 전후 비교로 새로 생긴 에러가 없는지 검증 후 커밋.
+
+### 12.5 ZoneMap — 동물 마을(Animal) 길 렌더링 버그 수정
+
+Lab 존 작업 이후, Animal 존의 길(path) 렌더링에서 두 가지 버그를 잡음(둘 다 커밋 전 워킹 트리 상태):
+
+- **길 위에 노이즈처럼 보이는 초록 반점**: 장식물 스캐터 로직이 길 타일 위에도 그대로 나무/덤불을 배치하고 있었음 — 길 판정 영역을 장식물 배치 후보에서 제외하도록 수정.
+- **길이 중간중간 끊겨 보이는 문제**: `organicSegment`/`jointSquare` 헬퍼가 곡선 방향(winding direction)에 따라 SVG `fill-rule: nonzero` 하에서 일부 구간의 폴리곤이 반대 방향으로 감겨 면적이 상쇄되는 버그 — 이후 사용자가 "직선/그리드형 길로 바꿔달라"고 요청해 유기적 곡선 자체를 직선 구간(격자 정렬) 조합으로 바꾸며 근본적으로 해결. 이 직선 경로 방식은 이후 12.6절의 자연 마을 길에도 그대로 재사용됨.
+
+### 12.6 ZoneMap — 자연 마을(Nature) 존 전면 교체
+
+기존에 이미 배포되어 있던(=`main`에도 존재하는) Nature 존은 손그린 SVG 연못/바위/부두/갈대 등을 무작위로 흩뿌린 형태였다. 이를 12.5절의 Animal 존과 동일한 아키텍처 패턴(`buildAnimalZone()`에 대응하는 `buildNatureZone()`, `buildZoneObjects()`/`ZoneObject()` 렌더 트리에 훅)으로 완전히 새로 구성했다.
+
+**필수 제약 — 반드시 지켜짐**: 소리 수집 로직(`spawnSoundItems`, `SOUND_ITEMS.Nature`, 참여자 진행도/블록 잠금 등)은 이 작업의 목적이 애초에 데이터 어노테이션이므로 **한 글자도 건드리지 않음**. 새로 추가된 집/울타리/연못/장식 타일은 `spawnSoundItems`에서 `isNearNaturePath`/`insideAnyNatureYard` 체크로 스폰 후보에서만 배제되며, 그 외 스폰·잠금·집계 로직은 기존 Nature 존과 100% 동일하게 동작.
+
+- **집 5채**: 기본형(cream, `buildings.png`), 어두운목재+해문양(dark), 초록지붕(green) — 이상 Cozy Farm 팩. 벽돌/빅토리안(victorian, Cozy Farm), 오두막+말굽문장(cabin, `town_buildings.png`) — Cozy Town 팩. 각 집은 게이트 1면 + 완전 개방 1면 + 나머지 2면 울타리로 마당을 두르며(`NATURE_YARD=3` 타일 여백), 좌표는 `NATURE_HOUSES`에 정의.
+- **길**: 12.5절과 동일한 직선/격자형 경로(`NATURE_PATH_SEGMENTS`) — 입구에서 뻗는 세로 간선 + 각 집으로 갈라지는 가지 길.
+- **연못 + 다리**: 타원형 연못을 Cozy Farm `waterFull` 타일로 완전히 채우고(가장자리에 대신 바위 밀도를 높여 "돌 둔치" 느낌), 다리 하부는 Cozy Town 연못 타일로 채워 난간 스프라이트의 투명 영역 사이로 물이 비치도록 처리.
+- **장식**: 나무/덤불/꽃/버섯/바위/곤충/나비를 100 Nature Things(`nature.png`) + Cozy Farm/Town 타일 조합으로 스캐터, 벤치 2개.
+- **마당 간격 셀프체크**: `buildNatureZone()` 내부에 하우스 5채의 모든 마당 쌍에 대해 간격을 계산하는 자기 검증 로직이 있어 콘솔에 `[NatureZone 셀프체크] 집 5채, 나무 243그루 → PASS (마당 간격 전부 5타일 이상)` 형태로 통과 여부를 출력.
+
+**버그 수정 이력**:
+| 버그 | 원인 | 수정 |
+|---|---|---|
+| 집 이미지가 잔디/울타리 조각처럼 깨져 보임 | `buildings.png`(건물 시트) 대신 `terrain.png`(지형 시트)에서 잘못 크롭 | 정확한 소스 파일로 재크롭, 육안 검증 후 진행 |
+| 기본형 집이 옆 헛간 건물을 침범해서 잘려 보임 | 크롭 영역이 인접 건물까지 포함(85×153) | 알파 채널 행 분석으로 실제 집 높이(72px) 확인 후 58×72로 축소 |
+| 집들끼리 마당 간격이 너무 좁음(캐빈↔빅토리안 0~1타일) | 초기 배치가 48×36 맵 안에서 5채를 욱여넣음 | 맵 크기는 48×36 유지하기로 사용자가 결정, 모든 마당 쌍 간격 ≥5타일을 보장하는 재배치로 좌표 전면 수정 |
+| 연못 안에 흙이 비쳐 보임 | 가장자리 타일이 사각 대각선 경계용이라 타원 경계에 안 맞음 | 연못 전체를 `water.full`로 채우고 가장자리 바위 밀도만 0.35→0.7로 올림 |
+| 다리 밑에 깨진 초록 영역 | 목제 난간 스프라이트가 대부분 투명한데, 다리 밑 물 레이어를 비워서 투명 영역으로 잔디가 그대로 비쳤음 | 다리 밑은 절대 비우지 않고 Cozy Town 연못 타일로 항상 채움 |
+| 나무/덤불 밀도가 원래 목업보다 훨씬 옅음 | 스캐터 루프의 샘플링 step이 2였는데, Python 설계(16px 타일·32×32 나무=2×2타일) 기준을 32px 타일(나무=1×1타일) JS로 그대로 옮겨 실제 후보 위치의 1/4만 샘플링됨 | step을 2→1로 수정, 나무 개수 68→243그루로 정상화(확률값 자체는 그대로 유지) |
+
+**검증**: 12.4절과 동일한 headless Chrome 스크린샷 방식 + 연구용 접근 ID로 잠금 우회, 자기 검증 콘솔 로그, 기존 소리 수집 게임플레이(아이템 스폰/진행바/블록 언락)가 새 비주얼과 함께 정상 동작하는지 확인. 별도 배치 스키매틱(SVG 좌표 시각화)도 만들어 실제 좌표와 항상 동기화 상태로 유지.

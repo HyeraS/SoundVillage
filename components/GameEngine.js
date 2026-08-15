@@ -5,7 +5,7 @@ import { useEffect, useRef, useCallback } from 'react'
    상수
 ───────────────────────────────────────────── */
 export const TILE  = 32   // 타일 1칸 px
-export const SPEED = 3    // 픽셀/프레임
+export const SPEED = 3.9  // 픽셀/프레임 (기존 3 × 1.3)
 
 export const ZONE_META = {
   Animal: { label: '동물 마을',        color: '#5B9E3A', bg: '#1C3512', emoji: '🐾' },

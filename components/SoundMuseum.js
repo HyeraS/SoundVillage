@@ -2,30 +2,16 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { playSound, pauseSound, resumeSound, isSoundPaused, stopSound, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager'
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
+import { awardVoteCurrency, getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
+import { recordVoteQuestProgress } from '@/lib/dailyQuests'
+import { SHOP_PRODUCTS, getDailyDeal, getEffectivePrice, getShopGrowthTier, DEFAULT_OUTFIT_ID } from '@/lib/shopCatalog'
 import { ZONE_META } from '@/components/GameEngine'
+import LibraryRoom from '@/components/LibraryRoom'
 
 /* ─────────────────────────────────────────────
    동의 정도 슬라이더 라벨 (1~5)
 ───────────────────────────────────────────── */
 const CONFIDENCE_LABELS = ['매우 약함', '약함', '보통', '강한 동의', '매우동의']
-
-/* ─────────────────────────────────────────────
-   Zone별 룸 테마
-───────────────────────────────────────────── */
-const ROOM = {
-  Animal: { wall:'#1C120A', floor:'#120A04', shelf:'#3A2010', accent:'#5B9E3A',
-            glow:'#5B9E3A30', books:['#2D7A2D','#8B6347','#4A9E38','#7A5230','#4A6B27','#2A5A1A'] },
-  Human:  { wall:'#201808', floor:'#140E04', shelf:'#3A2A18', accent:'#E8A04A',
-            glow:'#E8A04A30', books:['#D4A070','#C08040','#E8C090','#A07050','#F0B860','#8B6040'] },
-  Nature: { wall:'#0A1420', floor:'#060C14', shelf:'#142030', accent:'#4A8FD4',
-            glow:'#4A8FD430', books:['#1E5A8A','#4A8FD4','#87CEEB','#2A5090','#5A8AAA','#3A6A8A'] },
-  Urban:  { wall:'#141210', floor:'#0A0806', shelf:'#222018', accent:'#C4B99A',
-            glow:'#C4B99A30', books:['#8A7060','#C4B99A','#6A5040','#D4C4A0','#504030','#7A6050'] },
-  Music:  { wall:'#0C0820', floor:'#060414', shelf:'#180E30', accent:'#9B6DD4',
-            glow:'#9B6DD430', books:['#9B6DD4','#D4883A','#5A3090','#C060A0','#7A4AB0','#4A2090'] },
-  Lab:    { wall:'#060410', floor:'#020208', shelf:'#100C1C', accent:'#D4883A',
-            glow:'#D4883A30', books:['#D4883A','#4A8FD4','#9B6DD4','#2A4A8A','#D46D6D','#6DD49B'] },
-}
 
 /* ─────────────────────────────────────────────
    Zone NPC
@@ -37,135 +23,6 @@ const ZONE_NPC = {
   Urban:  { emoji:'🦜', name:'Metro',  lines:['도시의 소음도 누군가에겐 음악이에요.', '가장 도시다운 표현을 골라봐요 🏙'] },
   Music:  { emoji:'🎵', name:'Aria',   lines:['무대의 소리를 언어로 옮겨봐요!', '어떤 표현이 가장 공명하나요? 🎶'] },
   Lab:    { emoji:'🤖', name:'ECHO',   lines:['데이터 분석 중… 최적 표현을 선택하세요.', '미지의 소리에 이름을 붙여봐요 ⚡'] },
-}
-
-/* ─────────────────────────────────────────────
-   룸 배경 (CSS 아트)
-───────────────────────────────────────────── */
-function BookShelf({ room, x, books = 7, rows = 3 }) {
-  return (
-    <div style={{
-      position: 'absolute', [x]: 0, top: 0, bottom: '60px',
-      width: '76px', background: room.shelf,
-      display: 'flex', flexDirection: 'column',
-      borderRight: x === 'left' ? `2px solid #ffffff08` : 'none',
-      borderLeft:  x === 'right' ? `2px solid #ffffff08` : 'none',
-      zIndex: 1, overflowX: 'hidden',
-    }}>
-      {Array.from({ length: rows }, (_, r) => (
-        <div key={r} style={{
-          flex: 1, display: 'flex', alignItems: 'flex-end', gap: '2px',
-          padding: '4px 6px 0',
-          borderBottom: `3px solid #00000044`,
-        }}>
-          {Array.from({ length: books }, (_, i) => (
-            <div key={i} style={{
-              flex: 1,
-              height: `${38 + ((i * 17 + r * 11) % 45)}%`,
-              background: room.books[(i + r * 2) % room.books.length],
-              borderRadius: '2px 2px 0 0',
-              opacity: 0.85 + (i % 3) * 0.05,
-            }}/>
-          ))}
-        </div>
-      ))}
-      {/* vinyl record */}
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '64px' }}>
-        <div style={{
-          width: '50px', height: '50px', borderRadius: '50%',
-          background: `conic-gradient(${room.books[0]} 0deg, ${room.books[2]} 120deg, ${room.books[4]} 240deg, ${room.books[0]} 360deg)`,
-          border: `3px solid #00000066`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          boxShadow: `0 0 10px ${room.glow}`,
-        }}>
-          <div style={{
-            width: '14px', height: '14px', borderRadius: '50%',
-            background: room.wall, border: '2px solid #ffffff22',
-          }}/>
-        </div>
-      </div>
-      {/* speaker / equipment block */}
-      <div style={{
-        margin: '0 8px 8px', height: '44px', borderRadius: '6px',
-        background: '#00000044', border: `1px solid ${room.accent}33`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px',
-      }}>
-        {[0,1,2].map(i => (
-          <div key={i} style={{
-            width: '6px', height: `${12 + i * 6}px`,
-            background: room.accent, borderRadius: '2px', opacity: 0.6,
-          }}/>
-        ))}
-      </div>
-    </div>
-  )
-}
-
-function WallWaveform({ zone }) {
-  const meta = ZONE_META[zone]
-  const pts = Array.from({ length: 32 }, (_, i) => ({
-    x: (i / 31) * 100,
-    y: 50 + Math.sin(i * 0.7) * 22 + Math.sin(i * 1.9) * 10,
-  }))
-  const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x},${p.y}`).join(' ')
-  return (
-    <div style={{
-      position: 'absolute', top: '10px', left: '86px', right: '86px',
-      height: '44px', opacity: 0.35, zIndex: 1, pointerEvents: 'none',
-    }}>
-      <svg width="100%" height="44" viewBox="0 0 100 100" preserveAspectRatio="none">
-        <path d={d} fill="none" stroke={meta.color} strokeWidth="2"/>
-        {pts.filter((_, i) => i % 4 === 0).map((p, i) => (
-          <circle key={i} cx={p.x} cy={p.y} r="2.5" fill={meta.color} opacity="0.8"/>
-        ))}
-      </svg>
-    </div>
-  )
-}
-
-function RoomBackground({ zone }) {
-  const room = ROOM[zone] || ROOM.Lab
-  const meta = ZONE_META[zone] || { color: '#9B6DD4' }
-  return (
-    <>
-      {/* shelves */}
-      <BookShelf room={room} x="left"  books={8} rows={3} />
-      <BookShelf room={room} x="right" books={8} rows={3} />
-
-      {/* wall waveform art */}
-      <WallWaveform zone={zone}/>
-
-      {/* ambient ceiling glow */}
-      <div style={{
-        position: 'absolute', top: '-60px', left: '50%',
-        transform: 'translateX(-50%)',
-        width: '300px', height: '200px',
-        background: room.glow,
-        borderRadius: '50%', filter: 'blur(50px)',
-        pointerEvents: 'none', zIndex: 1,
-      }}/>
-
-      {/* floor strip */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        height: '60px', background: room.floor,
-        borderTop: `1px solid ${meta.color}18`, zIndex: 1,
-      }}/>
-
-      {/* zone label top-center */}
-      <div style={{
-        position: 'absolute', top: '14px', left: '50%',
-        transform: 'translateX(-50%)',
-        fontSize: '9px', fontWeight: 800, letterSpacing: '3px',
-        color: meta.color, opacity: 0.5,
-        fontFamily: 'Nunito, sans-serif', zIndex: 2,
-        textTransform: 'uppercase', userSelect: 'none',
-        whiteSpace: 'nowrap',
-      }}>
-        SOUND MUSEUM · {meta.label}
-      </div>
-    </>
-  )
 }
 
 /* ─────────────────────────────────────────────
@@ -237,7 +94,8 @@ function useMuseumPlayer(filePath) {
   }, [playing, filePath, clearPoll, startPoll])
 
   useEffect(() => () => { stopSound(); clearPoll() }, [clearPoll])
-  return { playing, progress, playCount, error, toggle }
+  const getDuration = useCallback(() => durRef.current, [])
+  return { playing, progress, playCount, error, toggle, getDuration }
 }
 
 /* ─────────────────────────────────────────────
@@ -263,10 +121,275 @@ function MiniWave({ progress, accent }) {
 }
 
 /* ─────────────────────────────────────────────
+   전시 현황: Zone별 진열장. count/total 비율만큼 슬롯이
+   채워진 동물의 숲 박물관 스타일. 완전 읽기 전용 — zoneCounts는
+   부모(app/page.js)가 이미 하던 zoneProgress 계산에서 분자/분모를
+   함께 흘려보낸 것뿐, 여기서 새 쿼리를 만들지 않는다.
+───────────────────────────────────────────── */
+function DisplayCase({ zone, collected, total }) {
+  const meta = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
+  const visited = collected > 0
+  const complete = total > 0 && collected >= total
+  const slots = Math.max(total, 1)
+  return (
+    <div style={{
+      background: '#F0EBE0', borderRadius: '14px', padding: '14px',
+      border: `1.5px solid ${meta.color}${complete ? '' : '33'}`,
+      boxShadow: complete ? `0 0 0 2px ${meta.color}55, 0 4px 16px ${meta.color}33` : 'none',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+        <div style={{
+          width: '30px', height: '30px', borderRadius: '8px', flexShrink: 0,
+          background: `${meta.color}22`, border: `1.5px solid ${meta.color}`,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '15px',
+          opacity: visited ? 1 : 0.5,
+        }}>{meta.emoji}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: '12px', fontWeight: 800, color: visited ? '#2A1F0E' : '#8B6A3A' }}>
+            {meta.label}{!visited && <span style={{ fontWeight: 600, color: '#A09080' }}> · 아직 탐험 안 한 곳</span>}
+          </div>
+          <div style={{ fontSize: '10px', color: '#8B6A3A', fontVariantNumeric: 'tabular-nums' }}>
+            {collected}/{total}{complete ? ' · 완전 전시! ✨' : ''}
+          </div>
+        </div>
+      </div>
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(9px, 1fr))',
+        gap: '2px', maxWidth: '100%',
+      }}>
+        {Array.from({ length: slots }, (_, i) => {
+          const filled = i < collected
+          return (
+            <div key={i} title={filled ? '수집 완료' : '빈 슬롯'} style={{
+              aspectRatio: '1', borderRadius: '2px',
+              background: filled ? meta.color : '#00000012',
+              border: filled ? 'none' : `1px solid ${meta.color}22`,
+              opacity: filled ? 0.9 : 1,
+            }}/>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
+function ExhibitDisplay({ zoneCounts, accent }) {
+  const zones = Object.keys(ZONE_META)
+  return (
+    <div style={{
+      position: 'relative', zIndex: 10,
+      width: '100%', height: '100%', overflowY: 'auto',
+      background: '#FAF6EE', borderRadius: '20px',
+      boxShadow: `0 10px 60px #00000077, 0 0 0 1px ${accent}44`,
+      scrollbarWidth: 'none',
+    }}>
+      <div style={{
+        position: 'sticky', top: 0,
+        background: `linear-gradient(135deg, ${accent}1A, ${accent}08)`,
+        borderBottom: `1px solid ${accent}28`, padding: '16px 20px 12px',
+        borderRadius: '20px 20px 0 0',
+      }}>
+        <div style={{ fontSize: '9px', fontWeight: 800, color: accent, letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
+          LIBRARY COLLECTION
+        </div>
+        <div style={{ fontSize: '17px', fontWeight: 800, color: '#2A1F0E' }}>🏺 전시 현황</div>
+      </div>
+      <div style={{ padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {zones.map(z => (
+          <DisplayCase key={z} zone={z} collected={zoneCounts?.[z]?.collected ?? 0} total={zoneCounts?.[z]?.total ?? 0}/>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   상점: Character v.2 outfit 판매. body/head 고정, clothes
+   레이어만 교체. 가격은 lib/shopCatalog.SHOP_PRODUCTS 단일 출처.
+───────────────────────────────────────────── */
+function ShopGrowthDecor({ tierKey }) {
+  // 시각 효과만 — 구매 가능 여부와 완전 무관. 단계가 올라갈수록 장식이 늘어난다.
+  const icons = { seed: ['🪵'], sprout: ['🪵','🕯','🪴'], bloom: ['🪵','🕯','🪴','🏮','✨'] }[tierKey] || ['🪵']
+  return (
+    <div style={{ display: 'flex', gap: '6px', position: 'absolute', top: '10px', right: '16px', fontSize: '14px', opacity: 0.7 }}>
+      {icons.map((e, i) => <span key={i}>{e}</span>)}
+    </div>
+  )
+}
+
+function Shop({ participantId, accent, onCurrencyChange }) {
+  const [balance,       setBalance]       = useState(0)
+  const [ownedOutfits,  setOwnedOutfits]  = useState([])
+  const [equipped,      setEquipped]      = useState(null)
+  const [totalEarned,   setTotalEarned]   = useState(0)
+  const [loading,       setLoading]       = useState(true)
+  const [purchasingId,  setPurchasingId]  = useState(null)
+  const [notice,        setNotice]        = useState('')
+
+  const dailyDeal = getDailyDeal()
+  const tier = getShopGrowthTier(totalEarned)
+
+  const refresh = useCallback(async () => {
+    const [bal, owned, eq, earned] = await Promise.all([
+      getCurrencyBalance(participantId),
+      getOwnedOutfits(participantId),
+      getEquippedOutfit(participantId),
+      getTotalEarned(participantId),
+    ])
+    setBalance(bal)
+    setOwnedOutfits(owned)
+    setEquipped(eq)
+    setTotalEarned(earned)
+    setLoading(false)
+  }, [participantId])
+
+  useEffect(() => { refresh() }, [refresh])
+
+  const handleBuy = async (product) => {
+    const price = getEffectivePrice(product, dailyDeal)
+    setPurchasingId(product.id)
+    setNotice('')
+    const result = await purchaseOutfit({ participantId, outfitId: product.id, price })
+    setPurchasingId(null)
+    if (result.ok) {
+      setNotice(`${product.emoji} ${product.label} 구매 완료! 바로 장착했어요.`)
+      await refresh()
+      onCurrencyChange?.() // WorldMap HUD 잔액도 같이 갱신
+    } else if (result.reason === 'insufficient_funds') {
+      setNotice('잔액이 부족해요 🪙')
+    } else if (result.reason === 'already_owned') {
+      setNotice('이미 보유 중인 아이템이에요')
+      await refresh()
+    } else {
+      setNotice('구매 중 오류가 발생했어요. 다시 시도해주세요.')
+    }
+  }
+
+  const handleEquip = async (outfitId) => {
+    await setEquippedOutfit(participantId, outfitId)
+    setEquipped(outfitId)
+    onCurrencyChange?.()
+  }
+
+  return (
+    <div style={{
+      position: 'relative', zIndex: 10,
+      width: '100%', height: '100%', overflowY: 'auto',
+      background: tier.bg, borderRadius: '20px',
+      boxShadow: `0 10px 60px #00000077, 0 0 0 1px ${tier.accent}55`,
+      scrollbarWidth: 'none',
+      transition: 'background 0.6s ease',
+    }}>
+      <div style={{
+        position: 'sticky', top: 0,
+        background: `linear-gradient(135deg, ${tier.accent}2A, ${tier.accent}0A)`,
+        borderBottom: `1px solid ${tier.accent}38`, padding: '16px 20px 12px',
+        borderRadius: '20px 20px 0 0',
+      }}>
+        <ShopGrowthDecor tierKey={tier.key}/>
+        <div style={{ fontSize: '9px', fontWeight: 800, color: tier.accent, letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
+          {tier.label.toUpperCase()}
+        </div>
+        <div style={{ fontSize: '17px', fontWeight: 800, color: '#FAF6EE' }}>🛍 옷가게</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
+          <span style={{ fontSize: '16px' }}>🪙</span>
+          <span style={{ fontSize: '16px', fontWeight: 800, color: '#FFD866', fontVariantNumeric: 'tabular-nums' }}>{balance}</span>
+          <span style={{ fontSize: '10px', color: '#FAF6EEaa' }}>보유 화폐</span>
+        </div>
+      </div>
+
+      <div style={{ padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        {loading ? (
+          <div style={{ textAlign: 'center', color: '#FAF6EEaa', fontSize: '13px', padding: '16px' }}>불러오는 중...</div>
+        ) : (
+          SHOP_PRODUCTS.map(product => {
+            const owned  = ownedOutfits.includes(product.id)
+            const isEquipped = equipped === product.id
+            const isDeal = dailyDeal.productId === product.id
+            const price  = getEffectivePrice(product, dailyDeal)
+            const canAfford = balance >= price
+            return (
+              <div key={product.id} style={{
+                display: 'flex', alignItems: 'center', gap: '12px',
+                background: '#FAF6EE0d', border: `1.5px solid ${tier.accent}33`,
+                borderRadius: '14px', padding: '10px 12px',
+              }}>
+                <div style={{
+                  width: '44px', height: '44px', borderRadius: '10px', flexShrink: 0,
+                  background: '#FAF6EE12', border: `1.5px solid ${tier.accent}55`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px',
+                }}>{product.emoji}</div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#FAF6EE' }}>
+                    {product.label}
+                    {isDeal && (
+                      <span style={{
+                        marginLeft: '6px', fontSize: '9px', fontWeight: 800, color: '#2A1F0E',
+                        background: '#FFD866', borderRadius: '6px', padding: '1px 6px',
+                      }}>오늘의 특가</span>
+                    )}
+                  </div>
+                  <div style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums', marginTop: '2px' }}>
+                    {isDeal && <span style={{ color: '#FAF6EE66', textDecoration: 'line-through', marginRight: '5px' }}>🪙{product.price}</span>}
+                    <span style={{ color: isDeal ? '#FFD866' : '#FAF6EEcc', fontWeight: 700 }}>🪙{price}</span>
+                  </div>
+                </div>
+                {owned ? (
+                  <button onClick={() => handleEquip(product.id)} disabled={isEquipped} style={{
+                    padding: '8px 14px', borderRadius: '10px',
+                    background: isEquipped ? `${tier.accent}33` : '#FAF6EE',
+                    border: `1.5px solid ${tier.accent}`,
+                    color: isEquipped ? '#FAF6EE' : '#2A1F0E',
+                    fontSize: '11px', fontWeight: 800, fontFamily: 'Nunito, sans-serif',
+                    cursor: isEquipped ? 'default' : 'pointer', whiteSpace: 'nowrap',
+                  }}>
+                    {isEquipped ? '장착 중' : '장착하기'}
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleBuy(product)}
+                    disabled={!canAfford || purchasingId === product.id}
+                    title={!canAfford ? '잔액이 부족해요' : undefined}
+                    style={{
+                      padding: '8px 14px', borderRadius: '10px', border: 'none',
+                      background: canAfford ? tier.accent : '#FAF6EE22',
+                      color: canAfford ? '#fff' : '#FAF6EE55',
+                      fontSize: '11px', fontWeight: 800, fontFamily: 'Nunito, sans-serif',
+                      cursor: canAfford ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap',
+                      opacity: purchasingId === product.id ? 0.6 : 1,
+                    }}>
+                    {purchasingId === product.id ? '구매 중...' : canAfford ? '구매하기' : '잔액 부족'}
+                  </button>
+                )}
+              </div>
+            )
+          })
+        )}
+        {equipped && equipped !== DEFAULT_OUTFIT_ID && (
+          <button onClick={() => handleEquip(DEFAULT_OUTFIT_ID)} style={{
+            marginTop: '2px', padding: '9px', borderRadius: '10px',
+            background: 'transparent', border: `1.5px solid ${tier.accent}44`,
+            color: '#FAF6EEaa', fontSize: '11px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
+            cursor: 'pointer',
+          }}>
+            기본 옷차림으로 되돌리기
+          </button>
+        )}
+        {notice && (
+          <div style={{
+            textAlign: 'center', fontSize: '11px', fontWeight: 700, color: tier.accent,
+            background: '#FAF6EE12', borderRadius: '10px', padding: '8px',
+          }}>{notice}</div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound, zone, myExpression, participantId, sessionId, onDone, onExit }) {
-  const room  = ROOM[zone]      || ROOM.Lab
+export default function SoundMuseum({ sound, zone, myExpression, participantId, sessionId, zoneCounts, onCurrencyChange, onDone, onExit }) {
   const npc   = ZONE_NPC[zone]  || ZONE_NPC.Lab
   const meta  = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
   const accent = meta.color
@@ -280,7 +403,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const [visible,     setVisible]     = useState(false)
   const cardRef = useRef(null)
 
-  const { playing, progress, playCount, error, toggle } = useMuseumPlayer(sound.file_path)
+  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound.file_path)
 
   // 슬라이드인 애니메이션
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
@@ -327,6 +450,18 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             version:            'v0.4-web',
           })
           resetListeningTime()
+          // 화폐 지급은 별도 흐름 — await하지 않아 제출 속도에 영향 없고,
+          // 내부에서 절대 throw하지 않아 실패해도 투표 저장엔 영향 없음.
+          awardVoteCurrency({
+            participantId,
+            annotationId:      candidate.id,
+            subCategory:       sound.sub_category || '',
+            soundDurationSec:  getDuration(),
+            confidence,
+          })
+          // 일일 퀘스트(투표 10회) 진행도 갱신 — 화폐 지급과 동일하게 완전
+          // 별도 흐름, await 없이 호출.
+          recordVoteQuestProgress({ participantId })
         }
       }
     } catch {}
@@ -337,25 +472,15 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const noCandidate = !loading && candidates.length === 0
   const canSubmit   = noCandidate || pick !== null
 
-  return (
-    <div style={{
-      position: 'fixed', inset: 0, zIndex: 50,
-      background: room.wall,
-      fontFamily: 'Nunito, sans-serif',
-      overflow: 'hidden',
-      display: 'flex', alignItems: 'center', justifyContent: 'center',
-    }}>
-      <RoomBackground zone={zone}/>
-
-      {/* 전시 카드 */}
+  // 투표 카드 — 기존 로직/마크업 그대로, 바깥 래퍼 크기만 LibraryRoom이 주는
+  // 카드 슬롯(CARD_LAYOUT.vote, 뷰포트의 작은 영역)에 맞춰 100%/100%로 변경.
+  const voteCardBody = (
       <div ref={cardRef} style={{
         position: 'relative', zIndex: 10,
-        width: '100%', maxWidth: '420px',
-        maxHeight: '86vh', overflowY: 'auto',
+        width: '100%', height: '100%', overflowY: 'auto',
         background: '#FAF6EE',
         borderRadius: '20px',
         boxShadow: `0 10px 60px #00000077, 0 0 0 1px ${accent}44`,
-        margin: '0 84px',
         scrollbarWidth: 'none',
         transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.96)',
         opacity: visible ? 1 : 0,
@@ -582,10 +707,15 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
           </button>
         </div>
       </div>
+  )
 
-      {/* NPC 말풍선 */}
+  // NPC 말풍선 — 투표 카드 전용(기존엔 "다른 탭에서는 소리와 무관한 대사라 숨김"
+  // 이었던 것과 동일한 이유로, 이제는 "다른 카드가 열려 있을 땐 숨김"). 카드
+  // 슬롯(CARD_LAYOUT.vote) 안에 같이 반환되지만 화면 우하단 고정 위치를 유지해야
+  // 해서 position은 슬롯 기준 absolute가 아니라 뷰포트 기준 fixed로 바꿨다.
+  const npcBubble = (
       <div style={{
-        position: 'absolute', bottom: '28px', right: '96px',
+        position: 'fixed', bottom: '28px', right: '96px',
         zIndex: 20, display: 'flex', alignItems: 'flex-end', gap: '8px',
         maxWidth: '220px',
       }}>
@@ -609,6 +739,16 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
           {npc.emoji}
         </div>
       </div>
-    </div>
+  )
+
+  return (
+    <LibraryRoom
+      onExit={onExit}
+      cards={{
+        vote:     { render: () => (<>{voteCardBody}{npcBubble}</>) },
+        exhibits: { render: () => <ExhibitDisplay zoneCounts={zoneCounts} accent={accent}/> },
+        shop:     { render: () => <Shop participantId={participantId} accent={accent} onCurrencyChange={onCurrencyChange}/> },
+      }}
+    />
   )
 }

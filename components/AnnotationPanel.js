@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager';
 import { saveAnnotation } from '@/lib/supabase';
+import { awardAnnotationCurrency } from '@/lib/currency';
+import { recordAnnotationQuestProgress } from '@/lib/dailyQuests';
 
 /* ─────────────────────────────────────────────
    Zone 팔레트 — Mystery 포함
@@ -322,7 +324,9 @@ function useSegmentedPlayer(filePath) {
 
   useEffect(() => () => { stopSound(); clearPoll(); }, []);
 
-  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual };
+  const getDuration = useCallback(() => durationRef.current, []);
+
+  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual, getDuration };
 }
 
 /* ─────────────────────────────────────────────
@@ -342,7 +346,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
   const inputRef                    = useRef(null);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual } =
+  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual, getDuration } =
     useSegmentedPlayer(sound.file_path);
 
   const played = playCount > 0;
@@ -374,6 +378,22 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
         version:            'v0.4-web',
       });
       resetListeningTime();
+      // 화폐 지급은 완전히 별도 흐름 — 실패해도 이미 여기까지 저장은 끝났고,
+      // await하지 않아 제출 흐름 속도에도 영향 없음(내부에서 절대 throw 안 함).
+      awardAnnotationCurrency({
+        participantId:     participantId,
+        soundId:           sound.sound_id,
+        subCategory:       sound.sub_category || '',
+        soundDurationSec:  getDuration(),
+        confidence:        confMap[confidence],
+      });
+      // 일일 퀘스트 진행도 갱신도 화폐 지급과 동일하게 완전 별도 흐름 —
+      // await하지 않고, 내부에서 절대 throw 안 함.
+      recordAnnotationQuestProgress({
+        participantId,
+        zone,
+        subCategory: sound.sub_category || '',
+      });
       onSubmit({ expression_text: text.trim(), confidence });
     } catch (err) {
       console.error('[AnnotationPanel] 제출 오류:', err);
