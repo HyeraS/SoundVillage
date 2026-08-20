@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { playSound, pauseSound, resumeSound, isSoundPaused, stopSound, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager'
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
+import { awardVoteMilestoneRewards } from '@/lib/voteRewards'
 import { ZONE_META } from '@/components/GameEngine'
 
 /* ─────────────────────────────────────────────
@@ -327,6 +328,9 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
             version:            'v0.4-web',
           })
           resetListeningTime()
+          // 마일스톤 보상 — 내부에서 전부 흡수(never throw), await 안 해서
+          // 다음 소리로 넘어가는 흐름을 막지 않음.
+          awardVoteMilestoneRewards(participantId)
         }
       }
     } catch {}

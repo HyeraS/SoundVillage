@@ -4,3 +4,22 @@ node_modules
 .next/
 .env.local
 scripts/download_errors.csv
+
+# macOS and local review artifacts
+.DS_Store
+**/.DS_Store
+_review/
+
+# Purchased/source asset packs are preserved outside the review baseline.
+/Character v.2/
+/assets/
+/fishing_full/
+/full version/
+/interior full/
+/kenney_rpg-urban-pack/
+/nature full/
+/town full/
+/winter full/
+
+# Generated audit data is not required by the web runtime.
+/docs/interior_asset_manifest.json

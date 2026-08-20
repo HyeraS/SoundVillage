@@ -4,6 +4,7 @@
 ───────────────────────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+@import 'tailwindcss';
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -49,6 +50,13 @@ html, body {
   /* HUD */
   --hud-bg:       #F5EDD8;
   --hud-border:   #C8A96E;
+
+  /* House Decor */
+  --house-cream:   #F7F0E3;
+  --house-surface: #FFFDF8;
+  --house-peach:   #FF9F86;
+  --house-mint:    #91CDB2;
+  --house-cocoa:   #3A2A1E;
 }
 
 /* ─── 전역 keyframe ─── */
