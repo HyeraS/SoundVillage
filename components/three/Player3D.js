@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { moveWithCollisions } from '@/lib/three/collision.mjs'
+import { screenInputToWorld } from '@/lib/three/cameraConfig.mjs'
 import { PLAYER_RADIUS, PLAYER_START, WORLD_BOUNDS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
 import ModelAsset from './ModelAsset'
 
@@ -40,6 +41,12 @@ export default function Player3D({ playerRef, inputRef, placements, completedIds
     }
   }, [])
 
+  useEffect(() => {
+    if (enabled) return
+    keyboardRef.current = { up: false, down: false, left: false, right: false }
+    inputRef.current = { up: false, down: false, left: false, right: false }
+  }, [enabled, inputRef])
+
   useEffect(() => () => {
     const root = document.querySelector('[data-testid="three-prototype"]')
     if (root) {
@@ -55,20 +62,18 @@ export default function Player3D({ playerRef, inputRef, placements, completedIds
     if (!group) return
     const keyboard = keyboardRef.current
     const mobile = inputRef.current
-    let x = Number(keyboard.right || mobile.right) - Number(keyboard.left || mobile.left)
-    let z = Number(keyboard.down || mobile.down) - Number(keyboard.up || mobile.up)
-    const moving = enabled && (x !== 0 || z !== 0)
+    const screenX = Number(keyboard.right || mobile.right) - Number(keyboard.left || mobile.left)
+    const screenZ = Number(keyboard.down || mobile.down) - Number(keyboard.up || mobile.up)
+    const moving = enabled && (screenX !== 0 || screenZ !== 0)
 
     if (moving) {
-      const length = Math.hypot(x, z) || 1
-      x /= length
-      z /= length
+      const worldDirection = screenInputToWorld(screenX, screenZ)
       const speed = 4.1 * Math.min(delta, 0.05)
-      const next = moveWithCollisions(positionRef.current, { x: x * speed, z: z * speed }, PLAYER_RADIUS, WORLD_BOUNDS, WORLD_COLLIDERS)
+      const next = moveWithCollisions(positionRef.current, { x: worldDirection.x * speed, z: worldDirection.z * speed }, PLAYER_RADIUS, WORLD_BOUNDS, WORLD_COLLIDERS)
       positionRef.current = next
       group.position.x = next.x
       group.position.z = next.z
-      group.rotation.y = Math.atan2(x, z)
+      group.rotation.y = Math.atan2(worldDirection.x, worldDirection.z)
     }
 
     if (!reducedMotion) group.position.y = moving ? Math.abs(Math.sin(clock.elapsedTime * 9)) * 0.06 : 0

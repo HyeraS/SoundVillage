@@ -16,6 +16,8 @@
 .tools button, .tools a { border: 1px solid #fff8; border-radius: 999px; padding: 8px 11px; background: #fff4dbe8; color: #674f3e; font: 700 10px Nunito, sans-serif; text-decoration: none; cursor: pointer; backdrop-filter: blur(10px); }
 .mockBadge { padding: 7px 10px; border-radius: 999px; background: #65458e; color: white; font-size: 9px; font-weight: 900; letter-spacing: .05em; }
 .keyboardHint { position: fixed; z-index: 10; left: 18px; bottom: 20px; padding: 8px 11px; border-radius: 10px; background: #fff7e4d9; color: #6e5847; font-size: 10px; }
+.cameraDebug { position: fixed; z-index: 13; left: 18px; top: 112px; display: grid; gap: 3px; max-width: min(440px, calc(100vw - 36px)); padding: 10px 12px; border-radius: 10px; background: #241d2ce8; color: #f4edf8; font: 600 10px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; pointer-events: none; }
+.cameraDebug strong { color: #d8baf3; font-size: 11px; }
 :global(.mobileControls) { display: none; }
 :global(.fallbackScreen) { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(160deg, #b9ddf0, #9fc777); color: #3a2a14; font-family: Nunito, sans-serif; }
 :global(.fallbackCard) { max-width: 440px; padding: 34px; border: 2px solid #c8a96e; border-radius: 24px; background: #fff4db; box-shadow: 0 16px 50px #263a2633; text-align: center; }
@@ -24,12 +26,13 @@
 :global(.fallbackCard a) { display: inline-block; margin-top: 10px; padding: 11px 16px; border-radius: 12px; background: #5b9e3a; color: white; font-weight: 800; text-decoration: none; }
 :global(.fallbackIcon) { font-size: 40px; }
 
-@media (max-width: 720px), (pointer: coarse) {
+@media (max-width: 900px), (pointer: coarse) {
   .hud { top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; min-width: 0; justify-content: space-between; padding: 10px 12px; }
   .hud strong { font-size: 15px; }
   .tools { top: 94px; right: 10px; }
   .tools a, .tools button { padding: 7px 9px; }
   .keyboardHint { display: none; }
+  .cameraDebug { top: 132px; left: 10px; right: 10px; max-width: none; }
   .statusPill { bottom: calc(126px + env(safe-area-inset-bottom)); font-size: 11px; }
   :global(.mobileControls) { position: fixed; z-index: 12; left: 14px; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); display: flex; align-items: end; justify-content: space-between; pointer-events: none; }
   :global(.dpad) { display: grid; grid-template: 42px 42px 42px / 42px 42px 42px; gap: 3px; }
@@ -38,4 +41,8 @@
   :global(.dpad-up) { grid-area: 1 / 2; } :global(.dpad-left) { grid-area: 2 / 1; } :global(.dpad-down) { grid-area: 2 / 2; } :global(.dpad-right) { grid-area: 2 / 3; }
   :global(.interactButton) { width: 94px; height: 58px; border-radius: 50%; background: #7653a7e8; }
   :global(.dpadButton:disabled), :global(.interactButton:disabled) { opacity: .4; }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .statusPill { top: 96px; bottom: auto; }
 }

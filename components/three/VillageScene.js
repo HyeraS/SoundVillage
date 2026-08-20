@@ -7,7 +7,7 @@ import InteractableSound from './InteractableSound'
 import Player3D from './Player3D'
 import VillageEnvironment from './VillageEnvironment'
 
-export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, loadModels, forceModelFailure }) {
+export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure }) {
   const playerRef = useRef(null)
 
   return (
@@ -48,9 +48,9 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         onNearbySoundChange={onNearbySoundChange}
         reducedMotion={reducedMotion}
         loadModel={loadModels}
-        debug={debugColliders}
+        debug={debugColliders || debugCamera}
       />
-      <FollowCamera playerRef={playerRef} reducedMotion={reducedMotion} />
+      <FollowCamera playerRef={playerRef} reducedMotion={reducedMotion} paused={paused} debugCamera={debugCamera} />
     </>
   )
 }

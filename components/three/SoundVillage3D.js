@@ -8,6 +8,9 @@ import soundMetadata from '@/data/sound_metadata.json'
 import { getAnnotatedByParticipantZone } from '@/lib/supabase'
 import { getStudyAccessGroup, isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
 import { createSoundPlacements, normalizeCompletedIds, selectMusicBlockOneSounds } from '@/lib/three/prototypeData.mjs'
+import { CAMERA_CONFIG } from '@/lib/three/cameraConfig.mjs'
+import { PLAYER_START } from '@/lib/three/modelConfig.mjs'
+import CameraDebugHUD from './CameraDebugHUD'
 import MobileControls3D from './MobileControls3D'
 import GameHUD3D from './GameHUD3D'
 import VillageScene from './VillageScene'
@@ -22,11 +25,12 @@ function supportsWebGL() {
 }
 
 function readRuntimeOptions() {
-  if (typeof window === 'undefined') return { webglReady: null, debug: false, mock: false, models: false, forceFailure: false }
+  if (typeof window === 'undefined') return { webglReady: null, debug: false, debugCamera: false, mock: false, models: false, forceFailure: false }
   const params = new URLSearchParams(window.location.search)
   return {
     webglReady: !params.has('noWebGL') && supportsWebGL(),
     debug: params.has('debug'),
+    debugCamera: params.has('debugCamera'),
     mock: params.has('mock'),
     models: params.has('models'),
     forceFailure: params.has('forceModelFailure'),
@@ -56,6 +60,7 @@ export default function SoundVillage3D() {
   const mockMode = runtimeOptions.mock
   const loadModels = runtimeOptions.models
   const forceModelFailure = runtimeOptions.forceFailure
+  const debugCamera = runtimeOptions.debugCamera
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
@@ -117,10 +122,18 @@ export default function SoundVillage3D() {
     <main className={styles.root} data-testid="three-prototype">
       <CanvasBoundary>
         <Canvas
-          orthographic
           shadows
           dpr={[1, 1.5]}
-          camera={{ position: [8.8, 11.5, 16.4], zoom: 49, near: 0.1, far: 80 }}
+          camera={{
+            position: [
+              PLAYER_START[0] + CAMERA_CONFIG.positionOffset[0],
+              CAMERA_CONFIG.positionOffset[1],
+              PLAYER_START[2] + CAMERA_CONFIG.positionOffset[2],
+            ],
+            fov: CAMERA_CONFIG.fov,
+            near: CAMERA_CONFIG.near,
+            far: CAMERA_CONFIG.far,
+          }}
           gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
         >
           <VillageScene
@@ -132,6 +145,7 @@ export default function SoundVillage3D() {
             paused={Boolean(activeSound)}
             reducedMotion={reducedMotion}
             debugColliders={debugColliders}
+            debugCamera={debugCamera}
             loadModels={loadModels}
             forceModelFailure={forceModelFailure}
           />
@@ -149,6 +163,7 @@ export default function SoundVillage3D() {
         onToggleDebug={() => setDebugColliders(value => !value)}
       />
       <MobileControls3D inputRef={inputRef} disabled={Boolean(activeSound)} onInteract={interact} />
+      {debugCamera && <CameraDebugHUD />}
 
       {activeSound && (
         <AnnotationPanel
