@@ -334,7 +334,7 @@ const SEG_STATUS = {
   outro:  '마무리 부분 🎵',
 };
 
-function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit, onSkip }) {
+function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit, onSkip, mockMode = false }) {
   const [text, setText]             = useState('');
   const [confidence, setConfidence] = useState('medium');
   const [submitting, setSubmitting] = useState(false);
@@ -357,7 +357,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
     setError('');
     try {
       const confMap = { low: 1, medium: 3, high: 5 };
-      await saveAnnotation({
+      if (!mockMode) await saveAnnotation({
         participant_id:     participantId,
         session_id:         sessionId,
         sound_id:           sound.sound_id,
@@ -570,7 +570,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
    메인 AnnotationPanel — Stage 1 (표현 입력)만 담당
    Stage 2는 SoundMuseum으로 이전
 ───────────────────────────────────────────── */
-export default function AnnotationPanel({ sound, zone, participantId, sessionId, onClose, onComplete }) {
+export default function AnnotationPanel({ sound, zone, participantId, sessionId, onClose, onComplete, mockMode = false }) {
   const [visible, setVisible] = useState(false);
   const palette = ZONE_PALETTE[zone] || ZONE_PALETTE.Lab;
 
@@ -598,7 +598,7 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
 
   const handleSkip = async () => {
     try {
-      await saveAnnotation({
+      if (!mockMode) await saveAnnotation({
         participant_id:  participantId,
         session_id:      sessionId,
         sound_id:        sound.sound_id,
@@ -686,6 +686,7 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
             sound={sound} zone={zone} palette={palette}
             participantId={participantId} sessionId={sessionId}
             onSubmit={handleStage1Submit} onSkip={handleSkip}
+            mockMode={mockMode}
           />
         </div>
       </div>

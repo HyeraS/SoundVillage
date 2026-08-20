@@ -1,0 +1,41 @@
+.root { position: fixed; inset: 0; overflow: hidden; background: #b9ddf0; color: #3b2c27; font-family: Nunito, ui-rounded, system-ui, sans-serif; }
+.root canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.loading, :global(.prototypeLoading) { position: fixed; inset: 0; display: grid; place-items: center; background: #e7f2df; color: #5f4a35; font: 700 15px Nunito, sans-serif; }
+.startLoading { position: fixed; z-index: 130; left: 50%; bottom: 28px; transform: translateX(-50%); padding: 10px 16px; border-radius: 999px; background: #3b2c27e8; color: white; font-size: 12px; }
+.hud { position: fixed; z-index: 10; top: max(18px, env(safe-area-inset-top)); left: 18px; display: flex; gap: 26px; align-items: center; min-width: 300px; padding: 13px 16px; border: 1px solid #fff9; border-radius: 17px; background: #fff4dbe8; box-shadow: 0 8px 28px #4d66472e; backdrop-filter: blur(12px); }
+.hud > div:first-child { display: grid; gap: 2px; }
+.hud strong { font-size: 18px; }
+.hud span { font-size: 11px; color: #795f4b; }
+.eyebrow { color: #9368b5 !important; font-size: 9px !important; font-weight: 900; letter-spacing: .12em; }
+.progressWrap { display: grid; gap: 5px; min-width: 100px; text-align: right; }
+.progressTrack { width: 100px; height: 7px; overflow: hidden; border-radius: 10px; background: #cdbfadb8; }
+.progressTrack i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9873c7, #d19fd8); transition: width .3s ease; }
+.statusPill { position: fixed; z-index: 10; left: 50%; bottom: 78px; transform: translateX(-50%); max-width: min(440px, calc(100vw - 36px)); padding: 10px 16px; border-radius: 999px; background: #3b2c27df; color: #fff9e6; box-shadow: 0 5px 18px #33251e3d; font-size: 12px; font-weight: 700; text-align: center; white-space: nowrap; }
+.statusReady { background: #7653a7ed; box-shadow: 0 0 24px #a986db99; }
+.tools { position: fixed; z-index: 11; top: 20px; right: 18px; display: flex; align-items: center; gap: 8px; }
+.tools button, .tools a { border: 1px solid #fff8; border-radius: 999px; padding: 8px 11px; background: #fff4dbe8; color: #674f3e; font: 700 10px Nunito, sans-serif; text-decoration: none; cursor: pointer; backdrop-filter: blur(10px); }
+.mockBadge { padding: 7px 10px; border-radius: 999px; background: #65458e; color: white; font-size: 9px; font-weight: 900; letter-spacing: .05em; }
+.keyboardHint { position: fixed; z-index: 10; left: 18px; bottom: 20px; padding: 8px 11px; border-radius: 10px; background: #fff7e4d9; color: #6e5847; font-size: 10px; }
+:global(.mobileControls) { display: none; }
+:global(.fallbackScreen) { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(160deg, #b9ddf0, #9fc777); color: #3a2a14; font-family: Nunito, sans-serif; }
+:global(.fallbackCard) { max-width: 440px; padding: 34px; border: 2px solid #c8a96e; border-radius: 24px; background: #fff4db; box-shadow: 0 16px 50px #263a2633; text-align: center; }
+:global(.fallbackCard h1) { margin: 8px 0 14px; font-size: 22px; }
+:global(.fallbackCard p) { color: #725e49; font-size: 13px; line-height: 1.7; }
+:global(.fallbackCard a) { display: inline-block; margin-top: 10px; padding: 11px 16px; border-radius: 12px; background: #5b9e3a; color: white; font-weight: 800; text-decoration: none; }
+:global(.fallbackIcon) { font-size: 40px; }
+
+@media (max-width: 720px), (pointer: coarse) {
+  .hud { top: max(10px, env(safe-area-inset-top)); left: 10px; right: 10px; min-width: 0; justify-content: space-between; padding: 10px 12px; }
+  .hud strong { font-size: 15px; }
+  .tools { top: 94px; right: 10px; }
+  .tools a, .tools button { padding: 7px 9px; }
+  .keyboardHint { display: none; }
+  .statusPill { bottom: calc(126px + env(safe-area-inset-bottom)); font-size: 11px; }
+  :global(.mobileControls) { position: fixed; z-index: 12; left: 14px; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); display: flex; align-items: end; justify-content: space-between; pointer-events: none; }
+  :global(.dpad) { display: grid; grid-template: 42px 42px 42px / 42px 42px 42px; gap: 3px; }
+  :global(.dpadButton), :global(.interactButton) { pointer-events: auto; touch-action: none; border: 1px solid #fff9; background: #3b2c27c9; color: white; box-shadow: 0 4px 16px #33251e48; font: 800 13px Nunito, sans-serif; }
+  :global(.dpadButton) { border-radius: 12px; }
+  :global(.dpad-up) { grid-area: 1 / 2; } :global(.dpad-left) { grid-area: 2 / 1; } :global(.dpad-down) { grid-area: 2 / 2; } :global(.dpad-right) { grid-area: 2 / 3; }
+  :global(.interactButton) { width: 94px; height: 58px; border-radius: 50%; background: #7653a7e8; }
+  :global(.dpadButton:disabled), :global(.interactButton:disabled) { opacity: .4; }
+}
