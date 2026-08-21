@@ -10,6 +10,12 @@
 .progressWrap { display: grid; gap: 5px; min-width: 100px; text-align: right; }
 .progressTrack { width: 100px; height: 7px; overflow: hidden; border-radius: 10px; background: #cdbfadb8; }
 .progressTrack i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9873c7, #d19fd8); transition: width .3s ease; }
+.hubDots { display: flex; justify-content: flex-end; gap: 4px; }
+.hubDots i { width: 9px; height: 9px; border-radius: 50%; background: #e98662; }
+.hubDots i:nth-child(even) { background: #62d6c4; box-shadow: none; }
+.hubVillageLegend { position: fixed; z-index: 10; top: 112px; left: 18px; display: grid; grid-template-columns: repeat(2, max-content); gap: 5px 12px; padding: 9px 11px; border: 1px solid #fff9; border-radius: 13px; background: #fff4dbe3; color: #6c5542; box-shadow: 0 7px 22px #4d664729; font-size: 9px; font-weight: 800; backdrop-filter: blur(10px); }
+.hubVillageLegend span { display: flex; align-items: center; gap: 5px; }
+.hubVillageLegend i { width: 7px; height: 7px; border-radius: 50%; }
 .statusPill { position: fixed; z-index: 10; left: 50%; bottom: 78px; transform: translateX(-50%); max-width: min(440px, calc(100vw - 36px)); padding: 10px 16px; border-radius: 999px; background: #3b2c27df; color: #fff9e6; box-shadow: 0 5px 18px #33251e3d; font-size: 12px; font-weight: 700; text-align: center; white-space: nowrap; }
 .statusReady { background: #7653a7ed; box-shadow: 0 0 24px #a986db99; }
 .tools { position: fixed; z-index: 11; top: 20px; right: 18px; display: flex; align-items: center; gap: 8px; }
@@ -18,6 +24,17 @@
 .keyboardHint { position: fixed; z-index: 10; left: 18px; bottom: 20px; padding: 8px 11px; border-radius: 10px; background: #fff7e4d9; color: #6e5847; font-size: 10px; }
 .cameraDebug { position: fixed; z-index: 13; left: 18px; top: 112px; display: grid; gap: 3px; max-width: min(440px, calc(100vw - 36px)); padding: 10px 12px; border-radius: 10px; background: #241d2ce8; color: #f4edf8; font: 600 10px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; pointer-events: none; }
 .cameraDebug strong { color: #d8baf3; font-size: 11px; }
+.root[data-scene='hub'] .cameraDebug { top: 202px; }
+.villageEntryOverlay { position: fixed; z-index: 40; inset: 0; display: grid; place-items: center; padding: 24px; background: #203d3375; backdrop-filter: blur(8px); }
+.villageEntryCard { --village-color: #62d6c4; display: grid; justify-items: center; width: min(520px, 100%); padding: 30px; border: 3px solid var(--village-color); border-radius: 26px; background: #fff7e7; box-shadow: 0 22px 70px #253c2c5c; text-align: center; }
+.villageEntryCard h2 { margin: 8px 0; color: #4b382c; font-size: 25px; }
+.villageEntryCard p { margin: 4px 0; color: #725d4d; font-size: 13px; line-height: 1.6; }
+.villageEntryIcon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--village-color); color: white; font-size: 30px; box-shadow: 0 7px 20px color-mix(in srgb, var(--village-color), transparent 55%); }
+.villageEntryNote { font-weight: 800; }
+.villageEntryList { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 16px 0; }
+.villageEntryList span { padding: 5px 8px; border-radius: 999px; background: #eadfca; color: #725d4d; font-size: 9px; font-weight: 800; }
+.villageEntryList .villageEntryCurrent { background: var(--village-color); color: white; }
+.villageEntryCard button { border: 0; border-radius: 999px; padding: 11px 17px; background: #5f8f52; color: white; font: 800 12px Nunito, sans-serif; cursor: pointer; }
 :global(.mobileControls) { display: none; }
 :global(.fallbackScreen) { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(160deg, #b9ddf0, #9fc777); color: #3a2a14; font-family: Nunito, sans-serif; }
 :global(.fallbackCard) { max-width: 440px; padding: 34px; border: 2px solid #c8a96e; border-radius: 24px; background: #fff4db; box-shadow: 0 16px 50px #263a2633; text-align: center; }
@@ -33,6 +50,7 @@
   .tools a, .tools button { padding: 7px 9px; }
   .keyboardHint { display: none; }
   .cameraDebug { top: 132px; left: 10px; right: 10px; max-width: none; }
+  .hubVillageLegend { top: 132px; left: 10px; grid-template-columns: repeat(3, max-content); max-width: calc(100vw - 20px); gap: 4px 8px; }
   .statusPill { bottom: calc(126px + env(safe-area-inset-bottom)); font-size: 11px; }
   :global(.mobileControls) { position: fixed; z-index: 12; left: 14px; right: 14px; bottom: max(14px, env(safe-area-inset-bottom)); display: flex; align-items: end; justify-content: space-between; pointer-events: none; }
   :global(.dpad) { display: grid; grid-template: 42px 42px 42px / 42px 42px 42px; gap: 3px; }
@@ -41,6 +59,8 @@
   :global(.dpad-up) { grid-area: 1 / 2; } :global(.dpad-left) { grid-area: 2 / 1; } :global(.dpad-down) { grid-area: 2 / 2; } :global(.dpad-right) { grid-area: 2 / 3; }
   :global(.interactButton) { width: 94px; height: 58px; border-radius: 50%; background: #7653a7e8; }
   :global(.dpadButton:disabled), :global(.interactButton:disabled) { opacity: .4; }
+  .villageEntryCard { padding: 24px 18px; }
+  .villageEntryCard h2 { font-size: 21px; }
 }
 
 @media (max-width: 900px) and (orientation: landscape) {

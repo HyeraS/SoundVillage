@@ -4,7 +4,7 @@ const DIRECTIONS = [
   ['up', '▲', 'up'], ['left', '◀', 'left'], ['down', '▼', 'down'], ['right', '▶', 'right'],
 ]
 
-export default function MobileControls3D({ inputRef, disabled, onInteract }) {
+export default function MobileControls3D({ inputRef, disabled, onInteract, interactionLabel = '소리 듣기' }) {
   const setDirection = (direction, value) => { inputRef.current[direction] = value }
   return (
     <div className="mobileControls" aria-label="이동 컨트롤">
@@ -22,7 +22,7 @@ export default function MobileControls3D({ inputRef, disabled, onInteract }) {
           >{label}</button>
         ))}
       </div>
-      <button className="interactButton" disabled={disabled} onClick={onInteract}>소리 듣기</button>
+      <button className="interactButton" disabled={disabled} onClick={onInteract}>{interactionLabel}</button>
     </div>
   )
 }
