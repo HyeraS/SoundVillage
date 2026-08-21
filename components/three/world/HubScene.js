@@ -8,10 +8,10 @@ import Player3D from '../Player3D'
 import HubThirdPersonCamera from './HubThirdPersonCamera'
 import HubEnvironment from './HubEnvironment'
 
-export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, reducedMotion, debugColliders, debugCamera }) {
+export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, reducedMotion, debugColliders, debugCamera, startPosition = HUB_PLAYER_START, initialYaw = 0 }) {
   const playerRef = useRef(null)
-  const yawRef = useRef(0)
-  const facingYawRef = useRef(0)
+  const yawRef = useRef(initialYaw)
+  const facingYawRef = useRef(initialYaw)
   const movingRef = useRef(false)
   const interactionTargets = useMemo(() => createHubInteractionTargets(), [])
   const completedIds = useMemo(() => new Set(), [])
@@ -45,7 +45,7 @@ export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, re
         reducedMotion={reducedMotion}
         loadModel={false}
         debug={debugColliders || debugCamera}
-        startPosition={HUB_PLAYER_START}
+        startPosition={startPosition}
         worldBounds={HUB_BOUNDS}
         worldColliders={HUB_COLLIDERS}
         interactionRadius={2.35}

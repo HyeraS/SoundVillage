@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { moveWithCollisions } from '@/lib/three/collision.mjs'
 import { movementDirectionToFacingYaw, screenInputToWorld, shouldRefreshMovementBasis } from '@/lib/three/cameraConfig.mjs'
 import { PLAYER_RADIUS, PLAYER_START, WORLD_BOUNDS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
+import { findNearestInteractionTarget } from '@/lib/three/sceneFlow.mjs'
 import ModelAsset from './ModelAsset'
 
 const KEY_MAP = {
@@ -115,13 +116,7 @@ export default function Player3D({
     if (!reducedMotion) group.position.y = moving ? Math.abs(Math.sin(clock.elapsedTime * 9)) * 0.06 : 0
     if (walkingRef.current !== moving) walkingRef.current = moving
 
-    let nearest = null
-    let nearestDistance = interactionRadius
-    for (const placement of placements) {
-      if (completedIds.has(placement.id)) continue
-      const distance = Math.hypot(positionRef.current.x - placement.position[0], positionRef.current.z - placement.position[2])
-      if (distance < nearestDistance) { nearest = placement; nearestDistance = distance }
-    }
+    const nearest = findNearestInteractionTarget(placements, completedIds, positionRef.current, interactionRadius)
     const nextId = nearest?.id ?? null
     if (debug) {
       const root = document.querySelector('[data-testid="three-prototype"]')

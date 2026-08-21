@@ -2,13 +2,16 @@
 
 import { useRef } from 'react'
 import { Color } from 'three'
+import { MUSIC_EXIT_TARGET } from '@/lib/three/modelConfig.mjs'
+import { createMusicInteractionTargets } from '@/lib/three/sceneFlow.mjs'
 import FollowCamera from './FollowCamera'
 import InteractableSound from './InteractableSound'
 import Player3D from './Player3D'
 import VillageEnvironment from './VillageEnvironment'
 
-export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure }) {
+export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure, showHubExit = false }) {
   const playerRef = useRef(null)
+  const interactionTargets = createMusicInteractionTargets(placements, MUSIC_EXIT_TARGET, showHubExit)
 
   return (
     <>
@@ -28,7 +31,7 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         shadow-camera-top={12}
         shadow-camera-bottom={-12}
       />
-      <VillageEnvironment loadModels={loadModels} debugColliders={debugColliders} />
+      <VillageEnvironment loadModels={loadModels} debugColliders={debugColliders} showHubExit={showHubExit} exitNearby={nearbyId === MUSIC_EXIT_TARGET.id} />
       {placements.map(placement => (
         <InteractableSound
           key={placement.id}
@@ -42,7 +45,7 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
       <Player3D
         playerRef={playerRef}
         inputRef={inputRef}
-        placements={placements}
+        placements={interactionTargets}
         completedIds={completedIds}
         enabled={!paused}
         onNearbySoundChange={onNearbySoundChange}

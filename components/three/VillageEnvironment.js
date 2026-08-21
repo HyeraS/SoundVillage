@@ -2,12 +2,13 @@
 
 import { DECORATION_POSITIONS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
 import ModelAsset from './ModelAsset'
+import MusicVillageExit from './MusicVillageExit'
 
 function AssetAt({ assetKey, position, rotation, loadModel }) {
   return <group position={[position[0], 0, position[1]]} rotation={rotation}><ModelAsset assetKey={assetKey} loadModel={loadModel} /></group>
 }
 
-export default function VillageEnvironment({ loadModels, debugColliders }) {
+export default function VillageEnvironment({ loadModels, debugColliders, showHubExit = false, exitNearby = false }) {
   return (
     <group>
       <mesh receiveShadow position={[0, -0.55, 0]} scale={[1, 0.72, 1]}>
@@ -25,6 +26,7 @@ export default function VillageEnvironment({ loadModels, debugColliders }) {
 
       <AssetAt assetKey="musicVillageHouse" position={[-5.2, -2.7]} loadModel={loadModels} />
       <AssetAt assetKey="soundMuseum" position={[5.2, -2.7]} loadModel={loadModels} />
+      {showHubExit && <MusicVillageExit nearby={exitNearby} />}
       <group position={[2.9, 0, 1.9]} rotation={[0, -0.28, 0]}>
         <mesh castShadow position={[0, 0.75, 0]}><cylinderGeometry args={[0.07, 0.1, 1.5, 8]} /><meshStandardMaterial color="#7A543C" /></mesh>
         <mesh castShadow position={[0, 1.35, 0]}><boxGeometry args={[1.45, 0.58, 0.13]} /><meshStandardMaterial color="#C18A5C" /></mesh>

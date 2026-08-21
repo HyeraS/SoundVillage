@@ -6,14 +6,17 @@ import StartPanel from '@/components/StartPanel'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import soundMetadata from '@/data/sound_metadata.json'
 import { getAnnotatedByParticipantZone } from '@/lib/supabase'
+import { resetAudio } from '@/lib/audioManager'
 import { getStudyAccessGroup, isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
 import { createSoundPlacements, normalizeCompletedIds, selectMusicBlockOneSounds } from '@/lib/three/prototypeData.mjs'
-import { CAMERA_CONFIG, HUB_THIRD_PERSON_CAMERA_CONFIG } from '@/lib/three/cameraConfig.mjs'
+import { CAMERA_CONFIG, HUB_THIRD_PERSON_CAMERA_CONFIG, getYawForward } from '@/lib/three/cameraConfig.mjs'
 import { PLAYER_START } from '@/lib/three/modelConfig.mjs'
-import { getHubVillage, getPrototypeScene, HUB_PLAYER_START, resolveHubInteraction } from '@/lib/three/worldConfig.mjs'
+import { SCENE_IDS, addCompletedSound, createReleasedInputState, resolveMusicInteraction, resolveSceneTransition, shouldLoadRemoteProgress } from '@/lib/three/sceneFlow.mjs'
+import { getHubReturnPose, getHubVillage, getPrototypeScene, HUB_PLAYER_START, resolveHubInteraction } from '@/lib/three/worldConfig.mjs'
 import CameraDebugHUD from './CameraDebugHUD'
 import MobileControls3D from './MobileControls3D'
 import GameHUD3D from './GameHUD3D'
+import MusicExitOverlay from './MusicExitOverlay'
 import VillageEntryOverlay from './VillageEntryOverlay'
 import VillageScene from './VillageScene'
 import HubScene from './world/HubScene'
@@ -55,6 +58,7 @@ export default function SoundVillage3D() {
   const webglReady = runtimeOptions.webglReady
   const [started, setStarted] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [loadError, setLoadError] = useState('')
   const [participantId, setParticipantId] = useState('')
   const [groupId, setGroupId] = useState('')
   const [placements, setPlacements] = useState([])
@@ -63,13 +67,19 @@ export default function SoundVillage3D() {
   const [nearbyHubTarget, setNearbyHubTarget] = useState(null)
   const [activeVillage, setActiveVillage] = useState(null)
   const [activeSound, setActiveSound] = useState(null)
+  const [exitOverlayOpen, setExitOverlayOpen] = useState(false)
+  const [sceneId, setSceneId] = useState(runtimeOptions.scene)
+  const [sceneRevision, setSceneRevision] = useState(0)
+  const [transitioning, setTransitioning] = useState(false)
+  const [enteredMusicFromHub, setEnteredMusicFromHub] = useState(false)
+  const [hubPose, setHubPose] = useState(() => ({ position: [...HUB_PLAYER_START], yaw: 0 }))
+  const transitionLockRef = useRef(false)
   const [debugColliders, setDebugColliders] = useState(runtimeOptions.debug)
   const mockMode = runtimeOptions.mock
   const loadModels = runtimeOptions.models
   const forceModelFailure = runtimeOptions.forceFailure
   const debugCamera = runtimeOptions.debugCamera
-  const sceneMode = runtimeOptions.scene
-  const hubMode = sceneMode === 'hub'
+  const hubMode = sceneId === SCENE_IDS.HUB
   const [reducedMotion, setReducedMotion] = useState(() => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
   useEffect(() => {
@@ -81,68 +91,120 @@ export default function SoundVillage3D() {
 
   const begin = useCallback(async (nextParticipantId, nextGroupId) => {
     setLoading(true)
+    setLoadError('')
     const studyGroup = getStudyAccessGroup(nextParticipantId)
     const effectiveGroup = studyGroup || nextGroupId
-    let nextPlacements = []
-    let nextCompletedIds = new Set()
-    if (!hubMode) {
+    try {
       const bypassGroup = isStudyAccessParticipantId(nextParticipantId) && !studyGroup
       const sounds = selectMusicBlockOneSounds(soundMetadata.sounds, effectiveGroup, bypassGroup)
-      nextPlacements = createSoundPlacements(sounds)
-      const databaseIds = mockMode ? [] : await getAnnotatedByParticipantZone(nextParticipantId, 'Music')
-      nextCompletedIds = normalizeCompletedIds(databaseIds, sounds)
+      const nextPlacements = createSoundPlacements(sounds)
+      const databaseIds = shouldLoadRemoteProgress(mockMode) ? await getAnnotatedByParticipantZone(nextParticipantId, 'Music') : []
+      const nextCompletedIds = normalizeCompletedIds(databaseIds, sounds)
+      setParticipantId(nextParticipantId)
+      setGroupId(effectiveGroup)
+      setPlacements(nextPlacements)
+      setCompletedIds(nextCompletedIds)
+      setNearbySound(null)
+      setNearbyHubTarget(null)
+      setActiveVillage(runtimeOptions.scene === SCENE_IDS.HUB ? runtimeOptions.initialVillage : null)
+      setActiveSound(null)
+      setExitOverlayOpen(false)
+      setSceneId(runtimeOptions.scene)
+      setEnteredMusicFromHub(false)
+      setHubPose({ position: [...HUB_PLAYER_START], yaw: 0 })
+      inputRef.current = createReleasedInputState()
+      setStarted(true)
+    } catch (error) {
+      console.error('[3D] Music 진행 상태 초기화 실패:', error)
+      setLoadError('Music 진행 상태를 불러오지 못했습니다. 잠시 후 다시 시작해 주세요.')
+    } finally {
+      setLoading(false)
     }
-    setParticipantId(nextParticipantId)
-    setGroupId(effectiveGroup)
-    setPlacements(nextPlacements)
-    setCompletedIds(nextCompletedIds)
+  }, [mockMode, runtimeOptions.initialVillage, runtimeOptions.scene])
+
+  const transitionScene = useCallback((targetScene) => {
+    const result = resolveSceneTransition({
+      currentScene: sceneId,
+      targetScene,
+      transitioning: transitionLockRef.current,
+      annotationOpen: Boolean(activeSound),
+    })
+    if (result.type !== 'transition') return false
+    transitionLockRef.current = true
+    setTransitioning(true)
+    resetAudio()
+    inputRef.current = createReleasedInputState()
     setNearbySound(null)
     setNearbyHubTarget(null)
-    setActiveVillage(hubMode ? runtimeOptions.initialVillage : null)
-    setStarted(true)
-    setLoading(false)
-  }, [hubMode, mockMode, runtimeOptions.initialVillage])
+    setActiveVillage(null)
+    setExitOverlayOpen(false)
+    if (targetScene === SCENE_IDS.HUB) {
+      setHubPose(getHubReturnPose('music'))
+      setEnteredMusicFromHub(false)
+    } else {
+      setEnteredMusicFromHub(true)
+    }
+    setSceneId(targetScene)
+    setSceneRevision(value => value + 1)
+    window.requestAnimationFrame(() => {
+      transitionLockRef.current = false
+      setTransitioning(false)
+    })
+    return true
+  }, [activeSound, sceneId])
+
+  const enterMusic = useCallback(() => transitionScene(SCENE_IDS.MUSIC), [transitionScene])
+  const returnToHub = useCallback(() => transitionScene(SCENE_IDS.HUB), [transitionScene])
 
   const interact = useCallback(() => {
-    if (hubMode && !activeVillage) {
+    if (hubMode && !activeVillage && !transitioning) {
       const action = resolveHubInteraction(nearbyHubTarget)
       if (action.type === 'enter-village') setActiveVillage(action.village)
       return
     }
-    if (!hubMode && nearbySound && !activeSound) setActiveSound(nearbySound.sound)
-  }, [hubMode, nearbyHubTarget, activeVillage, nearbySound, activeSound])
+    if (!hubMode && nearbySound && !activeSound && !exitOverlayOpen && !transitioning) {
+      const action = resolveMusicInteraction(nearbySound)
+      if (action.type === 'return-hub') setExitOverlayOpen(true)
+      if (action.type === 'annotate-sound') setActiveSound(action.sound)
+    }
+  }, [hubMode, nearbyHubTarget, activeVillage, nearbySound, activeSound, exitOverlayOpen, transitioning])
 
   useEffect(() => {
     const handleKey = event => {
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName)) return
-      if (event.key === 'Escape' && activeVillage) {
-        event.preventDefault()
-        setActiveVillage(null)
-      } else if ((event.key === 'Enter' || event.key === ' ') && started && !activeSound && !activeVillage) {
+      if (activeVillage || exitOverlayOpen) return
+      if ((event.key === 'Enter' || event.key === ' ') && started && !activeSound) {
         event.preventDefault()
         interact()
-      } else if (event.key === 'Escape' && started && !activeSound && !activeVillage) {
-        setStarted(false)
-        setNearbySound(null)
-        setNearbyHubTarget(null)
+      } else if (event.key === 'Escape' && started && !activeSound) {
+        event.preventDefault()
+        if (!hubMode && enteredMusicFromHub) setExitOverlayOpen(true)
+        else {
+          resetAudio()
+          inputRef.current = createReleasedInputState()
+          setStarted(false)
+          setNearbySound(null)
+          setNearbyHubTarget(null)
+        }
       }
     }
     window.addEventListener('keydown', handleKey)
     return () => window.removeEventListener('keydown', handleKey)
-  }, [activeSound, activeVillage, interact, started])
+  }, [activeSound, activeVillage, enteredMusicFromHub, exitOverlayOpen, hubMode, interact, started])
 
   const handleComplete = useCallback(() => {
     const soundId = activeSound?.sound_id
-    if (soundId) setCompletedIds(previous => new Set([...previous, soundId]))
+    if (soundId) setCompletedIds(previous => addCompletedSound(previous, soundId, true))
     setActiveSound(null)
   }, [activeSound])
 
   const completed = completedIds.size
   const total = placements.length
-  const playerStart = hubMode ? HUB_PLAYER_START : PLAYER_START
+  const playerStart = hubMode ? hubPose.position : PLAYER_START
+  const hubForward = getYawForward(hubPose.yaw)
   const initialCamera = hubMode
     ? {
-        position: [playerStart[0], HUB_THIRD_PERSON_CAMERA_CONFIG.height, playerStart[2] + HUB_THIRD_PERSON_CAMERA_CONFIG.distance],
+        position: [playerStart[0] - hubForward.x * HUB_THIRD_PERSON_CAMERA_CONFIG.distance, HUB_THIRD_PERSON_CAMERA_CONFIG.height, playerStart[2] - hubForward.z * HUB_THIRD_PERSON_CAMERA_CONFIG.distance],
         fov: HUB_THIRD_PERSON_CAMERA_CONFIG.fov,
         near: HUB_THIRD_PERSON_CAMERA_CONFIG.near,
         far: HUB_THIRD_PERSON_CAMERA_CONFIG.far,
@@ -155,12 +217,13 @@ export default function SoundVillage3D() {
       }
   if (webglReady === null) return <main className={styles.loading}>그래픽 환경을 확인하고 있어요…</main>
   if (!webglReady) return <WebGLFallback />
-  if (!started) return <><StartPanel onStart={begin} />{loading && <div className={styles.startLoading}>진행 상태를 불러오는 중…</div>}</>
+  if (!started) return <><StartPanel onStart={begin} />{loading && <div className={styles.startLoading}>진행 상태를 불러오는 중…</div>}{loadError && <div className={styles.startError}>{loadError}</div>}</>
 
   return (
-    <main className={styles.root} data-testid="three-prototype" data-scene={sceneMode}>
+    <main className={styles.root} data-testid="three-prototype" data-scene={sceneId} data-transitioning={String(transitioning)}>
       <CanvasBoundary>
         <Canvas
+          key={`${sceneId}-${sceneRevision}`}
           shadows
           dpr={[1, 1.5]}
           camera={initialCamera}
@@ -170,10 +233,12 @@ export default function SoundVillage3D() {
             <HubScene
               inputRef={inputRef}
               onNearbyHubTargetChange={setNearbyHubTarget}
-              paused={Boolean(activeVillage)}
+              paused={Boolean(activeVillage || transitioning)}
               reducedMotion={reducedMotion}
               debugColliders={debugColliders}
               debugCamera={debugCamera}
+              startPosition={hubPose.position}
+              initialYaw={hubPose.yaw}
             />
           ) : (
             <VillageScene
@@ -182,12 +247,13 @@ export default function SoundVillage3D() {
               nearbyId={nearbySound?.id || null}
               inputRef={inputRef}
               onNearbySoundChange={setNearbySound}
-              paused={Boolean(activeSound)}
+              paused={Boolean(activeSound || exitOverlayOpen || transitioning)}
               reducedMotion={reducedMotion}
               debugColliders={debugColliders}
               debugCamera={debugCamera}
               loadModels={loadModels}
               forceModelFailure={forceModelFailure}
+              showHubExit={enteredMusicFromHub}
             />
           )}
         </Canvas>
@@ -200,16 +266,18 @@ export default function SoundVillage3D() {
         total={total}
         nearbySound={nearbySound}
         nearbyHubTarget={nearbyHubTarget}
-        sceneMode={sceneMode}
+        sceneMode={sceneId}
+        enteredMusicFromHub={enteredMusicFromHub}
         mockMode={mockMode}
         debugColliders={debugColliders}
         onToggleDebug={() => setDebugColliders(value => !value)}
       />
       <MobileControls3D
         inputRef={inputRef}
-        disabled={Boolean(activeSound || activeVillage)}
+        movementDisabled={Boolean(activeSound || activeVillage || exitOverlayOpen || transitioning)}
+        interactionDisabled={Boolean(activeSound || activeVillage || exitOverlayOpen || transitioning || (hubMode ? !nearbyHubTarget : !nearbySound))}
         onInteract={interact}
-        interactionLabel={hubMode && nearbyHubTarget?.kind === 'village-exit' ? '마을 입장' : hubMode ? '둘러보기' : '소리 듣기'}
+        interactionLabel={hubMode && nearbyHubTarget?.kind === 'village-exit' ? '마을 들어가기' : hubMode ? '랜드마크 보기' : nearbySound?.kind === 'music-exit' ? '광장으로 돌아가기' : '소리 듣기'}
       />
       {debugCamera && <CameraDebugHUD mode={hubMode ? 'hub-third-person' : 'follow'} />}
 
@@ -224,7 +292,9 @@ export default function SoundVillage3D() {
           onComplete={handleComplete}
         />
       )}
-      {hubMode && activeVillage && <VillageEntryOverlay village={activeVillage} onClose={() => setActiveVillage(null)} />}
+      {hubMode && activeVillage && <VillageEntryOverlay village={activeVillage} completed={completed} total={total} onEnter={enterMusic} onClose={() => setActiveVillage(null)} />}
+      {!hubMode && exitOverlayOpen && <MusicExitOverlay onConfirm={returnToHub} onClose={() => setExitOverlayOpen(false)} />}
+      {transitioning && <div className={styles.sceneTransition}>마을 길을 이동하고 있어요…</div>}
     </main>
   )
 }
