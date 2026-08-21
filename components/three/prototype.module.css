@@ -35,10 +35,12 @@
 .villageEntryList span { padding: 5px 8px; border-radius: 999px; background: #eadfca; color: #725d4d; font-size: 9px; font-weight: 800; }
 .villageEntryList .villageEntryCurrent { background: var(--village-color); color: white; }
 .villageEntryCard button { border: 0; border-radius: 999px; padding: 11px 17px; background: #5f8f52; color: white; font: 800 12px Nunito, sans-serif; cursor: pointer; }
+.villageEntryCard button:disabled { cursor: not-allowed; background: #9c988f; color: #eee9df; opacity: .72; }
 .villageEntryActions { display: flex; gap: 9px; margin-top: 16px; }
 .villageEntryCard .secondaryButton { background: #dfd2bb; color: #604b3d; }
 .sceneTransition { position: fixed; z-index: 55; inset: 0; display: grid; place-items: center; background: #f7e9c8cc; color: #5f4939; font-size: 13px; font-weight: 900; backdrop-filter: blur(5px); }
 .startError { position: fixed; z-index: 130; left: 50%; bottom: 28px; transform: translateX(-50%); width: min(520px, calc(100vw - 28px)); padding: 11px 15px; border-radius: 14px; background: #7e3f3fe8; color: white; font-size: 12px; text-align: center; }
+.unlockNotice { position: fixed; z-index: 38; top: max(116px, calc(env(safe-area-inset-top) + 96px)); left: 50%; transform: translateX(-50%); width: min(460px, calc(100vw - 28px)); padding: 13px 18px; border: 2px solid #f0c66e; border-radius: 18px; background: #fff6d9f2; color: #60472f; box-shadow: 0 12px 32px #573d2538; font-size: 13px; font-weight: 900; text-align: center; backdrop-filter: blur(10px); }
 :global(.mobileControls) { display: none; }
 :global(.fallbackScreen) { position: fixed; inset: 0; display: grid; place-items: center; padding: 24px; background: linear-gradient(160deg, #b9ddf0, #9fc777); color: #3a2a14; font-family: Nunito, sans-serif; }
 :global(.fallbackCard) { max-width: 440px; padding: 34px; border: 2px solid #c8a96e; border-radius: 24px; background: #fff4db; box-shadow: 0 16px 50px #263a2633; text-align: center; }

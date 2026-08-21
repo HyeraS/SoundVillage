@@ -8,7 +8,7 @@ import Player3D from '../Player3D'
 import HubThirdPersonCamera from './HubThirdPersonCamera'
 import HubEnvironment from './HubEnvironment'
 
-export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, reducedMotion, debugColliders, debugCamera, startPosition = HUB_PLAYER_START, initialYaw = 0 }) {
+export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, reducedMotion, debugColliders, debugCamera, startPosition = HUB_PLAYER_START, initialYaw = 0, villagesUnlocked = false }) {
   const playerRef = useRef(null)
   const yawRef = useRef(initialYaw)
   const facingYawRef = useRef(initialYaw)
@@ -34,7 +34,7 @@ export default function HubScene({ inputRef, onNearbyHubTargetChange, paused, re
         shadow-camera-top={14}
         shadow-camera-bottom={-14}
       />
-      <HubEnvironment reducedMotion={reducedMotion} debugColliders={debugColliders} />
+      <HubEnvironment reducedMotion={reducedMotion} debugColliders={debugColliders} villagesUnlocked={villagesUnlocked} />
       <Player3D
         playerRef={playerRef}
         inputRef={inputRef}

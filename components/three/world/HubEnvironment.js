@@ -6,12 +6,12 @@ import DecorationSet from './DecorationSet'
 import Ground from './Ground'
 import LandmarkOrb from './LandmarkOrb'
 
-export default function HubEnvironment({ reducedMotion, debugColliders }) {
+export default function HubEnvironment({ reducedMotion, debugColliders, villagesUnlocked = false }) {
   return (
     <group name="b-theme-central-plaza">
       <Ground />
       {HUB_BUILDINGS.map(building => <BuildingPlaceholder key={building.id} building={building} />)}
-      <DecorationSet />
+      <DecorationSet villagesUnlocked={villagesUnlocked} />
       <LandmarkOrb reducedMotion={reducedMotion} />
       {debugColliders && HUB_COLLIDERS.map(collider => (
         <mesh key={collider.id} position={[collider.position[0], collider.height / 2, collider.position[1]]}>

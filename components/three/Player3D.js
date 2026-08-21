@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { moveWithCollisions } from '@/lib/three/collision.mjs'
 import { movementDirectionToFacingYaw, screenInputToWorld, shouldRefreshMovementBasis } from '@/lib/three/cameraConfig.mjs'
-import { PLAYER_RADIUS, PLAYER_START, WORLD_BOUNDS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
+import { PLAYER_MOVE_SPEED, PLAYER_RADIUS, PLAYER_START, SOUND_INTERACTION_RADIUS, WORLD_BOUNDS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
 import { findNearestInteractionTarget } from '@/lib/three/sceneFlow.mjs'
 import ModelAsset from './ModelAsset'
 
@@ -26,7 +26,7 @@ export default function Player3D({
   startPosition = PLAYER_START,
   worldBounds = WORLD_BOUNDS,
   worldColliders = WORLD_COLLIDERS,
-  interactionRadius = 1.62,
+  interactionRadius = SOUND_INTERACTION_RADIUS,
   movementPositionOffset,
   movementYawRef,
   facingYawRef,
@@ -100,7 +100,7 @@ export default function Player3D({
       const basisYaw = Number.isFinite(movementBasisYawRef.current) ? movementBasisYawRef.current : yaw
       const activeMovementOffset = Number.isFinite(basisYaw) ? [-Math.sin(basisYaw), 0, Math.cos(basisYaw)] : movementPositionOffset
       const worldDirection = screenInputToWorld(screenX, screenZ, activeMovementOffset)
-      const speed = 4.1 * Math.min(delta, 0.05)
+      const speed = PLAYER_MOVE_SPEED * Math.min(delta, 0.05)
       const next = moveWithCollisions(positionRef.current, { x: worldDirection.x * speed, z: worldDirection.z * speed }, PLAYER_RADIUS, worldBounds, worldColliders)
       positionRef.current = next
       group.position.x = next.x

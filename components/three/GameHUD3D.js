@@ -4,12 +4,16 @@ import styles from './prototype.module.css'
 import Link from 'next/link'
 import { HUB_EXITS } from '@/lib/three/worldConfig.mjs'
 
-export default function GameHUD3D({ participantId, groupId, completed, total, nearbySound, nearbyHubTarget, sceneMode, enteredMusicFromHub, mockMode, debugColliders, onToggleDebug }) {
+export default function GameHUD3D({ participantId, groupId, completed, total, nearbySound, nearbyHubTarget, sceneMode, enteredMusicFromHub, villagesUnlocked, mockMode, debugColliders, onToggleDebug }) {
   const hubMode = sceneMode === 'hub'
   const percent = total ? Math.round((completed / total) * 100) : 0
   const status = hubMode
     ? nearbyHubTarget?.kind === 'village-exit'
-      ? `${nearbyHubTarget.label} · Enter 또는 마을 입장`
+      ? nearbyHubTarget.villageId !== 'music' && !villagesUnlocked
+        ? `🔒 ${nearbyHubTarget.label} · Music 15개를 완료하면 열립니다 (${completed}/${total})`
+        : nearbyHubTarget.villageId !== 'music'
+          ? `✓ ${nearbyHubTarget.label} · 해금됨 · 내부 공간 미리보기`
+          : `${nearbyHubTarget.label} · Enter 또는 마을 입장`
       : nearbyHubTarget?.kind === 'landmark'
         ? '중앙 광장 랜드마크 · 여섯 마을을 연결하는 기준점입니다'
         : '캐릭터 중심 3인칭 시점으로 여섯 마을 입구를 찾아보세요'
@@ -39,7 +43,10 @@ export default function GameHUD3D({ participantId, groupId, completed, total, ne
           </div>
         )}
       </section>
-      {hubMode && <div className={styles.hubVillageLegend} aria-label="마을 입구 6개">{HUB_EXITS.map((exit, index) => <span key={exit.id}><i style={{ background: exit.color }} />{index + 1}. {exit.label}</span>)}</div>}
+      {hubMode && <div className={styles.hubVillageLegend} aria-label="마을 입구 6개">{HUB_EXITS.map((exit, index) => {
+        const locked = exit.id !== 'music' && !villagesUnlocked
+        return <span key={exit.id}><i style={{ background: locked ? '#8D8A82' : exit.color }} />{locked ? '🔒' : exit.id === 'music' ? '●' : '✓'} {index + 1}. {exit.label}</span>
+      })}</div>}
       <div className={`${styles.statusPill} ${nearbySound || nearbyHubTarget ? styles.statusReady : ''}`}>{status}</div>
       <div className={styles.tools}>
         {mockMode && <span className={styles.mockBadge}>MOCK · 저장 안 함</span>}

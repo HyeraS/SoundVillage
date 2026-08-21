@@ -11,7 +11,7 @@ import { getStudyAccessGroup, isStudyAccessParticipantId } from '@/lib/studyAcce
 import { createSoundPlacements, normalizeCompletedIds, selectMusicBlockOneSounds } from '@/lib/three/prototypeData.mjs'
 import { CAMERA_CONFIG, HUB_THIRD_PERSON_CAMERA_CONFIG, getYawForward } from '@/lib/three/cameraConfig.mjs'
 import { PLAYER_START } from '@/lib/three/modelConfig.mjs'
-import { SCENE_IDS, addCompletedSound, createReleasedInputState, resolveMusicInteraction, resolveSceneTransition, shouldLoadRemoteProgress } from '@/lib/three/sceneFlow.mjs'
+import { SCENE_IDS, addCompletedSound, createMockCompletedIds, createReleasedInputState, getVillageAccessState, hasCompletedRequiredSounds, resolveMusicInteraction, resolveSceneTransition, shouldLoadRemoteProgress } from '@/lib/three/sceneFlow.mjs'
 import { getHubReturnPose, getHubVillage, getPrototypeScene, HUB_PLAYER_START, resolveHubInteraction } from '@/lib/three/worldConfig.mjs'
 import CameraDebugHUD from './CameraDebugHUD'
 import MobileControls3D from './MobileControls3D'
@@ -31,13 +31,14 @@ function supportsWebGL() {
 }
 
 function readRuntimeOptions() {
-  if (typeof window === 'undefined') return { webglReady: null, debug: false, debugCamera: false, mock: false, models: false, forceFailure: false, scene: 'music', initialVillage: null }
+  if (typeof window === 'undefined') return { webglReady: null, debug: false, debugCamera: false, mock: false, mockCompleted: null, models: false, forceFailure: false, scene: 'music', initialVillage: null }
   const params = new URLSearchParams(window.location.search)
   return {
     webglReady: !params.has('noWebGL') && supportsWebGL(),
     debug: params.has('debug'),
     debugCamera: params.has('debugCamera'),
     mock: params.has('mock'),
+    mockCompleted: params.has('mock') && params.has('mockCompleted') ? params.get('mockCompleted') : null,
     models: params.has('models'),
     forceFailure: params.has('forceModelFailure'),
     scene: getPrototypeScene(params),
@@ -68,6 +69,7 @@ export default function SoundVillage3D() {
   const [activeVillage, setActiveVillage] = useState(null)
   const [activeSound, setActiveSound] = useState(null)
   const [exitOverlayOpen, setExitOverlayOpen] = useState(false)
+  const [unlockNotice, setUnlockNotice] = useState(false)
   const [sceneId, setSceneId] = useState(runtimeOptions.scene)
   const [sceneRevision, setSceneRevision] = useState(0)
   const [transitioning, setTransitioning] = useState(false)
@@ -89,6 +91,12 @@ export default function SoundVillage3D() {
     return () => media.removeEventListener?.('change', update)
   }, [])
 
+  useEffect(() => {
+    if (!unlockNotice) return undefined
+    const timer = window.setTimeout(() => setUnlockNotice(false), 3600)
+    return () => window.clearTimeout(timer)
+  }, [unlockNotice])
+
   const begin = useCallback(async (nextParticipantId, nextGroupId) => {
     setLoading(true)
     setLoadError('')
@@ -99,7 +107,9 @@ export default function SoundVillage3D() {
       const sounds = selectMusicBlockOneSounds(soundMetadata.sounds, effectiveGroup, bypassGroup)
       const nextPlacements = createSoundPlacements(sounds)
       const databaseIds = shouldLoadRemoteProgress(mockMode) ? await getAnnotatedByParticipantZone(nextParticipantId, 'Music') : []
-      const nextCompletedIds = normalizeCompletedIds(databaseIds, sounds)
+      const nextCompletedIds = mockMode && runtimeOptions.mockCompleted !== null
+        ? createMockCompletedIds(sounds.map(sound => sound.sound_id), runtimeOptions.mockCompleted)
+        : normalizeCompletedIds(databaseIds, sounds)
       setParticipantId(nextParticipantId)
       setGroupId(effectiveGroup)
       setPlacements(nextPlacements)
@@ -109,6 +119,7 @@ export default function SoundVillage3D() {
       setActiveVillage(runtimeOptions.scene === SCENE_IDS.HUB ? runtimeOptions.initialVillage : null)
       setActiveSound(null)
       setExitOverlayOpen(false)
+      setUnlockNotice(false)
       setSceneId(runtimeOptions.scene)
       setEnteredMusicFromHub(false)
       setHubPose({ position: [...HUB_PLAYER_START], yaw: 0 })
@@ -120,7 +131,7 @@ export default function SoundVillage3D() {
     } finally {
       setLoading(false)
     }
-  }, [mockMode, runtimeOptions.initialVillage, runtimeOptions.scene])
+  }, [mockMode, runtimeOptions.initialVillage, runtimeOptions.mockCompleted, runtimeOptions.scene])
 
   const transitionScene = useCallback((targetScene) => {
     const result = resolveSceneTransition({
@@ -194,12 +205,21 @@ export default function SoundVillage3D() {
 
   const handleComplete = useCallback(() => {
     const soundId = activeSound?.sound_id
-    if (soundId) setCompletedIds(previous => addCompletedSound(previous, soundId, true))
+    if (soundId) {
+      const requiredIds = placements.map(placement => placement.id)
+      const nextCompletedIds = addCompletedSound(completedIds, soundId, true)
+      if (!hasCompletedRequiredSounds(requiredIds, completedIds) && hasCompletedRequiredSounds(requiredIds, nextCompletedIds)) {
+        setUnlockNotice(true)
+      }
+      setCompletedIds(nextCompletedIds)
+    }
     setActiveSound(null)
-  }, [activeSound])
+  }, [activeSound, completedIds, placements])
 
   const completed = completedIds.size
   const total = placements.length
+  const requiredMusicIds = placements.map(placement => placement.id)
+  const villagesUnlocked = isStudyAccessParticipantId(participantId) || hasCompletedRequiredSounds(requiredMusicIds, completedIds)
   const playerStart = hubMode ? hubPose.position : PLAYER_START
   const hubForward = getYawForward(hubPose.yaw)
   const initialCamera = hubMode
@@ -220,7 +240,7 @@ export default function SoundVillage3D() {
   if (!started) return <><StartPanel onStart={begin} />{loading && <div className={styles.startLoading}>진행 상태를 불러오는 중…</div>}{loadError && <div className={styles.startError}>{loadError}</div>}</>
 
   return (
-    <main className={styles.root} data-testid="three-prototype" data-scene={sceneId} data-transitioning={String(transitioning)}>
+    <main className={styles.root} data-testid="three-prototype" data-scene={sceneId} data-transitioning={String(transitioning)} data-villages-unlocked={String(villagesUnlocked)}>
       <CanvasBoundary>
         <Canvas
           key={`${sceneId}-${sceneRevision}`}
@@ -239,6 +259,7 @@ export default function SoundVillage3D() {
               debugCamera={debugCamera}
               startPosition={hubPose.position}
               initialYaw={hubPose.yaw}
+              villagesUnlocked={villagesUnlocked}
             />
           ) : (
             <VillageScene
@@ -268,6 +289,7 @@ export default function SoundVillage3D() {
         nearbyHubTarget={nearbyHubTarget}
         sceneMode={sceneId}
         enteredMusicFromHub={enteredMusicFromHub}
+        villagesUnlocked={villagesUnlocked}
         mockMode={mockMode}
         debugColliders={debugColliders}
         onToggleDebug={() => setDebugColliders(value => !value)}
@@ -277,7 +299,9 @@ export default function SoundVillage3D() {
         movementDisabled={Boolean(activeSound || activeVillage || exitOverlayOpen || transitioning)}
         interactionDisabled={Boolean(activeSound || activeVillage || exitOverlayOpen || transitioning || (hubMode ? !nearbyHubTarget : !nearbySound))}
         onInteract={interact}
-        interactionLabel={hubMode && nearbyHubTarget?.kind === 'village-exit' ? '마을 들어가기' : hubMode ? '랜드마크 보기' : nearbySound?.kind === 'music-exit' ? '광장으로 돌아가기' : '소리 듣기'}
+        interactionLabel={hubMode && nearbyHubTarget?.kind === 'village-exit'
+          ? getVillageAccessState(nearbyHubTarget.villageId, villagesUnlocked).mode === 'locked' ? '잠금 확인' : '마을 들어가기'
+          : hubMode ? '랜드마크 보기' : nearbySound?.kind === 'music-exit' ? '광장으로 돌아가기' : '소리 듣기'}
       />
       {debugCamera && <CameraDebugHUD mode={hubMode ? 'hub-third-person' : 'music-third-person'} />}
 
@@ -292,8 +316,9 @@ export default function SoundVillage3D() {
           onComplete={handleComplete}
         />
       )}
-      {hubMode && activeVillage && <VillageEntryOverlay village={activeVillage} completed={completed} total={total} onEnter={enterMusic} onClose={() => setActiveVillage(null)} />}
+      {hubMode && activeVillage && <VillageEntryOverlay village={activeVillage} completed={completed} total={total} villagesUnlocked={villagesUnlocked} onEnter={enterMusic} onClose={() => setActiveVillage(null)} />}
       {!hubMode && exitOverlayOpen && <MusicExitOverlay onConfirm={returnToHub} onClose={() => setExitOverlayOpen(false)} />}
+      {unlockNotice && <div className={styles.unlockNotice} role="status">🔓 Music 15개 완료! 나머지 다섯 마을이 모두 열렸습니다.</div>}
       {transitioning && <div className={styles.sceneTransition}>마을 길을 이동하고 있어요…</div>}
     </main>
   )

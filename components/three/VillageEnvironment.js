@@ -1,6 +1,6 @@
 'use client'
 
-import { DECORATION_POSITIONS, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
+import { DECORATION_POSITIONS, MUSIC_ENVIRONMENT_CONFIG, WORLD_COLLIDERS } from '@/lib/three/modelConfig.mjs'
 import ModelAsset from './ModelAsset'
 import MusicVillageExit from './MusicVillageExit'
 
@@ -12,22 +12,22 @@ export default function VillageEnvironment({ loadModels, debugColliders, showHub
   return (
     <group>
       <mesh receiveShadow position={[0, -0.55, 0]} scale={[1, 0.72, 1]}>
-        <cylinderGeometry args={[13.2, 12.7, 1.1, 48]} />
+        <cylinderGeometry args={[MUSIC_ENVIRONMENT_CONFIG.groundTopRadius, MUSIC_ENVIRONMENT_CONFIG.groundBottomRadius, 1.1, 48]} />
         <meshStandardMaterial color="#87B969" roughness={1} />
       </mesh>
       <mesh receiveShadow position={[0, 0.016, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <planeGeometry args={[3.2, 15.5]} />
+        <planeGeometry args={[MUSIC_ENVIRONMENT_CONFIG.northSouthPath.width, MUSIC_ENVIRONMENT_CONFIG.northSouthPath.length]} />
         <meshStandardMaterial color="#E8D2A8" roughness={1} />
       </mesh>
-      <mesh receiveShadow position={[0, 0.025, 4.9]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
-        <planeGeometry args={[2.4, 18.5]} />
+      <mesh receiveShadow position={[MUSIC_ENVIRONMENT_CONFIG.eastWestPath.position[0], 0.025, MUSIC_ENVIRONMENT_CONFIG.eastWestPath.position[1]]} rotation={[-Math.PI / 2, 0, Math.PI / 2]}>
+        <planeGeometry args={[MUSIC_ENVIRONMENT_CONFIG.eastWestPath.width, MUSIC_ENVIRONMENT_CONFIG.eastWestPath.length]} />
         <meshStandardMaterial color="#E8D2A8" roughness={1} />
       </mesh>
 
-      <AssetAt assetKey="musicVillageHouse" position={[-5.2, -2.7]} loadModel={loadModels} />
-      <AssetAt assetKey="soundMuseum" position={[5.2, -2.7]} loadModel={loadModels} />
+      <AssetAt assetKey="musicVillageHouse" position={MUSIC_ENVIRONMENT_CONFIG.housePosition} loadModel={loadModels} />
+      <AssetAt assetKey="soundMuseum" position={MUSIC_ENVIRONMENT_CONFIG.museumPosition} loadModel={loadModels} />
       {showHubExit && <MusicVillageExit nearby={exitNearby} />}
-      <group position={[2.9, 0, 1.9]} rotation={[0, -0.28, 0]}>
+      <group position={[MUSIC_ENVIRONMENT_CONFIG.signPosition[0], 0, MUSIC_ENVIRONMENT_CONFIG.signPosition[1]]} rotation={[0, -0.28, 0]}>
         <mesh castShadow position={[0, 0.75, 0]}><cylinderGeometry args={[0.07, 0.1, 1.5, 8]} /><meshStandardMaterial color="#7A543C" /></mesh>
         <mesh castShadow position={[0, 1.35, 0]}><boxGeometry args={[1.45, 0.58, 0.13]} /><meshStandardMaterial color="#C18A5C" /></mesh>
         <mesh position={[0.44, 1.36, 0.08]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.13, 0.035, 8, 18]} /><meshStandardMaterial color="#FFF1A8" emissive="#FFF1A8" emissiveIntensity={0.25} /></mesh>
@@ -45,8 +45,8 @@ export default function VillageEnvironment({ loadModels, debugColliders, showHub
       {DECORATION_POSITIONS.lamps.map((position, index) => (
         <AssetAt key={`lamp-${index}`} assetKey="lampPost" position={position} loadModel={loadModels} />
       ))}
-      {[-6.5, -4.3, -2.1, 2.1, 4.3, 6.5].map((x, index) => (
-        <AssetAt key={`fence-${index}`} assetKey="woodenFence" position={[x, -7.1]} loadModel={loadModels} />
+      {DECORATION_POSITIONS.fences.map((position, index) => (
+        <AssetAt key={`fence-${index}`} assetKey="woodenFence" position={position} loadModel={loadModels} />
       ))}
 
       {debugColliders && WORLD_COLLIDERS.map(collider => (

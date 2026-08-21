@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
+import { SOUND_ORB_VISUAL_SCALE } from '@/lib/three/modelConfig.mjs'
 import ModelAsset from './ModelAsset'
 
 export default function InteractableSound({ placement, completed, nearby, reducedMotion, loadModel }) {
@@ -18,7 +19,7 @@ export default function InteractableSound({ placement, completed, nearby, reduce
 
   return (
     <group ref={groupRef} position={placement.position}>
-      <group scale={completed ? 0.78 : nearby ? 1.18 : 1}>
+      <group scale={completed ? SOUND_ORB_VISUAL_SCALE.completed : nearby ? SOUND_ORB_VISUAL_SCALE.nearby : SOUND_ORB_VISUAL_SCALE.default}>
         <ModelAsset assetKey="soundOrb" loadModel={loadModel} />
       </group>
       <pointLight color={completed ? '#E6C87A' : '#B897EE'} intensity={nearby ? 1.7 : 0.75} distance={3.2} />
@@ -31,4 +32,3 @@ export default function InteractableSound({ placement, completed, nearby, reduce
     </group>
   )
 }
-

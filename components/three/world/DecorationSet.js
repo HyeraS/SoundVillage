@@ -78,12 +78,16 @@ function Pot({ position, index }) {
   </group>
 }
 
-function ExitMarker({ exit }) {
+function ExitMarker({ exit, locked }) {
   return <group name={`exit-${exit.id}`} position={exit.position} rotation={[0, exit.rotationY, 0]}>
     <mesh castShadow position={[-0.9, 1.05, 0]}><cylinderGeometry args={[0.11, 0.15, 2.1, 8]} /><meshStandardMaterial color={HUB_THEME.woodDark} /></mesh>
     <mesh castShadow position={[0.9, 1.05, 0]}><cylinderGeometry args={[0.11, 0.15, 2.1, 8]} /><meshStandardMaterial color={HUB_THEME.woodDark} /></mesh>
-    <mesh castShadow position={[0, 2.05, 0]}><boxGeometry args={[2.05, 0.52, 0.2]} /><meshStandardMaterial color={exit.color} roughness={0.78} /></mesh>
+    <mesh castShadow position={[0, 2.05, 0]}><boxGeometry args={[2.05, 0.52, 0.2]} /><meshStandardMaterial color={locked ? '#8D8A82' : exit.color} roughness={0.78} /></mesh>
     <mesh position={[0, 2.05, 0.13]} rotation={[Math.PI / 2, 0, 0]}><torusGeometry args={[0.15, 0.045, 7, 18]} /><meshStandardMaterial color={HUB_THEME.goldLight} /></mesh>
+    {locked && <group position={[0, 2.65, 0]}>
+      <mesh position={[0, 0.1, 0]}><torusGeometry args={[0.18, 0.06, 7, 14, Math.PI]} /><meshStandardMaterial color="#5D5A55" /></mesh>
+      <mesh position={[0, -0.13, 0]}><boxGeometry args={[0.48, 0.34, 0.18]} /><meshStandardMaterial color="#6E6A63" /></mesh>
+    </group>}
   </group>
 }
 
@@ -101,7 +105,7 @@ function DirectionSign() {
   </group>
 }
 
-export default function DecorationSet() {
+export default function DecorationSet({ villagesUnlocked = false }) {
   return (
     <group>
       <Trees />
@@ -111,7 +115,7 @@ export default function DecorationSet() {
       {HUB_DECORATIONS.benches.map((item, index) => <Bench key={`bench-${index}`} item={item} />)}
       {HUB_DECORATIONS.lamps.map((position, index) => <Lamp key={`lamp-${index}`} position={position} />)}
       {HUB_DECORATIONS.pots.map((position, index) => <Pot key={`pot-${index}`} position={position} index={index} />)}
-      {HUB_EXITS.map(exit => <ExitMarker key={exit.id} exit={exit} />)}
+      {HUB_EXITS.map(exit => <ExitMarker key={exit.id} exit={exit} locked={exit.id !== 'music' && !villagesUnlocked} />)}
       <DirectionSign />
     </group>
   )
