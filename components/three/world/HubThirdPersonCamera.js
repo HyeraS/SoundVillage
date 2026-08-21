@@ -16,7 +16,7 @@ import {
   updateStableFacingCandidate,
 } from '@/lib/three/cameraConfig.mjs'
 
-export default function HubThirdPersonCamera({ playerRef, yawRef, facingYawRef, movingRef, reducedMotion, paused, debugCamera }) {
+export default function HubThirdPersonCamera({ playerRef, yawRef, facingYawRef, movingRef, reducedMotion, paused, debugCamera, debugLabel = 'hub-third-person' }) {
   const { camera, gl, size } = useThree()
   const cameraRef = useRef(camera)
   const initializedRef = useRef(false)
@@ -177,7 +177,7 @@ export default function HubThirdPersonCamera({ playerRef, yawRef, facingYawRef, 
       if (root) {
         root.dataset.cameraPosition = `${activeCamera.position.x.toFixed(2)}, ${activeCamera.position.y.toFixed(2)}, ${activeCamera.position.z.toFixed(2)}`
         root.dataset.cameraTarget = `${lookAt.x.toFixed(2)}, ${lookAt.y.toFixed(2)}, ${lookAt.z.toFixed(2)}`
-        root.dataset.cameraLayout = `hub-third-person · ${responsive.layout} · FOV ${responsive.fov}°`
+        root.dataset.cameraLayout = `${debugLabel} · ${responsive.layout} · FOV ${responsive.fov}°`
         root.dataset.cameraPaused = String(paused)
         root.dataset.cameraYaw = yaw.toFixed(4)
         root.dataset.cameraAutoFollow = String(autoFollowing)

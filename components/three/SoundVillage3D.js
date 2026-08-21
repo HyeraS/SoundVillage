@@ -279,7 +279,7 @@ export default function SoundVillage3D() {
         onInteract={interact}
         interactionLabel={hubMode && nearbyHubTarget?.kind === 'village-exit' ? '마을 들어가기' : hubMode ? '랜드마크 보기' : nearbySound?.kind === 'music-exit' ? '광장으로 돌아가기' : '소리 듣기'}
       />
-      {debugCamera && <CameraDebugHUD mode={hubMode ? 'hub-third-person' : 'follow'} />}
+      {debugCamera && <CameraDebugHUD mode={hubMode ? 'hub-third-person' : 'music-third-person'} />}
 
       {!hubMode && activeSound && (
         <AnnotationPanel

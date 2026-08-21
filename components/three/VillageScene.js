@@ -4,13 +4,16 @@ import { useRef } from 'react'
 import { Color } from 'three'
 import { MUSIC_EXIT_TARGET } from '@/lib/three/modelConfig.mjs'
 import { createMusicInteractionTargets } from '@/lib/three/sceneFlow.mjs'
-import FollowCamera from './FollowCamera'
 import InteractableSound from './InteractableSound'
 import Player3D from './Player3D'
 import VillageEnvironment from './VillageEnvironment'
+import HubThirdPersonCamera from './world/HubThirdPersonCamera'
 
 export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure, showHubExit = false }) {
   const playerRef = useRef(null)
+  const yawRef = useRef(0)
+  const facingYawRef = useRef(0)
+  const movingRef = useRef(false)
   const interactionTargets = createMusicInteractionTargets(placements, MUSIC_EXIT_TARGET, showHubExit)
 
   return (
@@ -52,8 +55,21 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         reducedMotion={reducedMotion}
         loadModel={loadModels}
         debug={debugColliders || debugCamera}
+        movementPositionOffset={[0, 0, 1]}
+        movementYawRef={yawRef}
+        facingYawRef={facingYawRef}
+        movingRef={movingRef}
       />
-      <FollowCamera playerRef={playerRef} reducedMotion={reducedMotion} paused={paused} debugCamera={debugCamera} />
+      <HubThirdPersonCamera
+        playerRef={playerRef}
+        yawRef={yawRef}
+        facingYawRef={facingYawRef}
+        movingRef={movingRef}
+        reducedMotion={reducedMotion}
+        paused={paused}
+        debugCamera={debugCamera}
+        debugLabel="music-third-person"
+      />
     </>
   )
 }
