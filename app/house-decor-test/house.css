@@ -1,0 +1,6 @@
+/* ─────────────────────────────────────────────
+   집꾸미기 전용 스타일시트 — /house-decor-test 세그먼트에서만 로드된다.
+   Tailwind의 preflight 리셋이 나머지 화면(WorldMap, ZoneMap 등)에
+   번지지 않도록 root layout의 globals.css에는 절대 import하지 않는다.
+───────────────────────────────────────────── */
+@import 'tailwindcss';
