@@ -212,6 +212,10 @@ export const WORLD_BUILDINGS = {
   Lab:    { ...TOWN_BUILDINGS_SHEET,    x: 2, y: 849, w: 93,  h: 90  },
   Nature: { ...FISHING_BUILDINGS_SHEET, x: 2, y: 3,   w: 76,  h: 62  },
   Museum: { ...TOWN_BUILDINGS_SHEET,    x: 8, y: 650, w: 145, h: 100 },
+  // 우리 집(집꾸미기 입구) — "100 Nature Things"류 마을 장식용으로 받아뒀지만 코드에서
+  // 한 번도 안 쓰인 크림색 코티지(public/assets/world/nature_village/house_cream.png,
+  // 58×72). 독립 이미지라 시트 크기를 자기 자신으로 잡는다.
+  Home: { src: '/assets/world/nature_village/house_cream.png', sheetW: 58, sheetH: 72, x: 0, y: 0, w: 58, h: 72 },
 }
 
 /* ─────────────────────────────────────────────

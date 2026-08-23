@@ -72,6 +72,25 @@ const PORTALS = [
 const portalByZone = Object.fromEntries(PORTALS.map(p => [p.zone, p]))
 
 /* ─────────────────────────────────────────────
+   우리 집(집꾸미기 입구) — 6개 마을 포털과 달리 진짜 마을이 아니라 허브 바로 옆
+   작은 사유지라, 포털 간격(반경 26~36)보다 훨씬 가까운 반경 18에 둔다.
+   각도는 Animal(60°)과 Urban(0°) 사이 72° 폭의 빈 쐐기 정중앙(-28.69°) — 6개 포털이
+   0/60/120/180/240/300°를 다 차지해서 남는 방향이 없어, 새로 스포크를 하나 그어도
+   기존 스포크/링 도로와 안 겹치는 유일한 폭 넓은 틈이다(좌표는 오프라인 스크립트로
+   PATH_SET/PORTAL_SET/MUSEUM_SET/WATER_SET과 겹치지 않음을 확인).
+───────────────────────────────────────────── */
+const HOME_ANGLE_DEG = -28.69
+const HOME_RADIUS = 18
+const HOME_SIZE = 9
+const HOME = (() => {
+  const rad = HOME_ANGLE_DEG * Math.PI / 180
+  const cx = Math.round(MUSEUM_CENTER.x + HOME_RADIUS * Math.cos(rad))
+  const cy = Math.round(MUSEUM_CENTER.y + HOME_RADIUS * Math.sin(rad))
+  return { tx: cx - Math.floor(HOME_SIZE/2), ty: cy - Math.floor(HOME_SIZE/2), w: HOME_SIZE, h: HOME_SIZE }
+})()
+const HOME_CENTER = { x: HOME.tx + HOME.w/2, y: HOME.ty + HOME.h/2 }
+
+/* ─────────────────────────────────────────────
    경로 타일 — Museum 중심에서 각 포털까지 잇는다.
    폭은 고정 SPOKE_W 타일이라 맵이 넓어져도 광장/길이 화면을 뒤덮지 않고, 길이만 늘어난다.
    직각 L자 하나 대신 수평-수직-수평 3구간으로 살짝 꺾어서, 사진 속 코지 게임처럼
@@ -123,6 +142,13 @@ const RAW_PATH_TILES = [
     SPOKE_W, SPOKE_BENDS[p.zone],
   )),
   ...RING_TILES,
+  // 우리 집으로 가는 오솔길 — 마을 스포크(SPOKE_W=6)보다 좁게(4) 그려서 "작은 사유지
+  // 길"과 "마을 대로"가 시각적으로 구분되게 한다.
+  ...spoke(
+    Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
+    Math.round(HOME_CENTER.x),   Math.round(HOME_CENTER.y),
+    4, 0.5,
+  ),
 ]
 // 광장/바퀴살/링 통로가 포털 근처에서 서로 겹치는 타일이 나올 수 있어 좌표 기준으로
 // 한 번만 남긴다 — 안 그러면 오토타일·글로우 효과가 같은 자리에 중복으로 그려진다.
@@ -166,17 +192,22 @@ const MUSEUM_SET = new Set(
     Array.from({length: MUSEUM.h}, (_,dy) => `${MUSEUM.tx+dx},${MUSEUM.ty+dy}`)
   ).flat()
 )
+const HOME_SET = new Set(
+  Array.from({length: HOME.w}, (_,dx) =>
+    Array.from({length: HOME.h}, (_,dy) => `${HOME.tx+dx},${HOME.ty+dy}`)
+  ).flat()
+)
 
 // 길/물/포털/박물관과 안 겹치는 타일인지 — 모든 장식물 배치가 공통으로 쓰는 필터
 function isFree(tx, ty) {
   const k = `${tx},${ty}`
-  return !PATH_SET.has(k) && !WATER_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k)
+  return !PATH_SET.has(k) && !WATER_SET.has(k) && !PORTAL_SET.has(k) && !MUSEUM_SET.has(k) && !HOME_SET.has(k)
 }
 
-// 캐릭터 이동 가능 타일 — 길 + 포털/박물관 부지(건물 진입 지점까지는 자연스럽게 걸어
-// 들어갈 수 있어야 함). 잔디(나무·꽃 등 장식이 있는 isFree 타일)와 물은 제외해서,
+// 캐릭터 이동 가능 타일 — 길 + 포털/박물관/우리 집 부지(건물 진입 지점까지는 자연스럽게
+// 걸어 들어갈 수 있어야 함). 잔디(나무·꽃 등 장식이 있는 isFree 타일)와 물은 제외해서,
 // 방향키로 아무 데나(잔디 위) 못 가고 길로만 다니게 한다.
-const WALKABLE_SET = new Set([...PATH_SET, ...PORTAL_SET, ...MUSEUM_SET])
+const WALKABLE_SET = new Set([...PATH_SET, ...PORTAL_SET, ...MUSEUM_SET, ...HOME_SET])
 
 // 발밑 충돌 판정 — 캐릭터 스프라이트 전체(머리·몸통 포함)가 아니라 발끝 부분의 작은
 // 박스만 검사한다. 그래야 스프라이트가 시각적으로 길 가장자리에 살짝 걸쳐 보여도
@@ -977,6 +1008,53 @@ function MuseumIsland({ hovered }) {
 }
 
 /* ─────────────────────────────────────────────
+   우리 집 (집꾸미기 입구) — Museum보다 훨씬 작은 사유지라 기둥/현판 같은 장식 없이
+   건물 스프라이트 하나 + 라벨만 둔다. locked는 없음(잠금 로직과 무관).
+───────────────────────────────────────────── */
+function HomeIsland({ hovered }) {
+  const px = HOME.tx * TILE, py = HOME.ty * TILE
+  const pw = HOME.w  * TILE, ph = HOME.h  * TILE
+  const cx = px + pw / 2
+  const useRealBuilding = ASSET_READY.world && WORLD_BUILDINGS.Home
+
+  return (
+    <g>
+      <rect x={px+pw*0.12} y={py+ph*0.2} width={pw*0.76} height={ph*0.7} rx="10"
+        fill="none"
+        stroke={hovered ? '#91CDB2' : 'transparent'}
+        strokeWidth={hovered ? 2.5 : 0}
+        style={{ filter: hovered ? 'drop-shadow(0 0 12px #91CDB299)' : 'none', transition:'all 0.25s' }}
+      />
+      {useRealBuilding ? (
+        <BuildingSprite zone="Home" px={px} py={py} pw={pw} ph={ph}/>
+      ) : (
+        <text x={cx} y={py+ph*0.62} textAnchor="middle" fontSize={ph*0.5} style={{userSelect:'none'}}>🏠</text>
+      )}
+      <rect x={cx-42} y={py-24} width={84} height={20} rx="7"
+        fill={hovered ? '#91CDB2' : '#000000bb'}
+        stroke="#91CDB2" strokeWidth="1.5"
+        style={{ transition:'all 0.2s' }}
+      />
+      <text x={cx} y={py-11} textAnchor="middle" fontSize="9" fontWeight="700"
+        fontFamily="Nunito, sans-serif"
+        fill={hovered ? '#fff' : '#91CDB2'}
+        style={{ userSelect:'none', transition:'fill 0.2s' }}>
+        🏠 우리 집
+      </text>
+      {hovered && (
+        <g>
+          <rect x={cx-32} y={py+ph+6} width={64} height={17} rx="5" fill="#000000cc"/>
+          <text x={cx} y={py+ph+17} textAnchor="middle" fontSize="9"
+            fontFamily="Nunito, sans-serif" fill="#F0EDE8" style={{userSelect:'none'}}>
+            ENTER 진입
+          </text>
+        </g>
+      )}
+    </g>
+  )
+}
+
+/* ─────────────────────────────────────────────
    캐릭터
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
@@ -1208,8 +1286,9 @@ function HUD({ totalCount, zoneProgress, balance = 0, onOpenQuests, onOpenAttend
 /* ─────────────────────────────────────────────
    목표 패널
 ───────────────────────────────────────────── */
-function ObjectivePanel({ nearZone, nearMuseum, nearZoneLocked }) {
+function ObjectivePanel({ nearZone, nearMuseum, nearHome, nearZoneLocked }) {
   const isNearMuseum = !nearZone && nearMuseum
+  const isNearHome = !nearZone && !nearMuseum && nearHome
   return (
     <div style={{
       position:'absolute', bottom:'16px', right:'16px', width:'200px',
@@ -1219,17 +1298,18 @@ function ObjectivePanel({ nearZone, nearMuseum, nearZoneLocked }) {
       boxShadow:'0 4px 16px #00000044', zIndex:10,
     }}>
       <div style={{ display:'flex', alignItems:'center', gap:'6px', marginBottom:'8px' }}>
-        <span style={{ fontSize:'14px' }}>{isNearMuseum ? '🏛' : nearZoneLocked ? '🔒' : '🚩'}</span>
+        <span style={{ fontSize:'14px' }}>{isNearMuseum ? '🏛' : isNearHome ? '🏠' : nearZoneLocked ? '🔒' : '🚩'}</span>
         <span style={{ fontSize:'11px', fontWeight:800, color:'#3A2A14' }}>현재 목표</span>
       </div>
       <div style={{ fontSize:'12px', fontWeight:700, color:'#3A2A14', marginBottom:'4px' }}>
         {nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label} ${nearZoneLocked ? '(잠김)' : '진입'}`
           : isNearMuseum ? '🏛 도서관 진입'
+          : isNearHome ? '🏠 우리 집 진입'
           : '마을 탐험하기'}
       </div>
       <div style={{ fontSize:'11px', color:'#8B6A3A', lineHeight:1.5, marginBottom:'6px' }}>
         {nearZoneLocked ? '🎵 음악 마을 구역 1을 먼저 전사하세요'
-          : nearZone || isNearMuseum ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
+          : nearZone || isNearMuseum || isNearHome ? 'ENTER를 눌러 진입하세요' : '방향키로 이동해 Zone을 찾아보세요'}
       </div>
       <div style={{ height:'1px', background:'#D4C4A0', margin:'4px 0' }}/>
       <div style={{ fontSize:'10px', color:'#8B6A3A' }}>💡 WASD / 방향키 이동</div>
@@ -1506,7 +1586,7 @@ function AttendancePanel({ participantId, onClose }) {
 /* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
-export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', lockedZones = [] }) {
   const { keys, press, release } = useKeys()
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
 
@@ -1515,6 +1595,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
   const [moving,     setMoving]     = useState(false)
   const [nearZone,   setNearZone]   = useState(null)
   const [nearMuseum, setNearMuseum] = useState(false)
+  const [nearHome,   setNearHome]   = useState(false)
   const [questOpen,  setQuestOpen]  = useState(false)
   const [attendanceOpen, setAttendanceOpen] = useState(false)
   const posRef = useRef(pos)
@@ -1547,6 +1628,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
       const near = PORTALS.find(p => overlaps(x, y, CHAR_W, CHAR_H, p.tx*TILE-20, p.ty*TILE-10, p.w*TILE+40, p.h*TILE+30))
       setNearZone(near?.zone ?? null)
       setNearMuseum(overlaps(x, y, CHAR_W, CHAR_H, MUSEUM.tx*TILE-20, MUSEUM.ty*TILE-10, MUSEUM.w*TILE+40, MUSEUM.h*TILE+30))
+      setNearHome(overlaps(x, y, CHAR_W, CHAR_H, HOME.tx*TILE-20, HOME.ty*TILE-10, HOME.w*TILE+40, HOME.h*TILE+30))
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
@@ -1559,11 +1641,12 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
       if (e.key === 'Enter' || e.key === ' ') {
         if (nearZone && !lockedSet.has(nearZone)) onEnterZone(nearZone)
         else if (nearMuseum && onEnterMuseum) onEnterMuseum()
+        else if (nearHome && onEnterHouse) onEnterHouse()
       }
     }
     window.addEventListener('keydown', h)
     return () => window.removeEventListener('keydown', h)
-  }, [nearZone, nearMuseum, onEnterZone, onEnterMuseum, lockedSet])
+  }, [nearZone, nearMuseum, nearHome, onEnterZone, onEnterMuseum, onEnterHouse, lockedSet])
 
   const camX = Math.max(0, Math.min(PX_W - VIEW_W, pos.x + CHAR_W/2 - VIEW_W/2))
   const camY = Math.max(0, Math.min(PX_H - VIEW_H, pos.y + CHAR_H/2 - VIEW_H/2))
@@ -1676,6 +1759,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
           ))}
 
           <MuseumIsland hovered={nearMuseum}/>
+          <HomeIsland hovered={nearHome}/>
 
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}>
@@ -1685,7 +1769,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         </svg>
       </div>
 
-      <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum} nearZoneLocked={nearZone && lockedSet.has(nearZone)}/>
+      <ObjectivePanel nearZone={nearZone} nearMuseum={nearMuseum} nearHome={nearHome} nearZoneLocked={nearZone && lockedSet.has(nearZone)}/>
 
       {nearZone && (
         <EnterPrompt
@@ -1700,10 +1784,15 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, totalCount, zoneP
         <EnterPrompt emoji="🏛" label="도서관" color="#C8A96E"/>
       )}
 
+      {!nearZone && !nearMuseum && nearHome && (
+        <EnterPrompt emoji="🏠" label="우리 집" color="#91CDB2"/>
+      )}
+
       <DPad press={press} release={release}
         onConfirm={
           nearZone && !lockedSet.has(nearZone) ? () => onEnterZone(nearZone)
           : !nearZone && nearMuseum && onEnterMuseum ? () => onEnterMuseum()
+          : !nearZone && !nearMuseum && nearHome && onEnterHouse ? () => onEnterHouse()
           : null
         }
       />

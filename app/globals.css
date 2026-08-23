@@ -4,6 +4,13 @@
 ───────────────────────────────────────────── */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+/* 집꾸미기(HouseDecorRoom)가 Tailwind 유틸리티 클래스로 짜여 있어 전역에서 로드해야
+   하지만, preflight(전역 리셋)는 일부러 뺐다 — WorldMap/ZoneMap 등 기존 화면은
+   전부 손으로 짠 인라인 스타일/자체 리셋에 의존하므로, Tailwind의 h1~h6/버튼/보더
+   기본값 리셋이 거기까지 번지면 안 된다. utilities만 있으면 className들은 정상
+   동작하고, 리셋은 우리 자체 리셋(바로 아래 * 룰)만 적용된다. */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
 
 *, *::before, *::after {
   box-sizing: border-box;

@@ -6,6 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
+import HouseDecorRoom  from '@/components/HouseDecorRoom'
 import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
 import { ensureTodayCheckIn } from '@/lib/attendance'
@@ -67,6 +68,7 @@ function getOtherGroupSounds(groupId, bypassAll = false) {
    'zone'     → ZoneMap
    'annotate' → AnnotationPanel 오버레이 (ZoneMap 위)
    'museum'   → SoundMuseum 풀스크린
+   'house'    → HouseDecorRoom 풀스크린 (우리 집 집꾸미기)
 ───────────────────────────────────────────── */
 export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
@@ -377,6 +379,17 @@ export default function HomePage() {
     setScreen('world')
   }, [])
 
+  /* ── WorldMap → 우리 집 (ENTER로 진입) ── */
+  const handleEnterHouse = useCallback(() => {
+    setScreen('house')
+  }, [])
+
+  /* ── 우리 집 → WorldMap (뒤로가기/ESC) — 가구를 샀을 수 있으니 코인 잔액을 새로 읽는다 ── */
+  const handleExitHouse = useCallback(() => {
+    setScreen('world')
+    refreshCounts()
+  }, [refreshCounts])
+
   /* ── AnnotationPanel 닫기 (X, 제출 없이 취소) → ZoneMap 복귀. 제출 안 했으므로 collectedIds에 넣지 않음 ── */
   const handleAnnotateClose = useCallback(() => {
     setActiveSound(null)
@@ -405,6 +418,7 @@ export default function HomePage() {
         <WorldMap
           onEnterZone={handleEnterZone}
           onEnterMuseum={handleEnterMuseum}
+          onEnterHouse={handleEnterHouse}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
           balance={balance}
@@ -503,7 +517,12 @@ export default function HomePage() {
     )
   }
 
-  // 3. Sound Museum (Stage 1 제출 후)
+  // 3. 우리 집 (집꾸미기)
+  if (screen === 'house') {
+    return <HouseDecorRoom participantId={participantId} onExit={handleExitHouse} />
+  }
+
+  // 4. Sound Museum (Stage 1 제출 후)
   if (screen === 'museum' && activeSound) {
     return (
       <>
@@ -522,7 +541,7 @@ export default function HomePage() {
     )
   }
 
-  // 4. Zone 내부 맵 (+ annotation 오버레이)
+  // 5. Zone 내부 맵 (+ annotation 오버레이)
   if (screen === 'zone' || screen === 'annotate') {
     const currentBlock = unlockedBlock[activeZone] || 1
     const zoneSounds   = getGroupSounds(activeZone, effectiveGroupId, bypassGroupFilter)
