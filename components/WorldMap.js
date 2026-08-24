@@ -5,6 +5,7 @@ import { getAttendanceStatus } from '@/lib/attendance'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
 import { TILES, OBJECTS, CHARACTERS, ASSET_READY, WORLD_TILESET, WORLD_BUILDINGS, WORLD_CHARACTER, WORLD_SLIMES, WORLD_NATURE, WORLD_PROPS, LIBRARY_YARD } from '@/components/AssetRegistry'
 import { autotileShape } from '@/lib/autotile'
+import { useDuoSession } from '@/lib/duoSession'
 
 /* ─────────────────────────────────────────────
    맵 크기 — 이전 60×45 레이아웃 대비 사용자 요청으로 2배 확장.
@@ -1586,7 +1587,7 @@ function AttendancePanel({ participantId, onClose }) {
 /* ─────────────────────────────────────────────
    WorldMap 메인
 ───────────────────────────────────────────── */
-export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', lockedZones = [], duoHostId: duoHostIdProp = null }) {
   const { keys, press, release } = useKeys()
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
 
@@ -1600,6 +1601,23 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   const [attendanceOpen, setAttendanceOpen] = useState(false)
   const posRef = useRef(pos)
   const rafRef = useRef(null)
+
+  // 실시간 동행("초대" 기능) — duoHostId prop이 있으면 그걸 최우선으로 쓴다
+  // (4단계: 집 안에서 만난 상대가 월드맵으로 나갔을 때 app/page.js가 URL을
+  // 새로고침하지 않고 그대로 이어서 짝지어줄 때 씀). 없으면 URL의
+  // ?duo=<호스트participantId>를 본다(3단계 초대 링크). 그것도 없으면 자기
+  // 자신을 호스트로 써서 "누군가 들어오길 기다리는" 채널을 연다.
+  const [urlDuoHostId, setUrlDuoHostId] = useState(null)
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    setUrlDuoHostId(q.get('duo')?.trim() || participantId)
+  }, [participantId])
+  const duoHostId = duoHostIdProp || urlDuoHostId
+  const { partnerId, partnerPos, sendPosition } = useDuoSession(duoHostId, participantId)
+  // 접속 끊김 감지(하트비트 타임아웃) 자체는 presence가 처리 — partnerId가
+  // 사라지면 여기서도 자동으로 안 그려진다. 마지막으로 받은 위치가 오래됐는지
+  // 따로 재는 건 5단계(예외 처리)에서 다룬다.
+  const partnerOnMap = Boolean(partnerId && partnerPos && partnerPos.screen === 'worldmap')
 
   useEffect(() => {
     let lastTime = performance.now()
@@ -1629,12 +1647,16 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
       setNearZone(near?.zone ?? null)
       setNearMuseum(overlaps(x, y, CHAR_W, CHAR_H, MUSEUM.tx*TILE-20, MUSEUM.ty*TILE-10, MUSEUM.w*TILE+40, MUSEUM.h*TILE+30))
       setNearHome(overlaps(x, y, CHAR_W, CHAR_H, HOME.tx*TILE-20, HOME.ty*TILE-10, HOME.w*TILE+40, HOME.h*TILE+30))
+      // 움직였을 때만이 아니라 매 프레임 쏜다 — 훅 내부 스로틀(120ms)이 실제
+      // 전송 빈도를 정하고, 가만히 있을 때도 계속 쏴야 상대 쪽에서 "방금까지
+      // 살아있었다"는 최신 좌표가 계속 갱신된다.
+      sendPosition(x, y, newDir, 'worldmap', moved)
       rafRef.current = requestAnimationFrame(loop)
     }
     rafRef.current = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(rafRef.current)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dir])
+  }, [dir, sendPosition])
 
   useEffect(() => {
     const h = e => {
@@ -1760,6 +1782,19 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
 
           <MuseumIsland hovered={nearMuseum}/>
           <HomeIsland hovered={nearHome}/>
+
+          {partnerOnMap && (
+            <foreignObject x={partnerPos.x} y={partnerPos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
+              <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H, position:'relative' }}>
+                <div style={{
+                  position:'absolute', top:-20, left:0, right:0, textAlign:'center',
+                  fontSize:12, fontWeight:700, color:'#fff', fontFamily:"'Gothic A1', sans-serif",
+                  textShadow:'0 0 3px #000, 0 0 3px #000, 0 1px 1px #000',
+                }}>{partnerId}</div>
+                <PixelChar dir={partnerPos.facing || 'down'} moving={partnerPos.moving}/>
+              </div>
+            </foreignObject>
+          )}
 
           <foreignObject x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}>

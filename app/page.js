@@ -6,10 +6,13 @@ import ZoneMap         from '@/components/ZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
-import HouseDecorRoom  from '@/components/HouseDecorRoom'
+import InteriorDecorRoom from '@/components/InteriorDecorRoom'
 import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
 import { ensureTodayCheckIn } from '@/lib/attendance'
+import { getRoom } from '@/lib/interiorDecor'
+import { FRIEND_ROOM } from '@/lib/interiorFixtures'
+import { probeHost } from '@/lib/duoSession'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
@@ -74,6 +77,45 @@ export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
+
+  // 집꾸미기 초대 링크(?house=<호스트>)로 들어온 경우 — app/interior-test/page.js가
+  // 검증용으로 먼저 갖고 있던 로직을 실제 앱(루트 경로)에도 그대로 옮긴 것.
+  // InteriorDecorRoom의 초대 링크가 이제 여기(스왑 후 screen==='house')에서
+  // 만들어지므로, 그 링크를 열었을 때 실제로 응답하는 곳도 여기여야 한다 —
+  // 옮기지 않으면 링크가 그냥 평범한 시작 화면으로 떨어져서 초대 기능이
+  // 통째로 죽는다. 호스트가 지금 정확히 월드맵에 있을 때만 실시간 동행
+  // (?duo=)으로 보낸다 — 호스트가 집 안에 있으면(4단계) 굳이 월드맵으로
+  // 우회시키지 않고 바로 아래 방문 화면으로 들어가는데, InteriorDecorRoom이
+  // 방문 모드에서도 같은 duo 채널에 접속해 있으므로 호스트가 집 안에서
+  // 움직이는 걸 그 자리에서 실시간으로 보게 된다. 호스트가 아예 오프라인이면
+  // 저장된 방을 읽기 전용으로 보여준다(기존과 동일) — 이땐 duo 채널에 아무도
+  // 없으니 그냥 조용히 비어 있을 뿐이다.
+  const [visiting,      setVisiting]      = useState(null) // null | { id, room }
+  const [visitRedirecting, setVisitRedirecting] = useState(false)
+  // 방문 중이던 방(집 안)에서 호스트가 다른 화면(주로 월드맵)으로 나가버리면
+  // 방문객이 방 안에만 혼자 남는 문제가 있었다 — 호스트를 따라 그 화면으로
+  // 같이 옮겨가기 위한 상태. WorldMap이 이 값을 duoHostId prop으로 받아서
+  // URL을 새로고침하지 않고(=재로그인 없이) 바로 그 호스트와 짝지어진다.
+  const [followHostId, setFollowHostId] = useState(null)
+
+  useEffect(() => {
+    const houseId = new URLSearchParams(window.location.search).get('house')?.trim()
+    if (!houseId) return
+    let cancelled = false
+    probeHost(houseId).then(({ screen }) => {
+      if (cancelled) return
+      if (screen === 'worldmap') {
+        setVisitRedirecting(true)
+        window.location.assign(`/?duo=${encodeURIComponent(houseId)}`)
+        return
+      }
+      getRoom(houseId).then(room => {
+        if (cancelled) return
+        setVisiting({ id: houseId, room: room ?? FRIEND_ROOM })
+      })
+    })
+    return () => { cancelled = true }
+  }, [])
 
   const [activeZone,    setActiveZone]    = useState(null)
   const [activeSound,   setActiveSound]   = useState(null)
@@ -179,6 +221,17 @@ export default function HomePage() {
     setScreen('world')
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
+
+  /* ── 집 안에서 방문 중이던 호스트가 다른 화면(주로 월드맵)으로 나갔을 때 —
+     방문객도 그 화면으로 따라간다. URL을 새로고침하지 않으므로 이미 받은
+     참여자ID/그룹을 다시 물어보지 않는다. */
+  const handlePartnerLeftScreen = useCallback(hostScreen => {
+    if (hostScreen !== 'worldmap' || !visiting) return
+    setFollowHostId(visiting.id)
+    window.history.replaceState(null, '', window.location.pathname)
+    setVisiting(null)
+    setScreen('world')
+  }, [visiting])
 
   /* ── sound_id 포맷 무관하게 메타데이터 소리를 찾는 헬퍼 ── */
   const findSoundByDbId = useCallback((dbId, all) => {
@@ -406,6 +459,53 @@ export default function HomePage() {
      렌더
   ───────────────────────────────────────────── */
 
+  // 0. 집꾸미기 초대 링크(?house=)로 들어온 경우 — 방문객도 다른 진입 경로와
+  // 똑같이 참여자ID/그룹을 먼저 선택해야 한다(익명 구경 아님). participantId가
+  // 아직 없으면 평소 StartPanel을 그대로 재사용해서 받고, handleStart가
+  // 끝나면(participantId가 생기면) 그제서야 방으로 들어간다 — 그래야 연구
+  // 참여자 집계·출석 등 다른 진입 경로와 동일하게 처리된다.
+  if (visitRedirecting) {
+    return (
+      <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EDE2C6', fontFamily: "'Gothic A1', sans-serif", background: '#3A2A14' }}>
+        지금 접속해 있어요 — 같이 놀 수 있는 곳으로 이동할게요…
+      </main>
+    )
+  }
+  if (visiting) {
+    if (!participantId) {
+      return <StartPanel onStart={handleStart} />
+    }
+    return (
+      <main style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#6E5844',
+        backgroundImage:
+          'linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px)',
+        backgroundSize: '8px 8px',
+        padding: '24px',
+      }}>
+        <InteriorDecorRoom
+          visitorMode
+          visitorName={visiting.id}
+          visitorParticipantId={participantId}
+          initialRoom={visiting.room}
+          onLeaveVisit={() => {
+            // 이미 참여자ID/그룹을 받았으니(handleStart가 screen도 'world'로
+            // 돌려놨다) 다시 물어보지 않고 그대로 내 월드맵으로 넘어간다 —
+            // ?house= 쿼리는 지워서 새로고침해도 방문 판정이 다시 걸리지 않게.
+            window.history.replaceState(null, '', window.location.pathname)
+            setVisiting(null)
+          }}
+          onPartnerLeftScreen={handlePartnerLeftScreen}
+        />
+      </main>
+    )
+  }
+  // checkedVisit 자체로 화면을 막지는 않는다 — ?house= 없는 압도적 다수의
+  // 정상 진입에서 그 확인 한 번 때문에 시작 화면이 매번 잠깐 깜빡이면 안 되므로,
+  // 판정이 끝나기 전엔 그냥 평소 화면(아래)을 그대로 보여주다가 결과가 나오면
+  // (visiting/visitRedirecting) 그때 위 분기로 바뀐다.
+
   // 1. 시작 화면
   if (screen === 'start') {
     return <StartPanel onStart={handleStart} />
@@ -425,6 +525,7 @@ export default function HomePage() {
           outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
           lockedZones={studyAccessEnabled || villagesUnlocked ? [] : ZONES_LOCKED_AT_START}
           participantId={participantId}
+          duoHostId={followHostId}
         />
         {/* Zone 진입 로딩 */}
         {zoneLoading && (
@@ -519,7 +620,18 @@ export default function HomePage() {
 
   // 3. 우리 집 (집꾸미기)
   if (screen === 'house') {
-    return <HouseDecorRoom participantId={participantId} onExit={handleExitHouse} />
+    return (
+      <main style={{
+        minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#6E5844',
+        backgroundImage:
+          'linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px)',
+        backgroundSize: '8px 8px',
+        padding: '24px',
+      }}>
+        <InteriorDecorRoom participantId={participantId} onExit={handleExitHouse} onCurrencyChange={refreshCounts} />
+      </main>
+    )
   }
 
   // 4. Sound Museum (Stage 1 제출 후)
