@@ -23,3 +23,7 @@ _review/
 
 # Generated audit data is not required by the web runtime.
 /docs/interior_asset_manifest.json
+
+# Local design handoff/source files and currently unused extracted interior sprites.
+/design_handoff_cozy_room/
+/public/assets/
