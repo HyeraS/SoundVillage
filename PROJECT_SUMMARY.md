@@ -5,9 +5,10 @@
 
 `docs/notion/` 아래 2026-06-05 기준 상세 문서 7편이 있으나, 이후 커밋(Sound Museum, 블록 퀘스트, 그룹 A/B, 마을 잠금, 연구용 접근 ID, 실 접속자 장애 대응, WorldMap 비주얼 전면 개편 등)으로 Zone 체계·흐름·비주얼이 크게 바뀌었다. 이 문서는 **현재 코드 기준**으로 다시 정리한 것이다.
 
-**브랜치 상태가 두 갈래로 갈라져 있음 — 중요:**
+**브랜치 상태가 세 갈래로 갈라져 있음 — 중요:**
 - `main`: 실제 실험 참여자들이 접속하는 배포 브랜치. 게임플레이/백엔드 로직(1~11장 내용)은 이 브랜치 기준.
 - `asset-swap`: `main`의 `fabc721`에서 분기, 아직 push/merge 전인 **로컬 전용 WIP 브랜치**. WorldMap·Lab 존을 구매한 itch.io 픽셀 에셋으로 전면 리스킨하는 작업에 더해, 현재는 **동물 마을(Animal) 길 버그 수정**과 **자연 마을(Nature) 존 전면 교체**까지 진행 중이다(12장 참고). 이 두 항목은 아직 커밋되지 않은 워킹 트리 변경사항(`app/page.js`, `components/AssetRegistry.js`, `components/WorldMap.js`, `components/ZoneMap.js`)이다. **`main`에만 있는 커밋 2개(`fb2fb1c`, `79adf70` — 접속 장애 수정, Museum 로딩 인디케이터)가 `asset-swap`에는 없으므로**, 이후 `main`에 merge하거나 `main`을 다시 베이스로 rebase할 때 반드시 반영 확인 필요.
+- `house-decor-2d`: `asset-swap`의 `50ce34a`에서 분기, **별도 git worktree**(`SoundVillage-house-decor-2d/`)에서 작업 중인 브랜치. 3D 리서치 프로토타입(`codex/3d-research-prototype`)과 완전히 분리하기 위해 만들어졌으며, 집꾸미기(Cozy Room)와 실시간 동행("초대") 기능을 담고 있다(13장 참고). **이미 별도 Vercel 프로젝트(`new-soundvillage.vercel.app`, GitHub `HyeraS/new_soundvillage`)의 `main`에 push되어 배포 중** — `main`/`asset-swap`이 배포되는 원래 Vercel 프로젝트(Supabase 프로젝트 ref `nzzesrjneqsbkgtbaoxy`)와는 완전히 다른 배포·다른 Supabase 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)를 쓴다 — 실제 실험 데이터와 물리적으로 분리하기 위한 의도적 선택.
 
 ---
 
@@ -319,3 +320,71 @@ Lab 존 작업 이후, Animal 존의 길(path) 렌더링에서 두 가지 버그
 | 나무/덤불 밀도가 원래 목업보다 훨씬 옅음 | 스캐터 루프의 샘플링 step이 2였는데, Python 설계(16px 타일·32×32 나무=2×2타일) 기준을 32px 타일(나무=1×1타일) JS로 그대로 옮겨 실제 후보 위치의 1/4만 샘플링됨 | step을 2→1로 수정, 나무 개수 68→243그루로 정상화(확률값 자체는 그대로 유지) |
 
 **검증**: 12.4절과 동일한 headless Chrome 스크린샷 방식 + 연구용 접근 ID로 잠금 우회, 자기 검증 콘솔 로그, 기존 소리 수집 게임플레이(아이템 스폰/진행바/블록 언락)가 새 비주얼과 함께 정상 동작하는지 확인. 별도 배치 스키매틱(SVG 좌표 시각화)도 만들어 실제 좌표와 항상 동기화 상태로 유지.
+
+---
+
+## 13. `house-decor-2d` 브랜치 — 집꾸미기(Cozy Room) + 실시간 동행
+
+> 게임플레이 핵심(Zone/블록/어노테이션/투표)은 전혀 건드리지 않음. `asset-swap`(`50ce34a`)에서 분기한 완전히 새로운 기능 두 가지 — ① 참여자별 "우리 집" 인테리어 꾸미기, ② 참여자 둘이서 월드맵/집 안을 실시간으로 함께 돌아다니는 "초대" 기능 — 를 추가한 것. 3D 리서치 프로토타입과 뒤섞이지 않도록 별도 git worktree에서 작업했고, 이미 별도 배포(`new-soundvillage.vercel.app`)까지 완료된 상태.
+
+### 13.1 배경 및 진행 방식
+
+`design_handoff_cozy_room/README.md` + `Cozy Room.dc.html` 고정밀 디자인 목업을 기존 2D 코드베이스 패턴(App Router, 인라인 style, `app/globals.css` 변수, `lib/supabase.js`, `lib/currency.js`)으로 그대로 재구현하는 것이 출발점이었다. README가 제시한 6단계(① 카탈로그/에셋 ② 스테이지 렌더 ③ 편집 모드 ④ 보관함 패널 ⑤ 상점/구매/보상 ⑥ 방 저장·불러오기 + 친구 방문)를 하나씩 구현하고 매 단계 Playwright 헤드리스 브라우저로 실제 클릭·이동까지 확인받은 뒤 다음 단계로 넘어가는 방식으로 진행했다. 6단계 완료 후 사용자의 실제 요구사항(친구와 "같이 게임하는" 실시간 동행)이 README 범위보다 넓다는 게 드러나 별도 5단계 계획을 다시 세워 구현했다(13.3절).
+
+**절대 지킨 제약**: `lib/currency.js`의 기존 지급 로직과 annotation/vote 흐름은 한 줄도 안 건드림. 새 SQL은 전부 `scripts/*.sql` 파일로만 작성하고, 실행은 항상 사용자가 Supabase 대시보드에서 직접 함(에이전트가 DB에 DDL을 실행할 도구적 방법이 애초에 없음 — service role 키는 REST/RPC용이지 원본 SQL 실행용이 아니고, `supabase` CLI도 프로젝트 링크/DB 비밀번호가 없어 실행 불가).
+
+### 13.2 집꾸미기 시스템 (Interior Decor)
+
+| 파일 | 역할 |
+|---|---|
+| `lib/interiorCatalog.js` | 카탈로그 단일 출처 — 8개 카테고리(벽지/바닥재/러그/큰가구/소파·의자/소품/벽장식/펫) 40개 아이템, 3개 테마 세트, 날짜 시드 기반 "오늘의 특가"(40% 할인). `STARTER_WALLPAPER_ID`/`STARTER_FLOOR_ID`(클로버 벽지+갈색 바닥재) — 벽지·바닥재도 유료라 신규 참여자에게 방을 렌더링할 최소한의 무료 세트를 지급 |
+| `components/InteriorRoom.js` | 12×5 격자 스테이지 순수 렌더 — 배치/고스트 프리뷰/편집 격자 오버레이, 방향키로 움직이는 아바타(z-index `row*10+5`로 앞뒤 깊이 정렬), 4단계(13.3절)의 상대방 아바타도 같은 좌표계에 렌더 |
+| `components/InteriorDecorRoom.js` | 상태·이벤트 컨테이너 — 모드(view/edit)/보관함/상점/초대/저장 전체를 들고 있는 메인 컴포넌트. 방문 모드(`visitorMode`)에서는 읽기 전용으로 전환 |
+| `lib/interiorDecor.js` | 실제 Supabase 함수 — `getRoom`/`saveRoom`/`getOwnedInteriorItems`/`purchaseInteriorItem`/`purchaseInteriorSet`. `purchaseOutfit`(기존 옷가게)과 동일한 패턴(잔액 확인 → 보유기록 insert(PK 중복=이미 보유) → 거래기록 insert → RPC 차감)을 그대로 재사용 |
+| `scripts/interior_decor_schema.sql` | 신규 테이블 2개(`participant_interior_items`, `participant_room`) + `currency_transactions.type` CHECK 제약에 `'spend_interior'` 추가. 기존 테이블은 전혀 안 건드림(순수 추가) |
+
+**실제 데이터 연동**: 처음엔 구매/저장이 클라이언트 상태로만 시뮬레이션됐으나(스키마 미실행 구간), 이후 실제 Supabase 호출로 전환 — 마운트 시 `getCurrencyBalance`/`getOwnedInteriorItems`/`getRoom`으로 실데이터를 불러오고, 스키마가 없거나 저장 이력이 없으면 에러를 삼키고 "빈 방 + 무료 시작 벽지·바닥재"로 정직하게 대체한다. 저장 실패 시 편집 모드를 빠져나가지 않도록 해서(성공한 것처럼 보이며 세션을 날리지 않게) 사용자가 재시도할 수 있게 했다.
+
+**발견해서 고친 버그 2건**(모두 원래의 손그린 프로토타입에 잠재해 있던 것):
+1. **칸 점유 충돌 검사 부재** — `placeAt`이 실제로는 겹침 여부를 전혀 검사하지 않고 있었다. 우연히 안 겹치는 것처럼 보인 건 순전히 z-index 때문(이미 놓인 소품의 스프라이트가 편집 격자보다 위에 있어 그 위를 클릭하면 배치가 아니라 "선택"으로 가로채짐) — 작은 소품이 남기는 빈틈을 클릭하면 그대로 뚫렸다. `lib/interiorCatalog.js` 주석의 "fw·fh(칸 점유)"를 실제로 쓰는 사각형 겹침 검사(`footprintOf`/`footprintsOverlap`)로 교체.
+2. **소품을 든 채로 다른 소품을 클릭하면 조용히 손에서 놓침** — 위 1번 z-index 우연 때문에, 소품을 들고 있는 상태에서 이미 놓인(특히 큰) 소품의 스프라이트를 클릭하면 `selectPlaced`가 무조건 `setTool(null)`을 호출해 손에 든 걸 아무 안내 없이 잃어버렸다. 이제 손에 든 게 있을 때 기존 소품을 클릭하면 그 칸에 놓으려는 시도로 취급해 같은 충돌 검사를 태우고("이미 다른 소품이 놓여 있어요"), 들고 있던 소품은 그대로 유지.
+
+### 13.3 실시간 동행("초대") — `lib/duoSession.js`
+
+원래 계획한 5단계를 순서대로 구현·검증했다.
+
+| 단계 | 내용 |
+|---|---|
+| 1. Realtime 배관 | Supabase Realtime Presence(접속 여부)+Broadcast(위치)를 합친 `useDuoSession(hostId, selfId)` 훅. 채널명은 `duo:<hostId>` 하나뿐이라 초대한 사람과 링크로 들어온 사람 딱 둘만 만난다(오픈월드 아님). 소켓이 `SUBSCRIBED`되기 전 `sendPosition`을 부르면 supabase-js가 REST 폴백으로 느려지는 문제를 `joinedRef`로 막음 |
+| 2. 월드맵에서 서로 보이기 | `WorldMap.js`가 이 훅으로 자기 위치를 매 프레임 broadcast하고(`screen:'worldmap'`), 상대 아바타+이름표를 겹쳐 그림. `?duo=<호스트ID>` 쿼리로 짝을 정함(없으면 자기 자신을 호스트로 써서 대기) |
+| 3. 초대 흐름 | `probeHost(hostId)` — 링크를 연 사람이 호스트가 "지금 온라인인지 + 어느 화면(screen)에 있는지"를 짧게 엿보는 일회성 프로브. 호스트가 정확히 월드맵에 있으면 `/?duo=`로 리다이렉트해서 같이 돌아다니게 하고, 아니면(집 안/오프라인) 기존처럼 저장된 방을 보여줌 |
+| 4. 집 안까지 확장 | `InteriorDecorRoom`도 같은 훅으로 duo 채널에 참여(주인은 자기 자신과 자동 pairing, 방문객은 방문 세션 한정 임시 id 또는 실제 로그인 ID). 서로의 아바타가 방 안에서도 실시간으로 같이 움직임 — 단, 가구 배치 변화 자체의 실시간 방송은 범위 밖으로 명시적으로 제외(사용자 선택) |
+| 5. 예외 처리 | presence만으로는 "탭을 깨끗이 닫은 경우"만 빠르게 감지되고, 와이파이 끊김·절전 같은 지저분한 연결 끊김은 한참 방치된다 — 4초 유효기간 워치독(`STALE_MS`)을 추가해 마지막 위치 수신 후 4초가 지나면 자동으로 상대 아바타를 정리. 재연결은 Supabase 클라이언트가 알아서 처리(별도 코드 불필요) |
+
+**방문객도 실제 참여자로 로그인**: 처음엔 방문객이 참여자ID 없이 익명으로 바로 방에 들어가게 했으나, 사용자 요청으로 다른 진입 경로와 동일하게 StartPanel(참여자ID+그룹)을 먼저 거치도록 변경 — 방 주인 쪽에서 보이는 방문객 이름표도 이제 실제 입력한 참여자ID를 그대로 씀.
+
+**호스트를 따라 화면 이동(비대칭)**: 방문객이 집 안에서 호스트를 만난 뒤 호스트가 나가서 월드맵으로 이동하면, 방문객도 재로그인 없이 자동으로 같은 월드맵으로 따라간다(`onPartnerLeftScreen` 콜백 → `app/page.js`가 `WorldMap`에 `duoHostId` prop을 직접 넘겨 URL 새로고침 없이 페어링 유지). 반대 방향(방문객이 나가는 경우)에는 이 로직을 아예 안 넣었으므로 호스트는 전혀 영향받지 않는다 — 실제로 정상 종료/비정상 탭 종료 둘 다로 라이브 검증함.
+
+### 13.4 프로덕션 스왑
+
+`app/page.js`의 `screen==='house'`가 예전 `HouseDecorRoom.js`(자체 테이블 `participant_house_items`/`participant_house_layout` 사용) 대신 `InteriorDecorRoom`을 렌더링하도록 교체. 예전 파일들(`components/HouseDecorRoom.js`, `lib/houseDecor.js`, `lib/houseCatalog.js`, `scripts/house_decor_schema.sql`)은 더 이상 화면에서 안 쓰이지만 삭제하지 않고 남겨둠. 스왑하면서 예전에 있던 "나가기" 버튼/ESC 나가기가 새 컴포넌트엔 없어서 추가(편집 중이 아닐 때만 ESC가 나가기로 동작 — 실수로 안 나가지게).
+
+**발견해서 고친 버그**: 초대 링크가 이제 앱 루트(`/`)에서 열리게 됐는데, `app/page.js`엔 `?house=` 쿼리를 읽는 로직이 아예 없어서 **초대 기능이 스왑 직후 완전히 죽어 있었다**. `app/interior-test/page.js`(검증용 라우트)에 있던 로직을 실제 앱에 이식해서 해결.
+
+### 13.5 배포 상태 (2026-08-24 기준)
+
+- `new-soundvillage.vercel.app`(GitHub `HyeraS/new_soundvillage`, Vercel 프로젝트 `new-soundvillage`)의 `main`이 이 브랜치를 추적하며 자동 배포됨. `house-decor-2d` → `preview` remote(`new_soundvillage.git`)의 `main`으로 직접 push.
+- **Supabase 프로젝트를 의도적으로 분리**: 기존 배포가 쓰던 프로젝트(ref `nzzesrjneqsbkgtbaoxy`, 실제 실험 데이터 보유)는 전혀 건드리지 않고, Vercel 환경변수(`NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`)를 새 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)로 교체 후 재배포. 이 새 프로젝트엔 기존 스키마(annotations/votes/currency/quest/attendance) 전체가 이미 새로 구성돼 있었고, 여기에 `interior_decor_schema.sql`만 추가 실행.
+- 개발/QA 과정에서 이 새 프로젝트에 쌓인 테스트 참여자 데이터(TESTA/TESTB/QAFULLTEST01~08 등 수십 개 스크래치 ID)는 실제 참여자 유입 전 전부 정리(`DELETE FROM` — 퀘스트/출석 보상 템플릿 등 설정 테이블은 보존).
+- 로컬 `.env.local`을 바꿔도 배포엔 전혀 반영되지 않는다는 점(Vercel은 대시보드에 별도 저장된 환경변수를 씀)이 이번 배포 과정에서 혼선을 일으켰던 지점 — 기록해둠.
+
+### 13.6 알려진 한계 / 다음 단계
+
+| 항목 | 상태 |
+|---|---|
+| 가구 배치 변화 실시간 동기화 | **범위 밖(사용자 확정)** — 지금은 아바타 위치만 실시간, 방문 중 호스트가 가구를 옮겨도 방문객 화면엔 반영 안 됨(스냅샷은 재방문 시에만 갱신) |
+| 초대 게이팅이 개수만 봄(가구 4개 이상이면 무조건 활성화) | 미해결 — 품질과 무관하게 개수만 검사 |
+| 세트 구매 시 이미 보유한 아이템 할인 없음 | 미해결 |
+| 상점 구매 확인 단계 없음(가격 버튼 즉시 결제) | 미해결 |
+| 다중 방문객(3인 이상) 동시 접속 | 미검증 — 설계 자체가 1:1 전제(presence에서 "나 아닌 첫 번째 키"만 상대로 취급) |
+| `nzzesrjneqsbkgtbaoxy` 쪽 예전 house-decor 코드/테이블 | 정리 안 됨 — 코드는 안 쓰이지만 파일/테이블 그대로 존재 |

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Galmuri11:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  body { margin: 0; background: #0b0618; }
+  a { color: #4de3f0; text-decoration: none; }
+  a:hover { color: #6ef2c0; }
+</style>
+</helmet>
+<section style="display:flex;flex-direction:column;gap:28px;padding:40px;font-family:Galmuri11,'Apple SD Gothic Neo',sans-serif;color:#f4ecff">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:880px">
+    <span style="font-family:'Press Start 2P',monospace;font-size:12px;color:#b06bff">MUSIC ZONE · 48×36 TILES · 32PX</span>
+    <h1 style="margin:0;font-size:32px;font-weight:700;letter-spacing:-.5px">음악 마을 맵 — 강변 레코드 거리</h1>
+    <p style="margin:0;font-size:14px;line-height:1.7;color:#c0b1e4;text-wrap:pretty">2안 구조를 그대로 두고 건물·조명·지면을 레퍼런스 기준으로 다시 그렸습니다. 지붕은 박공/맨사드/평지붕 세 종류, 창은 창틀·격자살·셔터 3겹, 1층은 줄무늬 어닝과 계단 현관, 옥상에는 안테나·굴뚝·옥상정원·방송탑이 올라갑니다. 가로등은 지면에 빛 웅덩이를 남기고, 광장 위로는 전구 줄이 늘어집니다. 클릭하면 조작이 시작되고 <strong style="color:#ffd166">전체 보기(M)</strong>로 마을 전체를, <strong style="color:#6ef2c0">잠금 해제(L)</strong>로 다섯 거리를 모두 돌아볼 수 있습니다(현재 기본값: 해제 상태 — 실제 게임은 순차 언락).</p>
+  </div>
+
+  <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+    <div id="2a" style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="padding:4px 9px;background:#4de3f0;color:#0d2b2e;font-family:'Press Start 2P',monospace;font-size:10px">2a</span>
+        <span style="font-size:17px;font-weight:700">강변 레코드 거리 — 건물 리워크</span>
+        <span style="font-size:13px;color:#9d8bc9">2안 구조 유지 · 박공 지붕, 창틀·셔터, 줄무늬 어닝, 가로등 빛 웅덩이, 스트링 라이트</span>
+      </div>
+      <dc-import name="Music Village Map" variant="B" hint-size="968px,760px"></dc-import>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(3,minmax(240px,1fr));gap:20px;max-width:1200px;padding:22px;background:#150c29;border:2px solid #2b1d4d">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#6ef2c0">구현 연결점</span>
+      <span style="font-size:13px;line-height:1.7;color:#c0b1e4"><code style="color:#ffd166">music-village.js</code> 가 맵 생성·충돌·드로잉을 전부 갖고 있고, DC는 입력/HUD/패널만 담당합니다. ZoneMap에 붙일 때 <code style="color:#ffd166">buildVillage('A'|'B')</code> 의 결과를 그대로 쓰고, 소리 아이템 배열만 실제 <code style="color:#ffd166">SOUND_ITEMS.Music</code> 로 교체하면 됩니다. 목업은 화면 확인용으로 블록당 8개만 스폰하지만, 실제 게임 기준(<code style="color:#ffd166">block_size=15</code>)으로 올려도 배치 로직은 그대로 동작합니다.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#4de3f0">충돌 모델</span>
+      <span style="font-size:13px;line-height:1.7;color:#c0b1e4">발밑 20×14px 히트박스, 축 분리 이동(<code style="color:#ffd166">moveWithCollision</code>)으로 벽을 따라 미끄러집니다. 건물·소품·물·맵 테두리가 <code style="color:#ffd166">colliders</code> 배열로 나오고, 디버그 프롭 <code style="color:#ffd166">showColliders</code> 로 박스를 볼 수 있습니다.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#ff5fa2">전사 흐름</span>
+      <span style="font-size:13px;line-height:1.7;color:#c0b1e4">아이템 44px 이내 → SPACE → 패널에서 재생·의성어(80자)·자신감(1~5) → 제출 시 <code style="color:#ffd166">onSubmit({sound_id, zone, sub_category, expression_text, confidence})</code> 콜백. 기존 AnnotationPanel/Supabase 저장에 그대로 연결하면 됩니다.</span>
+    </div>
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>

@@ -3,6 +3,8 @@ import { useState, useEffect, useCallback } from 'react'
 import StartPanel      from '@/components/StartPanel'
 import WorldMap        from '@/components/WorldMap'
 import ZoneMap         from '@/components/ZoneMap'
+import MusicZoneMap    from '@/components/MusicZoneMap'
+import NatureZoneMap   from '@/components/NatureZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
@@ -371,13 +373,12 @@ export default function HomePage() {
     } catch (e) {
       console.error('[Museum] 진입 오류:', e)
     }
-    if (!sound) {
-      setMuseumEmpty(true)
-      return
-    }
 
+    // 투표할 소리가 아직 없어도(데이터 미달) Museum 자체는 들어갈 수 있게 한다 —
+    // 상점/전시 현황 탭은 sound와 무관하게 동작하므로, 투표 탭만 SoundMuseum
+    // 내부에서 "아직 없어요" 안내로 대체한다(사용자 확정, 2026-08-25).
     setActiveSound(sound)
-    setActiveZone(sound.game_zone || 'Lab')
+    setActiveZone(sound ? (sound.game_zone || 'Lab') : 'Lab')
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
@@ -634,8 +635,10 @@ export default function HomePage() {
     )
   }
 
-  // 4. Sound Museum (Stage 1 제출 후)
-  if (screen === 'museum' && activeSound) {
+  // 4. Sound Museum — 투표할 소리가 없어도(activeSound=null) 들어갈 수 있다.
+  // 상점/전시 현황 탭은 sound와 무관하게 동작하고, 투표 탭만 SoundMuseum
+  // 내부에서 "아직 없어요" 안내로 대체된다.
+  if (screen === 'museum') {
     return (
       <>
         <SoundMuseum
@@ -661,17 +664,44 @@ export default function HomePage() {
     return (
       <>
         {/* ZoneMap — zone의 모든 소리를 한 화면에 유지. 잠긴/해제된 구역 표시는
-            blockNum prop으로 ZoneMap 내부에서 처리하므로 리마운트하지 않는다. */}
-        <ZoneMap
-          zone={activeZone}
-          sounds={zoneSounds}
-          onCollectSound={handleCollectSound}
-          onExit={handleExitZone}
-          collectedIds={collectedIds}
-          isAnnotating={screen === 'annotate'}
-          blockNum={currentBlock}
-          blockTotal={maxBlock}
-        />
+            blockNum prop으로 ZoneMap 내부에서 처리하므로 리마운트하지 않는다.
+            Music/Nature만 예외 — 전용 캔버스 엔진을 쓴다(Music: 절차적 드로잉
+            handoff를 이식한 MusicZoneMap/lib/musicVillage.js. Nature: 구매
+            에셋 기반 타일맵 handoff를 이식한 NatureZoneMap/lib/natureVillage.js).
+            소리 데이터·전사 흐름(onCollectSound/AnnotationPanel)은 다른 Zone과
+            완전히 동일. */}
+        {activeZone === 'Music' ? (
+          <MusicZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={screen === 'annotate'}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+          />
+        ) : activeZone === 'Nature' ? (
+          <NatureZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={screen === 'annotate'}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+          />
+        ) : (
+          <ZoneMap
+            zone={activeZone}
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={screen === 'annotate'}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+          />
+        )}
 
         {/* AnnotationPanel — ZoneMap 위에 오버레이 */}
         {screen === 'annotate' && activeSound && (

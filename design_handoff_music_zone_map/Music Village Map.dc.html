@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Galmuri11:wght@400;700&display=swap" rel="stylesheet" />
+<style>
+  @keyframes vgBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+  @keyframes vgPulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+</style>
+</helmet>
+<div style="position:relative;width:960px;background:#120a26;border:4px solid #2b1d4d;border-radius:6px;overflow:hidden;font-family:Galmuri11,'Apple SD Gothic Neo',sans-serif;color:#f4ecff;box-shadow:0 24px 60px rgba(10,4,30,.55);image-rendering:pixelated" onClick="{{ focusOn }}">
+
+  <div style="display:flex;align-items:center;gap:14px;padding:10px 14px;background:#1a1033;border-bottom:3px solid #2b1d4d">
+    <div style="display:flex;align-items:center;gap:8px">
+      <div style="width:14px;height:14px;background:#b06bff;box-shadow:0 0 12px #b06bff"></div>
+      <span style="font-family:'Press Start 2P',monospace;font-size:11px;letter-spacing:.5px">MUSIC VILLAGE</span>
+    </div>
+    <span style="font-size:12px;color:#9d8bc9">{{ layoutLabel }}</span>
+    <div style="flex:1"></div>
+    <div style="display:flex;align-items:center;gap:10px;font-size:12px">
+      <span style="color:#9d8bc9">블록</span>
+      <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#ffd166">{{ blockLabel }}</span>
+      <div style="width:150px;height:12px;background:#241a3d;border:2px solid #3a2a63;position:relative">
+        <div style="position:absolute;inset:0;width:{{ blockPct }};background:linear-gradient(90deg,#ff5fa2,#b06bff)"></div>
+      </div>
+      <span style="font-family:'Press Start 2P',monospace;font-size:10px">{{ blockCountLabel }}</span>
+    </div>
+    <button onClick="{{ toggleFree }}" style="padding:6px 10px;background:#241a3d;border:2px solid #6ef2c0;color:#6ef2c0;font-family:Galmuri11,sans-serif;font-size:12px;cursor:pointer" style-hover="background:#2f2450">{{ freeLabel }}</button>
+    <button onClick="{{ toggleOverview }}" style="padding:6px 10px;background:#241a3d;border:2px solid #3a2a63;color:#c9bbe8;font-family:Galmuri11,sans-serif;font-size:12px;cursor:pointer" style-hover="border-color:#b06bff;color:#f4ecff">{{ overviewLabel }}</button>
+    <div style="display:flex;align-items:center;gap:6px;padding:4px 10px;background:#241a3d;border:2px solid #3a2a63;font-size:12px">
+      <span style="color:#4de3f0">◈</span>
+      <span>전사 완료 {{ collectedTotal }}</span>
+    </div>
+  </div>
+
+  <div style="position:relative;width:960px;height:600px;background:#0f0920">
+    <canvas data-stage="{{ uid }}" width="960" height="600" style="display:block;width:960px;height:600px;image-rendering:pixelated"></canvas>
+
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 45%,rgba(0,0,0,0) 40%,rgba(12,6,28,.62) 100%)"></div>
+
+    <div style="position:absolute;top:12px;right:12px;padding:6px;background:rgba(18,10,38,.86);border:2px solid #3a2a63">
+      <canvas data-mini="{{ uid }}" width="192" height="144" style="display:block;image-rendering:pixelated"></canvas>
+    </div>
+
+    <div style="position:absolute;left:12px;bottom:12px;display:flex;flex-direction:column;gap:6px;padding:8px 10px;background:rgba(18,10,38,.86);border:2px solid #3a2a63;font-size:11px;line-height:1.5">
+      <span style="color:#9d8bc9">방향키 / WASD — 이동</span>
+      <span style="color:#9d8bc9">SPACE — 소리 전사</span>
+      <span style="color:#9d8bc9">ESC — 닫기</span>
+    </div>
+
+    <sc-if value="{{ showFocusHint }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(12,6,28,.55);cursor:pointer">
+        <div style="padding:14px 22px;background:#1a1033;border:3px solid #b06bff;font-family:'Press Start 2P',monospace;font-size:11px;animation:vgPulse 1.6s infinite">CLICK TO PLAY</div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ nearItem }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;padding:10px 16px;background:#1a1033;border:3px solid #ff5fa2;box-shadow:0 0 24px rgba(255,95,162,.45);animation:vgBob 1.4s ease-in-out infinite">
+        <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#ffd166">SPACE</span>
+        <span style="font-size:13px">{{ nearLabel }}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ unlockToast }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;left:50%;top:80px;transform:translateX(-50%);padding:12px 20px;background:#1a1033;border:3px solid #6ef2c0;box-shadow:0 0 28px rgba(110,242,192,.4);font-size:13px">{{ unlockToast }}</div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ panelItem }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(10,5,24,.82);z-index:20">
+      <div style="width:520px;background:#1a1033;border:4px solid #b06bff;box-shadow:0 20px 60px rgba(0,0,0,.6)">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#241a3d;border-bottom:3px solid #3a2a63">
+          <span style="font-family:'Press Start 2P',monospace;font-size:10px;color:#4de3f0">SOUND FOUND</span>
+          <span style="font-size:11px;color:#9d8bc9">{{ panelId }}</span>
+        </div>
+        <div style="padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <button onClick="{{ togglePlay }}" style="width:52px;height:52px;background:#ff5fa2;border:3px solid #ffa6cd;color:#1a1033;font-family:'Press Start 2P',monospace;font-size:14px;cursor:pointer" style-hover="background:#ff85b9">{{ playIcon }}</button>
+            <div style="flex:1;display:flex;align-items:flex-end;gap:3px;height:44px;padding:0 4px;background:#120a26;border:2px solid #3a2a63">
+              <sc-for list="{{ bars }}" as="bar" hint-placeholder-count="28">
+                <div style="flex:1;height:{{ bar.h }};background:{{ bar.color }}"></div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-size:12px;color:#9d8bc9">이 소리를 의성어로 표현해 주세요 (최대 80자)</span>
+            <textarea value="{{ text }}" onChange="{{ onText }}" maxLength="80" placeholder="예: 딩- 디딩 하고 울리는" style="width:100%;height:76px;padding:10px;background:#120a26;border:2px solid #3a2a63;color:#f4ecff;font-family:Galmuri11,sans-serif;font-size:14px;resize:none;outline:none"></textarea>
+            <span style="align-self:flex-end;font-size:11px;color:#6f5f9a">{{ textCount }}/80</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span style="font-size:12px;color:#9d8bc9">표현이 얼마나 잘 맞나요? — {{ confLabel }}</span>
+            <input type="range" min="1" max="5" step="1" value="{{ conf }}" onChange="{{ onConf }}" style="width:100%;accent-color:#b06bff" />
+          </div>
+          <div style="display:flex;gap:10px">
+            <button onClick="{{ closePanel }}" style="flex:1;padding:12px;background:#241a3d;border:3px solid #3a2a63;color:#c9bbe8;font-family:Galmuri11,sans-serif;font-size:14px;cursor:pointer" style-hover="border-color:#6f5f9a">나가기</button>
+            <button onClick="{{ submit }}" style="flex:2;padding:12px;background:#6ef2c0;border:3px solid #a9ffe2;color:#0f2b22;font-family:Galmuri11,sans-serif;font-size:14px;font-weight:700;cursor:pointer" style-hover="background:#8ff7d2">전사 제출</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="display:flex;align-items:center;gap:16px;padding:10px 14px;background:#1a1033;border-top:3px solid #2b1d4d;font-size:11px;color:#9d8bc9">
+    <sc-for list="{{ legend }}" as="d" hint-placeholder-count="5">
+      <div style="display:flex;align-items:center;gap:6px">
+        <div style="width:10px;height:10px;background:{{ d.neon }}"></div>
+        <span>{{ d.text }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:968,&quot;height&quot;:720},&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;A&quot;,&quot;B&quot;],&quot;default&quot;:&quot;A&quot;,&quot;tsType&quot;:&quot;'A' | 'B'&quot;,&quot;section&quot;:&quot;맵&quot;},&quot;neon&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;맵&quot;},&quot;unlockAll&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;디버그&quot;},&quot;showColliders&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;디버그&quot;},&quot;onSubmit&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;(annotation: object) =&gt; void&quot;}}">
+class Component extends DCLogic {
+  state = {
+    ready: false, active: false, near: null, panel: null, text: '', conf: 3,
+    playing: false, collected: 0, blockDone: 0, unlocked: 1, toast: '', overview: false, freeRoam: true,
+  };
+
+  keys = {};
+  pos = { x: 0, y: 0, dir: 'down' };
+  moving = false;
+  cam = { x: 0, y: 0 };
+
+  componentDidMount() {
+    this.canvas = null; this.mini = null;
+    import('./music-village.js').then((m) => {
+      this.M = m;
+      this.build();
+      this.setState({ ready: true });
+      this.loop = requestAnimationFrame(this.frame);
+    });
+    this.onKeyDown = (e) => {
+      if (!this.state.active) return;
+      const k = e.key.toLowerCase();
+      if (['arrowup', 'arrowdown', 'arrowleft', 'arrowright', ' ', 'w', 'a', 's', 'd'].includes(k)) e.preventDefault();
+      if (k === 'escape') { this.setState({ panel: null }); return; }
+      if (k === 'm') { this.setState({ overview: !this.state.overview }); return; }
+      if (k === 'l') { this.setState({ freeRoam: !this.state.freeRoam }); return; }
+      if (k === ' ' && !this.state.panel && this.state.near) {
+        this.setState({ panel: this.state.near, text: '', conf: 3, playing: false });
+        return;
+      }
+      this.keys[k] = true;
+    };
+    this.onKeyUp = (e) => { this.keys[e.key.toLowerCase()] = false; };
+    // 활성 인스턴스는 항상 하나 — 클릭한 맵만 키 입력을 받는다
+    this.onActivate = (e) => {
+      const mine = e.detail === this.uid;
+      if (mine !== this.state.active) { this.keys = {}; this.setState({ active: mine }); }
+    };
+    window.addEventListener('keydown', this.onKeyDown);
+    window.addEventListener('keyup', this.onKeyUp);
+    window.addEventListener('mv-activate', this.onActivate);
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.variant !== this.props.variant && this.M) { this.build(); this.setState({ collected: 0, blockDone: 0, unlocked: 1, panel: null }); }
+    if (prev.neon !== this.props.neon && this.M) this.renderStatic();
+  }
+
+  componentWillUnmount() {
+    cancelAnimationFrame(this.loop);
+    window.removeEventListener('keydown', this.onKeyDown);
+    window.removeEventListener('keyup', this.onKeyUp);
+    window.removeEventListener('mv-activate', this.onActivate);
+  }
+
+  build() {
+    const M = this.M;
+    this.v = M.buildVillage(this.props.variant === 'B' ? 'B' : 'A');
+    this.pos = { x: this.v.spawn.x, y: this.v.spawn.y, dir: 'down' };
+    this.off = document.createElement('canvas');
+    this.off.width = M.MAP_W * M.T; this.off.height = M.MAP_H * M.T;
+    this.renderStatic();
+  }
+
+  renderStatic() {
+    if (!this.off) return;
+    const ctx = this.off.getContext('2d');
+    this.M.drawStatic(ctx, this.v, { neon: this.props.neon !== false });
+  }
+
+  uid = 'vg' + Math.random().toString(36).slice(2, 8);
+
+  grabCanvases() {
+    if (!this.canvas) this.canvas = document.querySelector('canvas[data-stage="' + this.uid + '"]');
+    if (!this.mini) this.mini = document.querySelector('canvas[data-mini="' + this.uid + '"]');
+  }
+
+  // 임시 잠금 해제: 전 구역 개방
+  openAll() { return this.state.freeRoam || this.props.unlockAll === true; }
+
+  frame = (t) => {
+    this.loop = requestAnimationFrame(this.frame);
+    const M = this.M, v = this.v;
+    this.grabCanvases();
+    if (!v || !this.canvas) return;
+    const k = this.keys;
+    let dx = 0, dy = 0;
+    if (!this.state.panel && this.state.active) {
+      if (k.arrowleft || k.a) { dx -= 1; this.pos.dir = 'left'; }
+      if (k.arrowright || k.d) { dx += 1; this.pos.dir = 'right'; }
+      if (k.arrowup || k.w) { dy -= 1; this.pos.dir = 'up'; }
+      if (k.arrowdown || k.s) { dy += 1; this.pos.dir = 'down'; }
+    }
+    this.moving = !!(dx || dy);
+    if (this.moving) {
+      const sp = 2.4 / (dx && dy ? 1.41 : 1);
+      const next = M.moveWithCollision(v, this.pos, dx * sp, dy * sp);
+      this.pos.x = next.x; this.pos.y = next.y;
+    }
+
+    const VW = 960, VH = 600;
+    const over = this.state.overview;
+    const Z = over ? Math.min(VW / (M.MAP_W * M.T), VH / (M.MAP_H * M.T)) : 2;
+    const halfW = VW / (2 * Z), halfH = VH / (2 * Z);
+    if (over) {
+      this.cam.x = -(VW / Z - M.MAP_W * M.T) / 2;
+      this.cam.y = -(VH / Z - M.MAP_H * M.T) / 2;
+    } else {
+      this.cam.x = Math.max(0, Math.min(M.MAP_W * M.T - VW / Z, this.pos.x - halfW));
+      this.cam.y = Math.max(0, Math.min(M.MAP_H * M.T - VH / Z, this.pos.y - halfH));
+    }
+
+    const ctx = this.canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = false;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, VW, VH);
+    ctx.fillStyle = '#0f0920';
+    ctx.fillRect(0, 0, VW, VH);
+    ctx.scale(Z, Z);
+    ctx.translate(-Math.round(this.cam.x), -Math.round(this.cam.y));
+    ctx.drawImage(this.off, 0, 0);
+
+    // 소리 아이템 (현재 언락된 블록까지만 활성)
+    const openTo = this.openAll() ? 5 : this.state.unlocked;
+    let near = null, nearD = 44;
+    v.items.forEach((it) => {
+      if (it.collected || it.block > openTo) return;
+      M.drawItem(ctx, it, t);
+      const d = Math.hypot(it.tx * M.T + 16 - this.pos.x, it.ty * M.T + 20 - this.pos.y);
+      if (d < nearD) { nearD = d; near = it; }
+    });
+
+    M.drawPlayer(ctx, this.pos, t, this.moving);
+    M.drawLockFog(ctx, v, openTo, t);
+
+    if (this.props.showColliders) {
+      ctx.strokeStyle = 'rgba(255,95,162,.7)';
+      ctx.lineWidth = 1;
+      v.colliders.forEach((c) => ctx.strokeRect(c.x + .5, c.y + .5, c.w - 1, c.h - 1));
+    }
+
+    if ((near && near.id) !== (this.state.near && this.state.near.id)) this.setState({ near });
+    if (t - (this._mini || 0) > 260) { this._mini = t; this.drawMini(); }
+    if (this.state.playing && t % 90 < 20) this.forceUpdate();
+  };
+
+  drawMini() {
+    if (!this.mini || !this.v) return;
+    const M = this.M, c = this.mini.getContext('2d'), s = 4;
+    c.imageSmoothingEnabled = false;
+    c.fillStyle = '#0f0920';
+    c.fillRect(0, 0, 192, 144);
+    for (let y = 0; y < M.MAP_H; y++)
+      for (let x = 0; x < M.MAP_W; x++) {
+        const t = this.v.terrain[y][x];
+        c.fillStyle = ['#223c48', '#3b2a5e', '#4a3170', '#2b3f8f', '#59306b', '#7a4a3c'][t] || '#223c48';
+        c.fillRect(x * s, y * s, s, s);
+      }
+    const openTo = this.openAll() ? 5 : this.state.unlocked;
+    this.v.districts.forEach((d) => {
+      c.globalAlpha = d.block <= openTo ? 0.3 : 0.85;
+      c.fillStyle = d.block <= openTo ? d.neon : '#1d1440';
+      c.fillRect(d.area.x * s, d.area.y * s, d.area.w * s, d.area.h * s);
+      c.globalAlpha = 1;
+    });
+    this.v.buildings.forEach((b) => { c.fillStyle = '#e7d9c4'; c.fillRect(b.x * s, b.y * s, b.w * s, b.h * s); });
+    c.fillStyle = '#ff5fa2';
+    c.fillRect(Math.round(this.pos.x / M.T) * s - 2, Math.round(this.pos.y / M.T) * s - 2, 6, 6);
+    c.strokeStyle = 'rgba(244,236,255,.5)';
+    c.strokeRect(this.cam.x / M.T * s, this.cam.y / M.T * s, (960 / 2 / M.T) * s, (600 / 2 / M.T) * s);
+  }
+
+  submit = () => {
+    const it = this.state.panel;
+    if (!it) return;
+    it.collected = true;
+    const blockItems = this.v.items.filter((i) => i.block === this.state.unlocked);
+    const done = blockItems.filter((i) => i.collected).length;
+    const total = this.v.items.filter((i) => i.collected).length;
+    if (typeof this.props.onSubmit === 'function')
+      this.props.onSubmit({ sound_id: it.id, zone: 'Music', sub_category: it.cat, expression_text: this.state.text, confidence: this.state.conf });
+    if (done >= blockItems.length && this.state.unlocked < 5) {
+      const nextName = this.v.districts.find((d) => d.block === this.state.unlocked + 1);
+      this.setState({ panel: null, collected: total, blockDone: 0, unlocked: this.state.unlocked + 1, toast: '새 거리가 열렸어요 — ' + (nextName ? nextName.name : '') });
+      clearTimeout(this._tt);
+      this._tt = setTimeout(() => this.setState({ toast: '' }), 3200);
+    } else {
+      this.setState({ panel: null, collected: total, blockDone: done });
+    }
+  };
+
+  renderVals() {
+    const st = this.state;
+    const free = this.openAll();
+    const cur = this.v ? this.v.districts.find((d) => d.block === st.unlocked) : null;
+    const blockItems = this.v ? (free ? this.v.items : this.v.items.filter((i) => i.block === st.unlocked)) : [];
+    const done = blockItems.filter((i) => i.collected).length;
+    const bars = [];
+    for (let i = 0; i < 28; i++) {
+      const base = 8 + ((i * 37) % 30);
+      const h = st.playing ? base + Math.abs(Math.sin(Date.now() / 180 + i)) * 12 : base * 0.7;
+      bars.push({ h: Math.round(h) + 'px', color: st.playing ? (i % 3 === 0 ? '#4de3f0' : '#b06bff') : '#3a2a63' });
+    }
+    return {
+      uid: this.uid,
+      layoutLabel: this.v ? this.v.label : '로딩 중',
+      blockLabel: free ? 'ALL OPEN' : 'BLOCK ' + st.unlocked + ' / 5',
+      freeRoam: free,
+      freeLabel: free ? '잠금 해제 (L)' : '순차 언락 (L)',
+      toggleFree: () => this.setState({ freeRoam: !this.state.freeRoam }),
+      blockCountLabel: done + '/' + (blockItems.length || 15),
+      blockPct: Math.round((done / (blockItems.length || 15)) * 100) + '%',
+      collectedTotal: st.collected,
+      showFocusHint: !st.active,
+      overviewLabel: st.overview ? '마을 걷기 (M)' : '전체 보기 (M)',
+      toggleOverview: () => this.setState({ overview: !this.state.overview }),
+      focusOn: () => window.dispatchEvent(new CustomEvent('mv-activate', { detail: this.uid })),
+      nearItem: !!st.near && !st.panel,
+      nearLabel: st.near ? (st.near.kind === 'tape' ? '카세트 소리 전사하기' : '음표 소리 전사하기') : '',
+      unlockToast: st.toast,
+      panelItem: !!st.panel,
+      panelId: st.panel ? st.panel.id + ' · ' + st.panel.cat : '',
+      playIcon: st.playing ? '||' : '▶',
+      togglePlay: () => this.setState({ playing: !st.playing }),
+      bars,
+      text: st.text,
+      textCount: st.text.length,
+      onText: (e) => this.setState({ text: e.target.value.slice(0, 80) }),
+      conf: st.conf,
+      onConf: (e) => this.setState({ conf: Number(e.target.value) }),
+      confLabel: ['', '전혀 아님', '조금 맞음', '보통', '잘 맞음', '아주 잘 맞음'][st.conf],
+      closePanel: () => this.setState({ panel: null }),
+      submit: this.submit,
+      legend: this.v
+        ? this.v.districts.map((d) => ({ neon: d.neon, text: d.name + (free || d.block <= st.unlocked ? '' : ' (잠김)') }))
+        : [],
+      curName: cur ? cur.name : '',
+    };
+  }
+}
+
+</script>
+</body>
+</html>

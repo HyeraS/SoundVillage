@@ -16,10 +16,10 @@ const VIEW_H  = 18 * TILE     // 576
 // CHAR_W/H는 이동·아이템 충돌 판정에 쓰는 히트박스 크기 — 기존 튜닝 그대로 유지.
 // SPRITE_W/H는 WorldMap과 동일한 캐릭터 스프라이트를 그릴 화면 표시 크기(히트박스보다
 // 큼)로, 히트박스 발치에 스프라이트 발이 오도록 오프셋을 줘서 그린다.
-const CHAR_W  = 22
-const CHAR_H  = 28
-const SPRITE_W = 72
-const SPRITE_H = 88
+export const CHAR_W  = 22
+export const CHAR_H  = 28
+export const SPRITE_W = 72
+export const SPRITE_H = 88
 const HUD_H   = 56
 
 // block(구역) 경계선 좌우/상하로 아이템을 놓지 않는 여백(칸 수) — 열린 구역과
@@ -2599,7 +2599,7 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-function PixelChar({ dir, moving }) {
+export function PixelChar({ dir, moving }) {
   const tick  = Math.floor(Date.now() / 160) % 2
   const frame = moving ? tick : 0
 
@@ -2685,7 +2685,7 @@ function PixelChar({ dir, moving }) {
 /* ─────────────────────────────────────────────
    Zone 내부 HUD (상단 — WorldMap HUD와 통일)
 ───────────────────────────────────────────── */
-function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTotal = 1 }) {
+export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTotal = 1 }) {
   const meta = ZONE_META[zone]
   const pct  = total > 0 ? Math.round((collected / total) * 100) : 0
   return (
@@ -2866,7 +2866,7 @@ function spawnSoundItems(sounds, zone) {
 /* ─────────────────────────────────────────────
    수집 완료 모달
 ───────────────────────────────────────────── */
-function CompleteModal({ zone, onExit }) {
+export function CompleteModal({ zone, onExit }) {
   const meta = ZONE_META[zone]
   return (
     <div style={{
@@ -2907,7 +2907,7 @@ function CompleteModal({ zone, onExit }) {
 /* ─────────────────────────────────────────────
    입구 확인 모달 — 캐릭터가 입구에 들어서면 표시
 ───────────────────────────────────────────── */
-function ExitConfirmModal({ zone, onConfirm, onCancel }) {
+export function ExitConfirmModal({ zone, onConfirm, onCancel }) {
   const meta = ZONE_META[zone]
   return (
     <div style={{
@@ -3383,7 +3383,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 /* ─────────────────────────────────────────────
    D-Pad
 ───────────────────────────────────────────── */
-function DPad({ press, release, onExit, onConfirm }) {
+export function DPad({ press, release, onExit, onConfirm }) {
   const BTN = [
     { dir:'up',    label:'▲', gridArea:'1/2' },
     { dir:'left',  label:'◀', gridArea:'2/1' },

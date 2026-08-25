@@ -389,7 +389,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound, zone, myExpression, participantId, sessionId, zoneCounts, onCurrencyChange, onDone, onExit }) {
+export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, onCurrencyChange, onDone, onExit }) {
   const npc   = ZONE_NPC[zone]  || ZONE_NPC.Lab
   const meta  = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
   const accent = meta.color
@@ -403,7 +403,7 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
   const [visible,     setVisible]     = useState(false)
   const cardRef = useRef(null)
 
-  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound.file_path)
+  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound?.file_path)
 
   // 슬라이드인 애니메이션
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
@@ -416,13 +416,14 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
     }
   }, [pick])
 
-  // 후보 표현 로드
+  // 후보 표현 로드 — 투표할 소리가 없으면(sound=null) 아예 요청하지 않는다.
   useEffect(() => {
+    if (!sound) { setCandidates([]); setLoading(false); return }
     getCandidateExpressions(sound.sound_id, myExpression)
       .then(data => setCandidates(data.slice(0, 5)))
       .catch(err => { console.error('[Museum] 후보 로드 오류:', err); setCandidates([]) })
       .finally(() => setLoading(false))
-  }, [sound.sound_id, myExpression])
+  }, [sound, myExpression])
 
   // NPC 대사 순환
   useEffect(() => {
@@ -474,7 +475,37 @@ export default function SoundMuseum({ sound, zone, myExpression, participantId, 
 
   // 투표 카드 — 기존 로직/마크업 그대로, 바깥 래퍼 크기만 LibraryRoom이 주는
   // 카드 슬롯(CARD_LAYOUT.vote, 뷰포트의 작은 영역)에 맞춰 100%/100%로 변경.
-  const voteCardBody = (
+  // 투표할 소리가 아직 없으면(sound=null, 데이터 미달) 투표 UI 대신 안내
+  // 카드만 보여준다 — 상점/전시 현황 탭은 이 조건과 무관하게 그대로 열린다.
+  const voteCardBody = !sound ? (
+      <div style={{
+        position: 'relative', zIndex: 10,
+        width: '100%', height: '100%',
+        background: '#FAF6EE', borderRadius: '20px',
+        boxShadow: `0 10px 60px #00000077, 0 0 0 1px ${accent}44`,
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        textAlign: 'center', padding: '32px', gap: '10px',
+        transform: visible ? 'translateY(0) scale(1)' : 'translateY(30px) scale(0.96)',
+        opacity: visible ? 1 : 0,
+        transition: 'transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease',
+      }}>
+        <div style={{ fontSize: '40px' }}>🗳️</div>
+        <div style={{ fontSize: '15px', fontWeight: 800, color: '#2A1F0E' }}>아직 투표할 소리가 없어요</div>
+        <div style={{ fontSize: '12px', color: '#8B6A3A', lineHeight: 1.6 }}>
+          다른 참여자들이 소리를 더 전사하면<br/>여기서 투표할 수 있어요 ✨
+        </div>
+        {onExit && (
+          <button onClick={onExit} style={{
+            marginTop: '10px', padding: '9px 18px',
+            background: '#F0EBE0', border: `1.5px solid ${accent}44`, borderRadius: '10px',
+            color: '#8B6A3A', fontSize: '12px', fontWeight: 800,
+            fontFamily: 'Nunito, sans-serif', cursor: 'pointer',
+          }}>
+            🗺 월드맵으로
+          </button>
+        )}
+      </div>
+  ) : (
       <div ref={cardRef} style={{
         position: 'relative', zIndex: 10,
         width: '100%', height: '100%', overflowY: 'auto',
