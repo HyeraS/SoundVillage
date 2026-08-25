@@ -6,7 +6,8 @@ import styles from './prototype.module.css'
 
 export default function CameraDebugHUD({ mode = 'follow' }) {
   const liveRef = useRef(null)
-  const thirdPerson = mode === 'hub-third-person' || mode === 'music-third-person'
+  const thirdPerson = ['hub-third-person', 'music-third-person', 'animal-third-person'].includes(mode)
+  const label = mode === 'hub-third-person' ? 'Hub' : mode === 'animal-third-person' ? 'Animal' : 'Music'
 
   useEffect(() => {
     const update = () => {
@@ -21,7 +22,7 @@ export default function CameraDebugHUD({ mode = 'follow' }) {
 
   return (
     <aside className={styles.cameraDebug} aria-label="카메라 디버그 정보">
-      <strong>{thirdPerson ? `${mode === 'hub-third-person' ? 'Hub' : 'Music'} third-person camera` : 'Perspective follow'}</strong>
+      <strong>{thirdPerson ? `${label} third-person camera` : 'Perspective follow'}</strong>
       {thirdPerson ? (
         <>
           <span>FOV {HUB_THIRD_PERSON_CAMERA_CONFIG.fov}° · height {HUB_THIRD_PERSON_CAMERA_CONFIG.height}</span>

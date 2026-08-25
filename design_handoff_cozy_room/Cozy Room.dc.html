@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Gothic+A1:wght@400;500;700;800&family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#6E5844;font-family:'Gothic A1',system-ui,sans-serif;font-weight:700;color:#3A2A14}
+a{color:#8B6347;text-decoration:none}
+a:hover{color:#3A2A14}
+img{image-rendering:pixelated}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes popin{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes flick{0%,100%{opacity:.85}50%{opacity:1}}
+@keyframes rise{from{transform:translateY(10px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</helmet>
+
+<div style="width:1280px;margin:0 auto;padding:24px 24px 60px;background:#6E5844;background-image:linear-gradient(rgba(0,0,0,.06) 1px,transparent 1px),linear-gradient(90deg,rgba(0,0,0,.06) 1px,transparent 1px);background-size:8px 8px">
+
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:6px 6px 0 rgba(0,0,0,.35);margin-bottom:16px">
+    <div style="display:flex;align-items:center;gap:12px">
+      <div style="width:44px;height:44px;border:3px solid #3A2A14;background:#E8D8B8;display:grid;place-items:center;overflow:hidden">
+        <img src="assets/avatar.png" alt="" style="width:38px;height:38px;image-rendering:pixelated;margin-bottom:-6px">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <div style="font-size:19px;letter-spacing:.5px">{{ roomName }}</div>
+        <div style="font-size:12px;color:#8B6A3A;font-family:'Gothic A1',sans-serif;white-space:nowrap">배치한 소품 {{ placedCount }}개 · 보유 {{ ownedCount }}종</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#FFF7E4;border:3px solid #3A2A14">
+        <span style="width:20px;height:20px;background:#E9B44C;border:2px solid #3A2A14;display:grid;place-items:center;font-size:11px;font-family:'Press Start 2P',monospace">♪</span>
+        <span style="font-size:18px;font-family:'Press Start 2P',monospace;letter-spacing:-1px">{{ balanceText }}</span>
+      </div>
+      <button onClick="{{ openShop }}" style="font-family:inherit;font-size:15px;padding:10px 16px;background:#E9B44C;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#3A2A14" style-hover="background:#F2C468;transform:translate(-1px,-1px);box-shadow:4px 4px 0 #3A2A14" style-active="transform:translate(2px,2px);box-shadow:1px 1px 0 #3A2A14">상점</button>
+      <button onClick="{{ openInventory }}" style="font-family:inherit;font-size:15px;padding:10px 16px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4;transform:translate(-1px,-1px)" style-active="transform:translate(2px,2px);box-shadow:1px 1px 0 #3A2A14">보관함</button>
+      <button onClick="{{ openFriend }}" style="font-family:inherit;font-size:15px;padding:10px 16px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4;transform:translate(-1px,-1px)" style-active="transform:translate(2px,2px);box-shadow:1px 1px 0 #3A2A14">친구 방</button>
+      <button onClick="{{ openHelp }}" style="font-family:inherit;font-size:15px;width:42px;height:42px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#8B6347" style-hover="background:#FFF7E4">?</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:16px;align-items:flex-start">
+
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:14px">
+      <div style="position:relative;padding:14px;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:6px 6px 0 rgba(0,0,0,.35)">
+        <div style="position:relative;isolation:isolate;z-index:0;width:768px;height:464px;margin:0 auto;overflow:hidden;border:3px solid #3A2A14;background:#CBB79B">
+          <div style="position:absolute;left:0;right:0;top:0;height:224px;background:#C8B49A">
+            <div style="{{ wallStyle }}"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;height:10px;background:#8B6347;border-top:3px solid #6B4327"></div>
+          </div>
+          <div style="{{ floorStyle }}"></div>
+
+          <div style="position:absolute;left:0;right:0;top:0;height:224px">
+            <sc-for list="{{ wallItems }}" as="w">
+              <div style="{{ w.style }}" onClick="{{ w.onClick }}"></div>
+            </sc-for>
+          </div>
+
+          <div style="position:absolute;left:0;right:0;top:224px;bottom:0">
+            <sc-for list="{{ rugItems }}" as="r" hint-placeholder-count="1">
+              <div style="{{ r.style }}" onClick="{{ r.onClick }}"></div>
+            </sc-for>
+            <sc-for list="{{ floorItems }}" as="f">
+              <div style="{{ f.style }}" onClick="{{ f.onClick }}"></div>
+            </sc-for>
+            <img src="assets/avatar.png" alt="" style="{{ avatarStyle }}">
+          </div>
+
+          <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+            <div style="position:absolute;left:0;right:0;top:0;bottom:0">
+              <div style="position:absolute;left:0;top:0;width:768px;height:224px;display:grid;grid-template-columns:repeat(12,64px);grid-template-rows:repeat(2,112px)">
+                <sc-for list="{{ wallCells }}" as="c" hint-placeholder-count="24">
+                  <div onClick="{{ c.onClick }}" onMouseEnter="{{ c.onEnter }}" style="border:1px dashed rgba(58,42,20,.35);background:rgba(255,255,255,.07)" style-hover="background:rgba(255,255,255,.22)"></div>
+                </sc-for>
+              </div>
+              <div style="position:absolute;left:0;top:224px;width:768px;height:240px;display:grid;grid-template-columns:repeat(12,64px);grid-template-rows:repeat(5,48px)">
+                <sc-for list="{{ floorCells }}" as="c" hint-placeholder-count="60">
+                  <div onClick="{{ c.onClick }}" onMouseEnter="{{ c.onEnter }}" style="border:1px dashed rgba(58,42,20,.35);background:rgba(255,255,255,.07)" style-hover="background:rgba(255,255,255,.22)"></div>
+                </sc-for>
+              </div>
+              <div style="{{ ghostStyle }}"></div>
+            </div>
+          </sc-if>
+
+          <sc-if value="{{ selected }}" hint-placeholder-val="{{ false }}">
+            <div style="{{ selectedBoxStyle }}"></div>
+            <div style="{{ popoverStyle }}">
+              <button onClick="{{ flipSelected }}" style="font-family:inherit;font-size:13px;padding:7px 10px;background:#F5EDD8;border:3px solid #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">뒤집기</button>
+              <button onClick="{{ pickUpSelected }}" style="font-family:inherit;font-size:13px;padding:7px 10px;background:#F5EDD8;border:3px solid #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">옮기기</button>
+              <button onClick="{{ storeSelected }}" style="font-family:inherit;font-size:13px;padding:7px 10px;background:#C97C6B;border:3px solid #3A2A14;color:#FFF7E4" style-hover="background:#D98D7C">치우기</button>
+            </div>
+          </sc-if>
+
+          <div style="{{ friendBadgeStyle }}">{{ friendBadgeText }}</div>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px">
+          <div style="font-size:13px;font-family:'Gothic A1',sans-serif;color:#8B6A3A;max-width:520px">{{ hint }}</div>
+          <div style="display:flex;gap:10px">
+            <sc-if value="{{ isEdit }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ cancelEdit }}" style="font-family:inherit;font-size:15px;padding:11px 18px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#8B6347" style-hover="background:#FFF7E4">되돌리기</button>
+              <button onClick="{{ saveEdit }}" style="font-family:inherit;font-size:15px;padding:11px 22px;background:#7FA65C;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#FFF7E4" style-hover="background:#8FB86A;transform:translate(-1px,-1px)" style-active="transform:translate(2px,2px);box-shadow:1px 1px 0 #3A2A14">저장하기</button>
+            </sc-if>
+            <sc-if value="{{ isView }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ startEdit }}" style="font-family:inherit;font-size:16px;padding:12px 26px;background:#E9B44C;border:3px solid #3A2A14;box-shadow:4px 4px 0 #3A2A14;color:#3A2A14" style-hover="background:#F2C468;transform:translate(-1px,-1px);box-shadow:5px 5px 0 #3A2A14" style-active="transform:translate(2px,2px);box-shadow:2px 2px 0 #3A2A14">꾸미기 시작</button>
+            </sc-if>
+            <sc-if value="{{ isFriend }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ leaveFriend }}" style="font-family:inherit;font-size:15px;padding:11px 18px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">내 방으로</button>
+              <button onClick="{{ praiseFriend }}" style="font-family:inherit;font-size:15px;padding:11px 20px;background:#C97C6B;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#FFF7E4" style-hover="background:#D98D7C">칭찬 남기기</button>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:360px;flex:none;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:6px 6px 0 rgba(0,0,0,.35);display:flex;flex-direction:column;height:604px">
+      <div style="padding:12px 14px;border-bottom:4px solid #3A2A14;display:flex;align-items:center;justify-content:space-between">
+        <div style="font-size:17px">{{ panelTitle }}</div>
+        <div style="font-size:12px;font-family:'Gothic A1',sans-serif;color:#8B6A3A">{{ panelSub }}</div>
+      </div>
+      <div style="padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px;border-bottom:3px solid #C8A96E;background:#EDE2C6">
+        <sc-for list="{{ cats }}" as="c" hint-placeholder-count="8">
+          <button onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.label }}</button>
+        </sc-for>
+      </div>
+      <div style="flex:1;overflow-y:auto;padding:12px">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <sc-for list="{{ tray }}" as="t" hint-placeholder-count="9">
+            <div onClick="{{ t.onClick }}" style="{{ t.cardStyle }}">
+              <div style="height:74px;display:grid;place-items:center;padding:6px">
+                <div style="{{ t.imgStyle }}"></div>
+              </div>
+              <div style="font-size:12px;font-family:'Gothic A1',sans-serif;font-weight:700;line-height:1.25;min-height:30px;text-align:center;padding:0 4px">{{ t.name }}</div>
+              <div style="{{ t.metaStyle }}">{{ t.meta }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ trayEmpty }}" hint-placeholder-val="{{ false }}">
+          <div style="padding:40px 16px;text-align:center;font-size:13px;font-family:'Gothic A1',sans-serif;color:#A09080;line-height:1.7">이 카테고리에 가진 아이템이 없어요.<br>상점에서 데려와 볼까요?</div>
+        </sc-if>
+      </div>
+      <div style="padding:10px 12px;border-top:3px solid #C8A96E;background:#EDE2C6;display:flex;gap:8px;align-items:center;justify-content:space-between">
+        <div style="font-size:12px;font-family:'Gothic A1',sans-serif;color:#8B6A3A">{{ panelFoot }}</div>
+        <button onClick="{{ clearRoom }}" style="font-family:inherit;font-size:12px;padding:8px 12px;background:#F5EDD8;border:3px solid #8B6347;color:#8B6347" style-hover="background:#FFF7E4;border-color:#3A2A14;color:#3A2A14">전부 치우기</button>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showShop }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(30,20,10,.62);display:grid;place-items:center;z-index:60;padding:32px">
+      <div style="width:1020px;max-height:88vh;overflow:hidden;display:flex;flex-direction:column;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:10px 10px 0 rgba(0,0,0,.4);animation:rise .18s ease both">
+        <div style="padding:14px 18px;border-bottom:4px solid #3A2A14;display:flex;align-items:center;justify-content:space-between;background:#E9B44C">
+          <div style="font-size:20px">인테리어 상점</div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="display:flex;align-items:center;gap:8px;padding:6px 12px;background:#FFF7E4;border:3px solid #3A2A14;font-family:'Press Start 2P',monospace;font-size:14px">♪ {{ balanceText }}</div>
+            <button onClick="{{ closeModal }}" style="font-family:inherit;font-size:16px;width:38px;height:38px;background:#F5EDD8;border:3px solid #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">✕</button>
+          </div>
+        </div>
+        <div style="flex:1;overflow-y:auto;padding:18px">
+          <div style="font-size:15px;margin-bottom:10px">테마 세트 <span style="font-size:12px;font-family:'Gothic A1',sans-serif;color:#8B6A3A">· 한 번에 방 전체를 바꿔요</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:22px">
+            <sc-for list="{{ themeSets }}" as="s" hint-placeholder-count="3">
+              <div style="border:3px solid #3A2A14;background:#FFF7E4;display:flex;flex-direction:column">
+                <div style="{{ s.previewStyle }}">
+                  <sc-for list="{{ s.thumbs }}" as="th" hint-placeholder-count="3">
+                    <div style="{{ th.style }}"></div>
+                  </sc-for>
+                  <div style="{{ s.tagStyle }}">{{ s.tag }}</div>
+                </div>
+                <div style="padding:10px 12px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:15px">{{ s.name }}</div>
+                  <div style="font-size:11.5px;font-family:'Gothic A1',sans-serif;color:#8B6A3A;line-height:1.5;min-height:32px">{{ s.desc }}</div>
+                  <button onClick="{{ s.onClick }}" style="{{ s.btnStyle }}">{{ s.btnLabel }}</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:15px;margin-bottom:10px">단품 <span style="font-size:12px;font-family:'Gothic A1',sans-serif;color:#8B6A3A">· 오늘의 특가는 도장이 붙어 있어요</span></div>
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:12px">
+            <sc-for list="{{ shopItems }}" as="p" hint-placeholder-count="18">
+              <div style="{{ p.cardStyle }}">
+                <div style="height:80px;display:grid;place-items:center;padding:6px;position:relative">
+                  <div style="{{ p.imgStyle }}"></div>
+                  <div style="{{ p.dealStyle }}">SALE</div>
+                </div>
+                <div style="font-size:11.5px;font-family:'Gothic A1',sans-serif;font-weight:700;text-align:center;min-height:28px;line-height:1.25;padding:0 4px">{{ p.name }}</div>
+                <button onClick="{{ p.onClick }}" style="{{ p.btnStyle }}">{{ p.btnLabel }}</button>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ reward }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(30,20,10,.7);display:grid;place-items:center;z-index:80">
+      <div style="width:400px;padding:26px 24px;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:10px 10px 0 rgba(0,0,0,.4);text-align:center;animation:popin .32s cubic-bezier(.34,1.56,.64,1) both">
+        <div style="font-size:13px;font-family:'Gothic A1',sans-serif;color:#8B6A3A;letter-spacing:2px">NEW ITEM</div>
+        <div style="margin:14px auto;width:150px;height:150px;display:grid;place-items:center;background:#FFF7E4;border:3px solid #3A2A14;box-shadow:inset 0 0 0 4px #E8D8B8">
+          <div style="{{ reward.imgStyle }}"></div>
+        </div>
+        <div style="font-size:20px;margin-bottom:6px">{{ reward.name }}</div>
+        <div style="font-size:13px;font-family:'Gothic A1',sans-serif;color:#8B6A3A;line-height:1.6;margin-bottom:16px">{{ reward.msg }}</div>
+        <div style="display:flex;gap:10px">
+          <button onClick="{{ closeReward }}" style="flex:1;font-family:inherit;font-size:14px;padding:12px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">보관함에 넣기</button>
+          <button onClick="{{ placeReward }}" style="flex:1;font-family:inherit;font-size:14px;padding:12px;background:#7FA65C;border:3px solid #3A2A14;box-shadow:3px 3px 0 #3A2A14;color:#FFF7E4" style-hover="background:#8FB86A">바로 놓기</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ showHelp }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed;inset:0;background:rgba(30,20,10,.62);display:grid;place-items:center;z-index:70;padding:32px">
+      <div style="width:560px;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:10px 10px 0 rgba(0,0,0,.4);animation:rise .18s ease both">
+        <div style="padding:14px 18px;border-bottom:4px solid #3A2A14;display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:18px">방 꾸미기 규칙</div>
+          <button onClick="{{ closeModal }}" style="font-family:inherit;font-size:16px;width:36px;height:36px;background:#F5EDD8;border:3px solid #3A2A14;color:#3A2A14" style-hover="background:#FFF7E4">✕</button>
+        </div>
+        <div style="padding:18px;font-family:'Gothic A1',sans-serif;font-size:13.5px;line-height:1.9;color:#3A2A14">
+          <div>· 소리를 기록하고 투표하면 <b>♪ 음표</b>가 쌓여요. 음표로 소품을 데려올 수 있어요.</div>
+          <div>· 보관함에서 소품을 고른 뒤, 방의 원하는 칸을 누르면 그 자리에 놓여요.</div>
+          <div>· 놓인 소품을 누르면 뒤집기 · 옮기기 · 치우기를 할 수 있어요.</div>
+          <div>· 벽지와 바닥재는 칸이 아니라 방 전체에 한 번에 입혀져요.</div>
+          <div>· 저장하기를 누르기 전까지는 되돌리기로 원래 배치로 돌아갈 수 있어요.</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <div style="{{ toastStyle }}">{{ toast }}</div>
+
+  <div style="margin-top:34px;padding:24px 26px;background:#F5EDD8;border:4px solid #3A2A14;box-shadow:6px 6px 0 rgba(0,0,0,.35)">
+    <div style="font-size:18px;margin-bottom:6px">구현 노트 · Claude Code 인수용</div>
+    <div style="font-size:12.5px;font-family:'Gothic A1',sans-serif;color:#8B6A3A;line-height:1.7;margin-bottom:18px">이 화면은 <b>uploads/global.png</b> 한 장에서 잘라낸 스프라이트(assets/*.png)만 사용합니다. 좌표는 아래 표 그대로 재추출 가능합니다. 화폐 명칭은 기존 <code>lib/currency.js</code>의 잔액을 그대로 쓰는 것으로 가정했습니다(♪ 음표).</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-family:'Gothic A1',sans-serif;font-size:12.5px;line-height:1.75">
+      <div>
+        <div style="font-family:'Gothic A1',sans-serif;font-size:14px;margin-bottom:8px">데이터 모델</div>
+        <pre style="margin:0;padding:12px;background:#2A2016;color:#E8D8B8;font-size:11.5px;line-height:1.6;overflow-x:auto;border:3px solid #3A2A14">room = {
+  wallpaper: 'wp_clover',   // 벽지 1개
+  floor:     'fl_green',    // 바닥재 1개
+  items: [
+    { uid, itemId, layer:'floor'|'wall'|'rug',
+      col, row, flip:false }
+  ]
+}
+inventory = { [itemId]: count }
+balance   = participant_currency.balance</pre>
+      </div>
+      <div>
+        <div style="font-family:'Gothic A1',sans-serif;font-size:14px;margin-bottom:8px">상태 · 이벤트</div>
+        <pre style="margin:0;padding:12px;background:#2A2016;color:#E8D8B8;font-size:11.5px;line-height:1.6;overflow-x:auto;border:3px solid #3A2A14">mode: view | edit | friend
+tool: itemId | null      // 손에 든 소품
+selected: uid | null     // 방에서 고른 소품
+
+chooseTool(itemId)  placeAt(col,row)
+selectPlaced(uid)   flip/pickUp/store(uid)
+setWallpaper(id)    setFloor(id)
+purchase(itemId)    purchaseSet(setId)
+saveRoom(room)      resetRoom()</pre>
+      </div>
+    </div>
+    <div style="margin-top:18px;font-family:'Gothic A1',sans-serif;font-size:14px;margin-bottom:8px">그리드 규격</div>
+    <div style="font-family:'Gothic A1',sans-serif;font-size:12.5px;line-height:1.8;color:#3A2A14">
+      바닥 12칸 × 5줄(칸 64px, 줄 깊이 48px) · 벽 12칸 × 2줄(칸 64px, 줄 112px) · 스프라이트는 원본 픽셀 × {{ scaleText }}배, 칸 하단 기준 정렬 · z-index = row 순서(앞줄이 위) · 러그는 바닥 레이어(2×2칸) · 벽지/바닥재는 32px 타일 repeat.
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;roomName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;혜라의 방&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;pixelScale&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:4,&quot;min&quot;:3,&quot;max&quot;:5,&quot;step&quot;:1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;방 표현&quot;},&quot;startBalance&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:1240,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;화폐&quot;}}">
+const CAT = ['벽지','바닥재','러그','큰가구','소파·의자','소품','벽장식','펫'];
+
+const CATALOG = [
+  { id:'wp_hearts', name:'하트 벽지', cat:'벽지', kind:'wallpaper', src:'assets/wp_hearts.png', price:280 },
+  { id:'wp_clover', name:'클로버 벽지', cat:'벽지', kind:'wallpaper', src:'assets/wp_clover.png', price:280 },
+  { id:'wp_bunny', name:'달토끼 벽지', cat:'벽지', kind:'wallpaper', src:'assets/wp_bunny.png', price:340 },
+  { id:'wp_stripe', name:'산뜻한 줄무늬', cat:'벽지', kind:'wallpaper', src:'assets/wp_stripe.png', price:220 },
+  { id:'wp_night', name:'별밤 벽지', cat:'벽지', kind:'wallpaper', src:'assets/wp_night.png', price:420 },
+  { id:'fl_green', name:'초록 타일', cat:'바닥재', kind:'floor', src:'assets/fl_green.png', price:240 },
+  { id:'fl_rose', name:'로즈 타일', cat:'바닥재', kind:'floor', src:'assets/fl_rose.png', price:240 },
+  { id:'fl_brown', name:'따뜻한 갈색 타일', cat:'바닥재', kind:'floor', src:'assets/fl_brown.png', price:200 },
+  { id:'fl_stone', name:'돌 바닥', cat:'바닥재', kind:'floor', src:'assets/fl_stone.png', price:300 },
+  { id:'rug_persian_red', name:'붉은 자수 러그', cat:'러그', layer:'rug', src:'assets/rug_persian_red.png', fw:2, fh:2, price:320 },
+  { id:'rug_persian_green', name:'모래빛 자수 러그', cat:'러그', layer:'rug', src:'assets/rug_persian_green.png', fw:2, fh:2, price:320 },
+  { id:'rug_circle_teal', name:'둥근 청록 러그', cat:'러그', layer:'rug', src:'assets/rug_circle_teal.png', fw:2, fh:2, price:260 },
+  { id:'bed_cream', name:'크림 침대', cat:'큰가구', layer:'floor', src:'assets/bed_cream.png', nw:33, nh:33, fw:2, fh:2, price:520 },
+  { id:'bed_teal', name:'청록 침대', cat:'큰가구', layer:'floor', src:'assets/bed_teal.png', nw:33, nh:33, fw:2, fh:2, price:560 },
+  { id:'dresser', name:'토끼 서랍장', cat:'큰가구', layer:'floor', src:'assets/dresser.png', nw:29, nh:30, fw:2, fh:1, price:410 },
+  { id:'wardrobe_teal', name:'청록 옷장', cat:'큰가구', layer:'floor', src:'assets/wardrobe_teal.png', nw:23, nh:29, fw:1, fh:1, price:380 },
+  { id:'wardrobe_purple', name:'라벤더 옷장', cat:'큰가구', layer:'floor', src:'assets/wardrobe_purple.png', nw:17, nh:29, fw:1, fh:1, price:380 },
+  { id:'fireplace', name:'장작 난로', cat:'큰가구', layer:'floor', src:'assets/fireplace.png', nw:27, nh:24, fw:2, fh:1, price:640 },
+  { id:'sofa_cream', name:'크림 소파', cat:'소파·의자', layer:'floor', src:'assets/sofa_cream.png', nw:31, nh:20, fw:2, fh:1, price:340 },
+  { id:'sofa_red', name:'붉은 소파', cat:'소파·의자', layer:'floor', src:'assets/sofa_red.png', nw:31, nh:20, fw:2, fh:1, price:340 },
+  { id:'armchair_cream', name:'폭신 1인 의자', cat:'소파·의자', layer:'floor', src:'assets/armchair_cream.png', nw:16, nh:20, fw:1, fh:1, price:210 },
+  { id:'chair_cream', name:'긴 벤치', cat:'소파·의자', layer:'floor', src:'assets/chair_cream.png', nw:30, nh:21, fw:2, fh:1, price:230 },
+  { id:'table_round', name:'둥근 협탁', cat:'소파·의자', layer:'floor', src:'assets/table_round.png', nw:23, nh:21, fw:1, fh:1, price:180 },
+  { id:'stool_wood', name:'나무 요람', cat:'소파·의자', layer:'floor', src:'assets/stool_wood.png', nw:23, nh:28, fw:1, fh:1, price:260 },
+  { id:'plant_tall', name:'키 큰 화분', cat:'소품', layer:'floor', src:'assets/plant_tall.png', nw:13, nh:16, fw:1, fh:1, price:120 },
+  { id:'plant_bush', name:'통통 화분', cat:'소품', layer:'floor', src:'assets/plant_bush.png', nw:13, nh:16, fw:1, fh:1, price:120 },
+  { id:'pot_cactus', name:'분홍 꽃 화분', cat:'소품', layer:'floor', src:'assets/pot_cactus.png', nw:15, nh:25, fw:1, fh:1, price:150 },
+  { id:'books', name:'책 무더기', cat:'소품', layer:'floor', src:'assets/books.png', nw:23, nh:11, fw:1, fh:1, price:140 },
+  { id:'fruitbowl', name:'과일 바구니', cat:'소품', layer:'floor', src:'assets/fruitbowl.png', nw:18, nh:13, fw:1, fh:1, price:160 },
+  { id:'lamp_floor', name:'무드 스탠드', cat:'소품', layer:'floor', src:'assets/lamp_floor.png', nw:13, nh:22, fw:1, fh:1, price:290 },
+  { id:'candle', name:'촛대', cat:'소품', layer:'floor', src:'assets/candle.png', nw:13, nh:20, fw:1, fh:1, price:270 },
+  { id:'xmas_tree', name:'선물 나무', cat:'소품', layer:'floor', src:'assets/xmas_tree.png', nw:31, nh:48, fw:1, fh:1, price:480, limited:true },
+  { id:'curtain_red', name:'붉은 커튼', cat:'벽장식', layer:'wall', src:'assets/curtain_red.png', nw:26, nh:30, fw:2, fh:1, price:260 },
+  { id:'curtain_green', name:'청록 커튼', cat:'벽장식', layer:'wall', src:'assets/curtain_green.png', nw:26, nh:30, fw:2, fh:1, price:260 },
+  { id:'curtain_blue', name:'자수정 커튼', cat:'벽장식', layer:'wall', src:'assets/curtain_blue.png', nw:26, nh:30, fw:2, fh:1, price:260 },
+  { id:'frame_butterfly2', name:'나비 표본 액자', cat:'벽장식', layer:'wall', src:'assets/frame_butterfly2.png', nw:17, nh:22, fw:1, fh:1, price:190 },
+  { id:'cat', name:'낮잠 고양이', cat:'펫', layer:'floor', src:'assets/cat.png', nw:11, nh:11, fw:1, fh:1, price:360 },
+  { id:'hamster', name:'통통 햄찌', cat:'펫', layer:'floor', src:'assets/hamster.png', nw:14, nh:12, fw:1, fh:1, price:340 },
+  { id:'deer', name:'아기 사슴', cat:'펫', layer:'floor', src:'assets/deer.png', nw:18, nh:16, fw:1, fh:1, price:520 },
+  { id:'cactus', name:'초록 친구', cat:'펫', layer:'floor', src:'assets/cactus.png', nw:11, nh:14, fw:1, fh:1, price:300 },
+];
+
+const SETS = [
+  { id:'set_clover', name:'토끼풀 하우스', desc:'클로버 벽지와 초록 타일, 자수 러그와 아기 사슴까지.', price:1180,
+    items:['wp_clover','fl_green','rug_persian_green','deer'], tag:'인기' },
+  { id:'set_night', name:'별밤 다락방', desc:'별밤 벽지에 돌 바닥, 촛대와 낮잠 고양이를 얹었어요.', price:1290,
+    items:['wp_night','fl_stone','candle','cat'], tag:'신규' },
+  { id:'set_heart', name:'하트 룸', desc:'하트 벽지와 로즈 타일, 둥근 러그와 햄찌 세트.', price:1080,
+    items:['wp_hearts','fl_rose','rug_circle_teal','hamster'], tag:'한정' },
+];
+
+const COLS = 12, ROWS = 5, CELL = 64, ROWD = 48, WALL_ROWS = 2, WALL_ROWD = 112, WALL_H = 224;
+
+const DEFAULT_ROOM = {
+  wallpaper:'wp_clover', floor:'fl_brown',
+  items:[
+    { uid:1, itemId:'rug_persian_green', layer:'rug', col:4, row:3, flip:false },
+    { uid:2, itemId:'bed_cream', layer:'floor', col:0, row:2, flip:false },
+    { uid:3, itemId:'dresser', layer:'floor', col:2, row:1, flip:false },
+    { uid:4, itemId:'sofa_cream', layer:'floor', col:6, row:1, flip:false },
+    { uid:5, itemId:'table_round', layer:'floor', col:8, row:2, flip:false },
+    { uid:6, itemId:'plant_tall', layer:'floor', col:11, row:2, flip:false },
+    { uid:7, itemId:'lamp_floor', layer:'floor', col:5, row:1, flip:false },
+    { uid:8, itemId:'cat', layer:'floor', col:5, row:4, flip:false },
+    { uid:9, itemId:'books', layer:'floor', col:9, row:4, flip:false },
+    { uid:10, itemId:'curtain_green', layer:'wall', col:8, row:0, flip:false },
+    { uid:11, itemId:'frame_butterfly2', layer:'wall', col:3, row:0, flip:false },
+  ],
+};
+
+const FRIEND_ROOM = {
+  wallpaper:'wp_night', floor:'fl_stone',
+  items:[
+    { uid:1, itemId:'rug_circle_teal', layer:'rug', col:5, row:3, flip:false },
+    { uid:2, itemId:'bed_teal', layer:'floor', col:9, row:2, flip:false },
+    { uid:3, itemId:'fireplace', layer:'floor', col:0, row:1, flip:false },
+    { uid:4, itemId:'candle', layer:'floor', col:3, row:1, flip:false },
+    { uid:5, itemId:'sofa_red', layer:'floor', col:5, row:2, flip:false },
+    { uid:6, itemId:'deer', layer:'floor', col:7, row:4, flip:false },
+    { uid:7, itemId:'xmas_tree', layer:'floor', col:2, row:3, flip:false },
+    { uid:8, itemId:'curtain_red', layer:'wall', col:4, row:0, flip:false },
+  ],
+};
+
+const OWNED_START = ['wp_clover','wp_stripe','fl_brown','fl_green','rug_persian_green','bed_cream','dresser',
+  'sofa_cream','table_round','plant_tall','lamp_floor','cat','books','curtain_green','frame_butterfly2','armchair_cream','wardrobe_teal','pot_cactus','rug_circle_teal'];
+
+const byId = id => CATALOG.find(i => i.id === id);
+const DEAL = ['bed_teal','plant_bush','curtain_blue'];
+
+class Component extends DCLogic {
+  state = {
+    mode:'view', cat:'큰가구', tool:null, selected:null, hover:null,
+    room: JSON.parse(JSON.stringify(DEFAULT_ROOM)),
+    saved: JSON.parse(JSON.stringify(DEFAULT_ROOM)),
+    balance: this.props.startBalance ?? 1240, owned: OWNED_START.slice(), modal:null, reward:null, toast:'', nextUid:100,
+  };
+
+  get scale() { return this.props.pixelScale ?? 4; }
+
+  say(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.setState({ toast:'' }), 2200);
+  }
+
+  price(id) { const it = byId(id); return DEAL.includes(id) ? Math.round(it.price * 0.6) : it.price; }
+
+  activeRoom() { return this.state.mode === 'friend' ? FRIEND_ROOM : this.state.room; }
+
+  chooseTool(id) {
+    const it = byId(id);
+    if (it.kind === 'wallpaper' || it.kind === 'floor') {
+      const room = { ...this.state.room };
+      if (it.kind === 'wallpaper') room.wallpaper = id; else room.floor = id;
+      this.setState({ room, tool:null, selected:null });
+      this.say(it.name + '을(를) 방 전체에 입혔어요');
+      return;
+    }
+    this.setState({ tool: this.state.tool === id ? null : id, selected:null });
+  }
+
+  placeAt(layer, col, row) {
+    const { tool } = this.state;
+    if (!tool) { this.setState({ selected:null }); return; }
+    const it = byId(tool);
+    const wantWall = it.layer === 'wall';
+    if (wantWall !== (layer === 'wall')) { this.say(wantWall ? '벽장식은 벽에만 놓을 수 있어요' : '이 소품은 바닥에 놓아요'); return; }
+    const fw = it.fw || 1;
+    const c = Math.min(col, COLS - fw);
+    const room = { ...this.state.room, items: this.state.room.items.concat([
+      { uid: this.state.nextUid, itemId: tool, layer: it.layer, col: c, row, flip:false },
+    ]) };
+    this.setState({ room, nextUid: this.state.nextUid + 1, selected: this.state.nextUid, tool:null, hover:null });
+  }
+
+  selectPlaced(uid, e) {
+    if (e) e.stopPropagation();
+    if (this.state.mode !== 'edit') { this.say('꾸미기 시작을 누르면 소품을 옮길 수 있어요'); return; }
+    this.setState({ selected: this.state.selected === uid ? null : uid, tool:null });
+  }
+
+  mutateSelected(fn) {
+    const items = this.state.room.items.map(i => (i.uid === this.state.selected ? fn(i) : i)).filter(Boolean);
+    this.setState({ room: { ...this.state.room, items } });
+  }
+
+  buy(id) {
+    const p = this.price(id);
+    if (this.state.owned.includes(id)) { this.say('이미 보관함에 있어요'); return; }
+    if (this.state.balance < p) { this.say('음표가 ' + (p - this.state.balance) + '개 더 필요해요'); return; }
+    const it = byId(id);
+    this.setState({
+      balance: this.state.balance - p,
+      owned: this.state.owned.concat([id]),
+      reward: { id, name: it.name, msg: '♪ ' + p + '을 썼어요. 남은 음표 ' + (this.state.balance - p) + '개' },
+    });
+  }
+
+  buySet(setId) {
+    const s = SETS.find(x => x.id === setId);
+    const need = s.items.filter(i => !this.state.owned.includes(i));
+    if (!need.length) { this.applySet(setId); this.say(s.name + ' 테마를 방에 적용했어요'); return; }
+    if (this.state.balance < s.price) { this.say('음표가 ' + (s.price - this.state.balance) + '개 더 필요해요'); return; }
+    this.setState({ balance: this.state.balance - s.price, owned: this.state.owned.concat(need) }, () => this.applySet(setId));
+    this.setState({ modal:null });
+    this.say(s.name + ' 테마를 방에 적용했어요');
+  }
+
+  applySet(setId) {
+    const s = SETS.find(x => x.id === setId);
+    const room = { ...this.state.room, items: this.state.room.items.slice() };
+    let uid = this.state.nextUid;
+    s.items.forEach(id => {
+      const it = byId(id);
+      if (it.kind === 'wallpaper') room.wallpaper = id;
+      else if (it.kind === 'floor') room.floor = id;
+      else if (it.layer === 'rug') {
+        room.items = room.items.filter(i => i.layer !== 'rug');
+        room.items.push({ uid: uid++, itemId:id, layer:'rug', col:4, row:3, flip:false });
+      } else {
+        room.items.push({ uid: uid++, itemId:id, layer:it.layer, col: it.layer === 'wall' ? 6 : 10, row: it.layer === 'wall' ? 0 : 4, flip:false });
+      }
+    });
+    this.setState({ room, nextUid: uid, mode:'edit', modal:null });
+  }
+
+  renderVals() {
+    const S = this.scale;
+    const st = this.state;
+    const room = this.activeRoom();
+    const isEdit = st.mode === 'edit';
+    const isFriend = st.mode === 'friend';
+    const wp = byId(room.wallpaper), fl = byId(room.floor);
+
+    const spriteStyle = (it, p, ghost) => {
+      const fw = it.fw || 1;
+      const w = (it.nw || 16) * S, h = (it.nh || 16) * S;
+      const left = p.col * CELL + (fw * CELL - w) / 2;
+      const bg = 'background-image:url(' + it.src + ');background-size:100% 100%;image-rendering:pixelated;';
+      if (it.layer === 'wall') {
+        const top = p.row * WALL_RD_SAFE + (WALL_RD_SAFE - h) / 2 + 8;
+        return 'position:absolute;left:' + left + 'px;top:' + top + 'px;width:' + w + 'px;height:' + h +
+          'px;cursor:pointer;' + bg + 'transform:scaleX(' + (p.flip ? -1 : 1) + ');' +
+          (ghost ? 'opacity:.55;pointer-events:none;' : '');
+      }
+      const bottom = (ROWS - 1 - p.row) * ROWD;
+      return 'position:absolute;left:' + left + 'px;bottom:' + bottom + 'px;width:' + w + 'px;height:' + h +
+        'px;cursor:pointer;' + bg + 'z-index:' + (p.row * 10 + 5) +
+        ';filter:drop-shadow(0 2px 0 rgba(58,42,20,.22));transform:scaleX(' + (p.flip ? -1 : 1) + ');' +
+        (ghost ? 'opacity:.55;pointer-events:none;' : '');
+    };
+    const WALL_RD_SAFE = WALL_ROWD;
+
+    const floorItems = room.items.filter(p => p.layer === 'floor').map(p => {
+      const it = byId(p.itemId);
+      return { key:p.uid, src:it.src, style: spriteStyle(it, p) + (st.selected === p.uid ? 'outline:3px solid #E9B44C;outline-offset:2px;' : ''),
+        onClick: e => this.selectPlaced(p.uid, e) };
+    });
+    const wallItems = room.items.filter(p => p.layer === 'wall').map(p => {
+      const it = byId(p.itemId);
+      return { key:p.uid, src:it.src, style: spriteStyle(it, p) + (st.selected === p.uid ? 'outline:3px solid #E9B44C;outline-offset:2px;' : ''),
+        onClick: e => this.selectPlaced(p.uid, e) };
+    });
+    const rugItems = room.items.filter(p => p.layer === 'rug').map(p => {
+      const it = byId(p.itemId);
+      const w = (it.fw || 2) * CELL, h = (it.fh || 2) * ROWD;
+      return { key:p.uid, onClick: e => this.selectPlaced(p.uid, e),
+        style:'position:absolute;left:' + (p.col * CELL) + 'px;bottom:' + ((ROWS - 1 - p.row) * ROWD) + 'px;width:' + w + 'px;height:' + h +
+          'px;background-image:url(' + it.src + ');background-size:' + (32 * S) + 'px ' + (32 * S) + 'px;image-rendering:pixelated;cursor:pointer;z-index:1;' +
+          (st.selected === p.uid ? 'outline:3px solid #E9B44C;outline-offset:2px;' : '') };
+    });
+
+    const floorCells = [];
+    for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+      floorCells.push({ key:'f' + r + c, onClick: () => this.placeAt('floor', c, r), onEnter: () => this.setState({ hover:{ layer:'floor', col:c, row:r } }) });
+    }
+    const wallCells = [];
+    for (let r = 0; r < WALL_ROWS; r++) for (let c = 0; c < COLS; c++) {
+      wallCells.push({ key:'w' + r + c, onClick: () => this.placeAt('wall', c, r), onEnter: () => this.setState({ hover:{ layer:'wall', col:c, row:r } }) });
+    }
+
+    let ghostStyle = 'display:none';
+    if (isEdit && st.tool && st.hover) {
+      const it = byId(st.tool);
+      const layerOk = (it.layer === 'wall') === (st.hover.layer === 'wall');
+      if (layerOk) {
+        const p = { col: Math.min(st.hover.col, COLS - (it.fw || 1)), row: st.hover.row, flip:false };
+        if (it.layer === 'rug') {
+          ghostStyle = 'position:absolute;left:' + (p.col * CELL) + 'px;top:' + (WALL_H + (ROWS - 1 - p.row) * ROWD - ((it.fh || 2) * ROWD - ROWD)) + 'px;width:' +
+            ((it.fw || 2) * CELL) + 'px;height:' + ((it.fh || 2) * ROWD) + 'px;background-image:url(' + it.src + ');background-size:' + (32 * S) + 'px ' + (32 * S) + 'px;opacity:.55;pointer-events:none';
+        } else if (it.layer === 'wall') {
+          ghostStyle = spriteStyle(it, p, true).replace('position:absolute;', 'position:absolute;');
+        } else {
+          const w = (it.nw || 16) * S, h = (it.nh || 16) * S;
+          ghostStyle = 'position:absolute;left:' + (p.col * CELL + ((it.fw || 1) * CELL - w) / 2) + 'px;top:' +
+            (WALL_H + 240 - (ROWS - 1 - p.row) * ROWD - h) + 'px;width:' + w + 'px;height:' + h +
+            'px;opacity:.55;pointer-events:none;background-image:url(' + it.src + ');background-size:100% 100%;image-rendering:pixelated';
+        }
+      }
+    }
+
+    const sel = st.room.items.find(i => i.uid === st.selected);
+    let popoverStyle = 'display:none', selectedBoxStyle = 'display:none';
+    if (sel && isEdit) {
+      const it = byId(sel.itemId);
+      const fw = it.fw || 1;
+      const x = sel.col * CELL + (fw * CELL) / 2;
+      const y = sel.layer === 'wall' ? sel.row * WALL_ROWD + 100 : WALL_H + 240 - (ROWS - 1 - sel.row) * ROWD - ((it.nh || 16) * S) - 14;
+      popoverStyle = 'position:absolute;left:' + Math.max(8, Math.min(x - 100, 768 - 210)) + 'px;top:' + Math.max(6, y - 44) +
+        'px;display:flex;gap:6px;padding:6px;background:#F5EDD8;border:3px solid #3A2A14;box-shadow:3px 3px 0 rgba(0,0,0,.35);z-index:90';
+    }
+
+    const catBtns = CAT.map(c => ({
+      key:c, label:c, onClick: () => this.setState({ cat:c, tool:null }),
+      style:'font-family:inherit;font-size:12.5px;padding:7px 10px;border:3px solid #3A2A14;cursor:pointer;' +
+        (st.cat === c ? 'background:#3A2A14;color:#F5EDD8;' : 'background:#F5EDD8;color:#8B6347;'),
+    }));
+
+    const trayList = CATALOG.filter(i => i.cat === st.cat && st.owned.includes(i.id));
+    const tray = trayList.map(i => {
+      const active = st.tool === i.id;
+      const applied = (i.kind === 'wallpaper' && st.room.wallpaper === i.id) || (i.kind === 'floor' && st.room.floor === i.id);
+      const isTile = i.kind === 'wallpaper' || i.kind === 'floor' || i.layer === 'rug';
+      return {
+        key:i.id, name:i.name, src:i.src,
+        onClick: () => (isEdit ? this.chooseTool(i.id) : this.say('꾸미기 시작을 누르면 소품을 놓을 수 있어요')),
+        cardStyle:'display:flex;flex-direction:column;cursor:pointer;background:#FFF7E4;border:3px solid ' +
+          (active ? '#E9B44C' : '#C8A96E') + ';box-shadow:' + (active ? '0 0 0 3px #E9B44C inset' : 'none') + ';padding-bottom:6px;' +
+          (isEdit ? '' : 'opacity:.72;'),
+        imgStyle: isTile
+          ? 'width:60px;height:60px;image-rendering:pixelated;border:2px solid #8B6347;background-image:url(' + i.src + ');background-size:30px 30px;'
+          : (() => { const k = Math.min(3, 62 / (i.nw || 16), 62 / (i.nh || 16));
+              return 'width:' + Math.round((i.nw || 16) * k) + 'px;height:' + Math.round((i.nh || 16) * k) +
+                'px;background-image:url(' + i.src + ');background-size:100% 100%;image-rendering:pixelated'; })(),
+        meta: applied ? '사용 중' : (active ? '손에 들었어요' : (isTile ? '방 전체' : (i.fw || 1) + '×' + (i.fh || 1) + '칸')),
+        metaStyle:'font-size:10.5px;font-family:\'Gothic A1\',sans-serif;text-align:center;color:' + (applied || active ? '#7FA65C' : '#A09080'),
+      };
+    });
+
+    const shopItems = CATALOG.filter(i => !st.owned.includes(i.id)).map(i => {
+      const p = this.price(i.id);
+      const deal = DEAL.includes(i.id);
+      const poor = st.balance < p;
+      const isTile = i.kind === 'wallpaper' || i.kind === 'floor' || i.layer === 'rug';
+      return {
+        key:i.id, name:i.name, src:i.src, onClick: () => this.buy(i.id),
+        cardStyle:'display:flex;flex-direction:column;background:#FFF7E4;border:3px solid #C8A96E;padding-bottom:8px',
+        imgStyle: isTile
+          ? 'width:64px;height:64px;border:2px solid #8B6347;background-image:url(' + i.src + ');background-size:32px 32px;image-rendering:pixelated'
+          : (() => { const k = Math.min(3, 66 / (i.nw || 16), 70 / (i.nh || 16));
+              return 'width:' + Math.round((i.nw || 16) * k) + 'px;height:' + Math.round((i.nh || 16) * k) +
+                'px;background-image:url(' + i.src + ');background-size:100% 100%;image-rendering:pixelated'; })(),
+        dealStyle: deal
+          ? 'position:absolute;top:2px;right:2px;font-family:\'Press Start 2P\',monospace;font-size:8px;padding:4px 5px;background:#C97C6B;color:#FFF7E4;border:2px solid #3A2A14'
+          : 'display:none',
+        btnLabel:'♪ ' + p,
+        btnStyle:'margin:0 8px;font-family:\'Press Start 2P\',monospace;font-size:10px;padding:9px 4px;border:3px solid #3A2A14;cursor:pointer;' +
+          (poor ? 'background:#E8D8B8;color:#A09080;' : 'background:#E9B44C;color:#3A2A14;'),
+      };
+    });
+
+    const themeSets = SETS.map(s => {
+      const owned = s.items.every(i => st.owned.includes(i));
+      const wpItem = byId(s.items[0]), flItem = byId(s.items[1]);
+      return {
+        key:s.id, name:s.name, desc:s.desc, tag:s.tag,
+        previewStyle:'position:relative;height:118px;border-bottom:3px solid #3A2A14;background-image:url(' + wpItem.src + ');background-size:' + (32 * 3) + 'px ' + (24 * 3) + 'px;image-rendering:pixelated',
+        tagStyle:'position:absolute;top:6px;left:6px;font-size:11px;padding:3px 7px;background:#C97C6B;color:#FFF7E4;border:2px solid #3A2A14',
+        thumbs: s.items.slice(1).map((id, k) => {
+          const it = byId(id);
+          const isTile = it.kind === 'floor' || it.layer === 'rug';
+          const kk = Math.min(3, 58 / (it.nh || 16));
+          return { key:id,
+            style: isTile
+              ? 'position:absolute;left:0;right:0;bottom:0;height:44px;background-image:url(' + it.src + ');background-size:48px 48px;image-rendering:pixelated;border-top:3px solid #6B4327'
+              : 'position:absolute;bottom:6px;left:' + (60 + k * 62) + 'px;width:' + Math.round((it.nw || 16) * kk) + 'px;height:' + Math.round((it.nh || 16) * kk) +
+                'px;background-image:url(' + it.src + ');background-size:100% 100%;image-rendering:pixelated;z-index:2' };
+        }),
+        onClick: () => this.buySet(s.id),
+        btnLabel: owned ? '방에 적용하기' : '♪ ' + s.price + ' · 세트로 데려오기',
+        btnStyle:'font-family:inherit;font-size:12.5px;padding:10px;border:3px solid #3A2A14;cursor:pointer;box-shadow:3px 3px 0 #3A2A14;' +
+          (owned ? 'background:#7FA65C;color:#FFF7E4;' : 'background:#E9B44C;color:#3A2A14;'),
+      };
+    });
+
+    const rewardItem = st.reward ? byId(st.reward.id) : null;
+
+    return {
+      roomName: this.props.roomName ?? '혜라의 방',
+      balanceText: st.balance.toLocaleString(),
+      placedCount: st.room.items.length,
+      ownedCount: st.owned.length,
+      scaleText: S,
+      isEdit, isView: st.mode === 'view', isFriend,
+      wallStyle:'position:absolute;inset:0;background-image:url(' + wp.src + ');background-size:' + (32 * S) + 'px ' + (24 * S) + 'px;image-rendering:pixelated',
+      floorStyle:'position:absolute;left:0;right:0;top:' + WALL_H + 'px;bottom:0;background-image:url(' + fl.src + ');background-size:' + (32 * S) + 'px ' + (32 * S) + 'px;image-rendering:pixelated',
+      floorItems, wallItems, rugItems,
+      floorCells: isEdit ? floorCells : [], wallCells: isEdit ? wallCells : [],
+      ghostStyle,
+      avatarStyle:'position:absolute;left:' + (2 * CELL + 8) + 'px;bottom:' + (0 * ROWD + 2) + 'px;width:' + (32 * S) + 'px;height:' + (32 * S) +
+        'px;image-rendering:pixelated;z-index:48;animation:bob 2.6s ease-in-out infinite;filter:drop-shadow(0 3px 0 rgba(58,42,20,.25))',
+      selected: !!(sel && isEdit), popoverStyle, selectedBoxStyle,
+      flipSelected: () => this.mutateSelected(i => ({ ...i, flip: !i.flip })),
+      pickUpSelected: () => { const it = sel; this.mutateSelected(() => null); this.setState({ tool: it.itemId, selected:null }); this.say('놓을 칸을 눌러 주세요'); },
+      storeSelected: () => { this.mutateSelected(() => null); this.setState({ selected:null }); this.say('보관함으로 넣었어요'); },
+      cats: catBtns, tray, trayEmpty: tray.length === 0,
+      panelTitle: isFriend ? '친구의 소품' : (isEdit ? '보관함 · 놓을 소품 고르기' : '보관함'),
+      panelSub: st.owned.length + '종 보유',
+      panelFoot: isEdit ? (st.tool ? byId(st.tool).name + '을(를) 들고 있어요' : '카드를 눌러 소품을 손에 드세요') : '꾸미기 시작을 누르면 배치할 수 있어요',
+      hint: isFriend ? '친구 방은 구경만 할 수 있어요. 칭찬을 남기면 친구에게 음표가 쌓여요.'
+        : (isEdit ? (st.tool ? '방의 칸을 누르면 그 자리에 놓여요. 벽장식은 벽 칸에만 놓입니다.' : '보관함에서 소품을 고르거나, 놓인 소품을 눌러 옮기세요.')
+          : '오늘의 방이에요. 꾸미기 시작을 누르면 칸이 나타나요.'),
+      friendBadgeStyle: isFriend
+        ? 'position:absolute;top:10px;right:10px;padding:7px 12px;background:#F5EDD8;border:3px solid #3A2A14;font-size:13px;z-index:95'
+        : 'display:none',
+      friendBadgeText:'루미의 방 · 구경 중',
+      startEdit: () => this.setState({ mode:'edit', saved: JSON.parse(JSON.stringify(st.room)) }),
+      cancelEdit: () => this.setState({ mode:'view', room: JSON.parse(JSON.stringify(st.saved)), tool:null, selected:null }),
+      saveEdit: () => { this.setState({ mode:'view', saved: JSON.parse(JSON.stringify(st.room)), tool:null, selected:null }); this.say('방을 저장했어요'); },
+      openShop: () => this.setState({ modal:'shop', selected:null }),
+      openInventory: () => { this.setState({ mode:'edit', modal:null }); this.say('보관함에서 소품을 골라 보세요'); },
+      openFriend: () => this.setState({ mode: st.mode === 'friend' ? 'view' : 'friend', tool:null, selected:null }),
+      leaveFriend: () => this.setState({ mode:'view' }),
+      praiseFriend: () => this.say('루미에게 칭찬을 남겼어요'),
+      openHelp: () => this.setState({ modal:'help', selected:null }),
+      closeModal: () => this.setState({ modal:null }),
+      showShop: st.modal === 'shop', showHelp: st.modal === 'help',
+      clearRoom: () => { this.setState({ room: { ...st.room, items:[] }, selected:null }); this.say('소품을 모두 보관함에 넣었어요'); },
+      shopItems, themeSets,
+      reward: st.reward ? { src: rewardItem.src, name: rewardItem.name, msg: st.reward.msg,
+        imgStyle: (rewardItem.kind || rewardItem.layer === 'rug')
+          ? 'width:120px;height:' + (rewardItem.kind === 'wallpaper' ? 90 : 120) + 'px;border:3px solid #8B6347;background-image:url(' + rewardItem.src + ');background-size:100% 100%;image-rendering:pixelated'
+          : (() => { const k = Math.min(4, 120 / (rewardItem.nw || 16), 120 / (rewardItem.nh || 16));
+              return 'width:' + Math.round((rewardItem.nw || 16) * k) + 'px;height:' + Math.round((rewardItem.nh || 16) * k) +
+                'px;background-image:url(' + rewardItem.src + ');background-size:100% 100%;image-rendering:pixelated;animation:bob 1.6s ease-in-out infinite'; })() } : null,
+      closeReward: () => this.setState({ reward:null }),
+      placeReward: () => { const id = st.reward.id; this.setState({ reward:null, modal:null, mode:'edit', cat: byId(id).cat }); this.chooseTool(id); },
+      toast: st.toast,
+      toastStyle: st.toast
+        ? 'position:fixed;left:50%;bottom:40px;transform:translateX(-50%);padding:12px 20px;background:#3A2A14;color:#F5EDD8;border:3px solid #F5EDD8;font-size:14px;z-index:120;animation:rise .18s ease both'
+        : 'display:none',
+    };
+  }
+}
+</script>
+</body>
+</html>

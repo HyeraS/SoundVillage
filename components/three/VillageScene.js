@@ -2,24 +2,27 @@
 
 import { useRef } from 'react'
 import { Color } from 'three'
-import { MUSIC_EXIT_TARGET } from '@/lib/three/modelConfig.mjs'
-import { createMusicInteractionTargets } from '@/lib/three/sceneFlow.mjs'
+import { getVillageRuntimeConfig } from '@/lib/three/modelConfig.mjs'
+import { createVillageInteractionTargets } from '@/lib/three/sceneFlow.mjs'
+import AnimalVillageEnvironment from './AnimalVillageEnvironment'
 import InteractableSound from './InteractableSound'
 import Player3D from './Player3D'
 import VillageEnvironment from './VillageEnvironment'
 import HubThirdPersonCamera from './world/HubThirdPersonCamera'
 
-export default function VillageScene({ placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure, showHubExit = false }) {
+export default function VillageScene({ sceneId = 'music', placements, completedIds, nearbyId, inputRef, onNearbySoundChange, paused, reducedMotion, debugColliders, debugCamera, loadModels, forceModelFailure, showHubExit = false }) {
   const playerRef = useRef(null)
   const yawRef = useRef(0)
   const facingYawRef = useRef(0)
   const movingRef = useRef(false)
-  const interactionTargets = createMusicInteractionTargets(placements, MUSIC_EXIT_TARGET, showHubExit)
+  const config = getVillageRuntimeConfig(sceneId)
+  const interactionTargets = createVillageInteractionTargets(placements, config.exitTarget, showHubExit)
+  const animalMode = sceneId === 'animal'
 
   return (
     <>
-      <color attach="background" args={['#B9DDF0']} />
-      <fog attach="fog" args={['#B9DDF0', 20, 39]} />
+      <color attach="background" args={[animalMode ? '#BCE4EE' : '#B9DDF0']} />
+      <fog attach="fog" args={[animalMode ? '#BCE4EE' : '#B9DDF0', 20, 39]} />
       <hemisphereLight args={['#FFF6DD', '#668855', 1.45]} />
       <ambientLight intensity={0.42} />
       <directionalLight
@@ -34,7 +37,11 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         shadow-camera-top={12}
         shadow-camera-bottom={-12}
       />
-      <VillageEnvironment loadModels={loadModels} debugColliders={debugColliders} showHubExit={showHubExit} exitNearby={nearbyId === MUSIC_EXIT_TARGET.id} />
+      {animalMode ? (
+        <AnimalVillageEnvironment debugColliders={debugColliders} showHubExit={showHubExit} exitNearby={nearbyId === config.exitTarget.id} />
+      ) : (
+        <VillageEnvironment loadModels={loadModels} debugColliders={debugColliders} showHubExit={showHubExit} exitNearby={nearbyId === config.exitTarget.id} />
+      )}
       {placements.map(placement => (
         <InteractableSound
           key={placement.id}
@@ -59,6 +66,9 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         movementYawRef={yawRef}
         facingYawRef={facingYawRef}
         movingRef={movingRef}
+        startPosition={config.playerStart}
+        worldBounds={config.worldBounds}
+        worldColliders={config.worldColliders}
       />
       <HubThirdPersonCamera
         playerRef={playerRef}
@@ -68,7 +78,7 @@ export default function VillageScene({ placements, completedIds, nearbyId, input
         reducedMotion={reducedMotion}
         paused={paused}
         debugCamera={debugCamera}
-        debugLabel="music-third-person"
+        debugLabel={config.cameraDebugLabel}
       />
     </>
   )

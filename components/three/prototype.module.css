@@ -10,6 +10,8 @@
 .progressWrap { display: grid; gap: 5px; min-width: 100px; text-align: right; }
 .progressTrack { width: 100px; height: 7px; overflow: hidden; border-radius: 10px; background: #cdbfadb8; }
 .progressTrack i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #9873c7, #d19fd8); transition: width .3s ease; }
+.hubProgressList { display: grid; gap: 7px; }
+.hubProgressList .progressWrap:last-child .progressTrack i { background: linear-gradient(90deg, #67a857, #e39a77); }
 .hubDots { display: flex; justify-content: flex-end; gap: 4px; }
 .hubDots i { width: 9px; height: 9px; border-radius: 50%; background: #e98662; }
 .hubDots i:nth-child(even) { background: #62d6c4; box-shadow: none; }
@@ -31,6 +33,7 @@
 .villageEntryCard p { margin: 4px 0; color: #725d4d; font-size: 13px; line-height: 1.6; }
 .villageEntryIcon { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 50%; background: var(--village-color); color: white; font-size: 30px; box-shadow: 0 7px 20px color-mix(in srgb, var(--village-color), transparent 55%); }
 .villageEntryNote { font-weight: 800; }
+.villageEntryError { color: #9c3f3f !important; font-weight: 800; }
 .villageEntryList { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 16px 0; }
 .villageEntryList span { padding: 5px 8px; border-radius: 999px; background: #eadfca; color: #725d4d; font-size: 9px; font-weight: 800; }
 .villageEntryList .villageEntryCurrent { background: var(--village-color); color: white; }
