@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState, useMemo, memo } from 'react'
 import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER, HUMAN_WINTER_GROUND, HUMAN_FROST_PATH } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER_GROUND, WINTER_TILES, WINTER_MARKET } from '@/components/AssetRegistry'
 import { SHEET_CODES, LAB_DUNGEON_SHEET_META, LAB_STATIC, LAB_TORCHES, LAB_TRAPS, LAB_PROPS, LAB_ANIM, LAB_FLOOR_CELLS } from '@/components/labDungeonData'
 
 /* ─────────────────────────────────────────────
@@ -1110,296 +1110,286 @@ function buildUrbanZone(objs) {
 }
 
 /* ─────────────────────────────────────────────
-   Human Zone("사람 마을") — Kevin Lynch "The Image of the City" 5요소
-   (랜드마크/경로/결절점/구역/경계)를 명시적으로 구분해 재설계. Urban Zone과
-   같은 6구역 격자(HUMAN_BLOCKS, colBounds=[2,17,31,46]/rowBounds=[2,18,34],
-   computeBlockGrid가 6개 block에서 만드는 격자와 동일)를 캔버스로 쓰되, 이번엔
-   block마다 정확히 하나의 역할만 갖는다("예쁘게 흩뿌리기" 금지):
-
-     ne(LANDMARK 1) — SUPAM 슈퍼마켓. HUMAN_WINTER.buildings 중 가장 큰
-       단일 건물(167×127) → 단일 기준점.
-     sw(LANDMARK 2) — Public Library. 두 번째로 큰 건물(149×101), ne와
-       대각선 코너 → 어느 코너에 있어도 반대쪽 랜드마크를 향해 걸어야
-       다음 기준점이 나오게(두 랜드마크를 동시에 보는 시점이 없도록).
-     nmid(NODE 1, 주) — 마켓 광장. 진저브레드 하우스(랜드마크 악센트)+
-       눈사람+마켓 부스 3종이 모인 결절점 — 길이 모이고 사람이 몰리는 지점.
-     smid(NODE 2, 보조) — 빙판 광장. bakery가 광장을 감싸고 iceRink가
-       중심에 있는 결절점. nmid와 남북 축으로 바로 이어져 입구(24,35)에서
-       가장 먼저 닿는다.
-     nw(DISTRICT) — 주거 구역. Hippie Home↔Pub이 마주보는 조용한 골목,
-       성격이 균일한 텍스처 지역(단일 기준점이 아님).
-     se(EDGE/여백) — 건물 없이 나무·벤치만 있는 조용한 모서리. 랜드마크·
-       결절점·구역 사이에 "숨 쉴 틈"을 주는 경계 지역.
-
-   경로(HUMAN_STREET)는 block 경계선 위에 그대로 얹는다(colBounds/rowBounds와
-   동일 좌표) — 이러면 buildPaths()/computeBlockGrid()가 이미 만드는
-   PATH_BUFFER 여백과 겹쳐서 별도 처리 없이 "길이 곧 block 사이 여백"이 된다.
-   동서 축 하나(y17~19)는 동시에 경계이기도 하다 — 북쪽 줄(주거+마켓+
-   슈퍼마켓, 붐비는 성격)과 남쪽 줄(도서관+빙판광장+여백, 조용한 성격)을
-   가르는 선. Lynch가 말한 "경로와 경계가 같은 선일 수 있다"는 사례를 그대로
-   적용했다.
+   Human Zone("사람 마을") — 크리스마스 마켓 리스킨(HANDOFF_christmas_market.md
+   2단계: 지형). 디자인 원본(크리스마스 마켓 마을.dc.html)의 ground(tx,ty)/hash()를
+   그대로 포팅 — 좌표계(TILE=32, MAP_W=48, MAP_H=36)가 이미 이 파일 상수와 동일해서
+   변환 없이 옮길 수 있었다. 아래 buildHumanZone()(3단계에서 오브젝트/충돌까지 교체)과
+   marketGroundType()/prerenderMarketGround()가 함께 이 zone 전용 렌더링을 구성한다.
 ───────────────────────────────────────────── */
-const HUMAN_BLOCKS = {
-  nw:   { x0: 2,  y0: 2,  x1: 15, y1: 16, kind: 'district',  role: '주거 구역(Hippie Home+Pub)' },
-  nmid: { x0: 19, y0: 2,  x1: 29, y1: 16, kind: 'node',      role: '결절점 1(마켓 광장)' },
-  ne:   { x0: 33, y0: 2,  x1: 45, y1: 16, kind: 'landmark',  role: '랜드마크 1(SUPAM 슈퍼마켓)' },
-  sw:   { x0: 2,  y0: 20, x1: 15, y1: 33, kind: 'landmark',  role: '랜드마크 2(Public Library)' },
-  smid: { x0: 19, y0: 20, x1: 29, y1: 33, kind: 'node',      role: '결절점 2(빙판 광장)' },
-  se:   { x0: 33, y0: 20, x1: 45, y1: 33, kind: 'edge',      role: '경계/여백(조용한 모서리)' },
+const MARKET_CX = MAP_W / 2, MARKET_CY = MAP_H / 2 // 24, 18
+// 눈길 가지 [x0,x1,y0,y1] — 디자인 원본 BRANCH 그대로.
+const MARKET_BRANCH = [
+  [5, 17, 12, 13], [8, 9, 13, 17],
+  [33, 44, 12, 13], [33, 34, 13, 17],
+  [11, 12, 22, 30], [36, 37, 22, 30],
+]
+function marketHash(x, y, s) {
+  let h = x * 374761393 + y * 668265263 + s * 2246822519
+  h = (h ^ (h >> 13)) * 1274126177
+  return ((h ^ (h >> 16)) >>> 0) / 4294967295
 }
-
-// 十자형 간선(경로) — block 경계선(colBounds/rowBounds)과 동일 좌표라
-// PATH_BUFFER가 이미 아이템 스폰을 막아준다. 셋과 동일 폭(3타일)으로
-// 남북 두 축 + 동서 한 축.
-const HUMAN_STREET = {
-  vA: { x0: 16, x1: 18, y0: 2, y1: 33 }, // nw·sw ↔ nmid·smid
-  vB: { x0: 30, x1: 32, y0: 2, y1: 33 }, // nmid·smid ↔ ne·se
-  h:  { x0: 2,  x1: 45, y0: 17, y1: 19 }, // 북쪽 줄 ↔ 남쪽 줄(=경계)
+// 0 눈밭 / 1 눈길 / 2 광장 보도블록 / 3 흙길 — 게임 타일(32px) 단위로 하나씩 평가.
+function marketGroundType(tx, ty) {
+  const d = Math.hypot(tx + 0.5 - MARKET_CX, ty + 0.5 - MARKET_CY)
+  if (d < 6.2) return 2                                              // 중앙 광장(보도블록)
+  if (d < 7.6) return 0
+  if (d < 9.8) return 3                                              // 광장 둘레 흙길
+  if (Math.abs(tx - MARKET_CX) <= 2 && ty >= MARKET_CY) return 3      // 남쪽 메인 프롬나드
+  if (Math.abs(tx - MARKET_CX) <= 1.5 && ty < MARKET_CY) return 1     // 북쪽 눈길
+  if (Math.abs(ty - (MARKET_CY - 0.5)) <= 1.5) return 1               // 동서 눈길
+  for (const b of MARKET_BRANCH) if (tx >= b[0] && tx <= b[1] && ty >= b[2] && ty <= b[3]) return 1
+  return 0
 }
-
-function humanRect(x0, y0, x1, y1) {
-  const tiles = []
-  for (let ty = y0; ty <= y1; ty++) for (let tx = x0; tx <= x1; tx++) tiles.push({ tx, ty })
-  return tiles
-}
-
-// ── spawnSoundItems 전용 제외 영역(HUMAN_SPAWN_EXCLUDE) — 시각적 범위(마당/
-// 광장 전체)보다 훨씬 좁게, 실제 스프라이트 발자국("core")만 잡는다. Urban에서
-// "칸은 넉넉한데 core가 block 폭 대부분을 가로질러 남는 공간이 길쭉한 조각으로
-// 쪼개진다"는 문제를 두 번 겪은 전례를 그대로 반영해, 이번엔 처음부터 각
-// core를 block 폭의 일부(60~75%)로만 잡고 나머지가 한 덩어리로 남게 했다.
-// 十자 간선(HUMAN_STREET)은 여기 포함하지 않는다 — block 경계선과 좌표가
-// 같아서 PATH_BUFFER가 이미 스폰을 막아준다(Urban의 "avenue는 스폰 제외에서
-// 아예 빼는 게 제일 간단" 교훈 그대로).
-const HUMAN_LANDMARK1_CORE = { x0: 35, y0: 3,  x1: 44, y1: 10 } // ne — supam 건물 발자국
-const HUMAN_LANDMARK2_CORE = { x0: 4,  y0: 21, x1: 12, y1: 27 } // sw — library 건물 발자국
-const HUMAN_DISTRICT_BUILDINGS = {
-  hippie: { x0: 4, y0: 2,  x1: 9,  y1: 8  },
-  pub:    { x0: 8, y0: 11, x1: 13, y1: 16 },
-}
-// nmid/smid는 한 덩어리 core로 잡으면(block 폭 11칸 중 8~9칸을 차지) 남는 공간이
-// block 전체를 감싸는 얇은 L자 테두리가 돼서 산점도 검증에서 실제로 "선"처럼
-// 보였다(1차 구현 후 window.__ITEMS_DEBUG__로 확인) — 세로로 얕은 두 개의 띠로
-// 쪼개 위/아래에 각각 8~10칸짜리 덩어리 여백이 남게 재조정했다.
-const HUMAN_NODE1_CORE_A = { x0: 19, y0: 2,  x1: 25, y1: 9  } // nmid 상단 — 진저브레드+눈사람
-const HUMAN_NODE1_CORE_B = { x0: 19, y0: 10, x1: 28, y1: 13 } // nmid 부스 행(세로로 얕음)
-const HUMAN_NODE2_CORE_A = { x0: 19, y0: 21, x1: 25, y1: 25 } // smid 상단 — bakery
-const HUMAN_NODE2_CORE_B = { x0: 19, y0: 26, x1: 25, y1: 29 } // smid — iceRink
-function insideHumanSpawnExclude(tx, ty) {
-  const inRect = (r) => tx >= r.x0 && tx <= r.x1 && ty >= r.y0 && ty <= r.y1
-  return inRect(HUMAN_LANDMARK1_CORE) || inRect(HUMAN_LANDMARK2_CORE) ||
-    Object.values(HUMAN_DISTRICT_BUILDINGS).some(inRect) ||
-    inRect(HUMAN_NODE1_CORE_A) || inRect(HUMAN_NODE1_CORE_B) ||
-    inRect(HUMAN_NODE2_CORE_A) || inRect(HUMAN_NODE2_CORE_B)
+// 16px 서브셀 그리드로 맵 전체(PX_W×PX_H)를 한 번만 오프스크린 캔버스에 그려 dataURL로
+// 굳힌다 — Nature Zone 리스킨 때 쓴 "정적 프리렌더" 기법과 동일(매 프레임 6900여 개
+// 서브셀을 SVG 엘리먼트로 그리는 대신 이미지 한 장으로 합성). 9-slice(광장 보도블록/
+// 눈 더미)·해시 기반 변형(흙길/눈길)·흙길 가장자리 흰 눈 띠까지 디자인 원본 draw()
+// 로직 그대로 포팅.
+function prerenderMarketGround(imgTown, imgSnow) {
+  const canvas = document.createElement('canvas')
+  canvas.width = PX_W
+  canvas.height = PX_H
+  const ctx = canvas.getContext('2d')
+  ctx.imageSmoothingEnabled = false
+  const cols = PX_W / 16, rows = PX_H / 16
+  const cellGround = (cx, cy) => marketGroundType(Math.floor(cx / 2), Math.floor(cy / 2))
+  for (let cy = 0; cy < rows; cy++) {
+    for (let cx = 0; cx < cols; cx++) {
+      const g = cellGround(cx, cy)
+      const n = marketHash(cx, cy, 3)
+      const X = cx * 16, Y = cy * 16
+      const drawSnowBase = () => {
+        const sv = WINTER_TILES.snow[n < 0.6 ? 0 : n < 0.85 ? 1 : 2]
+        ctx.drawImage(imgSnow, sv.x, sv.y, 16, 16, X, Y, 16, 16)
+      }
+      if (g === 2) {
+        const l = cellGround(cx - 1, cy) === 2, r = cellGround(cx + 1, cy) === 2
+        const u = cellGround(cx, cy - 1) === 2, d = cellGround(cx, cy + 1) === 2
+        const col = l ? (r ? 1 : 2) : 0, row = u ? (d ? 1 : 2) : 0
+        drawSnowBase()
+        ctx.drawImage(imgTown, WINTER_TILES.cobble.x + col * 16, WINTER_TILES.cobble.y + row * 16, 16, 16, X, Y, 16, 16)
+      } else if (g === 3) {
+        const v = WINTER_TILES.dirt[n < 0.6 ? 0 : n < 0.8 ? 1 : 2]
+        ctx.drawImage(imgTown, v.x, v.y, 16, 16, X, Y, 16, 16)
+        ctx.fillStyle = 'rgba(252,250,244,.18)'
+        ctx.fillRect(X, Y, 16, 16)
+      } else if (g === 1) {
+        const v = WINTER_TILES.packed[n < 0.5 ? 0 : n < 0.8 ? 1 : 2]
+        ctx.drawImage(imgSnow, v.x, v.y, 16, 16, X, Y, 16, 16)
+      } else {
+        drawSnowBase()
+        const dr = (a, b) => marketHash(a >> 1, b >> 1, 31) > 0.66 && cellGround(a, b) === 0
+        if (dr(cx, cy)) {
+          const col = dr(cx - 1, cy) ? (dr(cx + 1, cy) ? 1 : 2) : 0
+          const row = dr(cx, cy - 1) ? (dr(cx, cy + 1) ? 1 : 2) : 0
+          ctx.drawImage(imgSnow, WINTER_TILES.drift.x + col * 16, WINTER_TILES.drift.y + row * 16, 16, 16, X, Y, 16, 16)
+        }
+      }
+      if (g === 3) {
+        ctx.fillStyle = 'rgba(242,251,255,.92)'
+        const sc = 2 + Math.round(n * 3)
+        if (cellGround(cx, cy - 1) !== 3) ctx.fillRect(X, Y, 16, sc)
+        if (cellGround(cx, cy + 1) !== 3) ctx.fillRect(X, Y + 16 - sc, 16, sc)
+        if (cellGround(cx - 1, cy) !== 3) ctx.fillRect(X, Y, sc, 16)
+        if (cellGround(cx + 1, cy) !== 3) ctx.fillRect(X + 16 - sc, Y, sc, 16)
+        if (n > 0.9) { ctx.fillStyle = 'rgba(242,251,255,.5)'; ctx.fillRect(X + 4, Y + 5, 7, 4) }
+      }
+    }
+  }
+  return canvas
 }
 
 /* ─────────────────────────────────────────────
-   Human Zone 전체 배치 — HUMAN_BLOCKS 6개에 Lynch 5요소를 하나씩 배정한
-   결과물. 순서: 경로(바닥 레이어) → 결절점 2곳 → 랜드마크 2곳 → 구역(nw) →
-   경계/여백(se). 매 구역이 blockOf()로 자기 소속 block 안에 있는지 셀프체크.
+   Human Zone("사람 마을") — 크리스마스 마켓 리스킨(HANDOFF_christmas_market.md
+   3단계: 오브젝트·충돌). 디자인 원본(크리스마스 마켓 마을.dc.html)의 PLACED/
+   RINK/TREES/GIFTS 배열과 build()의 스캐터·충돌 마킹 로직을 그대로 포팅해
+   위 Kevin Lynch 5요소 버전(HUMAN_BLOCKS 등)을 전부 대체한다.
+   충돌: 이 파일의 다른 어떤 zone도 오브젝트 충돌이 없다(전부 순수 장식) —
+   Human Zone만 디자인 원본이 요구하는 실제 footprint 충돌을 새로 추가한다
+   (격리된 부가 기능. 아래 buildHumanZone()이 objs.solid에 Uint8Array를 얹어
+   반환하고, ZoneMap 본체 게임 루프의 tryMoveX/Y가 zone==='Human'일 때만
+   그 solid를 검사한다 — 다른 zone은 solid가 undefined라 동작 완전히 그대로).
 ───────────────────────────────────────────── */
-function buildHumanZone(objs) {
-  const blockOf = (tx, ty) => Object.entries(HUMAN_BLOCKS).find(
-    ([, r]) => tx >= r.x0 && tx <= r.x1 && ty >= r.y0 && ty <= r.y1
-  )?.[0] ?? null
-  const propCount = {}
-  const oobErrors = []
-  const countProp = (tx, ty, expectBlock) => {
-    const b = blockOf(tx, ty)
-    if (b) propCount[b] = (propCount[b] || 0) + 1
-    if (expectBlock && b !== expectBlock) oobErrors.push(`(${tx},${ty})가 ${expectBlock} 밖(${b ?? '구역 없음'})`)
-  }
-
-  // ── 경로(십자 간선, HUMAN_STREET) — block 경계선과 동일 좌표라 별도
-  // spawn-exclude 없이 PATH_BUFFER만으로 이미 아이템을 밀어낸다. ──
-  const pathSeen = new Set()
-  const addPath = (tx, ty) => {
-    const k = `${tx},${ty}`
-    if (pathSeen.has(k)) return
-    pathSeen.add(k)
-    objs.push({ type: 'humanPath', tx, ty })
-  }
-  ;[HUMAN_STREET.vA, HUMAN_STREET.vB, HUMAN_STREET.h].forEach(band => {
-    humanRect(band.x0, band.y0, band.x1, band.y1).forEach(p => addPath(p.tx, p.ty))
-  })
-  // 간선 가로등 4개 — 교차점 근처는 피하고, 아직 다른 구역이 안 쓴 여백에만.
-  ;[[10, 16], [38, 16], [10, 20], [38, 20]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanLamp', key: 'lampWreath', tx, ty, tileH: 3.5 })
-  })
-
-  // ── 결절점 1(nmid, 주) — 마켓 광장. 진저브레드 하우스(랜드마크 악센트,
-  // 광장 안에서 튀는 캔디컬러라 작아도 시선이 모임)+눈사람이 북쪽, 부스
-  // 3종이 남쪽에 늘어서 "장이 선" 느낌을 낸다. HUMAN_NODE1_CORE_A/B(세로로
-  // 얕은 두 띠)가 spawn 제외 core — 오른쪽 열(x26-29)과 아래쪽 3줄(y14-16)이
-  // 각각 덩어리로 남아 아이템이 그 안에 자연스럽게 퍼진다. ──
-  objs.push({ type: 'humanGingerbread', key: 'gingerbreadHouse', tx: 21, ty: 3, tileH: 4.5 })
-  countProp(21, 3, 'nmid')
-  objs.push({ type: 'humanSnowman', key: 'snowmanSmall', tx: 24, ty: 5, tileH: 2.2 })
-  countProp(24, 5, 'nmid')
-  objs.push({ type: 'humanDecor', key: 'giftBox', tx: 21, ty: 8, tileH: 0.6 })
-  countProp(21, 8, 'nmid')
-  const node1Stands = [
-    { key: 'standAlmonds', tx: 19, ty: 11 },
-    { key: 'standJewelry', tx: 22, ty: 11 },
-    { key: 'standPretzel', tx: 25, ty: 11 },
+// 발치 사각형 4점 검사 — 디자인 원본 blocked()와 같은 원칙, 이 게임의 CHAR_W/H
+// 히트박스에 맞춰 오프셋만 조정. 축별로 따로 호출되므로(tryMoveX/Y) 벽을
+// 스치며 걷는 느낌이 나고 모서리에 끼지 않는다.
+function marketBlocked(solid, px, py) {
+  const pts = [
+    [px + 3, py + CHAR_H - 4], [px + CHAR_W - 3, py + CHAR_H - 4],
+    [px + 3, py + CHAR_H + 2], [px + CHAR_W - 3, py + CHAR_H + 2],
   ]
-  node1Stands.forEach(s => {
-    objs.push({ type: 'humanStand', key: s.key, tx: s.tx, ty: s.ty, tileH: 3.5 })
-    countProp(s.tx, s.ty, 'nmid')
-  })
-  ;[[19, 2], [27, 2]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'nmid')
-  })
-
-  // ── 결절점 2(smid, 보조) — 빙판 광장. bakery가 북쪽에서 광장을 감싸고
-  // iceRink가 중심 바닥에 깔린다(Urban plaza2 "장식으로 감싸기" 패턴).
-  // HUMAN_NODE2_CORE_A/B — 오른쪽 열(x26-29)과 아래쪽 3줄(y30-33)이 덩어리로 남는다. ──
-  objs.push({ type: 'humanBuilding', key: 'bakery', tx: 20, ty: 21, tileH: 5 })
-  countProp(20, 21, 'smid')
-  objs.push({ type: 'humanRink', tx: 19, ty: 26, tileW: 6 })
-  countProp(19, 26, 'smid')
-  objs.push({ type: 'humanBench', tx: 19, ty: 31 })
-  countProp(19, 31, 'smid')
-  objs.push({ type: 'humanBench', tx: 27, ty: 27 })
-  countProp(27, 27, 'smid')
-  objs.push({ type: 'humanDecor', key: 'giftBox', tx: 27, ty: 31, tileH: 0.6 })
-  countProp(27, 31, 'smid')
-  ;[[19, 21], [28, 21]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'smid')
-  })
-
-  // ── 랜드마크 1(ne) — SUPAM 슈퍼마켓. 등록된 건물 중 가장 큰 단일
-  // 실루엣이라 그 자체로 기준점 역할. 문에서 간선(h밴드)까지 짧은 골목은
-  // 순수 시각 요소(spawn-exclude에는 안 넣음 — Urban의 "avenue가 칸을
-  // 반으로 가르지 않게" 교훈). ──
-  objs.push({ type: 'humanBuilding', key: 'supam', tx: 35, ty: 3, tileH: 7 })
-  countProp(35, 3, 'ne')
-  humanRect(38, 11, 40, 16).forEach(p => addPath(p.tx, p.ty)) // 문→간선 골목
-  ;[[33, 3], [44, 13]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'ne')
-  })
-  objs.push({ type: 'humanLamp', key: 'lampWreath', tx: 33, ty: 9, tileH: 3.5 })
-  countProp(33, 9, 'ne')
-
-  // ── 랜드마크 2(sw) — Public Library. ne와 대각선 코너. 스프라이트가
-  // 항상 "문이 이미지 아래쪽"에 고정돼 있어 간선(북쪽)을 등지므로, 억지로
-  // 돌리는 대신 문 앞에 조용한 앞뜰(벤치+짧은 울타리)을 둬서 "간선과 별개로
-  // 존재하는 도서관 마당" 컨셉으로 처리했다. ──
-  objs.push({ type: 'humanBuilding', key: 'library', tx: 4, ty: 21, tileH: 6 })
-  countProp(4, 21, 'sw')
-  objs.push({ type: 'humanBench', tx: 6, ty: 30 })
-  countProp(6, 30, 'sw')
-  objs.push({ type: 'humanDecor', key: 'giftBox', tx: 10, ty: 30, tileH: 0.6 })
-  countProp(10, 30, 'sw')
-  for (let fx = 7; fx <= 10; fx++) {
-    objs.push({ type: 'humanFrostFence', tx: fx, ty: 29, role: 'rail' })
-    countProp(fx, 29, 'sw')
+  for (const [px2, py2] of pts) {
+    const tx = Math.floor(px2 / TILE), ty = Math.floor(py2 / TILE)
+    if (tx < 0 || ty < 0 || tx >= MAP_W || ty >= MAP_H) return true
+    if (solid[ty * MAP_W + tx]) return true
   }
-  ;[[2, 21], [14, 32]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'sw')
-  })
+  return false
+}
 
-  // ── 구역(nw) — 주거 골목. Hippie Home↔Pub이 짧은 안길을 사이에 두고
-  // 마주본다(랜드마크·결절점과 달리 "단일 기준점"이 아니라 균일한 텍스처). ──
-  objs.push({ type: 'humanBuilding', key: 'hippie', tx: 4, ty: 2, tileH: 6 })
-  countProp(4, 2, 'nw')
-  objs.push({ type: 'humanBuilding', key: 'pub', tx: 8, ty: 11, tileH: 5 })
-  countProp(8, 11, 'nw')
-  ;[[11, 2], [13, 6], [2, 12], [13, 13]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'nw')
-  })
-  for (let fx = 9; fx <= 12; fx++) {
-    objs.push({ type: 'humanFrostFence', tx: fx, ty: 8, role: 'rail' })
-    countProp(fx, 8, 'nw')
+// (key, tileX, tileY, footprintW, footprintH, scale) — 디자인 원본 PLACED 그대로.
+const MARKET_SHOP_SCALE = 2.25
+const MARKET_PLACED = [
+  ['tree_big', 23, 15, 3, 3, 1.5],
+  // 프롬나드 양쪽 스톨 열 — 실제 크리스마스 마켓처럼 통로를 마주 보게 두 줄
+  ['stall_pretzel', 17, 26, 4, 3, MARKET_SHOP_SCALE],
+  ['stall_bakery', 17, 31, 4, 3, MARKET_SHOP_SCALE],
+  ['shop_flores', 27, 26, 4, 3, MARKET_SHOP_SCALE],
+  ['cart_cotton', 28, 31, 3, 3, MARKET_SHOP_SCALE],
+  // 광장 북쪽 — 뜨거운 음료·과자 코너
+  ['stall_menu', 16, 7, 4, 3, MARKET_SHOP_SCALE],
+  ['shop_candy', 28, 7, 5, 3, MARKET_SHOP_SCALE],
+  // 랜드마크
+  ['ginger_house', 5, 4, 4, 3, MARKET_SHOP_SCALE],
+  ['igloo', 11, 9, 2, 2, 1.5],
+  ['snowman3', 8, 8, 1, 1, 1.2], ['snowman4', 13, 7, 1, 1, 1.2],
+  ['snowman2', 14, 11, 1, 1, 1.2], ['snowman1', 9, 12, 1, 1, 1.2],
+  ['snowman5', 11, 6, 1, 1, 1.2], ['snowman6', 6, 10, 1, 1, 1.2],
+  ['bunny1', 12, 13, 1, 1, 1.2], ['bunny3', 8, 14, 1, 1, 1.2],
+  ['sled', 15, 13, 1, 1, 1.5], ['pile', 17, 5, 1, 1, 1.2],
+  ['snow_blob', 45, 15, 1, 1, 1.2], ['reindeer', 44, 20, 1, 1, 1.5],
+  // 남쪽 게이트 + 프롬나드 가로등
+  ['candycane', 21, 33, 1, 2, 3], ['candycane', 27, 33, 1, 2, 3],
+  ['lamp', 21, 25, 1, 1, 1.5], ['lamp_wreath', 26, 25, 1, 1, 1.5],
+  ['lamp_wreath', 21, 30, 1, 1, 1.5], ['lamp', 26, 30, 1, 1, 1.5],
+  ['lamp', 21, 34, 1, 1, 1.5], ['lamp_wreath', 26, 34, 1, 1, 1.5],
+  // 광장 둘레 가로등
+  ['lamp', 19, 13, 1, 1, 1.5], ['lamp_wreath', 29, 13, 1, 1, 1.5],
+  ['lamp_wreath', 19, 23, 1, 1, 1.5], ['lamp', 29, 23, 1, 1, 1.5],
+  // 광장 안 — 트리 앞 선물더미 · 스탠딩 테이블 · 눈사람
+  ['counter', 21, 20, 2, 1, 1.5], ['counter', 26, 20, 2, 1, 1.5],
+  ['counter', 23, 13, 2, 1, 1.5],
+  ['gift4', 22, 19, 1, 1, 1.4], ['gift5', 25, 19, 1, 1, 1.4],
+  ['gift1', 20, 16, 1, 1, 1.4], ['gift6', 27, 16, 1, 1, 1.4],
+  ['snowman1', 20, 14, 1, 1, 1.2], ['snowman5', 28, 14, 1, 1, 1.2],
+  ['candycane', 19, 17, 1, 2, 2], ['candycane', 29, 17, 1, 2, 2],
+  ['bunny2', 27, 15, 1, 1, 1.2],
+]
+// 아이스링크 — 테두리만 충돌, 남쪽 게이트(38~39)는 열림. 디자인 원본 RINK 그대로.
+const MARKET_RINK = { tx: 34, ty: 5, w: 10, h: 6, scale: 2, gate: [38, 39] }
+const MARKET_TREES = ['pine_snow', 'pine_snow', 'pine_snow', 'tree_snow1', 'tree_snow2', 'tree_snow3', 'tree_snow1', 'tree_snow2', 'tree_bare2']
+const MARKET_GIFTS = ['gift1', 'gift2', 'gift3', 'gift4', 'gift5', 'gift6', 'gift7', 'gift8']
+
+// 전체 배치가 고정된 해시 시드로만 결정되는 순수 함수라 결과가 매번 동일하다 —
+// ZoneMap 본체가 buildZoneObjects(zone)을 useRef(초기값)으로 감싸는 기존 관례상
+// 매 프레임(60fps, setTick) 초기값 표현식 자체는 다시 평가되는데(React가 그
+// 결과를 버리고 .current는 그대로 두지만, 함수 호출 자체는 실행됨 — 이 zone 밖
+// 다른 zone도 원래 이런 구조), 이 zone은 스캐터 래스터 스캔이 있어 그 낭비가
+// 눈에 띄어서 결과를 모듈 레벨에 캐시해 첫 호출 이후엔 즉시 반환한다.
+let _marketCache = null
+function buildHumanZone(objs) {
+  if (_marketCache) {
+    for (const o of _marketCache.objs) objs.push(o)
+    objs.solid = _marketCache.solid
+    return
   }
-  objs.push({ type: 'humanDecor', key: 'giftBox', tx: 5, ty: 8, tileH: 0.6 })
-  countProp(5, 8, 'nw')
+  const solid = new Uint8Array(MAP_W * MAP_H)
+  const mark = (tx, ty) => { if (tx >= 0 && ty >= 0 && tx < MAP_W && ty < MAP_H) solid[ty * MAP_W + tx] = 1 }
+  for (let x = 0; x < MAP_W; x++) { mark(x, 0); mark(x, MAP_H - 1) }
+  for (let y = 0; y < MAP_H; y++) { mark(0, y); mark(MAP_W - 1, y) }
+  for (let x = 21; x <= 27; x++) solid[(MAP_H - 1) * MAP_W + x] = 0 // 남쪽 게이트만 열어둔다
 
-  // ── 경계/여백(se) — 건물 없이 나무·벤치만 있는 조용한 모서리. 얇은
-  // 소품이라 spawn-exclude에는 안 넣는다(굵은 건물/광장 core만 제외 대상). ──
-  ;[[35, 22], [38, 26], [43, 30], [34, 31]].forEach(([tx, ty]) => {
-    objs.push({ type: 'humanTree', key: 'pineTree', tx, ty, tileH: 3 })
-    countProp(tx, ty, 'se')
-  })
-  objs.push({ type: 'humanBench', tx: 37, ty: 24 })
-  countProp(37, 24, 'se')
-  objs.push({ type: 'humanBench', tx: 41, ty: 29 })
-  countProp(41, 29, 'se')
-  for (let fx = 34; fx <= 37; fx++) {
-    objs.push({ type: 'humanFrostFence', tx: fx, ty: 21, role: 'rail' })
-    countProp(fx, 21, 'se')
+  // footprint 가로 중앙·아래쪽 정렬로 배치 + 그만큼 solid 마킹 — 디자인 원본
+  // add()와 완전히 동일한 공식. sortY(ty+fh, 발이 닿는 타일 좌표)로 나중에
+  // 전체를 한 번 정렬해 "깊이 정렬은 전부 발 y좌표 하나로 통일"(HANDOFF 9장)을 만족한다.
+  // 가로등(lamp/lamp_wreath)은 사용자 요청으로 충돌에서 제외 — 기둥이 가늘어서
+  // 시각적으로만 서 있고 길을 막지 않는다(다른 오브젝트는 그대로 충돌 유지).
+  const MARKET_NO_COLLIDE = new Set(['lamp', 'lamp_wreath'])
+  const addMarket = (key, tx, ty, fw, fh, scale) => {
+    if (!WINTER_MARKET[key]) return
+    objs.push({ type: 'marketSprite', key, tx, ty, fw, fh, scale, sortY: ty + fh })
+    if (MARKET_NO_COLLIDE.has(key)) return
+    for (let a = 0; a < fw; a++) for (let b = 0; b < fh; b++) mark(tx + a, ty + b)
   }
-  objs.push({ type: 'humanDecor', key: 'giftBox', tx: 40, ty: 22, tileH: 0.6 })
-  countProp(40, 22, 'se')
+  MARKET_PLACED.forEach(p => addMarket(p[0], p[1], p[2], p[3], p[4], p[5]))
 
-  // ── 셀프체크 1: 오브젝트-구역 소속(십자 간선은 의도적으로 경계를 가로지르므로 제외) ──
-  console.log(
-    `[HumanZone 셀프체크] 오브젝트-구역 소속(간선 제외) → ` +
-    (oobErrors.length === 0 ? 'PASS (전부 배정된 구역 안)' : `FAIL:\n  ${oobErrors.join('\n  ')}`)
-  )
+  // 아이스링크 — 테두리 한 줄만 충돌(남쪽 입구 구간은 열어서 안에서 스케이트
+  // 가능). 스프라이트 자체는 ZoneMap 본체 렌더의 바닥 레이어에서 별도로 그린다.
+  for (let a = 0; a < MARKET_RINK.w; a++) for (let b = 0; b < MARKET_RINK.h; b++) {
+    const edge = a === 0 || a === MARKET_RINK.w - 1 || b === 0 || b === MARKET_RINK.h - 1
+    const gate = b === MARKET_RINK.h - 1 && MARKET_RINK.tx + a >= MARKET_RINK.gate[0] && MARKET_RINK.tx + a <= MARKET_RINK.gate[1]
+    if (edge && !gate) mark(MARKET_RINK.tx + a, MARKET_RINK.ty + b)
+  }
 
-  // ── 셀프체크 2: 마켓 부스 크롭이 winter.png 시트 안에서 실제로 겹치지 않는지 ──
-  const standKeys = ['standAlmonds', 'standJewelry', 'standPretzel']
-  const standGapLines = []
-  for (let i = 0; i < standKeys.length; i++) {
-    for (let j = i + 1; j < standKeys.length; j++) {
-      const a = HUMAN_WINTER[standKeys[i]], b = HUMAN_WINTER[standKeys[j]]
-      const overlapX = a.x < b.x + b.w && b.x < a.x + a.w
-      const overlapY = a.y < b.y + b.h && b.y < a.y + a.h
-      const overlap = overlapX && overlapY
-      const gapX = a.x + a.w <= b.x ? b.x - (a.x + a.w) : (b.x + b.w <= a.x ? a.x - (b.x + b.w) : 0)
-      standGapLines.push(
-        `${standKeys[i]}↔${standKeys[j]}: ${overlap ? 'FAIL 겹침' : 'OK 안 겹침'}` +
-        (overlapY ? ` (같은 행, 시트상 x간격 ${gapX}px)` : ` (다른 행이라 y축으로 이미 분리됨)`)
-      )
+  // 울타리 — 지도 테두리 안쪽 한 칸(y=1/y=MAP_H-2, x=1/x=MAP_W-2)에 시각
+  // 장식으로만 그린다(충돌은 위에서 이미 실제 테두리 y=0/MAP_H-1·x=0/MAP_W-1에
+  // 마킹됨 — 디자인 원본도 울타리 자체는 solid를 안 건드리고 지도 테두리
+  // mark()에만 의존). 남쪽은 게이트 폭(21~26)만 비운다.
+  for (let x = 1; x < MAP_W - 1; x++) {
+    objs.push({ type: 'marketFenceH', tx: x, ty: 1, sortY: 1.9 })
+    if (x < 21 || x > 26) objs.push({ type: 'marketFenceH', tx: x, ty: MAP_H - 2, sortY: MAP_H - 2 + 0.95 })
+  }
+  for (let y = 2; y < MAP_H - 2; y++) {
+    objs.push({ type: 'marketFenceV', tx: 1, ty: y, sortY: y + 0.95 })
+    objs.push({ type: 'marketFenceV', tx: MAP_W - 2, ty: y, sortY: y + 0.95 })
+  }
+
+  // 나무·덤불·선물 스캐터 — 눈밭(ground===0)이면서 solid 아니고 링크 주변이
+  // 아니며 3×3 이웃까지 전부 눈밭인 칸에서만, 해시 밀도로 배치한다. 디자인
+  // 원본과 동일한 hash()·밀도식이라 같은 시드에서 같은 결과가 재현된다.
+  for (let ty = 2; ty < MAP_H - 2; ty++) {
+    for (let tx = 2; tx < MAP_W - 2; tx++) {
+      if (marketGroundType(tx, ty) !== 0) continue
+      if (solid[ty * MAP_W + tx]) continue
+      if (tx >= MARKET_RINK.tx - 1 && tx <= MARKET_RINK.tx + MARKET_RINK.w && ty >= MARKET_RINK.ty - 1 && ty <= MARKET_RINK.ty + MARKET_RINK.h) continue
+      let free = true
+      for (let a = -1; a <= 1 && free; a++) for (let b = -1; b <= 1; b++) {
+        if (marketGroundType(tx + a, ty + b) !== 0) { free = false; break }
+      }
+      if (!free) continue
+      const r1 = marketHash(tx, ty, 7)
+      const clearing = marketHash(Math.floor(tx / 6), Math.floor(ty / 6), 21)
+      const nearGarden = tx < 17 && ty < 16
+      const density = (nearGarden ? 0.035 : 0.085) * (0.35 + clearing * 1.5)
+      if (r1 < density) {
+        const key = MARKET_TREES[Math.floor(marketHash(tx, ty, 11) * MARKET_TREES.length)]
+        addMarket(key, tx, ty, 1, 1, 2)
+      } else if (r1 < density + 0.02) {
+        addMarket('bush', tx, ty, 1, 1, 1.5)
+      } else if (r1 < density + 0.032) {
+        const key = MARKET_GIFTS[Math.floor(marketHash(tx, ty, 13) * MARKET_GIFTS.length)]
+        // 스캐터 선물은 충돌 없는 순수 바닥 소품이라 addMarket()이 아니라 디자인
+        // 원본과 동일한 반 타일 오프셋으로만 그린다(footprint/solid 마킹 없음).
+        objs.push({ type: 'marketGiftScatter', key, tx, ty, sortY: ty + 0.6 })
+      }
     }
   }
-  console.log(`[HumanZone 셀프체크] 마켓 부스 시트 크롭 간격 →\n  ${standGapLines.join('\n  ')}`)
 
-  // ── 셀프체크 3: 랜드마크/결절점 건물이 자기 block 경계 안에 있는가(지붕 없이
-  // 통짜 스프라이트라 Urban의 URBAN_ROOF_H 같은 여유는 필요 없음) ──
-  const buildingErrors = []
-  ;[
-    ['supam', HUMAN_WINTER.buildings.supam, 35, 3, 7, 'ne'],
-    ['library', HUMAN_WINTER.buildings.library, 4, 21, 6, 'sw'],
-    ['bakery', HUMAN_WINTER.buildings.bakery, 20, 21, 5, 'smid'],
-    ['hippie', HUMAN_WINTER.buildings.hippie, 4, 2, 6, 'nw'],
-    ['pub', HUMAN_WINTER.buildings.pub, 8, 11, 5, 'nw'],
-  ].forEach(([id, sprite, tx, ty, tileH, block]) => {
-    const scale = (tileH * TILE) / sprite.h
-    const renderW = Math.ceil((sprite.w * scale) / TILE)
-    const b = HUMAN_BLOCKS[block]
-    if (tx < b.x0 || tx + renderW - 1 > b.x1 || ty < b.y0 || ty + tileH > b.y1) {
-      buildingErrors.push(`${id}(${block}) 발자국(${tx},${ty})~(${tx + renderW - 1},${Math.ceil(ty + tileH)})가 block(${b.x0},${b.y0})-(${b.x1},${b.y1}) 밖`)
-    }
-  })
-  console.log(
-    `[HumanZone 셀프체크] 랜드마크/결절점/구역 건물 5동 block 경계 → ` +
-    (buildingErrors.length === 0 ? 'PASS (전부 자기 block 안)' : `FAIL:\n  ${buildingErrors.join('\n  ')}`)
-  )
+  objs.sort((a, b) => a.sortY - b.sortY)
+  objs.solid = solid
+  _marketCache = { objs: objs.slice(), solid }
 
-  // ── 셀프체크 4: 오브젝트 개수 + 구역별 밀도 ──
+  // ── 셀프체크 — 배치 개수 + 맵 유효범위(0~47,0~35) 밖 배치 여부 ──
   const byType = {}
-  objs.forEach(o => { if (o.type.startsWith('human')) byType[o.type] = (byType[o.type] || 0) + 1 })
+  objs.forEach(o => { byType[o.type] = (byType[o.type] || 0) + 1 })
+  const scatterCount = (byType.marketSprite || 0) - MARKET_PLACED.length
+  const rangeErrors = objs.filter(o => o.type === 'marketSprite' && (o.tx < 0 || o.tx > MAP_W - 1 || o.ty < 0 || o.ty > MAP_H - 1))
   console.log(
-    `[HumanZone 셀프체크] 배치 개수 → 건물 5동(랜드마크2+결절점 bakery1+구역2), ` +
-    `결절점 소품(부스3+진저브레드+눈사람+빙판+벤치2) ${(byType.humanStand||0)+(byType.humanGingerbread||0)+(byType.humanSnowman||0)+(byType.humanRink||0)+(byType.humanBench||0)}개, ` +
-    `나무 ${byType.humanTree||0}그루, 간선(HUMAN_STREET) 타일 ${byType.humanPath||0}칸`
+    `[HumanZone(마켓) 셀프체크] PLACED ${MARKET_PLACED.length}개 + 스캐터(나무/덤불 ${scatterCount}개, 선물 ${byType.marketGiftScatter || 0}개) + ` +
+    `울타리 ${(byType.marketFenceH || 0) + (byType.marketFenceV || 0)}칸 → 맵 밖 배치 ${rangeErrors.length}개`
   )
-  console.log(
-    `[HumanZone 셀프체크] block별 오브젝트 밀도 → ` +
-    Object.entries(HUMAN_BLOCKS).map(([id, b]) => `${id}(${b.kind}):${propCount[id] || 0}개`).join(', ')
-  )
+}
 
-  // ── 셀프체크 5: 맵 유효범위 밖 배치 여부 ──
-  const rangeErrors = objs.filter(o => o.type.startsWith('human') &&
-    (o.tx < 2 || o.tx > 45 || o.ty < 2 || o.ty > 33))
-  console.log(`[HumanZone 셀프체크] 맵 유효범위(2~45,2~33) 밖 배치 → ${rangeErrors.length}개`)
+// spawnSoundItems 전용 제외 판정(HANDOFF 4단계: "길·마당 위 스폰 제외") —
+// 걷기 가능한 눈밭(ground===0)이 아니거나, 오브젝트 footprint/지도 테두리
+// (solid)이거나, 아이스링크 내부(테두리 포함 전체)면 스폰 후보에서 뺀다.
+// spawnSoundItems() 본체는 한 글자도 안 바뀌었고, 이 판정 함수 하나만
+// (기존 Lynch 버전의 HUMAN_LANDMARK_CORE 방식에서) 새 지형 함수 기반으로
+// 갈아끼웠다 — buildHumanZone()이 만드는 solid를 재사용하되, spawnSoundItems가
+// 48×36칸을 순회하며 매 칸마다 부르므로 다시 계산하지 않게 모듈 레벨에 한 번만 캐시.
+let _marketSolidCache = null
+function getMarketSolid() {
+  if (!_marketSolidCache) {
+    const tmp = []
+    buildHumanZone(tmp)
+    _marketSolidCache = tmp.solid
+  }
+  return _marketSolidCache
+}
+function insideHumanSpawnExclude(tx, ty) {
+  if (marketGroundType(tx, ty) !== 0) return true
+  if (getMarketSolid()[ty * MAP_W + tx]) return true
+  if (tx >= MARKET_RINK.tx && tx < MARKET_RINK.tx + MARKET_RINK.w && ty >= MARKET_RINK.ty && ty < MARKET_RINK.ty + MARKET_RINK.h) return true
+  return false
 }
 
 /* ─────────────────────────────────────────────
@@ -1934,67 +1924,37 @@ function ZoneObject({ obj, zone, tick }) {
     return <LabSprite x={x} y={y} sprite={NATURE_VILLAGE_TILESET.fenceGate} scale={1}/>
   }
 
-  /* ── Human Zone("사람 마을") Winter 리스킨 — natureHouse와 동일한 "tileH만큼
-     세로로 맞춰 스케일 계산 + 발치 그림자" 패턴을 그대로 재사용한다(건물 하나가
-     통짜 스프라이트라 조립이 필요 없음, 1단계에서 확인 완료). humanBuilding은
-     nested(HUMAN_WINTER.buildings) 조회 + 그림자, humanStand/humanGingerbread/
-     humanSnowman/humanLamp/humanTree는 flat(HUMAN_WINTER) 조회 + 타일 하단-중앙
-     앵커(그림자 없음, 소품이 작아 생략)로 구분한다. ── */
-  if (obj.type === 'humanBuilding') {
-    const sprite = HUMAN_WINTER.buildings[obj.key]
+  /* ── Human Zone("사람 마을") 크리스마스 마켓 리스킨(HANDOFF 3단계) — 디자인
+     원본 add()의 "footprint 가로 중앙·아래쪽 정렬 + 큰 오브젝트만 그림자" 규칙을
+     그대로 포팅한 단일 제네릭 렌더러. PLACED 배열 항목(스톨·랜드마크·가로등·
+     눈사람 등)과 스캐터 나무/덤불이 전부 이 하나로 처리된다(디자인이 add()
+     하나로 통일한 것과 동일한 이유 — buildHumanZone()의 addMarket()이 만든
+     tx/ty/fw/fh/scale을 그대로 여기서 소비). ── */
+  if (obj.type === 'marketSprite') {
+    const sprite = WINTER_MARKET[obj.key]
     if (!sprite) return null
-    const scale = (obj.tileH * T) / sprite.h
+    const w = sprite.w * obj.scale, h = sprite.h * obj.scale
+    const sx = Math.round((obj.tx + obj.fw / 2) * T - w / 2)
+    const sy = Math.round((obj.ty + obj.fh) * T - h)
     return (
       <g>
-        <ellipse cx={x + (sprite.w*scale)/2} cy={y + sprite.h*scale - 3} rx={sprite.w*scale*0.4} ry={5} fill="#00000030"/>
-        <LabSprite x={x} y={y} sprite={sprite} scale={scale}/>
+        {h > 26 && <ellipse cx={sx + w / 2} cy={sy + h - 2} rx={w * 0.31} ry={5} fill="#00000029"/>}
+        <LabSprite x={sx} y={sy} sprite={sprite} scale={obj.scale}/>
       </g>
     )
   }
-  if (['humanStand', 'humanGingerbread', 'humanSnowman', 'humanLamp', 'humanTree', 'humanDecor'].includes(obj.type)) {
-    const sprite = HUMAN_WINTER[obj.key]
+  if (obj.type === 'marketGiftScatter') {
+    // 충돌 없는 순수 바닥 소품 — 디자인 원본 스캐터 선물과 동일한 반 타일 오프셋
+    // (x=tx*TILE+8, y=ty*TILE+20-h, footprint/그림자 없음).
+    const sprite = WINTER_MARKET[obj.key]
     if (!sprite) return null
-    const scale = (obj.tileH * T) / sprite.h
-    const sx = x - (sprite.w * scale - T) / 2 // 타일 폭 중앙 정렬
-    const sy = y + T - sprite.h * scale        // 타일 바닥 기준 앵커
-    return <LabSprite x={sx} y={sy} sprite={sprite} scale={scale}/>
+    return <LabSprite x={x + 8} y={y + 20 - sprite.h} sprite={sprite} scale={1}/>
   }
-  if (obj.type === 'humanFrostFence') {
-    if (obj.role === 'post') {
-      const s = HUMAN_WINTER.frostFencePost
-      return <LabSprite x={x + (T - s.w) / 2} y={y + T - s.h} sprite={s} scale={1}/>
-    }
-    // rail은 8px 폭 낱장 — LIBRARY_YARD와 동일하게 타일 폭(32px)을 4번 반복해 채운다.
-    const s = HUMAN_WINTER.frostFenceRail
-    const reps = Math.round(T / s.w)
-    return (
-      <>
-        {Array.from({ length: reps }, (_, i) => (
-          <LabSprite key={i} x={x + i * s.w} y={y + T - s.h} sprite={s} scale={1}/>
-        ))}
-      </>
-    )
+  if (obj.type === 'marketFenceH') {
+    return <LabSprite x={x} y={y + 6} sprite={WINTER_MARKET.fence_h} scale={1}/>
   }
-  if (obj.type === 'humanPath') {
-    // HUMAN_FROST_PATH는 32×32 = TILE 순정 크기라 스케일 계산 없이 그대로 한 칸에 하나.
-    return <LabSprite x={x} y={y} sprite={HUMAN_FROST_PATH} scale={1}/>
-  }
-  if (obj.type === 'humanRink') {
-    // 빙판(iceRink) — 건물처럼 발치 그림자를 넣지 않고, 바닥에 평평하게 깔린
-    // 장식(natureBridge의 물타일과 같은 취급)이라 top-left 앵커로 그대로 놓는다.
-    const sprite = HUMAN_WINTER.iceRink
-    const scale = (obj.tileW * T) / sprite.w
-    return <LabSprite x={x} y={y} sprite={sprite} scale={scale}/>
-  }
-  if (obj.type === 'humanBench') {
-    // NATURE_VILLAGE_TILESET.bench(terrain-town.png, 이미 알파 스캔 검증된 좌표) 재사용.
-    const sprite = NATURE_VILLAGE_TILESET.bench
-    return (
-      <g>
-        <ellipse cx={x + sprite.w/2} cy={y + sprite.h + 2} rx={sprite.w*0.6} ry={3} fill="#00000030"/>
-        <LabSprite x={x} y={y} sprite={sprite} scale={1}/>
-      </g>
-    )
+  if (obj.type === 'marketFenceV') {
+    return <LabSprite x={x + 8} y={y} sprite={WINTER_MARKET.fence_v} scale={1}/>
   }
 
   if (obj.type === 'natureBridge') {
@@ -2963,10 +2923,53 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const zoneObjects = useRef(buildZoneObjects(zone))
   const pathTiles   = useRef(buildPaths(sounds))
 
+  // Human Zone 지형 프리렌더(2단계) — global.png/global2.png 두 장을 비동기로
+  // 로드한 뒤 prerenderMarketGround()로 한 번만 합성해 dataURL로 굳힌다. 로드
+  // 전까지는 아래 <defs>의 기존 ASSET_READY.tiles 폴백 패턴이 그대로 보인다
+  // (1단계 지시서의 "ASSET_READY 폴백 패턴 유지" 그대로).
+  const [marketGroundUrl, setMarketGroundUrl] = useState(null)
+  useEffect(() => {
+    if (zone !== 'Human') return
+    let cancelled = false
+    const imgTown = new window.Image()
+    const imgSnow = new window.Image()
+    let loaded = 0
+    const tryBuild = () => {
+      loaded++
+      if (loaded < 2 || cancelled) return
+      setMarketGroundUrl(prerenderMarketGround(imgTown, imgSnow).toDataURL())
+    }
+    imgTown.onload = tryBuild
+    imgSnow.onload = tryBuild
+    imgTown.src = WINTER_TILES.dirt[0].src
+    imgSnow.src = WINTER_TILES.snow[0].src
+    return () => { cancelled = true }
+  }, [zone])
+
   const [pos,        setPos]       = useState({ x: PX_W/2 - CHAR_W/2, y: PX_H - TILE*4 })
   const [dir,        setDir]       = useState('up')
   const [moving,     setMoving]    = useState(false)
   const [tick,       setTick]      = useState(0)
+
+  // 픽셀아트 정수배 스케일링 — SVG를 width/height:100%로 늘리면 컨테이너 크기가
+  // VIEW_W×VIEW_H(768×576)의 정수배가 아닐 때 브라우저가 어중간한 배율로
+  // 리샘플링해 image-rendering:pixelated를 걸어도 타일/스프라이트 가장자리가
+  // 흐려진다. 컨테이너 크기를 관찰해 항상 정수배(1x,2x,3x...)로만 그리고,
+  // 남는 공간은 레터박스(테마 border색 배경)로 남긴다.
+  const canvasWrapRef = useRef(null)
+  const [scale, setScale] = useState(1)
+  useEffect(() => {
+    const el = canvasWrapRef.current
+    if (!el) return
+    const compute = () => {
+      const { width, height } = el.getBoundingClientRect()
+      setScale(Math.max(1, Math.floor(Math.min(width / VIEW_W, height / VIEW_H))))
+    }
+    compute()
+    const ro = new ResizeObserver(compute)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   // 아이템은 초기화 후 위치가 변하지 않으므로 ref로 관리
   // 가시성은 부모의 collectedIds(제출 완료 후 갱신)로만 결정
@@ -3053,10 +3056,18 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       const minX = TILE, maxX = PX_W - TILE - CHAR_W
       const minY = TILE, maxY = PX_H - TILE - CHAR_H
 
-      if (k.up)    { y = Math.max(minY, y - spd); newDir = 'up';    moved = true }
-      if (k.down)  { y = Math.min(maxY, y + spd); newDir = 'down';  moved = true }
-      if (k.left)  { x = Math.max(minX, x - spd); newDir = 'left';  moved = true }
-      if (k.right) { x = Math.min(maxX, x + spd); newDir = 'right'; moved = true }
+      // Human Zone 전용 충돌(3단계, HANDOFF 6장) — 다른 zone은 zoneObjects.current.solid가
+      // 없으므로(undefined) tryMoveX/Y가 기존과 완전히 동일하게 동작한다(격리된 부가 기능,
+      // 기존 zone 이동 로직은 한 글자도 안 바뀜). 축별로 따로 검사해 벽을 스치며
+      // 걷는 느낌을 내고 모서리에 끼지 않는다(디자인 원본 blocked() 원칙 그대로).
+      const humanSolid = zoneObjects.current.solid
+      const tryMoveY = (ny) => { if (!humanSolid || !marketBlocked(humanSolid, x, ny)) y = ny }
+      const tryMoveX = (nx) => { if (!humanSolid || !marketBlocked(humanSolid, nx, y)) x = nx }
+
+      if (k.up)    { tryMoveY(Math.max(minY, y - spd)); newDir = 'up';    moved = true }
+      if (k.down)  { tryMoveY(Math.min(maxY, y + spd)); newDir = 'down';  moved = true }
+      if (k.left)  { tryMoveX(Math.max(minX, x - spd)); newDir = 'left';  moved = true }
+      if (k.right) { tryMoveX(Math.min(maxX, x + spd)); newDir = 'right'; moved = true }
 
       if (moved) {
         posRef.current = { x, y }
@@ -3148,16 +3159,17 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       {/* Zone HUD */}
       <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal}/>
 
-      {/* 게임 캔버스 */}
-      <div style={{
+      {/* 게임 캔버스 — 정수배 스케일링(위 useEffect)으로 항상 선명하게, 남는
+          공간은 레터박스로 둔다. */}
+      <div ref={canvasWrapRef} style={{
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
         background: theme.border, overflow:'hidden',
+        display:'flex', alignItems:'center', justifyContent:'center',
       }}>
         <svg
-          width="100%" height="100%"
+          width={VIEW_W * scale} height={VIEW_H * scale}
           viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
-          preserveAspectRatio="xMidYMid meet"
-          style={{ display:'block', position:'absolute', inset:0 }}
+          style={{ display:'block', imageRendering:'pixelated' }}
         >
           <defs>
             <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
@@ -3242,8 +3254,13 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             })()}
           </defs>
 
-          {/* 바닥 */}
-          <rect width={PX_W} height={PX_H} fill={`url(#ground_${zone})`}/>
+          {/* 바닥 — Human Zone은 prerenderMarketGround()가 만든 dataURL 이미지 한 장
+              (16px 서브셀 지형), 그 외 zone은 기존 반복 패턴 그대로. */}
+          {zone === 'Human' && marketGroundUrl ? (
+            <image href={marketGroundUrl} x={0} y={0} width={PX_W} height={PX_H} style={{ imageRendering:'pixelated' }}/>
+          ) : (
+            <rect width={PX_W} height={PX_H} fill={`url(#ground_${zone})`}/>
+          )}
 
           {/* Urban 도로망 — 도로/인도/횡단보도/차선(넓은 면적)은 NatureWater와 같은
               방식으로 UrbanRoadNetwork가 직접 그린다. */}
@@ -3291,6 +3308,12 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           {zone === 'Animal' && <AnimalPath/>}
           {zone === 'Nature' && <NatureWater/>}
           {zone === 'Nature' && <NaturePath/>}
+
+          {/* 아이스링크 — 바닥 레이어(지형 위, 오브젝트 아래)에 그린다(HANDOFF 6/9장) */}
+          {zone === 'Human' && (
+            <LabSprite x={MARKET_RINK.tx * TILE} y={MARKET_RINK.ty * TILE}
+              sprite={WINTER_MARKET.ice_rink} scale={MARKET_RINK.scale}/>
+          )}
 
           {/* Zone 오브젝트 — 소리 아이템 칸과 겹치는 natureTree는 제외 */}
           {visibleZoneObjects.map((obj, i) => (

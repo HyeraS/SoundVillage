@@ -798,6 +798,100 @@ export const HUMAN_FROST_PATH = { ...TOWN_TILES_SHEET, x: 84, y: 200, w: 32, h: 
 export const HUMAN_WINTER_GROUND = '#9CBDC1'
 
 /* ─────────────────────────────────────────────
+   Human Zone("사람 마을") — 크리스마스 마켓 리스킨(HANDOFF_christmas_market.md,
+   asset-swap 인수인계 문서 1단계). 위 HUMAN_WINTER(Lynch 5요소 버전)를 대체한다.
+   문서가 넘긴 에셋 3장 중 winter_global.png/global2.png는 이미 등록된 파일과
+   MD5까지 완전히 동일해 재사용(WINTER_SHEET, MARKET_WINTER_TERRAIN_SHEET) —
+   Nature Zone 리스킨 때 복사해둔 nature_village_map/terrain.png가 global2.png와
+   동일 파일. global.png(Cozy Town 마스터 타일셋, 4224×1712)만 신규 카피
+   (public/assets/winter/global.png).
+───────────────────────────────────────────── */
+const MARKET_TOWN_SHEET = { src: '/assets/winter/global.png', sheetW: 4224, sheetH: 1712 }
+const MARKET_WINTER_TERRAIN_SHEET = { src: '/assets/world/nature_village_map/terrain.png', sheetW: 2368, sheetH: 1136 }
+
+// 지형 타일(16px 그리드) — HANDOFF 3장 표 그대로.
+export const WINTER_TILES = {
+  dirt: [
+    { ...MARKET_TOWN_SHEET, x: 112, y: 48, w: 16, h: 16 },
+    { ...MARKET_TOWN_SHEET, x: 96,  y: 48, w: 16, h: 16 },
+    { ...MARKET_TOWN_SHEET, x: 128, y: 48, w: 16, h: 16 },
+  ],
+  cobble: { ...MARKET_TOWN_SHEET, x: 608, y: 192, w: 16, h: 16 }, // 3×3 그룹 좌상단(9-slice)
+  snow: [
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 672, y: 160, w: 16, h: 16 },
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 688, y: 160, w: 16, h: 16 },
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 672, y: 176, w: 16, h: 16 },
+  ],
+  packed: [
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 672, y: 352, w: 16, h: 16 },
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 688, y: 352, w: 16, h: 16 },
+    { ...MARKET_WINTER_TERRAIN_SHEET, x: 704, y: 352, w: 16, h: 16 },
+  ],
+  drift: { ...MARKET_WINTER_TERRAIN_SHEET, x: 656, y: 144, w: 16, h: 16 }, // 3×3 그룹 좌상단(9-slice)
+}
+
+// 오브젝트/랜드마크 스프라이트(winter_global.png=WINTER_SHEET) — HANDOFF 4장 표 그대로,
+// 알파 스캔 실측치.
+export const WINTER_MARKET = {
+  stall_menu:    { ...WINTER_SHEET, x: 192, y: 80,  w: 48, h: 64 },
+  stall_pretzel: { ...WINTER_SHEET, x: 160, y: 193, w: 48, h: 63 },
+  cart_cotton:   { ...WINTER_SHEET, x: 357, y: 196, w: 40, h: 60 },
+  shop_candy:    { ...WINTER_SHEET, x: 2,   y: 195, w: 75, h: 61 },
+  shop_flores:   { ...WINTER_SHEET, x: 405, y: 187, w: 54, h: 69 },
+  stall_bakery:  { ...WINTER_SHEET, x: 480, y: 94,  w: 48, h: 50 },
+  stall_hearts:  { ...WINTER_SHEET, x: 0,   y: 93,  w: 48, h: 51 },
+  stall_jam:     { ...WINTER_SHEET, x: 97,  y: 93,  w: 46, h: 51 },
+  tree_big:      { ...WINTER_SHEET, x: 11,  y: 386, w: 64, h: 126 },
+  ginger_house:  { ...WINTER_SHEET, x: 305, y: 435, w: 62, h: 77 },
+  igloo:         { ...WINTER_SHEET, x: 306, y: 385, w: 29, h: 30 },
+  ice_rink:      { ...WINTER_SHEET, x: 400, y: 391, w: 160, h: 89 },
+  snowman1: { ...WINTER_SHEET, x: 3,   y: 14, w: 25, h: 18 },
+  snowman2: { ...WINTER_SHEET, x: 34,  y: 7,  w: 27, h: 25 },
+  snowman3: { ...WINTER_SHEET, x: 64,  y: 5,  w: 31, h: 42 },
+  snowman4: { ...WINTER_SHEET, x: 96,  y: 9,  w: 31, h: 39 },
+  snowman5: { ...WINTER_SHEET, x: 182, y: 4,  w: 23, h: 22 },
+  snowman6: { ...WINTER_SHEET, x: 226, y: 40, w: 26, h: 23 },
+  bunny1:   { ...WINTER_SHEET, x: 128, y: 16, w: 16, h: 16 },
+  bunny2:   { ...WINTER_SHEET, x: 150, y: 17, w: 18, h: 15 },
+  bunny3:   { ...WINTER_SHEET, x: 211, y: 17, w: 25, h: 15 },
+  reindeer: { ...WINTER_SHEET, x: 162, y: 49, w: 14, h: 15 },
+  lamp:        { ...WINTER_SHEET, x: 1,  y: 36, w: 14, h: 44 },
+  lamp_wreath: { ...WINTER_SHEET, x: 17, y: 36, w: 14, h: 44 },
+  candycane:   { ...WINTER_SHEET, x: 3,  y: 305, w: 9,  h: 15 },
+  pine_snow:  { ...WINTER_SHEET, x: 96,  y: 324, w: 32, h: 44 },
+  tree_snow1: { ...WINTER_SHEET, x: 193, y: 336, w: 31, h: 32 },
+  tree_snow2: { ...WINTER_SHEET, x: 256, y: 336, w: 32, h: 32 },
+  tree_snow3: { ...WINTER_SHEET, x: 288, y: 337, w: 32, h: 31 },
+  tree_bare1: { ...WINTER_SHEET, x: 2,   y: 342, w: 26, h: 26 },
+  tree_bare2: { ...WINTER_SHEET, x: 35,  y: 339, w: 29, h: 45 },
+  tree_bare3: { ...WINTER_SHEET, x: 132, y: 342, w: 23, h: 26 },
+  tree_bare4: { ...WINTER_SHEET, x: 165, y: 342, w: 20, h: 26 },
+  tree_bare5: { ...WINTER_SHEET, x: 232, y: 342, w: 23, h: 26 },
+  bush:       { ...WINTER_SHEET, x: 70,  y: 340, w: 19, h: 28 },
+  gift1: { ...WINTER_SHEET, x: 2,   y: 326, w: 12, h: 10 },
+  gift2: { ...WINTER_SHEET, x: 17,  y: 326, w: 14, h: 10 },
+  gift3: { ...WINTER_SHEET, x: 35,  y: 324, w: 11, h: 12 },
+  gift4: { ...WINTER_SHEET, x: 50,  y: 322, w: 11, h: 14 },
+  gift5: { ...WINTER_SHEET, x: 65,  y: 322, w: 14, h: 14 },
+  gift6: { ...WINTER_SHEET, x: 81,  y: 323, w: 14, h: 13 },
+  gift7: { ...WINTER_SHEET, x: 97,  y: 324, w: 14, h: 12 },
+  gift8: { ...WINTER_SHEET, x: 130, y: 321, w: 12, h: 15 },
+  fence_h: { ...WINTER_SHEET, x: 412, y: 392, w: 32, h: 22 },
+  fence_v: { ...WINTER_SHEET, x: 412, y: 412, w: 16, h: 32 },
+  counter: { ...WINTER_SHEET, x: 243, y: 483, w: 48, h: 22 },
+  sled:      { ...WINTER_SHEET, x: 372, y: 403, w: 24, h: 13 },
+  drift:     { ...WINTER_SHEET, x: 240, y: 388, w: 30, h: 13 },
+  pile:      { ...WINTER_SHEET, x: 273, y: 384, w: 13, h: 32 },
+  snow_blob: { ...WINTER_SHEET, x: 340, y: 386, w: 24, h: 29 },
+  npc0: { ...WINTER_SHEET, x: 292, y: 290, w: 11, h: 14 },
+  npc1: { ...WINTER_SHEET, x: 307, y: 289, w: 11, h: 15 },
+  npc2: { ...WINTER_SHEET, x: 339, y: 289, w: 13, h: 15 },
+  npc3: { ...WINTER_SHEET, x: 355, y: 290, w: 11, h: 14 },
+  npc4: { ...WINTER_SHEET, x: 371, y: 290, w: 11, h: 14 },
+  npc5: { ...WINTER_SHEET, x: 386, y: 290, w: 11, h: 14 },
+}
+
+/* ─────────────────────────────────────────────
    Zone별 타일 매핑
 ───────────────────────────────────────────── */
 export const ZONE_GROUND_TILE = {
