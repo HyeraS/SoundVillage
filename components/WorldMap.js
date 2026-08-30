@@ -179,8 +179,11 @@ const PATH_TILES = [...pathTileMap.values()]
 
 const PATH_SET = new Set(PATH_TILES.map(p => `${p.tx},${p.ty}`))
 
-// Nature 포털 옆 작은 연못 — 완전한 직사각형 대신 타원+노이즈로 가장자리를 울퉁불퉁하게
-// 깎아서 사진 속 자연스러운 연못처럼 보이게 한다 (오토타일이 그 울퉁불퉁한 경계를 따라 그려짐).
+// Nature 포털 옆 연못 — 타일 격자(WATER_TILES/WATER_SET)는 "물 위를 못 걷는다"는 충돌
+// 판정용으로만 남기고, 실제 렌더는 <NaturePond/> 가 SVG 블롭으로 그린다(아래).
+// 예전엔 이 격자를 water 오토타일로 그렸는데, 시트의 water.full(96,224)은 연잎·기포 줄이
+// 섞인 장식 타일이고 water.edge(96,192)는 네 귀퉁이에 잔디+흙둔치가 구워진 십자 조각이라,
+// 작은 블롭에서는 "열린 물"이 아니라 "연잎·경계 조각 무더기"로 읽혔다.
 function organicBlob(cx, cy, rx, ry, seedOffset = 0, threshold = 0.82) {
   const out = []
   for (let tx = Math.floor(cx - rx); tx <= Math.ceil(cx + rx); tx++) {
@@ -194,8 +197,43 @@ function organicBlob(cx, cy, rx, ry, seedOffset = 0, threshold = 0.82) {
   return out
 }
 const NATURE_P = portalByZone.Nature
-const WATER_TILES = organicBlob(NATURE_P.tx - 7, NATURE_P.ty + 5, 5, 4, 91)
+// 연못 확대 — 예전 rx5/ry4 는 너무 작고 들쭉날쭉해서 "웅덩이"로 보였다. rx7/ry6 로 키우되
+// 중심을 포털 마당(x0=15) 바깥쪽·아래로 옮겨(스포크 길/울타리/포털과 안 겹침, 오프라인 확인)
+// 포털 왼쪽 아래의 넉넉한 연못으로 만든다. SVG 블롭도 아래 POND 에서 같은 값으로 파생시켜
+// 시각 경계와 충돌 경계가 대략 일치하게 한다.
+const POND_CX_T = NATURE_P.tx - 10
+const POND_CY_T = NATURE_P.ty + 7
+const POND_RX_T = 7
+const POND_RY_T = 6
+const WATER_TILES = organicBlob(POND_CX_T, POND_CY_T, POND_RX_T, POND_RY_T, 91)
 const WATER_SET = new Set(WATER_TILES.map(w => `${w.tx},${w.ty}`))
+
+// animalVillage drawPond 의 레이어 구성을 SVG 로 옮긴 연못. organicBlob 과 같은 (중심,반경)
+// 에서 각도별 wobble 로 점을 만들고 Catmull-Rom 으로 부드럽게 이어 닫은 블롭.
+function smoothClosedPath(pts) {
+  const n = pts.length
+  let d = `M ${pts[0][0].toFixed(1)} ${pts[0][1].toFixed(1)}`
+  for (let i = 0; i < n; i++) {
+    const p0 = pts[(i - 1 + n) % n], p1 = pts[i]
+    const p2 = pts[(i + 1) % n],     p3 = pts[(i + 2) % n]
+    const c1x = p1[0] + (p2[0] - p0[0]) / 6, c1y = p1[1] + (p2[1] - p0[1]) / 6
+    const c2x = p2[0] - (p3[0] - p1[0]) / 6, c2y = p2[1] - (p3[1] - p1[1]) / 6
+    d += ` C ${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`
+  }
+  return d + ' Z'
+}
+const POND = (() => {
+  const cx = (POND_CX_T + 0.5) * TILE, cy = (POND_CY_T + 0.5) * TILE
+  const rx = POND_RX_T * TILE,         ry = POND_RY_T * TILE
+  const N = 22
+  const pts = []
+  for (let i = 0; i < N; i++) {
+    const a = (i / N) * Math.PI * 2
+    const wob = 0.80 + seedRand(i * 3 + 91) * 0.34   // 각도별 반경 흔들림 0.80~1.14
+    pts.push([cx + Math.cos(a) * rx * wob, cy + Math.sin(a) * ry * wob])
+  }
+  return { cx, cy, rx, ry, pts, d: smoothClosedPath(pts) }
+})()
 
 // Portal 영역 타일 셋
 const PORTAL_SET = new Set(
@@ -386,9 +424,10 @@ const BENCHES = [
   ...scatterInYard(portalByZone.Urban, 3, 167, 3),
   ...scatterInYard(portalByZone.Human, 2, 173, 3),
 ]
-// 풍차 — Nature 연못 바로 옆 랜드마크(물레방아 느낌), 마당 담장 밖 별도 배치
+// 풍차 — Nature 연못 북쪽 물가 랜드마크(물레방아 느낌), 마당 담장 밖 별도 배치.
+// 연못을 rx7/ry6 로 키우면서 예전 자리(tx-4,ty+1)가 수면에 잠겨, 블롭 위쪽 바깥으로 옮김.
 const WINDMILL = (() => {
-  const t = { tx: NATURE_P.tx - 4, ty: NATURE_P.ty + 1 }
+  const t = { tx: NATURE_P.tx - 10, ty: NATURE_P.ty - 1 }
   return isFree(t.tx, t.ty) ? [{ ...t, sprite: WORLD_PROPS.windmill }] : []
 })()
 
@@ -878,6 +917,95 @@ function PropSprite({ x, y, sprite, scale = 2, rotate = 0 }) {
       <ellipse cx={x + w/2} cy={y + h - 3} rx={w*0.36} ry={4} fill="#00000030"/>
       <SheetSprite x={x} y={y} srcX={sprite.x} srcY={sprite.y} w={sprite.w} h={sprite.h}
         renderW={w} renderH={h} rotate={rotate} sheet={sprite}/>
+    </g>
+  )
+}
+
+/* ─────────────────────────────────────────────
+   Nature 연못 — 타일 water 오토타일(연잎·기포 장식 타일 반복) 대신 animalVillage.js
+   drawPond(레퍼런스, canvas)의 레이어 구성을 SVG 로 옮긴 것. 좌표는 전부 px.
+   레이어 순서(= drawPond): 흙 둔치 → 잔디 프린지 → (블롭 클립)물 채움+파란 틴트+
+   얕은 물 띠+반짝임 → 수련잎 → 물가 갈대. 애니메이션 없음, 반짝임은 seedRand 로 고정.
+───────────────────────────────────────────── */
+function NaturePond() {
+  const { cx, cy, rx, ry, pts, d } = POND
+  const x0 = cx - rx * 1.3, y0 = cy - ry * 1.3
+  const bw = rx * 2.6, bh = ry * 2.6
+
+  // 잔디 프린지 — 둔치 바깥으로 어긋나게 덮어내리는 스캘럽(풀톤 작은 원)
+  const grassTone = ['#7d8c4a', '#8b9a55', '#93a25c']
+  const fringe = []
+  for (let i = 0; i < pts.length; i++) {
+    const [px, py] = pts[i]
+    const [nx, ny] = pts[(i + 1) % pts.length]
+    const dx = nx - px, dy = ny - py
+    const len = Math.hypot(dx, dy) || 1
+    const ox = -dy / len, oy = dx / len   // 바깥방향 법선
+    for (let k = 0; k < 2; k++) {
+      const t = k * 0.5
+      const s = i * 9 + k + 340
+      fringe.push({
+        x: px + dx * t + ox * (6 + seedRand(s) * 5),
+        y: py + dy * t + oy * (6 + seedRand(s + 1) * 5),
+        r: 4 + seedRand(s + 2) * 4,
+        c: grassTone[Math.floor(seedRand(s + 3) * 3)],
+      })
+    }
+  }
+  // 수면 반짝임 — 블롭 bbox 안 랜덤(시드 고정), 블롭 클립으로 밖은 잘림
+  const sparks = Array.from({ length: 20 }, (_, i) => ({
+    x: cx - rx + seedRand(i * 2 + 300) * rx * 2,
+    y: cy - ry + seedRand(i * 2 + 301) * ry * 2,
+    w: 3 + Math.round(seedRand(i + 320) * 5),
+  }))
+  // 수련잎
+  const lilies = Array.from({ length: 6 }, (_, i) => ({
+    x: cx - rx * 0.7 + seedRand(i * 2 + 400) * rx * 1.4,
+    y: cy - ry * 0.7 + seedRand(i * 2 + 401) * ry * 1.4,
+    lrx: 7 + seedRand(i + 420) * 4,
+    lry: 5 + seedRand(i + 421) * 3,
+    dark: i % 2 === 0,
+  }))
+  // 물가 갈대/덤불 — 블롭 남·동쪽 가장자리 몇 점
+  const reeds = [4, 9, 14, 18].map(idx => {
+    const [px, py] = pts[idx % pts.length]
+    return { x: px - 8, y: py - 12, sprite: WORLD_NATURE.bushes[idx % WORLD_NATURE.bushes.length] }
+  })
+
+  return (
+    <g>
+      <defs>
+        <clipPath id="naturePondClip"><path d={d}/></clipPath>
+      </defs>
+      {/* 1) 흙 둔치 — 물가를 두르는 짙은/밝은 흙 띠 두 겹 */}
+      <path d={d} fill="none" stroke="#6f4a2a" strokeWidth="13" strokeLinejoin="round"/>
+      <path d={d} fill="none" stroke="#8a5f38" strokeWidth="7"  strokeLinejoin="round"/>
+      {/* 2) 잔디 프린지 */}
+      {fringe.map((f, i) => <circle key={`fr${i}`} cx={f.x} cy={f.y} r={f.r} fill={f.c}/>)}
+      {/* 3) 물 — 블롭으로 클립 */}
+      <g clipPath="url(#naturePondClip)">
+        {/* 시트의 열린 물(단색 teal) + 파란 틴트 */}
+        <rect x={x0} y={y0} width={bw} height={bh} fill="#60a0a8"/>
+        <rect x={x0} y={y0} width={bw} height={bh} fill="#3a8ca2" opacity="0.18"/>
+        {/* 얕은 물 — 둔치 안쪽으로 밝은 띠(스트로크의 안쪽 절반만 보임) */}
+        <path d={d} fill="none" stroke="#bae8f6" strokeWidth="10" opacity="0.42"/>
+        <path d={d} fill="none" stroke="#ffffff" strokeWidth="4"  opacity="0.22"/>
+        {/* 수면 반짝임 */}
+        {sparks.map((s, i) => (
+          <rect key={`sp${i}`} x={s.x} y={s.y} width={s.w} height="2" fill="#ffffff" opacity="0.3"/>
+        ))}
+        {/* 4) 수련잎 */}
+        {lilies.map((l, i) => (
+          <g key={`ly${i}`}>
+            <ellipse cx={l.x} cy={l.y} rx={l.lrx} ry={l.lry} fill={l.dark ? '#4e8f43' : '#5da54e'}/>
+            <ellipse cx={l.x - 2} cy={l.y - 1.5} rx={l.lrx * 0.4} ry={l.lry * 0.4} fill="#ffffff" opacity="0.18"/>
+          </g>
+        ))}
+      </g>
+      {/* 5) 물가 갈대 — 클립 밖(물 위로 삐져나오게) */}
+      {reeds.map((r, i) => (
+        <PropSprite key={`rd${i}`} x={r.x} y={r.y} sprite={r.sprite} scale={1.5}/>
+      ))}
     </g>
   )
 }
@@ -2029,11 +2157,9 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
                 const s = WORLD_TILESET.dirt[shape]
                 return <SheetSprite key={i} x={p.tx*TILE} y={p.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
               })}
-              {WATER_TILES.map((w,i) => {
-                const { shape, rotate } = autotileShape(w.tx, w.ty, terrainAt, 'water')
-                const s = WORLD_TILESET.water[shape]
-                return <SheetSprite key={i} x={w.tx*TILE} y={w.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
-              })}
+              {/* Nature 연못 — per-tile water 오토타일 대신 SVG 블롭 하나로(연잎/기포 장식
+                  타일 반복 문제 해결). WATER_TILES/WATER_SET 은 보행 불가 판정용으로만 유지. */}
+              <NaturePond/>
               {/* 흙길 노면 보강 — 중앙 밟힘 띠 + 등간격 아닌 노면 디테일 */}
               <WornStrips/>
               {PATH_DETAIL.map((d,i) => <PathDetailMark key={`pd${i}`} {...d}/>)}
@@ -2048,11 +2174,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
                 const { shape, rotate } = autotileShape(p.tx, p.ty, terrainAt, 'dirt')
                 if (shape !== 'edge') return null
                 return <EdgeGlow key={i} tx={p.tx} ty={p.ty} rotate={rotate} color="#F5E6BE"/>
-              })}
-              {WATER_TILES.map((w,i) => {
-                const { shape, rotate } = autotileShape(w.tx, w.ty, terrainAt, 'water')
-                if (shape !== 'edge') return null
-                return <EdgeGlow key={i} tx={w.tx} ty={w.ty} rotate={rotate} color="#EAF7F5"/>
               })}
               {/* 잔디↔흙 경계 페더 — 크림 glow 위에 흙 얼룩/풀포기를 서로 물리게(주역) */}
               {PATH_EDGE_TILES.map((t,i) => <PathFeather key={`pf${i}`} tx={t.tx} ty={t.ty} rotate={t.rotate}/>)}
