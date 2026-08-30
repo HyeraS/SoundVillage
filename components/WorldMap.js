@@ -628,6 +628,195 @@ const GRASS_DETAIL = (() => {
 })()
 
 /* ─────────────────────────────────────────────
+   흙길·돌광장 노면 보강 (B2) — terrain 코드/PATH_SET/STONE_SET/충돌/보행/autotileShape
+   판정은 전부 그대로. 아래는 순수 렌더 오버레이(밟힘 띠·노면 디테일·판석 균열·경계 페더).
+───────────────────────────────────────────── */
+const PATH_CENTER_DARKEN     = 0.1   // 중앙 밟힘 띠 어둡기(브라운 alpha)
+const PATH_DETAIL_ODDS       = 0.09  // 흙길 내부 타일당 자갈/바큇자국/마른풀 확률
+const STONE_CRACK_ODDS       = 0.08  // 판석 균열·이끼·변색 확률
+const STONE_EDGE_BLEND_RINGS = 2     // 광장 가장자리에서 흙/깨진 판석으로 섞을 링 수
+const EDGE_FEATHER_COUNT     = 3     // 잔디↔흙 경계 타일당 한쪽 침투 스탬프 수
+const EDGE_FEATHER_DEPTH     = 7     // 경계 침투 최대 px
+const EDGE_FEATHER_ODDS      = 0.55  // 경계 타일 중 페더를 그릴 비율(SVG 노드 상한)
+
+// 결정론적 per-tile 난수 [0,1)
+const pr = (a, b = 0, c = 0) => seedRand(a * 131.71 + b * 977.3 + c * 17.13 + 3.1)
+
+// 흙길 'full'(사방이 흙) 타일인지 — autotileShape 를 다시 호출하지 않고 terrainAt 로 판정
+const dirtFull = (tx, ty) =>
+  [[0, -1], [0, 1], [-1, 0], [1, 0]].every(([dx, dy]) => terrainAt(tx + dx, ty + dy) === 'dirt')
+
+// 스포크/링 중심선(±THICK/2 타일)을 하나의 긴 rect 몇 개로 — "자로 잰 길" 위에 밟힌 자국
+function centerlineStrips(x0, y0, x1, y1, bend, thick = 2) {
+  const pts = spokeCenterline(x0, y0, x1, y1, bend)
+  const runs = []
+  let cur = null
+  for (const p of pts) {
+    if (!cur || cur.dir !== p.dir) { cur = { dir: p.dir, xs: [p.tx], ys: [p.ty] }; runs.push(cur) }
+    else { cur.xs.push(p.tx); cur.ys.push(p.ty) }
+  }
+  const half = thick / 2
+  return runs.map(r => {
+    const xmin = Math.min(...r.xs), xmax = Math.max(...r.xs)
+    const ymin = Math.min(...r.ys), ymax = Math.max(...r.ys)
+    return r.dir === 'h'
+      ? { x: xmin * TILE, y: (ymin + 0.5 - half) * TILE, w: (xmax - xmin + 1) * TILE, h: thick * TILE }
+      : { x: (xmin + 0.5 - half) * TILE, y: ymin * TILE, w: thick * TILE, h: (ymax - ymin + 1) * TILE }
+  })
+}
+const WORN_STRIPS = [
+  ...PORTALS.flatMap(p => centerlineStrips(
+    Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
+    Math.round(p.tx + p.w / 2), Math.round(p.ty + p.h / 2), SPOKE_BENDS[p.zone])),
+  ...RING_ORDER.flatMap((zone, i) => {
+    const a = portalByZone[zone], b = portalByZone[RING_ORDER[(i + 1) % RING_ORDER.length]]
+    return centerlineStrips(
+      Math.round(a.tx + a.w / 2), Math.round(a.ty + a.h / 2),
+      Math.round(b.tx + b.w / 2), Math.round(b.ty + b.h / 2), RING_BEND)
+  }),
+]
+
+// 흙길 내부 타일에만, 등간격 아닌 시드 스캐터로 노면 디테일
+const PATH_DETAIL = PATH_TILES
+  .filter(t => !inMuseumStonePlaza(t.tx, t.ty) && dirtFull(t.tx, t.ty) && pr(t.tx, t.ty, 17) < PATH_DETAIL_ODDS)
+  .map(t => ({ tx: t.tx, ty: t.ty, kind: Math.floor(pr(t.tx, t.ty, 29) * 3), j: pr(t.tx, t.ty, 31) }))
+
+// 잔디↔흙 경계 타일(흙쪽) + 그 경계가 향한 방향 — autotileShape 와 동일 규칙, 렌더 전용
+const PATH_EDGE_TILES = PATH_TILES
+  .filter(t => !inMuseumStonePlaza(t.tx, t.ty))
+  .map(t => {
+    const { shape, rotate } = autotileShape(t.tx, t.ty, terrainAt, 'dirt')
+    return { tx: t.tx, ty: t.ty, shape, rotate }
+  })
+  .filter(t => t.shape === 'edge'
+    && terrainAt(t.tx + [0, -1, 0, 1][t.rotate / 90], t.ty + [1, 0, -1, 0][t.rotate / 90]) === 'grass'
+    && pr(t.tx, t.ty, 43) < EDGE_FEATHER_ODDS)
+
+// 돌 광장 가장자리 링(1=최외곽) — 시각적으로만 흙/깨진 판석으로 섞을 대상
+const STONE_RING = (() => {
+  const m = new Map()
+  for (const k of STONE_SET) {
+    const [tx, ty] = k.split(',').map(Number)
+    if ([[0, -1], [0, 1], [-1, 0], [1, 0]].some(([dx, dy]) => !STONE_SET.has(`${tx + dx},${ty + dy}`))) m.set(k, 1)
+  }
+  for (let ring = 2; ring <= STONE_EDGE_BLEND_RINGS; ring++) {
+    for (const k of STONE_SET) {
+      if (m.has(k)) continue
+      const [tx, ty] = k.split(',').map(Number)
+      if ([[0, -1], [0, 1], [-1, 0], [1, 0]].some(([dx, dy]) => m.get(`${tx + dx},${ty + dy}`) === ring - 1)) m.set(k, ring)
+    }
+  }
+  return m
+})()
+// 판석 균열/이끼/변색 — 안쪽(링 아님) 돌 타일에만
+const STONE_MARKS = [...STONE_SET]
+  .map(k => { const [tx, ty] = k.split(',').map(Number); return { tx, ty } })
+  .filter(t => !STONE_RING.has(`${t.tx},${t.ty}`) && pr(t.tx, t.ty, 53) < STONE_CRACK_ODDS)
+  .map(t => ({ ...t, kind: Math.floor(pr(t.tx, t.ty, 59) * 3), j: pr(t.tx, t.ty, 61) }))
+// 광장 중앙→정문(남쪽) 축 — 살짝 밝아지는 큰 그라디언트 1장
+const STONE_AXIS = {
+  x: STONE_RECT.x0 * TILE, y: STONE_RECT.y0 * TILE,
+  w: (STONE_RECT.x1 - STONE_RECT.x0 + 1) * TILE, h: (STONE_RECT.y1 - STONE_RECT.y0 + 1) * TILE,
+}
+
+/* 밟힘 띠 — 길게 이어지는 반투명 캡슐 */
+function WornStrips() {
+  return (
+    <g fill="#3a2a18" opacity={PATH_CENTER_DARKEN}>
+      {WORN_STRIPS.map((s, i) => (
+        <rect key={i} x={s.x} y={s.y} width={s.w} height={s.h} rx={TILE * 0.5} ry={TILE * 0.5}/>
+      ))}
+    </g>
+  )
+}
+
+/* 노면 디테일 — kind 0 자갈 / 1 바큇자국 / 2 마른 풀포기 */
+function PathDetailMark({ tx, ty, kind, j }) {
+  const x = tx * TILE, y = ty * TILE
+  if (kind === 0) {
+    const pts = [[9, 12], [15, 18], [21, 11], [13, 22]]
+    return <g fill="#8a7452" opacity="0.7">
+      {pts.slice(0, 3 + Math.round(j)).map(([dx, dy], k) => (
+        <ellipse key={k} cx={x + dx + j * 4} cy={y + dy} rx={2 + (k % 2)} ry={1.6}/>
+      ))}
+    </g>
+  }
+  if (kind === 1) {
+    const oy = 8 + j * 14
+    return <g stroke="#5c4a30" strokeWidth="1.4" opacity="0.45" strokeLinecap="round">
+      <line x1={x + 3} y1={y + oy} x2={x + TILE - 3} y2={y + oy + 2}/>
+      <line x1={x + 3} y1={y + oy + 5} x2={x + TILE - 3} y2={y + oy + 7}/>
+    </g>
+  }
+  const bx = x + 8 + j * 14, by = y + 22
+  return <g stroke="#94925a" strokeWidth="1.4" opacity="0.75" strokeLinecap="round">
+    <line x1={bx} y1={by} x2={bx - 3} y2={by - 7}/>
+    <line x1={bx} y1={by} x2={bx + 1} y2={by - 9}/>
+    <line x1={bx} y1={by} x2={bx + 4} y2={by - 6}/>
+  </g>
+}
+
+/* 경계 페더 — 흙 얼룩이 잔디로 삐져나오고, 풀포기가 흙으로 덮인다 */
+function PathFeather({ tx, ty, rotate }) {
+  const x = tx * TILE, y = ty * TILE
+  const idx = rotate / 90                     // 0:S 1:W 2:N 3:E 가 잔디쪽
+  const nx = [0, -1, 0, 1][idx], ny = [1, 0, -1, 0][idx]
+  const dirt = []
+  const grass = []
+  for (let i = 0; i < EDGE_FEATHER_COUNT; i++) {
+    const t = pr(tx, ty, 70 + i)
+    const d = 2 + pr(tx, ty, 80 + i) * EDGE_FEATHER_DEPTH
+    if (nx === 0) {
+      const cx = x + 3 + t * (TILE - 6)
+      const edgeY = ny > 0 ? y + TILE : y
+      dirt.push(<rect key={`d${i}`} x={cx} y={edgeY + (ny > 0 ? d - 2 : -d)} width={2 + (i % 2)} height={2 + (i % 2)} fill="#b39468"/>)
+      grass.push(<line key={`g${i}`} x1={cx} y1={edgeY - ny * 3} x2={cx + (i % 2 ? 2 : -2)} y2={edgeY - ny * 9}
+        stroke="#6f7f42" strokeWidth="1.3" strokeLinecap="round"/>)
+    } else {
+      const cy = y + 3 + t * (TILE - 6)
+      const edgeX = nx > 0 ? x + TILE : x
+      dirt.push(<rect key={`d${i}`} x={edgeX + (nx > 0 ? d - 2 : -d)} y={cy} width={2 + (i % 2)} height={2 + (i % 2)} fill="#b39468"/>)
+      grass.push(<line key={`g${i}`} x1={edgeX - nx * 3} y1={cy} x2={edgeX - nx * 9} y2={cy + (i % 2 ? 2 : -2)}
+        stroke="#6f7f42" strokeWidth="1.3" strokeLinecap="round"/>)
+    }
+  }
+  return <g>{dirt}{grass}</g>
+}
+
+/* 광장 가장자리 링 타일 — 판석 대신 흙 'full' + 판석 파편 몇 조각으로 잔디와 물려 보이게 */
+function StoneEdgeTile({ tx, ty, ring }) {
+  const d = WORLD_TILESET.dirt.full
+  const x = tx * TILE, y = ty * TILE
+  const shards = ring === 1 ? 3 : 5
+  return (
+    <g>
+      <SheetSprite x={x} y={y} srcX={d.x} srcY={d.y}/>
+      {Array.from({ length: shards }, (_, i) => {
+        const a = pr(tx, ty, 90 + i), b = pr(tx, ty, 100 + i)
+        return <rect key={i} x={x + 4 + a * 22} y={y + 4 + b * 22} width={5 + (i % 2) * 3} height={5}
+          fill="#9c968c" opacity={ring === 1 ? 0.55 : 0.8}/>
+      })}
+    </g>
+  )
+}
+
+/* 판석 균열·이끼·변색 */
+function StonePlazaMark({ tx, ty, kind, j }) {
+  const x = tx * TILE, y = ty * TILE
+  if (kind === 0) {
+    return <polyline points={`${x + 4},${y + 6 + j * 8} ${x + 13},${y + 16} ${x + 10},${y + 24} ${x + 22},${y + 28}`}
+      fill="none" stroke="#5f5a54" strokeWidth="1" opacity="0.5"/>
+  }
+  if (kind === 1) {
+    return <g>
+      <ellipse cx={x + 10 + j * 12} cy={y + 14 + j * 8} rx={7} ry={5} fill="#6f8046" opacity="0.26"/>
+      <ellipse cx={x + 13 + j * 12} cy={y + 12 + j * 8} rx={2.5} ry={2} fill="#8aa056" opacity="0.3"/>
+    </g>
+  }
+  return <rect x={x + 3} y={y + 3} width={TILE - 6} height={TILE - 6} fill="#d8d2c8" opacity="0.2"/>
+}
+
+/* ─────────────────────────────────────────────
    헬퍼
 ───────────────────────────────────────────── */
 // 시트(WORLD_TILESET)에서 임의의 srcX/srcY,w×h 영역만 잘라 (x,y)에 그리는 범용 크롭 컴포넌트.
@@ -1254,6 +1443,11 @@ function GroundPatterns() {
         <filter id="grassBlur" x="-30%" y="-30%" width="160%" height="160%">
           <feGaussianBlur stdDeviation="12"/>
         </filter>
+        <linearGradient id="stoneAxis" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#ffffff" stopOpacity="0"/>
+          <stop offset="0.55" stopColor="#ffffff" stopOpacity="0.02"/>
+          <stop offset="1" stopColor="#fff3d8" stopOpacity="0.1"/>
+        </linearGradient>
       </defs>
     )
   }
@@ -1789,6 +1983,10 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
                 // 노이즈로 들쭉날쭉하게 깎은 범위) 안에 든 것만 회색 판석으로 — 블롭 밖으로
                 // 밀려난 길 타일과 그 바깥 스포크 길/다른 존 플라자는 기존 흙길 그대로.
                 if (inMuseumStonePlaza(p.tx, p.ty)) {
+                  // 가장 바깥 1~2링은 판석 대신 흙+파편으로 그려 잔디와의 칼경계를 없앤다
+                  // (STONE_SET 멤버십/충돌/보행은 그대로 — 시각 전용).
+                  const ring = STONE_RING.get(`${p.tx},${p.ty}`)
+                  if (ring) return <StoneEdgeTile key={i} tx={p.tx} ty={p.ty} ring={ring}/>
                   // 32×32 순정 크롭(스케일=1)으로 바꿔도 초록 줄이 남아있었음 — 원인은 이
                   // 타일만의 문제가 아니라 게임 전체가 공유하는 뷰포트(VIEW_W/H → 실제 창
                   // 크기) 비정수 배율 확대 때문에 타일별 개별 <svg> 클립 경계마다 생기는
@@ -1807,6 +2005,12 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
                 const s = WORLD_TILESET.water[shape]
                 return <SheetSprite key={i} x={w.tx*TILE} y={w.ty*TILE} srcX={s.x} srcY={s.y} rotate={rotate}/>
               })}
+              {/* 흙길 노면 보강 — 중앙 밟힘 띠 + 등간격 아닌 노면 디테일 */}
+              <WornStrips/>
+              {PATH_DETAIL.map((d,i) => <PathDetailMark key={`pd${i}`} {...d}/>)}
+              {/* 돌 광장 — 중앙→정문 축 그라디언트 + 판석 균열/이끼/변색 */}
+              <rect x={STONE_AXIS.x} y={STONE_AXIS.y} width={STONE_AXIS.w} height={STONE_AXIS.h} fill="url(#stoneAxis)"/>
+              {STONE_MARKS.map((m,i) => <StonePlazaMark key={`sm${i}`} {...m}/>)}
               {/* 시트 자체의 톱니 경계가 은은해서, 그 위에 짧은 크림색 glow 선을 겹쳐 그려
                   레퍼런스 이미지처럼 잔디↔길·잔디↔물 경계가 눈에 뚜렷하게 들어오게 보강.
                   Museum 마당 안 판석 구간은 흙길 오토타일이 아니라서 glow 대상에서 제외. */}
@@ -1821,6 +2025,8 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
                 if (shape !== 'edge') return null
                 return <EdgeGlow key={i} tx={w.tx} ty={w.ty} rotate={rotate} color="#EAF7F5"/>
               })}
+              {/* 잔디↔흙 경계 페더 — 크림 glow 위에 흙 얼룩/풀포기를 서로 물리게(주역) */}
+              {PATH_EDGE_TILES.map((t,i) => <PathFeather key={`pf${i}`} tx={t.tx} ty={t.ty} rotate={t.rotate}/>)}
             </>
           ) : (
             <>
