@@ -533,14 +533,27 @@ const LIBRARY_FLOWERS = LIBRARY_FLOWER_SPOTS
    이어지는 느낌만 낸다 — 픽셀아트 톤을 해치지 않도록 블러 강도는 약하게 유지.
 ───────────────────────────────────────────── */
 const GRASS_BASE = '#7FA24A'
-const GRASS_BLOTCH_COLORS = ['#93B85E', '#6C8F3D']
-const GRASS_BLOTCHES = Array.from({ length: Math.round((MAP_W * MAP_H) / 70) }, (_, i) => ({
-  cx: seedRand(i * 4 + 1) * PX_W,
-  cy: seedRand(i * 4 + 2) * PX_H,
-  r:  60 + seedRand(i * 4 + 3) * 110,
-  color: GRASS_BLOTCH_COLORS[i % 2],
-  opacity: 0.22 + seedRand(i * 4 + 4) * 0.14,
-}))
+// 3톤(밝음 / 중간 / 어두움) — 단색 위에 큰 저주파 패치로 번지게. 중간톤은 베이스보다
+// 살짝만 밝게 잡아 "같은 잔디인데 볕 든 자리"처럼 읽히게 한다.
+const GRASS_TONES = ['#A6C265', '#8FB255', '#6C8F3D']
+const GRASS_PATCH_COUNT = Math.round((MAP_W * MAP_H) / 70)
+// 열린 잔디용 군집 장식 — 타일마다 독립 확률로 흩뿌리지 않고, 시드로 고른 군집
+// 중심 주변 반경 안에만 몇 개를 지터 배치한다(그 외 넓은 잔디는 비운다).
+const GRASS_DETAIL_CLUSTERS = 24
+const CLUSTER_RADIUS_TILES = 2.6
+const CLUSTER_MIN = 3
+const CLUSTER_MAX = 6
+
+const GRASS_BLOTCHES = Array.from({ length: GRASS_PATCH_COUNT }, (_, i) => {
+  const big = seedRand(i * 4 + 5) < 0.34
+  return {
+    cx: seedRand(i * 4 + 1) * PX_W,
+    cy: seedRand(i * 4 + 2) * PX_H,
+    r:  (big ? 140 : 52) + seedRand(i * 4 + 3) * (big ? 130 : 88),
+    color: GRASS_TONES[i % GRASS_TONES.length],
+    opacity: 0.2 + seedRand(i * 4 + 4) * 0.18,
+  }
+})
 
 function GrassBlotches() {
   return (
@@ -552,6 +565,54 @@ function GrassBlotches() {
     </g>
   )
 }
+
+/* 열린 잔디 군집 장식 — 마당(yardBounds/MUSEUM_YARD) 안쪽·길·물·포털·테두리 나무
+   자리는 제외. 군집 중심 N개를 시드로 고르고, 각 중심 주변에 3~6개를 지터로 뿌린다. */
+const GRASS_DECOR_SRCS = [
+  ...WORLD_NATURE.flowers,
+  ...WORLD_NATURE.bushes.slice(0, 5),
+  ...WORLD_NATURE.mushrooms.slice(0, 4),
+]
+const YARD_RECTS = [...PORTALS.map(yardBounds), MUSEUM_YARD]
+const BORDER_TREE_SET = new Set(BORDER_TREES.map(t => `${t.tx},${t.ty}`))
+function grassDetailOk(tx, ty) {
+  if (tx < 2 || ty < 2 || tx >= MAP_W - 2 || ty >= MAP_H - 2) return false
+  if (!isFree(tx, ty) || terrainAt(tx, ty) !== 'grass') return false
+  if (YARD_RECTS.some(y => tx >= y.x0 && tx <= y.x1 && ty >= y.y0 && ty <= y.y1)) return false
+  for (let dx = -1; dx <= 1; dx++)
+    for (let dy = -1; dy <= 1; dy++)
+      if (BORDER_TREE_SET.has(`${tx + dx},${ty + dy}`)) return false
+  return true
+}
+const GRASS_DETAIL = (() => {
+  const out = []
+  let s = 900
+  const rnd = () => seedRand(s++)
+  for (let i = 0; i < GRASS_DETAIL_CLUSTERS; i++) {
+    let cx = 0, cy = 0, ok = false
+    for (let t = 0; t < 40 && !ok; t++) {
+      cx = 2 + Math.floor(rnd() * (MAP_W - 4))
+      cy = 2 + Math.floor(rnd() * (MAP_H - 4))
+      ok = grassDetailOk(cx, cy)
+    }
+    if (!ok) continue
+    const n = CLUSTER_MIN + Math.floor(rnd() * (CLUSTER_MAX - CLUSTER_MIN + 1))
+    for (let j = 0; j < n; j++) {
+      const ang = rnd() * Math.PI * 2
+      const rad = rnd() * CLUSTER_RADIUS_TILES
+      const tx = Math.round(cx + Math.cos(ang) * rad)
+      const ty = Math.round(cy + Math.sin(ang) * rad)
+      if (!grassDetailOk(tx, ty)) continue
+      out.push({
+        tx, ty,
+        sprite: GRASS_DECOR_SRCS[Math.floor(rnd() * GRASS_DECOR_SRCS.length)],
+        scale: 1.5 + (rnd() - 0.5) * 0.6,
+        rot: (rnd() - 0.5) * 22,
+      })
+    }
+  }
+  return out
+})()
 
 /* ─────────────────────────────────────────────
    헬퍼
@@ -604,13 +665,13 @@ function BuildingSprite({ zone, px, py, pw, ph, scaleMul = 1 }) {
 
 // 범용 소품 렌더러 — WORLD_NATURE/WORLD_PROPS의 스프라이트를 발밑 그림자와 함께 그린다.
 // 마당 스커팅/내부 소품(버섯·크리스탈·사일로·풍차·가로등)이 전부 이걸 공유한다.
-function PropSprite({ x, y, sprite, scale = 2 }) {
+function PropSprite({ x, y, sprite, scale = 2, rotate = 0 }) {
   const w = sprite.w * scale, h = sprite.h * scale
   return (
     <g>
       <ellipse cx={x + w/2} cy={y + h - 3} rx={w*0.36} ry={4} fill="#00000030"/>
       <SheetSprite x={x} y={y} srcX={sprite.x} srcY={sprite.y} w={sprite.w} h={sprite.h}
-        renderW={w} renderH={h} sheet={sprite}/>
+        renderW={w} renderH={h} rotate={rotate} sheet={sprite}/>
     </g>
   )
 }
@@ -1164,7 +1225,7 @@ function GroundPatterns() {
           <feGaussianBlur stdDeviation="2.2"/>
         </filter>
         <filter id="grassBlur" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="14"/>
+          <feGaussianBlur stdDeviation="12"/>
         </filter>
       </defs>
     )
@@ -1756,6 +1817,9 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
           {BUSHES.map((b,i) => <PixelBush key={i} x={b.tx*TILE} y={b.ty*TILE} sprite={b.sprite}/>)}
           {FLOWERS.map((f,i) => <PixelFlower key={i} x={f.tx*TILE} y={f.ty*TILE} sprite={f.sprite}/>)}
           {MUSHROOMS.map((m,i) => <PropSprite key={i} x={m.tx*TILE} y={m.ty*TILE} sprite={m.sprite} scale={1.8}/>)}
+          {ASSET_READY.world && GRASS_DETAIL.map((d,i) => (
+            <PropSprite key={`gd${i}`} x={d.tx*TILE} y={d.ty*TILE} sprite={d.sprite} scale={d.scale} rotate={d.rot}/>
+          ))}
           {YARD_ROCKS.map((r,i) => <PropSprite key={i} x={r.tx*TILE} y={r.ty*TILE} sprite={r.sprite} scale={1.8}/>)}
           {CRYSTALS.map((c,i) => <PropSprite key={i} x={c.tx*TILE} y={c.ty*TILE} sprite={c.sprite} scale={1.8}/>)}
           {ASSET_READY.world && GRAVESTONES.map((g,i) => <GravestoneSprite key={i} x={g.tx*TILE} y={g.ty*TILE} sprite={g.sprite}/>)}
