@@ -21,6 +21,19 @@ const CHAR_W = 72
 const CHAR_H = 88
 const HUD_H  = 56
 
+/* ─────────────────────────────────────────────
+   포털/도서관/우리 집 "여기 들어갈 수 있다" hover 큐 — 예전엔 건물을 통째로 감싸는
+   라운드 사각 테두리(디자인 툴 셀렉션 박스처럼 보였다)였으나, 은은한 디에게틱
+   신호로 교체한다: (a) 건물 발치의 부드러운 방사형 바닥 글로우, (b) 건물 위에서
+   위아래로 까딱이는 작은 아래 방향 쐐기(▼). locked면 쐐기 대신 회색 글로우 +
+   기존 🔒만 유지. 아래 값만 만지면 전체 톤이 조정된다.
+───────────────────────────────────────────── */
+const PORTAL_GLOW_OPACITY = 0.3      // 바닥 글로우 중심 최대 불투명도(가장자리로 0)
+const PORTAL_GLOW_RX_MUL  = 0.5      // 글로우 rx = 건물 폭  * 이 값
+const PORTAL_GLOW_RY_MUL  = 0.22     // 글로우 ry = 건물 높이 * 이 값
+const PORTAL_BOB_PX       = 4        // 쐐기 인디케이터 위아래 진폭(px)
+const PORTAL_BOB_DUR      = '1.6s'   // 쐐기 bobbing 한 주기
+
 // 카메라 뷰포트 — 맵이 2배로 넓어진 만큼, 화면엔 항상 전체 맵을 다 보여주는 대신
 // 캐릭터를 따라다니는 창(예전 60×45 맵의 절반 크기)만 보여준다. 그러면 같은 화면에
 // 건물·나무가 실제로 2배 크게 보이면서("맵 크기를 2배 키워달라"는 요청), 넓어진 맵을
@@ -927,6 +940,42 @@ function ZoneBuilding({ zone, px, py, pw, ph }) {
 }
 
 /* ─────────────────────────────────────────────
+   근처 hover 큐 — 바닥 글로우 + 위에서 까딱이는 쐐기.
+   PortalIsland / MuseumIsland / HomeIsland 가 공유한다. active(=플레이어가 근처)
+   가 아니면 opacity 0 으로 0.25s fade-out 되어 깔끔히 사라진다.
+   gid: <radialGradient> id 충돌 방지용 고유 문자열(존 이름 / "museum" / "home").
+───────────────────────────────────────────── */
+function EnterCue({ px, py, pw, ph, accent, gid, active, locked }) {
+  const cx = px + pw / 2
+  const glowRx = pw * PORTAL_GLOW_RX_MUL
+  const glowRy = ph * PORTAL_GLOW_RY_MUL
+  const glowCy = py + ph * 0.86
+  const gradId = `enterGlow_${gid}`
+  return (
+    <g pointerEvents="none" style={{ opacity: active ? 1 : 0, transition: 'opacity 0.25s ease' }}>
+      <defs>
+        <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor={accent} stopOpacity={PORTAL_GLOW_OPACITY}/>
+          <stop offset="62%"  stopColor={accent} stopOpacity={PORTAL_GLOW_OPACITY * 0.5}/>
+          <stop offset="100%" stopColor={accent} stopOpacity="0"/>
+        </radialGradient>
+      </defs>
+      <ellipse cx={cx} cy={glowCy} rx={glowRx} ry={glowRy} fill={`url(#${gradId})`}/>
+      {!locked && (
+        <g transform={`translate(${cx},${py - 28})`}>
+          <polygon points="-6,-9 6,-9 0,-1" fill={accent} opacity="0.92"
+            style={{ filter: `drop-shadow(0 1px 2px ${accent}66)` }}>
+            <animateTransform attributeName="transform" type="translate"
+              values={`0 0; 0 -${PORTAL_BOB_PX}; 0 0`} dur={PORTAL_BOB_DUR}
+              repeatCount="indefinite" additive="sum"/>
+          </polygon>
+        </g>
+      )}
+    </g>
+  )
+}
+
+/* ─────────────────────────────────────────────
    Zone 포털 섬
 ───────────────────────────────────────────── */
 function PortalIsland({ portal, hovered, progress, locked }) {
@@ -942,25 +991,17 @@ function PortalIsland({ portal, hovered, progress, locked }) {
 
   return (
     <g opacity={locked ? 0.6 : 1} style={{ filter: locked ? 'grayscale(0.8)' : 'none', transition:'all 0.25s' }}>
-      {useRealBuilding ? (
-        <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
-          fill="none"
-          stroke={hovered ? accent : 'transparent'}
-          strokeWidth={hovered ? 2.5 : 0}
-          style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
-        />
-      ) : (
+      {!useRealBuilding && (
         <>
           <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
-            fill="#3A6B2A"
-            stroke={hovered ? accent : '#2A5A1A'}
-            strokeWidth={hovered ? 2.5 : 1}
-            style={{ filter: hovered && !locked ? `drop-shadow(0 0 10px ${accent}66)` : 'none', transition:'all 0.25s' }}
-          />
+            fill="#3A6B2A" stroke="#2A5A1A" strokeWidth="1"/>
           <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#4A8B3A" opacity="0.7"/>
           <rect x={px+pw/2-8} y={py+ph-4} width={16} height={12} rx="2" fill="#C8B89A"/>
         </>
       )}
+
+      <EnterCue px={px} py={py} pw={pw} ph={ph} accent={accent}
+        gid={portal.zone} active={hovered} locked={locked}/>
 
       <ZoneBuilding zone={portal.zone} px={px} py={py} pw={pw} ph={ph}/>
 
@@ -975,14 +1016,14 @@ function PortalIsland({ portal, hovered, progress, locked }) {
       <rect x={px-4} y={py+ph+2} width={(pw+8)*prog} height={4} rx="2" fill={accent}/>
 
       <rect x={px+pw/2-38} y={py-26} width={76} height={22} rx="7"
-        fill={hovered ? accent : '#000000bb'}
-        stroke={accent} strokeWidth="1.5"
+        fill="#000000c8"
+        stroke={accent} strokeWidth={hovered ? 2 : 1.5}
         style={{ transition:'all 0.2s' }}
       />
       <text x={px+pw/2} y={py-12} textAnchor="middle" fontSize="10" fontWeight="700"
         fontFamily="Nunito, sans-serif"
-        fill={hovered ? '#fff' : accent}
-        style={{ userSelect:'none', transition:'fill 0.2s' }}>
+        fill={accent}
+        style={{ userSelect:'none' }}>
         {locked ? '🔒' : meta.emoji} {meta.label}
       </text>
 
@@ -1010,24 +1051,14 @@ function MuseumIsland({ hovered }) {
 
   return (
     <g>
+      <EnterCue px={px} py={py} pw={pw} ph={ph} accent="#C8A96E"
+        gid="museum" active={hovered} locked={false}/>
       {useRealBuilding ? (
-        <>
-          <rect x={px-4} y={py-4} width={pw+8} height={ph+8} rx="14"
-            fill="none"
-            stroke={hovered ? '#C8A96E' : 'transparent'}
-            strokeWidth={hovered ? 2.5 : 0}
-            style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
-          />
-          <BuildingSprite zone="Museum" px={px} py={py} pw={pw} ph={ph} scaleMul={0.8}/>
-        </>
+        <BuildingSprite zone="Museum" px={px} py={py} pw={pw} ph={ph} scaleMul={0.8}/>
       ) : (
         <>
           <rect x={px-4} y={py} width={pw+8} height={ph} rx="10"
-            fill="#C8B870"
-            stroke={hovered ? '#C8A96E' : '#A89050'}
-            strokeWidth={hovered ? 3 : 1.5}
-            style={{ filter: hovered ? 'drop-shadow(0 0 14px #C8A96E99)' : 'none', transition:'all 0.25s' }}
-          />
+            fill="#C8B870" stroke="#A89050" strokeWidth="1.5"/>
           <rect x={px-4} y={py} width={pw+8} height={12} rx="10" fill="#D8C880" opacity="0.6"/>
           <rect x={cx-pw*0.2} y={py+ph-4} width={pw*0.4} height={12} rx="2" fill="#C8B880"/>
           {[-1.2,-0.4,0.4,1.2].map((dx,i) => (
@@ -1046,14 +1077,14 @@ function MuseumIsland({ hovered }) {
         </>
       )}
       <rect x={cx-46} y={py-26} width={92} height={22} rx="7"
-        fill={hovered ? '#C8A96E' : '#000000bb'}
-        stroke="#C8A96E" strokeWidth="1.5"
+        fill="#000000c8"
+        stroke="#C8A96E" strokeWidth={hovered ? 2 : 1.5}
         style={{ transition:'all 0.2s' }}
       />
       <text x={cx} y={py-12} textAnchor="middle" fontSize="10" fontWeight="700"
         fontFamily="Nunito, sans-serif"
-        fill={hovered ? '#fff' : '#C8A96E'}
-        style={{ userSelect:'none', transition:'fill 0.2s' }}>
+        fill="#C8A96E"
+        style={{ userSelect:'none' }}>
         🏛 도서관
       </text>
       {hovered && (
@@ -1081,26 +1112,22 @@ function HomeIsland({ hovered }) {
 
   return (
     <g>
-      <rect x={px+pw*0.12} y={py+ph*0.2} width={pw*0.76} height={ph*0.7} rx="10"
-        fill="none"
-        stroke={hovered ? '#91CDB2' : 'transparent'}
-        strokeWidth={hovered ? 2.5 : 0}
-        style={{ filter: hovered ? 'drop-shadow(0 0 12px #91CDB299)' : 'none', transition:'all 0.25s' }}
-      />
+      <EnterCue px={px} py={py} pw={pw} ph={ph} accent="#91CDB2"
+        gid="home" active={hovered} locked={false}/>
       {useRealBuilding ? (
         <BuildingSprite zone="Home" px={px} py={py} pw={pw} ph={ph}/>
       ) : (
         <text x={cx} y={py+ph*0.62} textAnchor="middle" fontSize={ph*0.5} style={{userSelect:'none'}}>🏠</text>
       )}
       <rect x={cx-42} y={py-24} width={84} height={20} rx="7"
-        fill={hovered ? '#91CDB2' : '#000000bb'}
-        stroke="#91CDB2" strokeWidth="1.5"
+        fill="#000000c8"
+        stroke="#91CDB2" strokeWidth={hovered ? 2 : 1.5}
         style={{ transition:'all 0.2s' }}
       />
       <text x={cx} y={py-11} textAnchor="middle" fontSize="9" fontWeight="700"
         fontFamily="Nunito, sans-serif"
-        fill={hovered ? '#fff' : '#91CDB2'}
-        style={{ userSelect:'none', transition:'fill 0.2s' }}>
+        fill="#91CDB2"
+        style={{ userSelect:'none' }}>
         🏠 우리 집
       </text>
       {hovered && (
