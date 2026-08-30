@@ -24,13 +24,17 @@ const HUD_H  = 56
 /* ─────────────────────────────────────────────
    포털/도서관/우리 집 "여기 들어갈 수 있다" hover 큐 — 예전엔 건물을 통째로 감싸는
    라운드 사각 테두리(디자인 툴 셀렉션 박스처럼 보였다)였으나, 은은한 디에게틱
-   신호로 교체한다: (a) 건물 발치의 부드러운 방사형 바닥 글로우, (b) 건물 위에서
-   위아래로 까딱이는 작은 아래 방향 쐐기(▼). locked면 쐐기 대신 회색 글로우 +
-   기존 🔒만 유지. 아래 값만 만지면 전체 톤이 조정된다.
+   신호로 교체한다. 6개 마을 + 도서관 + 우리 집이 전부 같은 <EnterCue>를 쓴다:
+   (a) 건물 발치의 옅은 접지 그림자(어느 지형에서도 형태가 읽히게) + 그 위 존
+       accent 색 방사형 글로우, (b) 발치에서 퍼져나가는 accent 링 "핑"(소리 게임에
+       어울리는 신호), (c) 라벨 팻말 위에서 위아래로 까딱이는 작은 쐐기(▼).
+   locked면 정적 회색 글로우 + 기존 🔒만 남기고 핑·쐐기는 숨긴다.
+   아래 값만 만지면 전체 톤이 조정된다.
 ───────────────────────────────────────────── */
-const PORTAL_GLOW_OPACITY = 0.3      // 바닥 글로우 중심 최대 불투명도(가장자리로 0)
-const PORTAL_GLOW_RX_MUL  = 0.5      // 글로우 rx = 건물 폭  * 이 값
-const PORTAL_GLOW_RY_MUL  = 0.22     // 글로우 ry = 건물 높이 * 이 값
+const PORTAL_GLOW_OPACITY = 0.34     // 바닥 accent 글로우 중심 최대 불투명도(가장자리로 0)
+const PORTAL_GLOW_RX_MUL  = 0.52     // 글로우/핑 rx = 건물 폭  * 이 값
+const PORTAL_GLOW_RY_MUL  = 0.22     // 글로우/핑 ry = 건물 높이 * 이 값
+const PORTAL_PING_DUR     = '2.4s'   // 발치 accent 링이 한 번 퍼지는 주기
 const PORTAL_BOB_PX       = 4        // 쐐기 인디케이터 위아래 진폭(px)
 const PORTAL_BOB_DUR      = '1.6s'   // 쐐기 bobbing 한 주기
 
@@ -1129,10 +1133,12 @@ function ZoneBuilding({ zone, px, py, pw, ph }) {
 }
 
 /* ─────────────────────────────────────────────
-   근처 hover 큐 — 바닥 글로우 + 위에서 까딱이는 쐐기.
-   PortalIsland / MuseumIsland / HomeIsland 가 공유한다. active(=플레이어가 근처)
-   가 아니면 opacity 0 으로 0.25s fade-out 되어 깔끔히 사라진다.
-   gid: <radialGradient> id 충돌 방지용 고유 문자열(존 이름 / "museum" / "home").
+   근처 hover 큐 — 접지 그림자 + accent 글로우 + accent 링 "핑" + 위에서 까딱이는 쐐기.
+   6개 마을 포털 · 도서관 · 우리 집이 전부 공유한다(PortalIsland / MuseumIsland /
+   HomeIsland). active(=플레이어가 근처)가 아니면 opacity 0 으로 0.25s fade-out 되어
+   깔끔히 사라진다. gid: <radialGradient> id 충돌 방지용 고유 문자열.
+   접지 그림자는 밝은 흙길에서도 형태가 읽히도록 항상 그리고, 색 신호(글로우·핑·쐐기)는
+   locked 가 아닐 때만 그린다(회색 신호가 "활성"처럼 보이지 않게).
 ───────────────────────────────────────────── */
 function EnterCue({ px, py, pw, ph, accent, gid, active, locked }) {
   const cx = px + pw / 2
@@ -1140,25 +1146,48 @@ function EnterCue({ px, py, pw, ph, accent, gid, active, locked }) {
   const glowRy = ph * PORTAL_GLOW_RY_MUL
   const glowCy = py + ph * 0.86
   const gradId = `enterGlow_${gid}`
+  const shId = `enterSh_${gid}`
   return (
     <g pointerEvents="none" style={{ opacity: active ? 1 : 0, transition: 'opacity 0.25s ease' }}>
       <defs>
+        <radialGradient id={shId} cx="50%" cy="50%" r="50%">
+          <stop offset="0%"   stopColor="#000000" stopOpacity="0.22"/>
+          <stop offset="70%"  stopColor="#000000" stopOpacity="0.1"/>
+          <stop offset="100%" stopColor="#000000" stopOpacity="0"/>
+        </radialGradient>
         <radialGradient id={gradId} cx="50%" cy="50%" r="50%">
           <stop offset="0%"   stopColor={accent} stopOpacity={PORTAL_GLOW_OPACITY}/>
-          <stop offset="62%"  stopColor={accent} stopOpacity={PORTAL_GLOW_OPACITY * 0.5}/>
+          <stop offset="60%"  stopColor={accent} stopOpacity={PORTAL_GLOW_OPACITY * 0.5}/>
           <stop offset="100%" stopColor={accent} stopOpacity="0"/>
         </radialGradient>
       </defs>
+
+      {/* 접지 그림자 — 어느 지형에서도 "여기 뭔가 있다"는 형태를 준다 */}
+      <ellipse cx={cx} cy={glowCy} rx={glowRx * 0.82} ry={glowRy * 0.82} fill={`url(#${shId})`}/>
+      {/* 존 색 글로우 */}
       <ellipse cx={cx} cy={glowCy} rx={glowRx} ry={glowRy} fill={`url(#${gradId})`}/>
+
       {!locked && (
-        <g transform={`translate(${cx},${py - 28})`}>
-          <polygon points="-6,-9 6,-9 0,-1" fill={accent} opacity="0.92"
-            style={{ filter: `drop-shadow(0 1px 2px ${accent}66)` }}>
-            <animateTransform attributeName="transform" type="translate"
-              values={`0 0; 0 -${PORTAL_BOB_PX}; 0 0`} dur={PORTAL_BOB_DUR}
-              repeatCount="indefinite" additive="sum"/>
-          </polygon>
-        </g>
+        <>
+          {/* 발치에서 퍼져나가는 accent 링 핑 */}
+          <ellipse cx={cx} cy={glowCy} fill="none" stroke={accent} strokeWidth="2">
+            <animate attributeName="rx" dur={PORTAL_PING_DUR} repeatCount="indefinite"
+              values={`${glowRx * 0.3}; ${glowRx * 1.02}`}/>
+            <animate attributeName="ry" dur={PORTAL_PING_DUR} repeatCount="indefinite"
+              values={`${glowRy * 0.3}; ${glowRy * 1.02}`}/>
+            <animate attributeName="opacity" dur={PORTAL_PING_DUR} repeatCount="indefinite"
+              values="0.55; 0" keyTimes="0; 1"/>
+          </ellipse>
+          {/* 라벨 팻말 위 부유 쐐기 */}
+          <g transform={`translate(${cx},${py - 28})`}>
+            <polygon points="-6,-9 6,-9 0,-1" fill={accent} opacity="0.92"
+              style={{ filter: `drop-shadow(0 1px 2px ${accent}66)` }}>
+              <animateTransform attributeName="transform" type="translate"
+                values={`0 0; 0 -${PORTAL_BOB_PX}; 0 0`} dur={PORTAL_BOB_DUR}
+                repeatCount="indefinite" additive="sum"/>
+            </polygon>
+          </g>
+        </>
       )}
     </g>
   )
