@@ -1,17 +1,22 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { playSound, pauseSound, resumeSound, isSoundPaused, stopSound, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager'
+import { playSound, pauseSound, resumeSound, isSoundPaused, getCurrentTime, getListeningTime, resetAudio, resetListeningTime } from '@/lib/audioManager'
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
-import { awardVoteCurrency, getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
-import { recordVoteQuestProgress } from '@/lib/dailyQuests'
+import { getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
+import { newOperationKey } from '@/lib/persistenceResult'
 import { SHOP_PRODUCTS, getDailyDeal, getEffectivePrice, getShopGrowthTier, DEFAULT_OUTFIT_ID } from '@/lib/shopCatalog'
 import { ZONE_META } from '@/components/GameEngine'
 import LibraryRoom from '@/components/LibraryRoom'
+import { trackEvent } from '@/lib/userEvents'
 
 /* ─────────────────────────────────────────────
    동의 정도 슬라이더 라벨 (1~5)
 ───────────────────────────────────────────── */
 const CONFIDENCE_LABELS = ['매우 약함', '약함', '보통', '강한 동의', '매우동의']
+const MINI_WAVE_HEIGHTS = Array.from(
+  { length: 30 },
+  (_, index) => 15 + ((index * 41 + 17) % 72),
+)
 
 /* ─────────────────────────────────────────────
    Zone NPC
@@ -28,7 +33,7 @@ const ZONE_NPC = {
 /* ─────────────────────────────────────────────
    간단한 오디오 훅 (뮤지엄용 — 세그먼트 없음)
 ───────────────────────────────────────────── */
-function useMuseumPlayer(filePath) {
+function useMuseumPlayer(filePath, eventContext) {
   const [playing,   setPlaying]   = useState(false)
   const [progress,  setProgress]  = useState(0)
   const [playCount, setPlayCount] = useState(0)
@@ -51,18 +56,25 @@ function useMuseumPlayer(filePath) {
 
   // filePath 바뀌면 재생 상태 초기화
   useEffect(() => {
-    stopSound()
+    let cancelled = false
+    resetAudio()
     clearPoll()
     pausedRef.current = false
     durRef.current = null
-    setPlaying(false)
-    setProgress(0)
-    setError('')
+    Promise.resolve().then(() => {
+      if (cancelled) return
+      setPlaying(false)
+      setProgress(0)
+      setPlayCount(0)
+      setError('')
+    })
+    return () => { cancelled = true }
   }, [filePath, clearPoll])
 
   const toggle = useCallback(async () => {
     // 재생 중 → 일시정지 (언로드 없이)
     if (playing) {
+      trackEvent('audio_paused', eventContext)
       pauseSound()
       clearPoll()
       pausedRef.current = true
@@ -72,6 +84,7 @@ function useMuseumPlayer(filePath) {
 
     // 일시정지 상태 → 재개 (재다운로드 없음)
     if (pausedRef.current && isSoundPaused()) {
+      trackEvent('audio_resumed', eventContext)
       resumeSound()
       pausedRef.current = false
       setPlaying(true)
@@ -82,18 +95,26 @@ function useMuseumPlayer(filePath) {
     // 첫 재생 or 종료 후 재시작
     setError('')
     pausedRef.current = false
+    trackEvent('museum_audio_play_attempted', eventContext)
     try {
       const dur = await playSound(filePath, {
-        onEnd: () => { clearPoll(); pausedRef.current = false; setPlaying(false); setProgress(1) },
+        onEnd: () => {
+          clearPoll(); pausedRef.current = false; setPlaying(false); setProgress(1)
+          trackEvent('audio_completed', { ...eventContext, outcome: 'succeeded' })
+        },
       })
       durRef.current = dur
       setPlaying(true)
       setPlayCount(c => c + 1)
+      trackEvent('museum_audio_play_started', { ...eventContext, outcome: 'succeeded' })
       startPoll()
-    } catch { setError('오디오를 불러올 수 없어요.') }
-  }, [playing, filePath, clearPoll, startPoll])
+    } catch {
+      setError('오디오를 불러올 수 없어요.')
+      trackEvent('museum_audio_failed', { ...eventContext, outcome: 'failed', error_code: 'audio_load_failed' })
+    }
+  }, [playing, filePath, clearPoll, startPoll, eventContext])
 
-  useEffect(() => () => { stopSound(); clearPoll() }, [clearPoll])
+  useEffect(() => () => { clearPoll(); resetAudio() }, [clearPoll])
   const getDuration = useCallback(() => durRef.current, [])
   return { playing, progress, playCount, error, toggle, getDuration }
 }
@@ -102,12 +123,10 @@ function useMuseumPlayer(filePath) {
    미니 파형 바
 ───────────────────────────────────────────── */
 function MiniWave({ progress, accent }) {
-  const BAR = 30
-  const heights = useRef(Array.from({ length: BAR }, () => 15 + Math.random() * 72))
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '32px', margin: '8px 0' }}>
-      {heights.current.map((h, i) => {
-        const filled = (i + 0.5) / BAR <= progress
+      {MINI_WAVE_HEIGHTS.map((h, i) => {
+        const filled = (i + 0.5) / MINI_WAVE_HEIGHTS.length <= progress
         return (
           <div key={i} style={{
             flex: 1, height: `${h}%`, borderRadius: '2px',
@@ -224,7 +243,12 @@ function Shop({ participantId, accent, onCurrencyChange }) {
   const [totalEarned,   setTotalEarned]   = useState(0)
   const [loading,       setLoading]       = useState(true)
   const [purchasingId,  setPurchasingId]  = useState(null)
+  const [equippingId,   setEquippingId]   = useState(null)
   const [notice,        setNotice]        = useState('')
+  const purchaseKeys = useRef(new Map())
+  const equipKey = useRef(null)
+  const purchaseInFlightRef = useRef(false)
+  const equipInFlightRef = useRef(false)
 
   const dailyDeal = getDailyDeal()
   const tier = getShopGrowthTier(totalEarned)
@@ -243,32 +267,88 @@ function Shop({ participantId, accent, onCurrencyChange }) {
     setLoading(false)
   }, [participantId])
 
-  useEffect(() => { refresh() }, [refresh])
-
+  useEffect(() => {
+    const timeoutId = setTimeout(refresh, 0)
+    return () => clearTimeout(timeoutId)
+  }, [refresh])
   const handleBuy = async (product) => {
+    if (purchaseInFlightRef.current) return
+    purchaseInFlightRef.current = true
     const price = getEffectivePrice(product, dailyDeal)
     setPurchasingId(product.id)
     setNotice('')
-    const result = await purchaseOutfit({ participantId, outfitId: product.id, price })
-    setPurchasingId(null)
-    if (result.ok) {
-      setNotice(`${product.emoji} ${product.label} 구매 완료! 바로 장착했어요.`)
-      await refresh()
-      onCurrencyChange?.() // WorldMap HUD 잔액도 같이 갱신
-    } else if (result.reason === 'insufficient_funds') {
-      setNotice('잔액이 부족해요 🪙')
-    } else if (result.reason === 'already_owned') {
-      setNotice('이미 보유 중인 아이템이에요')
-      await refresh()
-    } else {
+    const idempotencyKey = purchaseKeys.current.get(product.id) || newOperationKey()
+    purchaseKeys.current.set(product.id, idempotencyKey)
+    trackEvent('purchase_attempted', {
+      target_type: 'outfit', target_id: product.id, operation_type: 'purchase:outfit', operation_idempotency_key: idempotencyKey,
+      metadata: { item_type: 'outfit', price_displayed: price, balance },
+    }, { critical: true })
+    try {
+      const result = await purchaseOutfit({ outfitId: product.id, idempotencyKey })
+      if (result.ok) {
+        trackEvent('purchase_succeeded', {
+          target_type: 'outfit', target_id: product.id, outcome: 'succeeded', operation_type: result.operationType,
+          operation_idempotency_key: result.idempotencyKey, result_entity_type: 'outfit', result_entity_id: product.id,
+          metadata: { price_displayed: price, price_confirmed: price, balance: result.newBalance, transaction_id: result.transactionId },
+        }, { critical: true, flush: true })
+        purchaseKeys.current.delete(product.id)
+        setNotice(`${product.emoji} ${product.label} 구매 완료! 바로 장착했어요.`)
+        await refresh()
+        onCurrencyChange?.()
+      } else {
+        trackEvent('purchase_failed', {
+          target_type: 'outfit', target_id: product.id, outcome: 'failed', operation_type: result.operationType,
+          operation_idempotency_key: result.idempotencyKey, error_code: result.error?.code || result.reason || 'purchase_failed',
+          metadata: { retryable: result.error?.retryable, price_displayed: price, price_confirmed: result.price, balance: result.balance },
+        }, { critical: true, flush: true })
+        if (result.reason === 'insufficient_funds') setNotice('잔액이 부족해요 🪙')
+        else if (result.reason === 'already_owned') { setNotice('이미 보유 중인 아이템이에요'); await refresh() }
+        else setNotice('구매 중 오류가 발생했어요. 다시 시도해주세요.')
+      }
+    } catch (error) {
+      console.error('[SoundMuseum] 구매 오류:', error)
       setNotice('구매 중 오류가 발생했어요. 다시 시도해주세요.')
+    } finally {
+      purchaseInFlightRef.current = false
+      setPurchasingId(null)
     }
   }
 
   const handleEquip = async (outfitId) => {
-    await setEquippedOutfit(participantId, outfitId)
-    setEquipped(outfitId)
-    onCurrencyChange?.()
+    if (equipInFlightRef.current) return
+    equipInFlightRef.current = true
+    setEquippingId(outfitId)
+    if (!equipKey.current || equipKey.current.outfitId !== outfitId) equipKey.current = { outfitId, key: newOperationKey() }
+    trackEvent('outfit_equip_attempted', {
+      target_type: 'outfit', target_id: outfitId, operation_type: 'outfit_equip', operation_idempotency_key: equipKey.current.key,
+    }, { critical: true })
+    try {
+      const result = await setEquippedOutfit(participantId, outfitId, equipKey.current.key)
+      if (!result.ok) {
+        trackEvent('outfit_equip_failed', {
+          target_type: 'outfit', target_id: outfitId, outcome: 'failed', operation_type: result.operationType,
+          operation_idempotency_key: result.idempotencyKey, error_code: result.error.code, metadata: { retryable: result.error.retryable },
+        }, { critical: true, flush: true })
+        setNotice(result.error.message); return
+      }
+      trackEvent('outfit_equip_succeeded', {
+        target_type: 'outfit', target_id: outfitId, outcome: 'succeeded', operation_type: result.operationType,
+        operation_idempotency_key: result.idempotencyKey, result_entity_type: 'outfit', result_entity_id: result.data?.outfitId,
+      }, { critical: true, flush: true })
+      equipKey.current = null
+      setEquipped(outfitId)
+      onCurrencyChange?.()
+    } catch (error) {
+      console.error('[SoundMuseum] 장착 오류:', error)
+      trackEvent('outfit_equip_failed', {
+        target_type: 'outfit', target_id: outfitId, outcome: 'failed', operation_type: 'outfit_equip',
+        operation_idempotency_key: equipKey.current?.key, error_code: 'outfit_equip_failed', metadata: { retryable: true },
+      }, { critical: true, flush: true })
+      setNotice('장착 중 오류가 발생했어요. 다시 시도해주세요.')
+    } finally {
+      equipInFlightRef.current = false
+      setEquippingId(null)
+    }
   }
 
   return (
@@ -335,7 +415,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
                   </div>
                 </div>
                 {owned ? (
-                  <button onClick={() => handleEquip(product.id)} disabled={isEquipped} style={{
+                  <button onClick={() => handleEquip(product.id)} disabled={isEquipped || Boolean(equippingId)} style={{
                     padding: '8px 14px', borderRadius: '10px',
                     background: isEquipped ? `${tier.accent}33` : '#FAF6EE',
                     border: `1.5px solid ${tier.accent}`,
@@ -348,7 +428,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
                 ) : (
                   <button
                     onClick={() => handleBuy(product)}
-                    disabled={!canAfford || purchasingId === product.id}
+                    disabled={!canAfford || Boolean(purchasingId)}
                     title={!canAfford ? '잔액이 부족해요' : undefined}
                     style={{
                       padding: '8px 14px', borderRadius: '10px', border: 'none',
@@ -366,7 +446,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
           })
         )}
         {equipped && equipped !== DEFAULT_OUTFIT_ID && (
-          <button onClick={() => handleEquip(DEFAULT_OUTFIT_ID)} style={{
+          <button onClick={() => handleEquip(DEFAULT_OUTFIT_ID)} disabled={Boolean(equippingId)} style={{
             marginTop: '2px', padding: '9px', borderRadius: '10px',
             background: 'transparent', border: `1.5px solid ${tier.accent}44`,
             color: '#FAF6EEaa', fontSize: '11px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
@@ -389,7 +469,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, onCurrencyChange, onDone, onExit }) {
+export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, onCurrencyChange, onDone, onExit }) {
   const npc   = ZONE_NPC[zone]  || ZONE_NPC.Lab
   const meta  = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
   const accent = meta.color
@@ -399,14 +479,32 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   const [pick,        setPick]        = useState(null) // 'A'|'B'|'C'|'D'|'E'
   const [confidence,  setConfidence]  = useState(3)   // 1=low 3=medium 5=high
   const [submitting,  setSubmitting]  = useState(false)
+  const [candidateError, setCandidateError] = useState('')
+  const [submitError, setSubmitError] = useState('')
+  const [reloadNonce, setReloadNonce] = useState(0)
   const [npcIdx,      setNpcIdx]      = useState(0)
   const [visible,     setVisible]     = useState(false)
   const cardRef = useRef(null)
+  const voteKeyRef = useRef(newOperationKey())
+  const voteInFlightRef = useRef(false)
+  const mountedRef = useRef(true)
+  const museumInstanceRef = useRef(crypto.randomUUID())
 
-  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound?.file_path)
+  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound?.file_path, {
+    zone, sound_id: sound?.sound_id, target_type: 'audio', target_id: 'museum-audio',
+  })
 
   // 슬라이드인 애니메이션
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
+  useEffect(() => {
+    mountedRef.current = true
+    return () => { mountedRef.current = false }
+  }, [])
+  useEffect(() => {
+    trackEvent('museum_entered', { zone, sound_id: sound?.sound_id, target_type: 'screen', target_id: 'sound-museum' }, {
+      dedupeKey: `museum:${museumInstanceRef.current}`,
+    })
+  }, [sound?.sound_id, zone])
 
   // 표현을 고르면 동의 정도 슬라이더 + 제출 버튼이 스크롤 없이 바로 보이도록
   // 카드 맨 아래로 스크롤 (작은 화면에서 후보 카드 밑에 가려지는 문제 방지)
@@ -418,12 +516,35 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
 
   // 후보 표현 로드 — 투표할 소리가 없으면(sound=null) 아예 요청하지 않는다.
   useEffect(() => {
-    if (!sound) { setCandidates([]); setLoading(false); return }
-    getCandidateExpressions(sound.sound_id, myExpression)
-      .then(data => setCandidates(data.slice(0, 5)))
-      .catch(err => { console.error('[Museum] 후보 로드 오류:', err); setCandidates([]) })
-      .finally(() => setLoading(false))
-  }, [sound, myExpression])
+    let cancelled = false
+    Promise.resolve().then(async () => {
+      if (!sound) { if (!cancelled) { setCandidates([]); setLoading(false) }; return }
+      if (!cancelled) { setLoading(true); setCandidateError('') }
+      trackEvent('museum_candidate_load_attempted', { zone, sound_id: sound.sound_id, target_type: 'candidate_list', target_id: 'museum-candidates' })
+      try {
+        const data = await getCandidateExpressions(sound.sound_id, myExpression)
+        if (!cancelled) {
+          const visibleCandidates = data.slice(0, 5)
+          setCandidates(visibleCandidates)
+          trackEvent(visibleCandidates.length ? 'museum_candidate_loaded' : 'museum_candidate_empty', {
+            zone, sound_id: sound.sound_id, target_type: 'candidate_list', target_id: 'museum-candidates',
+            outcome: visibleCandidates.length ? 'succeeded' : 'empty', metadata: { candidate_count: visibleCandidates.length },
+          })
+          visibleCandidates.forEach((candidate, index) => trackEvent('museum_expression_impression', {
+            zone, sound_id: sound.sound_id, target_type: 'annotation', target_id: candidate.id,
+            metadata: { candidate_index: index, candidate_count: visibleCandidates.length },
+          }, { dedupeKey: `impression:${museumInstanceRef.current}:${reloadNonce}:${candidate.id}` }))
+        }
+      } catch (err) {
+        console.error('[Museum] 후보 로드 오류:', err)
+        if (!cancelled) setCandidateError('후보를 불러오지 못했습니다. 다시 시도해주세요.')
+        trackEvent('museum_candidate_load_failed', { zone, sound_id: sound.sound_id, target_type: 'candidate_list', target_id: 'museum-candidates', outcome: 'failed', error_code: 'candidate_load_failed' })
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    })
+    return () => { cancelled = true }
+  }, [sound, myExpression, reloadNonce, zone])
 
   // NPC 대사 순환
   useEffect(() => {
@@ -432,13 +553,22 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   }, [npc.lines.length])
 
   const handleSubmit = async () => {
+    if (voteInFlightRef.current || candidateError || playCount < 1) return
+    voteInFlightRef.current = true
     setSubmitting(true)
+    setSubmitError('')
+    const operationKey = voteKeyRef.current
+    trackEvent('museum_vote_submit_attempted', {
+      zone, sound_id: sound?.sound_id, target_type: 'button', target_id: 'museum-vote-submit',
+      operation_type: 'museum_vote', operation_idempotency_key: operationKey,
+    }, { critical: true })
     try {
       const letterMap = { A: 0, B: 1, C: 2, D: 3, E: 4 }
       if (pick && pick in letterMap) {
         const candidate = candidates[letterMap[pick]]
         if (candidate) {
-          await saveVote({
+          const result = await saveVote({
+            idempotencyKey:     operationKey,
             participant_id:     participantId,
             session_id:         sessionId,
             sound_id:           sound.sound_id,
@@ -450,28 +580,36 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
             stage:              2,
             version:            'v0.4-web',
           })
+          if (!result.ok) {
+            trackEvent('museum_vote_submit_failed', {
+              zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'museum-vote-submit', outcome: 'failed',
+              operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+              error_code: result.error.code, metadata: { retryable: result.error.retryable },
+            }, { critical: true, flush: true })
+          }
+          if (!result.ok) throw new Error(result.error.message)
+          trackEvent('museum_vote_submit_succeeded', {
+            zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'museum-vote-submit', outcome: 'succeeded',
+            operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+            result_entity_type: 'vote', result_entity_id: result.data?.voteId,
+            metadata: { transaction_id: result.data?.reward?.transactionId, reward_amount: result.data?.reward?.awarded },
+          }, { critical: true, flush: true })
           resetListeningTime()
-          // 화폐 지급은 별도 흐름 — await하지 않아 제출 속도에 영향 없고,
-          // 내부에서 절대 throw하지 않아 실패해도 투표 저장엔 영향 없음.
-          awardVoteCurrency({
-            participantId,
-            annotationId:      candidate.id,
-            subCategory:       sound.sub_category || '',
-            soundDurationSec:  getDuration(),
-            confidence,
-          })
-          // 일일 퀘스트(투표 10회) 진행도 갱신 — 화폐 지급과 동일하게 완전
-          // 별도 흐름, await 없이 호출.
-          recordVoteQuestProgress({ participantId })
+          voteKeyRef.current = newOperationKey()
         }
       }
-    } catch {}
-    setSubmitting(false)
-    onDone()
+      onDone()
+    } catch (error) {
+      console.error('[SoundMuseum] 투표 저장 오류:', error)
+      if (mountedRef.current) setSubmitError('투표를 저장하지 못했습니다. 선택을 유지했으니 다시 시도해주세요.')
+    } finally {
+      voteInFlightRef.current = false
+      if (mountedRef.current) setSubmitting(false)
+    }
   }
 
-  const noCandidate = !loading && candidates.length === 0
-  const canSubmit   = noCandidate || pick !== null
+  const noCandidate = !loading && !candidateError && candidates.length === 0
+  const canSubmit   = !candidateError && playCount > 0 && (noCandidate || pick !== null)
 
   // 투표 카드 — 기존 로직/마크업 그대로, 바깥 래퍼 크기만 LibraryRoom이 주는
   // 카드 슬롯(CARD_LAYOUT.vote, 뷰포트의 작은 영역)에 맞춰 100%/100%로 변경.
@@ -495,7 +633,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
           다른 참여자들이 소리를 더 전사하면<br/>여기서 투표할 수 있어요 ✨
         </div>
         {onExit && (
-          <button onClick={onExit} style={{
+          <button data-library-navigation="true" onClick={onExit} style={{
             marginTop: '10px', padding: '9px 18px',
             background: '#F0EBE0', border: `1.5px solid ${accent}44`, borderRadius: '10px',
             color: '#8B6A3A', fontSize: '12px', fontWeight: 800,
@@ -530,14 +668,14 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
               <div style={{
                 fontSize: '9px', fontWeight: 800, color: accent,
                 letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px',
-              }}>TODAY'S EXHIBITION</div>
+              }}>TODAY&apos;S EXHIBITION</div>
               <div style={{ fontSize: '17px', fontWeight: 800, color: '#2A1F0E', lineHeight: 1.2 }}>
                 {meta.emoji} {meta.label} — {sound.sub_category || 'Unknown Sound'}
               </div>
               <div style={{ fontSize: '10px', color: '#8B6A3A', marginTop: '3px' }}>#{sound.sound_id}</div>
             </div>
             {onExit && (
-              <button onClick={onExit} style={{
+              <button data-library-navigation="true" onClick={onExit} style={{
                 flexShrink: 0,
                 padding: '6px 10px',
                 background: '#F0EBE0',
@@ -612,6 +750,11 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
             <div style={{ textAlign: 'center', color: '#8B6A3A', fontSize: '13px', padding: '16px' }}>
               ✦ 다른 참여자 표현 불러오는 중...
             </div>
+          ) : candidateError ? (
+            <div style={{ background: '#FCE8E6', borderRadius: '12px', padding: '18px', textAlign: 'center', color: '#A43C32' }}>
+              {candidateError}<br/>
+              <button onClick={() => setReloadNonce(value => value + 1)} style={{ marginTop: '10px', padding: '8px 14px', borderRadius: '9px', border: 0, cursor: 'pointer' }}>다시 불러오기</button>
+            </div>
           ) : noCandidate ? (
             <div style={{
               background: '#F0EBE0', borderRadius: '12px', padding: '18px',
@@ -636,7 +779,16 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                   return (
                     <div
                       key={c.id}
-                      onClick={() => setPick(isSelected ? null : letter)}
+                      onClick={() => {
+                        const previous = pick ? candidates[['A','B','C','D','E'].indexOf(pick)] : null
+                        const nextPick = isSelected ? null : letter
+                        trackEvent(isSelected ? 'museum_expression_deselected' : previous ? 'museum_expression_changed' : 'museum_expression_selected', {
+                          zone, sound_id: sound.sound_id, target_type: 'annotation', target_id: c.id,
+                          value_before: { candidate_index: previous ? ['A','B','C','D','E'].indexOf(pick) : null },
+                          value_after: { candidate_index: nextPick ? i : null },
+                        })
+                        setPick(nextPick)
+                      }}
                       style={{
                         display: 'flex', alignItems: 'stretch', gap: '0',
                         background: isSelected ? `${accent}12` : '#F0EBE0',
@@ -673,7 +825,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                           color: isSelected ? '#2A1F0E' : '#3A2A14',
                           lineHeight: 1.3, marginBottom: '4px',
                         }}>
-                          "{c.expression_text}"
+                          “{c.expression_text}”
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                           <span style={{ fontSize: '9px', color: '#A09080' }}>
@@ -705,7 +857,11 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
               <input
                 type="range" min={1} max={5} step={1}
                 value={confidence}
-                onChange={e => setConfidence(Number(e.target.value))}
+                onChange={e => {
+                  const next = Number(e.target.value)
+                  trackEvent('confidence_changed', { zone, sound_id: sound.sound_id, target_type: 'confidence', target_id: `museum-confidence-${next}`, value_before: { confidence }, value_after: { confidence: next } })
+                  setConfidence(next)
+                }}
                 style={{ width: '100%', accentColor: accent, cursor: 'pointer' }}
               />
               <div style={{
@@ -722,6 +878,10 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
           )}
 
           {/* 제출 버튼 */}
+          {playCount < 1 && !error && (
+            <div style={{ color:'#8B6A3A', fontSize:'11px', textAlign:'center' }}>음원을 실제로 재생한 뒤 투표할 수 있어요.</div>
+          )}
+          {submitError && <div role="alert" style={{ color: '#A43C32', fontSize: '12px', textAlign: 'center' }}>{submitError}</div>}
           <button
             onClick={handleSubmit}
             disabled={submitting || !canSubmit}
@@ -740,43 +900,15 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
       </div>
   )
 
-  // NPC 말풍선 — 투표 카드 전용(기존엔 "다른 탭에서는 소리와 무관한 대사라 숨김"
-  // 이었던 것과 동일한 이유로, 이제는 "다른 카드가 열려 있을 땐 숨김"). 카드
-  // 슬롯(CARD_LAYOUT.vote) 안에 같이 반환되지만 화면 우하단 고정 위치를 유지해야
-  // 해서 position은 슬롯 기준 absolute가 아니라 뷰포트 기준 fixed로 바꿨다.
-  const npcBubble = (
-      <div style={{
-        position: 'fixed', bottom: '28px', right: '96px',
-        zIndex: 20, display: 'flex', alignItems: 'flex-end', gap: '8px',
-        maxWidth: '220px',
-      }}>
-        <div style={{
-          background: '#FAF6EE',
-          border: `2px solid ${accent}44`,
-          borderRadius: '16px 16px 4px 16px',
-          padding: '10px 14px',
-          fontSize: '11px', color: '#3A2A14', lineHeight: 1.55, fontWeight: 600,
-          boxShadow: '0 4px 16px #00000033',
-          transition: 'opacity 0.5s',
-        }}>
-          {npc.lines[npcIdx]}
-        </div>
-        <div style={{
-          width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0,
-          background: `${accent}1A`, border: `2px solid ${accent}`,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontSize: '26px',
-        }}>
-          {npc.emoji}
-        </div>
-      </div>
-  )
-
   return (
     <LibraryRoom
       onExit={onExit}
+      zoneCounts={zoneCounts}
+      activeStations={candidates.length}
+      outfitSrc={outfitSrc}
+      npcDialogue={{ name: npc.name, line: npc.lines[npcIdx] }}
       cards={{
-        vote:     { render: () => (<>{voteCardBody}{npcBubble}</>) },
+        vote:     { render: () => voteCardBody },
         exhibits: { render: () => <ExhibitDisplay zoneCounts={zoneCounts} accent={accent}/> },
         shop:     { render: () => <Shop participantId={participantId} accent={accent} onCurrencyChange={onCurrencyChange}/> },
       }}

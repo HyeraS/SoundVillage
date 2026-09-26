@@ -1,0 +1,99 @@
+{
+  "version": 2,
+  "runtimeBaseUrl": "/assets/human-village/",
+  "world": { "tiles": { "width": 48, "height": 36 }, "tilePixels": 32, "pixels": { "width": 1536, "height": 1152 } },
+  "source": {
+    "file": "community-assets-v1.png",
+    "runtime": false,
+    "pixels": { "width": 1536, "height": 1024 },
+    "background": "ImageGen checker field retained for comparison/recovery only"
+  },
+  "runtimeAtlas": {
+    "file": "community-assets-alpha-v1.png",
+    "pixels": { "width": 1536, "height": 1024 },
+    "alpha": true,
+    "processing": "Flood-fill from all image edges through near-neutral pixels (RGB >= 238, channel spread <= 12); only the connected generated checker field was made transparent. Enclosed cream stucco pixels were preserved."
+  },
+  "referenceMaster": {
+    "file": "/design-previews/human-village-concepts/01-community-hall-plaza.png",
+    "pixels": { "width": 1448, "height": 1086 },
+    "runtime": false,
+    "role": "Absolute visual reference; preserved byte-for-byte"
+  },
+  "imagegenDonors": [
+    {
+      "file": "community-map-imagegen-donor-v2.png",
+      "pixels": { "width": 1448, "height": 1086 },
+      "role": "Precise-object-edit donor for nine gold markers and the south-gate player"
+    },
+    {
+      "file": "community-map-imagegen-shadow-donor-v2.png",
+      "pixels": { "width": 1448, "height": 1086 },
+      "role": "Second precise-object-edit donor for the nine residual marker shadows"
+    }
+  ],
+  "cleanMaster": {
+    "file": "community-map-master-v2.png",
+    "pixels": { "width": 1448, "height": 1086 },
+    "runtime": false,
+    "processing": "Original reference pixels are retained outside the ten approved object-removal regions. ImageGen donor pixels are feather-composited only inside the nine marker/player regions, and the second donor only inside the nine shadow regions.",
+    "editMask": "community-map-edit-mask-v2.png",
+    "outsideMaskChangedPixels": 0
+  },
+  "runtimeMaster": {
+    "file": "community-map-master-1536x1152-v2.png",
+    "pixels": { "width": 1536, "height": 1152 },
+    "runtime": true,
+    "processing": "One-time nearest-neighbor resize from the 1448x1086 clean master; drawn 1:1 in world coordinates"
+  },
+  "runtimeForeground": {
+    "file": "community-map-foreground-1536x1152-v2.png",
+    "pixels": { "width": 1536, "height": 1152 },
+    "alpha": true,
+    "runtime": true,
+    "processing": "Exact runtime-master pixels retained only in measured roof, awning and central-tree foreground polygons; all other pixels transparent"
+  },
+  "generation": {
+    "mode": "OpenAI built-in ImageGen",
+    "reference": "/design-previews/human-village-concepts/01-community-hall-plaza.png",
+    "promptSummary": "precise-object-edit: change only the nine gold sound markers, their nine oval shadows, and the one south-gate player; restore immediately surrounding terrain; keep every other pixel-level design invariant"
+  },
+  "sprites": {
+    "communityHall": [35, 15, 354, 311],
+    "bakery": [455, 43, 230, 280],
+    "flowerShop": [737, 91, 253, 230],
+    "familyHouse": [1040, 59, 185, 264],
+    "clinic": [1286, 77, 208, 243],
+    "cafeShop": [35, 379, 292, 213],
+    "laundry": [433, 377, 248, 211],
+    "awning": [758, 431, 250, 118],
+    "shadeTree": [1075, 349, 215, 235],
+    "cypress": [1395, 373, 63, 211],
+    "benchDark": [56, 648, 113, 83],
+    "benchLight": [235, 645, 103, 81],
+    "planterWood": [390, 640, 107, 88],
+    "planterStone": [530, 636, 124, 97],
+    "lampTall": [713, 590, 33, 150],
+    "lampShort": [779, 625, 39, 111],
+    "cafeTable": [860, 633, 69, 103],
+    "cafeSet": [961, 652, 170, 84],
+    "noticeBoard": [1237, 627, 116, 118],
+    "mailbox": [1400, 651, 43, 84],
+    "bikeRack": [52, 793, 145, 74],
+    "clothesline": [255, 774, 182, 94],
+    "vegetableBed": [495, 780, 148, 88],
+    "flowerBed": [681, 779, 147, 88],
+    "crate": [860, 785, 79, 81],
+    "flowerPot": [973, 764, 73, 100],
+    "pottedShrub": [1077, 773, 52, 92],
+    "raisedBed": [1174, 791, 78, 76],
+    "wateringCan": [1289, 801, 78, 63],
+    "barrels": [1411, 788, 71, 79],
+    "solidFence": [56, 906, 209, 70],
+    "railFence": [323, 915, 216, 60],
+    "picketFence": [597, 919, 126, 56],
+    "stoneWall": [765, 922, 202, 54],
+    "stonePost": [1042, 898, 47, 84],
+    "stoneSteps": [1174, 892, 270, 96]
+  }
+}

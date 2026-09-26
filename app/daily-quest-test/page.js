@@ -1,9 +1,9 @@
 'use client'
 import { useEffect, useState, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { saveAnnotation, saveVote, getClient } from '@/lib/supabase'
-import { awardAnnotationCurrency, awardVoteCurrency, getCurrencyBalance } from '@/lib/currency'
-import { recordAnnotationQuestProgress, recordVoteQuestProgress, getTodayQuestSummary, ensureTodayQuests } from '@/lib/dailyQuests'
+import { saveAnnotation, saveVote, getCandidateExpressions, getClient } from '@/lib/supabase'
+import { getCurrencyBalance } from '@/lib/currency'
+import { getTodayQuestSummary, ensureTodayQuests } from '@/lib/dailyQuests'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -15,6 +15,7 @@ import soundMetadata from '@/data/sound_metadata.json'
    실제 Supabase에 대해 검증한다.
 
    쿼리 파라미터: ?pid=AUDIOTEST_E2E_QUEST&annotations=20&votes=10
+   URL을 여는 것만으로는 실행되지 않으며, 화면의 실행 버튼을 눌러야 한다.
 ───────────────────────────────────────────── */
 function TestInner() {
   const params = useSearchParams()
@@ -25,9 +26,11 @@ function TestInner() {
 
   const [log, setLog] = useState([])
   const [result, setResult] = useState(null)
+  const [runRequested, setRunRequested] = useState(false)
   const ranRef = useRef(false)
 
   useEffect(() => {
+    if (!runRequested) return
     if (ranRef.current) return
     ranRef.current = true
     const push = (msg) => setLog(l => [...l, msg])
@@ -36,8 +39,11 @@ function TestInner() {
     // 그대로 들여다본다. 전사/투표 제출은 전혀 하지 않는다.
     if (peekOnly) {
       ;(async () => {
-        push(`peek 모드 — participant=${pid}, 브라우저 Date=${new Date().toString()}`)
-        const quests = await ensureTodayQuests(pid)
+        const { data: me } = await getClient().rpc('get_my_study_participant')
+        const participant = Array.isArray(me) ? me[0] : me
+        if (!participant || participant.participant_id !== pid.toUpperCase()) throw new Error('먼저 루트에서 동일한 테스트 참가자로 인증하세요.')
+        push(`peek 모드 — participant=${participant.participant_id}, 브라우저 Date=${new Date().toString()}`)
+        const quests = await ensureTodayQuests(participant.participant_id)
         setResult({
           nowDate: new Date().toISOString(),
           quests: quests.map(q => ({
@@ -52,23 +58,29 @@ function TestInner() {
 
     ;(async () => {
       const client = getClient()
-      push(`시작 — participant=${pid}`)
+      const { data: me, error: meError } = await client.rpc('get_my_study_participant')
+      if (meError) throw meError
+      const participant = Array.isArray(me) ? me[0] : me
+      if (!participant || participant.participant_id !== pid.toUpperCase()) throw new Error('먼저 루트에서 동일한 테스트 참가자로 인증하세요.')
+      const claimedPid = participant.participant_id
+      const claimedGroup = participant.group_id
+      push(`시작 — participant=${claimedPid}`)
 
-      const before = await getCurrencyBalance(pid)
+      const before = await getCurrencyBalance(claimedPid)
       push(`시작 잔액: ${before}`)
 
-      const initialQuests = await ensureTodayQuests(pid)
+      const initialQuests = await ensureTodayQuests(claimedPid)
       const categoryQuest = initialQuests.find(q => q.template?.type === 'category_participate')
       const targetSubCategory = categoryQuest?.target_sub_category
       push(`오늘 배정된 퀘스트 ${initialQuests.length}개, 다양성 대상 카테고리: ${targetSubCategory}`)
 
-      const categorySound = soundMetadata.sounds.find(s => s.sub_category === targetSubCategory)
+      const categorySound = soundMetadata.sounds.find(s => s.group === claimedGroup && s.sub_category === targetSubCategory)
 
       const zoneOrder = ['Music', 'Animal', 'Human', 'Nature', 'Urban', 'Lab']
       const picks = []
 
       // 1) 첫 제출 — visit_zone(오늘 첫 Zone 방문) 유도
-      const firstSound = soundMetadata.sounds.find(s => s.game_zone === zoneOrder[0])
+      const firstSound = soundMetadata.sounds.find(s => s.group === claimedGroup && s.game_zone === zoneOrder[0])
       if (firstSound) picks.push(firstSound)
 
       // 2) 다양성 카테고리 매칭 소리
@@ -79,52 +91,46 @@ function TestInner() {
       let guard = 0
       while (picks.length < annotationCount && guard < 500) {
         const z = zoneOrder[zi % zoneOrder.length]
-        const s = soundMetadata.sounds.find(s => s.game_zone === z && !picks.includes(s))
+        const s = soundMetadata.sounds.find(s => s.group === claimedGroup && s.game_zone === z && !picks.includes(s))
         if (s) picks.push(s)
         zi++; guard++
       }
 
       for (let i = 0; i < picks.length; i++) {
         const s = picks[i]
-        await saveAnnotation({
-          participant_id: pid, session_id: 'e2e-test',
+        const annotationResult = await saveAnnotation({
+          participant_id: claimedPid, session_id: claimedGroup,
           sound_id: s.sound_id, zone: s.game_zone, sub_category: s.sub_category || '',
           expression_text: `테스트표현_${i}`, confidence: 3,
           play_count: 1, listening_time_sec: 3, stage: 1,
           is_verified: false, version: 'v0.4-web-e2e-test',
         })
-        await awardAnnotationCurrency({
-          participantId: pid, soundId: s.sound_id, subCategory: s.sub_category || '',
-          soundDurationSec: 3, confidence: 3,
-        })
-        await recordAnnotationQuestProgress({ participantId: pid, zone: s.game_zone, subCategory: s.sub_category || '' })
+        if (!annotationResult.ok) throw new Error(annotationResult.error.message)
         push(`[전사 ${i + 1}/${picks.length}] zone=${s.game_zone} sub=${s.sub_category}`)
       }
 
       // 투표 — 다른 참여자의 실제 annotation을 그대로 후보로 사용
-      const { data: candidates } = await client
-        .from('annotations')
-        .select('id, sound_id, zone, sub_category')
-        .neq('participant_id', pid)
-        .not('expression_text', 'is', null)
-        .neq('expression_text', '')
-        .limit(voteCount)
+      const candidates = []
+      for (const sound of soundMetadata.sounds.filter(s => s.group === claimedGroup)) {
+        const rows = await getCandidateExpressions(sound.sound_id)
+        if (rows[0]) candidates.push({ ...rows[0], sound_id: sound.sound_id, zone: sound.game_zone, sub_category: sound.sub_category })
+        if (candidates.length >= voteCount) break
+      }
 
       for (let i = 0; i < (candidates || []).length; i++) {
         const c = candidates[i]
-        await saveVote({
-          participant_id: pid, session_id: 'e2e-test', sound_id: c.sound_id, zone: c.zone,
+        const voteResult = await saveVote({
+          participant_id: claimedPid, session_id: claimedGroup, sound_id: c.sound_id, zone: c.zone,
           voted_ids: [c.id], confidence: 3, play_count: 1, listening_time_sec: 2,
           stage: 2, version: 'v0.4-web-e2e-test',
         })
-        await awardVoteCurrency({ participantId: pid, annotationId: c.id, subCategory: c.sub_category || '', soundDurationSec: 2, confidence: 3 })
-        await recordVoteQuestProgress({ participantId: pid })
+        if (!voteResult.ok) throw new Error(voteResult.error.message)
         push(`[투표 ${i + 1}/${candidates.length}] annotation_id=${c.id}`)
       }
 
-      const after = await getCurrencyBalance(pid)
-      const finalQuests = await getTodayQuestSummary(pid)
-      const { data: txs } = await client.from('currency_transactions').select('*').eq('participant_id', pid)
+      const after = await getCurrencyBalance(claimedPid)
+      const finalQuests = await getTodayQuestSummary(claimedPid)
+      const { data: txs } = await client.from('currency_transactions').select('*').eq('participant_id', claimedPid)
 
       setResult({
         before, after, delta: after - before,
@@ -141,10 +147,15 @@ function TestInner() {
       push('ERROR: ' + (err?.message || String(err)))
       console.error(err)
     })
-  }, [pid, annotationCount, voteCount])
+  }, [pid, annotationCount, voteCount, peekOnly, runRequested])
 
   return (
     <div style={{ padding: 20, fontFamily: 'monospace', fontSize: 12, whiteSpace: 'pre-wrap' }}>
+      {!runRequested && (
+        <button type="button" onClick={() => setRunRequested(true)} style={{ marginBottom: 16, padding: '8px 12px' }}>
+          이 참가자로 테스트 실행
+        </button>
+      )}
       <div id="log">{log.join('\n')}</div>
       <div id="result" data-done={result ? 'true' : 'false'}>{result ? JSON.stringify(result, null, 2) : ''}</div>
     </div>

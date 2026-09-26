@@ -1,0 +1,131 @@
+{
+  "world": { "width": 1672, "height": 941 },
+  "assets": [
+    {
+      "id": "architecture-room-shell",
+      "src": "/assets/sound-museum-final-b/architecture/room-shell@2x.png",
+      "sourceWidth": 3344, "sourceHeight": 1882,
+      "displayWidth": 1672, "displayHeight": 941,
+      "x": 0, "y": 0, "anchorX": 0, "anchorY": 0,
+      "zMode": "fixed", "collision": null, "interactionId": null,
+      "animated": false, "frameData": null
+    },
+    {
+      "id": "center-waveform-frame",
+      "src": "/assets/sound-museum-final-b/center-archive/waveform-frame.png",
+      "sourceWidth": 1650, "sourceHeight": 772,
+      "displayWidth": 174, "displayHeight": 81,
+      "x": 749, "y": 59, "anchorX": 0, "anchorY": 0,
+      "zMode": "fixed", "collision": null, "interactionId": null,
+      "animated": false, "frameData": null
+    },
+    {
+      "id": "left-listening-lounge",
+      "src": "/assets/sound-museum-final-b/left-listening/l-shaped-listening-lounge.png",
+      "sourceWidth": 1317, "sourceHeight": 1156,
+      "displayWidth": 526, "displayHeight": 462,
+      "x": 22, "y": 116, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY",
+      "collision": [
+        { "x": 43, "y": 349, "width": 108, "height": 82 },
+        { "x": 111, "y": 318, "width": 386, "height": 64 },
+        { "x": 62, "y": 397, "width": 40, "height": 38 },
+        { "x": 102, "y": 430, "width": 40, "height": 38 },
+        { "x": 174, "y": 371, "width": 50, "height": 43 },
+        { "x": 267, "y": 371, "width": 50, "height": 43 },
+        { "x": 360, "y": 371, "width": 50, "height": 43 }
+      ],
+      "interactionId": "vote", "animated": false, "frameData": null
+    },
+    {
+      "id": "owl-curator",
+      "src": "/assets/sound-museum-final-b/center-archive/owl-curator-idle-4f.png",
+      "sourceWidth": 2172, "sourceHeight": 724,
+      "displayWidth": 112, "displayHeight": 152,
+      "x": 780, "y": 173, "anchorX": 0, "anchorY": 0,
+      "zMode": "fixed", "collision": null, "interactionId": null,
+      "animated": true, "frameData": { "frames": 4, "direction": "horizontal", "durationMs": 2600 }
+    },
+    {
+      "id": "curator-desk-ledger",
+      "src": "/assets/sound-museum-final-b/center-archive/curator-desk-ledger.png",
+      "sourceWidth": 1423, "sourceHeight": 979,
+      "displayWidth": 520, "displayHeight": 358,
+      "x": 527, "y": 188, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY",
+      "collision": [
+        { "x": 666, "y": 307, "width": 365, "height": 112 },
+        { "x": 556, "y": 393, "width": 78, "height": 118 }
+      ],
+      "interactionId": "exhibits", "animated": false, "frameData": null
+    },
+    {
+      "id": "costume-shop",
+      "src": "/assets/sound-museum-final-b/right-shop/costume-shop.png",
+      "sourceWidth": 1300, "sourceHeight": 1117,
+      "displayWidth": 520, "displayHeight": 447,
+      "x": 1119, "y": 120, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY",
+      "collision": [
+        { "x": 1190, "y": 267, "width": 410, "height": 92 },
+        { "x": 1218, "y": 354, "width": 345, "height": 77 },
+        { "x": 1358, "y": 427, "width": 235, "height": 73 },
+        { "x": 1110, "y": 391, "width": 70, "height": 45 },
+        { "x": 1575, "y": 356, "width": 60, "height": 85 }
+      ],
+      "interactionId": "shop", "animated": false, "frameData": null
+    },
+    {
+      "id": "shop-mannequin-two",
+      "src": "/assets/sound-museum-final-b/right-shop/mannequin-vest-skirt.png",
+      "sourceWidth": 877, "sourceHeight": 1399,
+      "displayWidth": 105, "displayHeight": 168,
+      "x": 1088, "y": 284, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY", "collision": { "x": 1111, "y": 408, "width": 62, "height": 40 },
+      "interactionId": null, "animated": false, "frameData": null
+    },
+    {
+      "id": "reading-lounge-left",
+      "src": "/assets/sound-museum-final-b/lounge/reading-lounge.png",
+      "sourceWidth": 1758, "sourceHeight": 873,
+      "displayWidth": 430, "displayHeight": 214,
+      "x": 127, "y": 608, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY", "collision": [
+        { "x": 148, "y": 675, "width": 105, "height": 100 },
+        { "x": 260, "y": 704, "width": 72, "height": 60 },
+        { "x": 341, "y": 675, "width": 105, "height": 100 }
+      ],
+      "interactionId": null, "animated": false, "frameData": null
+    },
+    {
+      "id": "reading-lounge-right",
+      "src": "/assets/sound-museum-final-b/lounge/reading-lounge.png",
+      "sourceWidth": 1758, "sourceHeight": 873,
+      "displayWidth": 430, "displayHeight": 214,
+      "x": 1115, "y": 608, "anchorX": 0, "anchorY": 0,
+      "zMode": "footY", "collision": [
+        { "x": 1150, "y": 675, "width": 105, "height": 100 },
+        { "x": 1310, "y": 704, "width": 72, "height": 60 },
+        { "x": 1392, "y": 675, "width": 105, "height": 100 }
+      ],
+      "interactionId": null, "animated": false, "frameData": null, "flipX": true
+    },
+    {
+      "id": "foreground-rail-bookshelf",
+      "src": "/assets/sound-museum-final-b/foreground/rail-bookshelf.png",
+      "sourceWidth": 4278, "sourceHeight": 1360,
+      "displayWidth": 1650, "displayHeight": 524,
+      "x": 11, "y": 520, "anchorX": 0, "anchorY": 0,
+      "zMode": "foreground",
+      "collision": [
+        { "x": 24, "y": 788, "width": 680, "height": 102 },
+        { "x": 968, "y": 788, "width": 680, "height": 102 }
+      ],
+      "interactionId": null, "animated": false, "frameData": null
+    }
+  ],
+  "instances": {
+    "listeningStations": ["vote-1", "vote-2", "vote-3", "vote-4", "vote-5"],
+    "zoneExhibits": ["Animal", "Human", "Nature", "Urban", "Music", "Lab"]
+  }
+}

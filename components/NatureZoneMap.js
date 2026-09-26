@@ -1,11 +1,11 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
+import { useCollectiblePromptLogging, useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
 import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
 import {
   T, MAP_W, MAP_H,
   loadNatureVillage, moveWithCollision, spawnNatureItems,
-  drawOrb, drawLockFog, PLAYER_BOX,
+  drawOrb, drawWaterShimmers, drawLockFog, PLAYER_BOX,
 } from '@/lib/natureVillage'
 
 // 다른 Zone(ZoneMap.js/MusicZoneMap.js)과 동일한 FOV(24x18타일)를 써서 마을/캐릭터
@@ -13,43 +13,54 @@ import {
 const FOV_W = 24 * TILE
 const FOV_H = 18 * TILE
 
-// 월드맵으로 나가는 입구 — 맵 남쪽 벽 밖으로 이어지는 실제 걸을 수 있는 타일
-// (collision 그리드 BFS로 스폰에서 도달 가능함을 미리 검증, 육안 어림짐작 아님).
-// 스폰(17,33)과 8타일 이상 떨어뜨려서 입장 즉시 나가기 팝업이 뜨지 않게 한다.
-const ENTRANCE = { x: 9 * T + 16, y: 34 * T + 20 }
+// 월드맵으로 나가는 입구는 village.exit 단일 소스를 쓴다. 해당 좌표는 스폰과
+// 분리되어 있고 collision 그리드 BFS로 도달 가능함을 자동 검증한다.
 const ENTRANCE_RADIUS = 26
 
-export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
-  const { keys, press, release } = useKeys()
-
+export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, debugTarget = null, debugOverview = false, debugStaticArt = false, debugFirstItem = false }) {
   const [village, setVillage] = useState(null)
+  const [loadError, setLoadError] = useState('')
   const villageRef = useRef(null)
   const itemsRef   = useRef(null)
 
   useEffect(() => {
     let cancelled = false
-    loadNatureVillage().then(v => {
-      if (cancelled) return
-      villageRef.current = v
-      itemsRef.current = spawnNatureItems(sounds, v)
-      setVillage(v)
-    })
+    loadNatureVillage()
+      .then(v => {
+        if (cancelled) return
+        const items = spawnNatureItems(sounds, v)
+        if (debugFirstItem && items[0]) {
+          v.spawn = { x: items[0].tx * T + 16, y: items[0].ty * T + 16 }
+        }
+        villageRef.current = v
+        itemsRef.current = items
+        setVillage(v)
+      })
+      .catch(error => {
+        if (cancelled) return
+        console.error('[NatureZone] 맵 로드 실패:', error)
+        setLoadError(error instanceof Error ? error.message : String(error))
+      })
     return () => { cancelled = true }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const stageRef  = useRef(null)
   const canvasRef = useRef(null)
+  const foregroundRef = useRef(null)
 
   useEffect(() => {
     const stage = stageRef.current
     const canvas = canvasRef.current
-    if (!stage || !canvas) return
+    const foreground = foregroundRef.current
+    if (!stage || !canvas || !foreground) return
     const resize = () => {
       const w = Math.round(stage.clientWidth)
       const h = Math.round(stage.clientHeight)
       if (canvas.width !== w) canvas.width = w
       if (canvas.height !== h) canvas.height = h
+      if (foreground.width !== w) foreground.width = w
+      if (foreground.height !== h) foreground.height = h
     }
     resize()
     const ro = new ResizeObserver(resize)
@@ -64,6 +75,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
   const [moving, setMoving] = useState(false)
   const [, setAnimTick] = useState(0)
   const [collecting, setCollecting] = useState(null)
+  useCollectiblePromptLogging(collecting, 'Nature')
   const collectingRef     = useRef(false)
   const collectingItemRef = useRef(null)
   const isAnnotatingRef   = useRef(isAnnotating)
@@ -72,6 +84,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
   const playerWrapRef     = useRef(null)
 
   const [exitConfirm, setExitConfirm] = useState(false)
+  const { keys, press, release } = useKeys({ disabled: isAnnotating || exitConfirm, screen: 'zone', zone: 'Nature' })
   const inExitZoneRef = useRef(false)
 
   useEffect(() => { isAnnotatingRef.current = isAnnotating }, [isAnnotating])
@@ -86,6 +99,11 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
     posRef.current = { ...village.spawn }
   }, [village])
 
+  useEffect(() => {
+    if (!village || !debugTarget) return
+    posRef.current = { x: debugTarget.x * T + 16, y: debugTarget.y * T + 16 }
+  }, [village, debugTarget])
+
   // PixelChar 걷기 프레임 강제 리렌더 — MusicZoneMap.js와 동일한 이유(캔버스를
   // ref로 직접 그려서 dir/moving만으로는 계속 걷는 동안 다리가 멈춰 보임).
   useEffect(() => {
@@ -97,8 +115,8 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
 
   useEffect(() => {
     const h = e => {
-      if (e.key === 'Escape') { if (!isAnnotatingRef.current) onExit(); return }
-      if (e.key === 'Enter' && collectingItemRef.current && !isAnnotatingRef.current) {
+      if (e.key === 'Escape' && !e.repeat) { if (!isAnnotatingRef.current) onExit(); return }
+      if (e.key === 'Enter' && !e.repeat && collectingItemRef.current && !isAnnotatingRef.current) {
         const item = collectingItemRef.current
         collectingItemRef.current = null
         setCollecting(null)
@@ -167,7 +185,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
       }
 
       if (!isAnnotatingRef.current) {
-        const edx = px - ENTRANCE.x, edy = py - ENTRANCE.y
+        const edx = px - village.exit.x, edy = py - village.exit.y
         const nearEntrance = edx * edx + edy * edy < ENTRANCE_RADIUS * ENTRANCE_RADIUS
         if (nearEntrance && !inExitZoneRef.current) {
           inExitZoneRef.current = true
@@ -181,13 +199,25 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
       const off    = village.staticCanvas
       let camX = 0, camY = 0, zoom = 1, offsetX = 0, offsetY = 0
       if (canvas && off && canvas.width > 0 && canvas.height > 0) {
-        zoom = Math.min(canvas.width / FOV_W, canvas.height / FOV_H)
-        const contentW = FOV_W * zoom, contentH = FOV_H * zoom
+        let viewW = debugOverview ? MAP_W * T : FOV_W
+        let viewH = debugOverview ? MAP_H * T : FOV_H
+        const portraitPlay = !debugOverview && canvas.width <= 600 && canvas.height > canvas.width
+        const landscapePlay = !debugOverview && canvas.width <= 900 && canvas.height <= 600
+        if (portraitPlay) {
+          zoom = canvas.height / viewH
+          viewW = canvas.width / zoom
+        } else if (landscapePlay) {
+          zoom = canvas.width / viewW
+          viewH = canvas.height / zoom
+        } else {
+          zoom = Math.min(canvas.width / viewW, canvas.height / viewH)
+        }
+        const contentW = viewW * zoom, contentH = viewH * zoom
         offsetX = (canvas.width - contentW) / 2
         offsetY = (canvas.height - contentH) / 2
 
-        camX = Math.max(0, Math.min(px - FOV_W / 2, MAP_W * T - FOV_W))
-        camY = Math.max(0, Math.min(py - FOV_H / 2, MAP_H * T - FOV_H))
+        camX = debugOverview ? 0 : Math.max(0, Math.min(px - viewW / 2, MAP_W * T - viewW))
+        camY = debugOverview ? 0 : Math.max(0, Math.min(py - viewH / 2, MAP_H * T - viewH))
 
         const ctx = canvas.getContext('2d')
         ctx.imageSmoothingEnabled = false
@@ -198,28 +228,46 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         ctx.scale(zoom, zoom)
         ctx.translate(-camX, -camY)
         ctx.drawImage(off, 0, 0)
+        if (!debugStaticArt) drawWaterShimmers(ctx, now)
 
-        ctx.font = 'bold 11px "Courier New", monospace'
-        const entLabel = '↓ 입구'
-        const entW = ctx.measureText(entLabel).width + 20
-        ctx.fillStyle = 'rgba(20,16,48,0.72)'
-        ctx.fillRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
-        ctx.strokeStyle = '#eafccb'
-        ctx.lineWidth = 2
-        ctx.strokeRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
-        ctx.fillStyle = '#eafccb'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(entLabel, ENTRANCE.x - entW / 2 + 10, ENTRANCE.y)
-
-        for (const item of items) {
-          if (item.block > blockNumRef.current) continue
-          const done = collectedIdsRef.current.has(item.id)
-          if (done) ctx.globalAlpha = 0.35
-          drawOrb(ctx, item, now)
-          if (done) ctx.globalAlpha = 1
+        if (!debugStaticArt) {
+          ctx.font = 'bold 11px "Courier New", monospace'
+          const entLabel = '↓ 입구'
+          const entW = ctx.measureText(entLabel).width + 20
+          ctx.fillStyle = 'rgba(20,16,48,0.72)'
+          ctx.fillRect(village.exit.x - entW / 2, village.exit.y - 10, entW, 20)
+          ctx.strokeStyle = '#eafccb'
+          ctx.lineWidth = 2
+          ctx.strokeRect(village.exit.x - entW / 2, village.exit.y - 10, entW, 20)
+          ctx.fillStyle = '#eafccb'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(entLabel, village.exit.x - entW / 2 + 10, village.exit.y)
         }
-        drawLockFog(ctx, sounds, blockNumRef.current, now)
+
+        if (!debugStaticArt) {
+          for (const item of items) {
+            if (item.block > blockNumRef.current) continue
+            const done = collectedIdsRef.current.has(item.id)
+            if (done) ctx.globalAlpha = 0.35
+            drawOrb(ctx, item, now)
+            if (done) ctx.globalAlpha = 1
+          }
+          drawLockFog(ctx, sounds, blockNumRef.current, now)
+        }
         ctx.restore()
+
+        const foreground = foregroundRef.current
+        if (foreground && village.foregroundCanvas) {
+          const fg = foreground.getContext('2d')
+          fg.imageSmoothingEnabled = false
+          fg.clearRect(0, 0, foreground.width, foreground.height)
+          fg.save()
+          fg.translate(offsetX, offsetY)
+          fg.scale(zoom, zoom)
+          fg.translate(-camX, -camY)
+          fg.drawImage(village.foregroundCanvas, 0, 0)
+          fg.restore()
+        }
       }
 
       if (playerWrapRef.current) {
@@ -235,17 +283,17 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [village])
+  }, [village, debugOverview, debugStaticArt])
 
   const total     = sounds.length
   const collected = sounds.filter(s => collectedIds.has(s.sound_id)).length
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', userSelect: 'none' }}>
-      <ZoneHUD zone="Nature" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />
+      {!debugStaticArt && <ZoneHUD zone="Nature" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />}
 
       <div ref={stageRef} style={{
-        position: 'absolute', top: 56, left: 0, right: 0, bottom: 0,
+        position: 'absolute', top: debugStaticArt ? 0 : 56, left: 0, right: 0, bottom: 0,
         background: '#7fa84a', overflow: 'hidden',
       }}>
         {!village ? (
@@ -253,31 +301,34 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
             position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
             flexDirection: 'column', gap: 8, fontFamily: 'Nunito, sans-serif',
           }}>
-            <div style={{ fontSize: 28 }}>🌿</div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: '#233a12' }}>자연 마을 불러오는 중...</div>
+            <div style={{ fontSize: 28 }}>{loadError ? '⚠️' : '🌿'}</div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: '#233a12' }}>
+              {loadError ? `자연 마을 로드 실패: ${loadError}` : '자연 마을 불러오는 중...'}
+            </div>
           </div>
         ) : (
           <>
-            <canvas ref={canvasRef}
-              style={{ display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated' }} />
+            <canvas ref={canvasRef} data-testid="nature-canvas"
+              style={{ display: 'block', position: 'absolute', inset: 0, width: '100%', height: '100%', imageRendering: 'pixelated' }} />
 
-            <div ref={playerWrapRef} style={{
-              position: 'absolute', left: 0, top: 0,
-              width: SPRITE_W, height: SPRITE_H,
-              transformOrigin: '0 0',
-              pointerEvents: 'none',
-            }}>
-              <PixelChar dir={dir} moving={moving} />
-            </div>
+            {!debugStaticArt && (
+              <div ref={playerWrapRef} data-testid="nature-player" style={{
+                position: 'absolute', left: 0, top: 0,
+                width: SPRITE_W, height: SPRITE_H,
+                transformOrigin: '0 0',
+                pointerEvents: 'none', zIndex: 2,
+              }}>
+                <PixelChar dir={dir} moving={moving} />
+              </div>
+            )}
 
-            <div style={{
-              position: 'absolute', inset: 0, pointerEvents: 'none',
-              background: 'radial-gradient(120% 90% at 50% 45%, transparent 45%, rgba(20,40,10,.28) 100%)',
-            }} />
+            <canvas ref={foregroundRef} aria-hidden="true"
+              style={{ display: 'block', position: 'absolute', inset: 0, width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 3 }} />
 
-            {collecting && !isAnnotating && (
+            {collecting && !isAnnotating && !debugStaticArt && (
               <div style={{
                 position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)',
+                zIndex: 4,
                 background: '#2c4a1a', border: '3px solid #a8d96a', borderRadius: 4,
                 boxShadow: '0 0 24px rgba(168,217,106,.45)',
                 padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8,
@@ -291,12 +342,14 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         )}
       </div>
 
-      <DPad press={press} release={release} onExit={onExit}
-        onConfirm={collecting ? confirmCollect : null} />
+      {!debugStaticArt && (
+        <DPad press={press} release={release} onExit={onExit}
+          onConfirm={collecting ? confirmCollect : null} />
+      )}
 
-      {total > 0 && collected === total && <CompleteModal zone="Nature" onExit={onExit} />}
+      {!debugStaticArt && total > 0 && collected === total && <CompleteModal zone="Nature" onExit={onExit} />}
 
-      {exitConfirm && (
+      {!debugStaticArt && exitConfirm && (
         <ExitConfirmModal
           zone="Nature"
           onConfirm={onExit}

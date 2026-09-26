@@ -4,24 +4,25 @@ import { ZONE_META } from '@/components/GameEngine'
 
 /* ─────────────────────────────────────────────
    Phase 2 FeedbackPanel — Cozy 토스트 팝업
-   2초 후 자동 닫힘 + 진행바
+   참가자가 내용을 읽을 수 있도록 2.4초 후 자동 닫힘 + 진행바
 ───────────────────────────────────────────── */
+export const FEEDBACK_DURATION_MS = 2400
+
 export default function FeedbackPanel({ zone, onClose }) {
   const [progress, setProgress] = useState(100)
   const meta = ZONE_META[zone] || { color: '#5B9E3A', emoji: '🎵', label: zone }
-  const DURATION = 400
 
   useEffect(() => {
     // 닫기 타이머
-    const closeTimer = setTimeout(onClose, DURATION)
+    const closeTimer = setTimeout(onClose, FEEDBACK_DURATION_MS)
     // 진행바 감소
     const start = Date.now()
     const tick  = setInterval(() => {
       const elapsed = Date.now() - start
-      setProgress(Math.max(0, 100 - (elapsed / DURATION) * 100))
+      setProgress(Math.max(0, 100 - (elapsed / FEEDBACK_DURATION_MS) * 100))
     }, 30)
     return () => { clearTimeout(closeTimer); clearInterval(tick) }
-  }, [onClose])
+  }, [onClose, zone])
 
   return (
     <div

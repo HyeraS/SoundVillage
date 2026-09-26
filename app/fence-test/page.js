@@ -1,4 +1,5 @@
 'use client'
+import Image from 'next/image'
 
 // 격리된 울타리 조립 테스트 — 마을 코드는 건드리지 않는다.
 //
@@ -23,9 +24,12 @@ const ISO = {
 function Piece({ tx, ty, src, srcW = 32 }) {
   const w = RENDER * (srcW / 32)
   return (
-    <img
+    <Image
       src={src}
       alt=""
+      width={srcW}
+      height={32}
+      unoptimized
       style={{
         position: 'absolute',
         left: tx * RENDER + (RENDER - w) / 2, top: ty * RENDER,
@@ -70,7 +74,7 @@ export default function FenceTestPage() {
           width: 32 * 12, height: 32 * 12, background: '#83924C',
           border: '2px dashed #4A3826', display: 'inline-block',
         }}>
-          <img src={ISO.gate} alt="gate candidate" width={32 * 12} height={32 * 12}
+          <Image src={ISO.gate} alt="gate candidate" width={32 * 12} height={32 * 12} unoptimized
             style={{ imageRendering: 'pixelated', display: 'block' }} />
         </div>
       </div>

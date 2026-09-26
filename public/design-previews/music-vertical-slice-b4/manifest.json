@@ -1,0 +1,381 @@
+{
+  "version": "2C-B4-v1",
+  "productionUse": false,
+  "role": "integration-index",
+  "frozenVariants": {
+    "stage": "S1 low double-wave",
+    "gate": "G1 open wave rail",
+    "buildings": "2C-B3.1-v1"
+  },
+  "map": {
+    "width": 1536,
+    "height": 1152,
+    "tiles": {
+      "width": 48,
+      "height": 36
+    }
+  },
+  "tileSize": 32,
+  "runtimeScale": 1,
+  "timeOfDay": "bright-soft-late-afternoon",
+  "sourceManifests": {
+    "groundPath": "../music-ground-path-b1/music-ground-path-b1-manifest.json",
+    "landmarks": "../music-landmarks-b2/manifest.json",
+    "buildingsProps": "../music-buildings-props-b3/manifest.json"
+  },
+  "markerContract": {
+    "source": "app/music-whitebox-preview/page.js",
+    "count": 15,
+    "positions": [
+      {
+        "id": "M01",
+        "x": 24,
+        "y": 29
+      },
+      {
+        "id": "M02",
+        "x": 19,
+        "y": 28
+      },
+      {
+        "id": "M03",
+        "x": 14,
+        "y": 25
+      },
+      {
+        "id": "M04",
+        "x": 10,
+        "y": 21
+      },
+      {
+        "id": "M05",
+        "x": 10,
+        "y": 16
+      },
+      {
+        "id": "M06",
+        "x": 16,
+        "y": 8
+      },
+      {
+        "id": "M07",
+        "x": 19,
+        "y": 12
+      },
+      {
+        "id": "M08",
+        "x": 24,
+        "y": 13
+      },
+      {
+        "id": "M09",
+        "x": 29,
+        "y": 12
+      },
+      {
+        "id": "M10",
+        "x": 34,
+        "y": 14
+      },
+      {
+        "id": "M11",
+        "x": 38,
+        "y": 19
+      },
+      {
+        "id": "M12",
+        "x": 36,
+        "y": 24
+      },
+      {
+        "id": "M13",
+        "x": 31,
+        "y": 28
+      },
+      {
+        "id": "M14",
+        "x": 21,
+        "y": 19
+      },
+      {
+        "id": "M15",
+        "x": 27,
+        "y": 19
+      }
+    ],
+    "states": [
+      "locked",
+      "unavailable",
+      "active",
+      "nearby",
+      "interacting",
+      "submitting",
+      "completed",
+      "saveError",
+      "audioError"
+    ],
+    "immutableForB4": true
+  },
+  "drawOrder": [
+    "B1 ground/path",
+    "contact shadows",
+    "Stage/Gate structural layers",
+    "building body/roof/door/trim",
+    "low props",
+    "foreground cutouts",
+    "environment emissive",
+    "character",
+    "sound marker/UI",
+    "preview-only guides"
+  ],
+  "productionExclusions": [
+    "all collision/interaction/clearance guide PNG/SVG",
+    "mock-character",
+    "concept references",
+    "comparison boards",
+    "all design/2d-map-redesign/previews files"
+  ],
+  "reviewImages": [
+    "../../../design/2d-map-redesign/previews/2c-b4-music/final-overview.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/camera-contact-sheet.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/building-entrance-montage.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/marker-state-contrast-montage.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/mobile-320-montage.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/grayscale-emissive-off-comparison.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/collision-entrance-marker-clearance-montage.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/character-foot-contact-montage.png",
+    "../../../design/2d-map-redesign/previews/2c-b4-music/b1-b3-layer-hierarchy-diagram.png"
+  ],
+  "validation": {
+    "pass": true,
+    "failures": [],
+    "pngChecks": {
+      "count": 103,
+      "passed": 103
+    },
+    "paletteConsistency": [
+      {
+        "key": "ground",
+        "values": [
+          "#AAB490",
+          "#AAB490",
+          "#AAB490"
+        ],
+        "pass": true
+      },
+      {
+        "key": "soil",
+        "values": [
+          "#B89E7C",
+          "#B89E7C",
+          "#B89E7C"
+        ],
+        "pass": true
+      },
+      {
+        "key": "stone",
+        "values": [
+          "#D9C7A8",
+          "#D9C7A8",
+          "#D9C7A8"
+        ],
+        "pass": true
+      },
+      {
+        "key": "stoneHi",
+        "values": [
+          "#E8DABF",
+          "#E8DABF",
+          "#E8DABF"
+        ],
+        "pass": true
+      },
+      {
+        "key": "stoneShade",
+        "values": [
+          "#B7A383",
+          "#B7A383",
+          "#B7A383"
+        ],
+        "pass": true
+      },
+      {
+        "key": "teal",
+        "values": [
+          "#668F8A",
+          "#668F8A",
+          "#668F8A"
+        ],
+        "pass": true
+      },
+      {
+        "key": "lavender",
+        "values": [
+          "#A89BC0",
+          "#A89BC0",
+          "#A89BC0"
+        ],
+        "pass": true
+      },
+      {
+        "key": "gold",
+        "values": [
+          "#C69A45",
+          "#C69A45",
+          "#C69A45"
+        ],
+        "pass": true
+      }
+    ],
+    "anchorChecks": [
+      {
+        "id": "stage",
+        "pass": true
+      },
+      {
+        "id": "gate",
+        "pass": true
+      },
+      {
+        "id": "record-archive",
+        "pass": true
+      },
+      {
+        "id": "listening-cafe",
+        "pass": true
+      },
+      {
+        "id": "community-studio",
+        "pass": true
+      },
+      {
+        "id": "sound-workshop",
+        "pass": true
+      }
+    ],
+    "overlaps": {
+      "propEntrance": [],
+      "markerCollision": [],
+      "markerEntrance": []
+    },
+    "approvedGeometry": {
+      "stage": {
+        "x": 18,
+        "y": 3,
+        "width": 12,
+        "height": 5
+      },
+      "stageApproach": {
+        "x": 23,
+        "y": 10,
+        "width": 3,
+        "height": 3
+      },
+      "gateOpening": {
+        "x": 23,
+        "y": 32,
+        "width": 2,
+        "height": 3
+      },
+      "gatePostCollision": [
+        {
+          "x": 22,
+          "y": 32,
+          "width": 1,
+          "height": 3
+        },
+        {
+          "x": 25,
+          "y": 32,
+          "width": 1,
+          "height": 3
+        }
+      ],
+      "buildings": [
+        {
+          "id": "record-archive",
+          "collision": {
+            "x": 4,
+            "y": 4,
+            "width": 8,
+            "height": 6
+          },
+          "entrance": "south",
+          "clearance": {
+            "x": 6,
+            "y": 10,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "id": "listening-cafe",
+          "collision": {
+            "x": 35,
+            "y": 5,
+            "width": 10,
+            "height": 5
+          },
+          "entrance": "south",
+          "clearance": {
+            "x": 38,
+            "y": 10,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "id": "community-studio",
+          "collision": {
+            "x": 3,
+            "y": 28,
+            "width": 10,
+            "height": 5
+          },
+          "entrance": "east",
+          "doorEdge": {
+            "x": 12,
+            "y": 28,
+            "width": 1,
+            "height": 3
+          },
+          "clearance": {
+            "x": 13,
+            "y": 28,
+            "width": 3,
+            "height": 3
+          }
+        },
+        {
+          "id": "sound-workshop",
+          "collision": {
+            "x": 36,
+            "y": 27,
+            "width": 8,
+            "height": 6
+          },
+          "entrance": "west",
+          "doorEdge": {
+            "x": 36,
+            "y": 28,
+            "width": 1,
+            "height": 3
+          },
+          "clearance": {
+            "x": 33,
+            "y": 28,
+            "width": 3,
+            "height": 3
+          }
+        }
+      ]
+    }
+  },
+  "remainingProductionMeasurements": [
+    "approved preview visual edge versus production walkable/collision mask: target <=0.5 tile",
+    "Gate 2-tile opening and post collision with runtime player box",
+    "Stage 3x3 approach and four building entrance triggers under real movement input",
+    "marker interaction radius versus approved 1+2 tile visual clearance",
+    "camera/FOV framing after production renderer replacement"
+  ]
+}

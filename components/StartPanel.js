@@ -1,23 +1,47 @@
 'use client'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
 
 /* ─────────────────────────────────────────────
    Phase 2 StartPanel — Cozy 낮 감성, 마을 테마
 ───────────────────────────────────────────── */
-export default function StartPanel({ onStart }) {
+const AUTH_ERROR_MESSAGES = {
+  participant_not_registered: '등록되지 않은 참여자 ID입니다. 진행자에게 확인해 주세요.',
+  participant_claimed: '이미 다른 브라우저에 연결된 참여자 ID입니다. 진행자에게 재연결을 요청해 주세요.',
+  participant_inactive: '현재 비활성화된 참여자 ID입니다. 진행자에게 문의해 주세요.',
+  group_mismatch: '배정된 그룹과 선택한 그룹이 다릅니다.',
+  anonymous_sign_in_failed: '인증 세션을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  session_restore_failed: '기존 인증 세션을 복구하지 못했습니다. 참여자 ID를 다시 확인해 주세요.',
+  claim_unavailable: '인증 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+}
+
+export default function StartPanel({ onStart, restoring = false, initialError = '' }) {
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
   const [focused,       setFocused]       = useState(null)
+  const [submitting,    setSubmitting]    = useState(false)
+  const [localAuthError, setAuthError]    = useState('')
+  const startInFlightRef = useRef(false)
+  const authError = localAuthError || initialError
   const studyAccessPreview = isStudyAccessParticipantId(participantId)
 
-  function handleStart() {
-    if (!participantId.trim() || !groupId.trim()) return
+  async function handleStart() {
+    if (!participantId.trim() || !groupId.trim() || startInFlightRef.current || restoring) return
     // 대소문자 차이로 같은 참여자가 다른 사람 취급되지 않도록 정규화
     // (예: "p1"과 "P1"이 Supabase에서 다른 participant_id로 갈라지는 것 방지)
-    onStart(participantId.trim().toUpperCase(), groupId.trim())
+    startInFlightRef.current = true
+    setSubmitting(true)
+    setAuthError('')
+    try {
+      await onStart(participantId.trim().toUpperCase(), groupId.trim())
+    } catch (error) {
+      setAuthError(error?.code || 'claim_unavailable')
+    } finally {
+      startInFlightRef.current = false
+      setSubmitting(false)
+    }
   }
-  const canStart = participantId.trim() && groupId.trim()
+  const canStart = participantId.trim() && groupId.trim() && !submitting && !restoring
 
   return (
     <div style={{
@@ -186,6 +210,17 @@ export default function StartPanel({ onStart }) {
           </div>
         )}
 
+        {(authError || restoring) && (
+          <div role="status" aria-live="polite" style={{
+            marginBottom: '16px', padding: '10px 12px', borderRadius: '10px',
+            background: authError ? '#FDE8E3' : '#EEF3E5',
+            border: `1px solid ${authError ? '#C96B5A' : '#9BAE7A'}`,
+            color: '#5A3A2A', fontSize: '11px', lineHeight: 1.6,
+          }}>
+            {restoring ? '이 브라우저의 참여 세션을 확인하고 있어요…' : (AUTH_ERROR_MESSAGES[authError] || '인증에 실패했습니다. 다시 시도해 주세요.')}
+          </div>
+        )}
+
         {/* 시작 버튼 — 나무 간판 스타일 */}
         <button
           onClick={handleStart}
@@ -209,7 +244,7 @@ export default function StartPanel({ onStart }) {
           onMouseDown={e => { if (canStart) e.currentTarget.style.transform = 'translateY(2px)' }}
           onMouseUp={e   => { if (canStart) e.currentTarget.style.transform = 'translateY(0)' }}
         >
-          {canStart ? '🌿 마을 입장하기' : '정보를 입력해주세요'}
+          {submitting ? '참여자 ID 확인 중…' : restoring ? '세션 확인 중…' : canStart ? '🌿 마을 입장하기' : '정보를 입력해주세요'}
         </button>
 
         {/* 하단 힌트 */}

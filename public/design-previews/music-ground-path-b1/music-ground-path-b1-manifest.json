@@ -1,0 +1,319 @@
+{
+  "version": "2C-B1-v1",
+  "tileSize": 32,
+  "runtimeScale": 1,
+  "sourceMaster": "music-ground-path-b1-atlas.svg",
+  "smoothing": false,
+  "palette": {
+    "ground": "#AAB490",
+    "groundAlt": "#B3BC98",
+    "groundShade": "#929C77",
+    "soil": "#B89E7C",
+    "soilAlt": "#C3AA87",
+    "stone": "#D9C7A8",
+    "stoneHi": "#E8DABF",
+    "stoneShade": "#B7A383",
+    "teal": "#668F8A",
+    "lavender": "#A89BC0",
+    "gold": "#C69A45",
+    "navy": "#3F4358"
+  },
+  "tiles": [
+    {
+      "name": "grass-0",
+      "group": "ground",
+      "x": 0,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "grass-1",
+      "group": "ground",
+      "x": 32,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "grass-2",
+      "group": "ground",
+      "x": 64,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "grass-3",
+      "group": "ground",
+      "x": 96,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "grass-4",
+      "group": "ground",
+      "x": 128,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "soil-0",
+      "group": "ground",
+      "x": 160,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "soil-1",
+      "group": "ground",
+      "x": 192,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "soil-2",
+      "group": "ground",
+      "x": 224,
+      "y": 0,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "soil-3",
+      "group": "ground",
+      "x": 0,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-0",
+      "group": "path",
+      "x": 32,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-1",
+      "group": "path",
+      "x": 64,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-2",
+      "group": "path",
+      "x": 96,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-3",
+      "group": "path",
+      "x": 128,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-4",
+      "group": "path",
+      "x": 160,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-5",
+      "group": "path",
+      "x": 192,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-6",
+      "group": "path",
+      "x": 224,
+      "y": 32,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-7",
+      "group": "path",
+      "x": 0,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-8",
+      "group": "path",
+      "x": 32,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-9",
+      "group": "path",
+      "x": 64,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-A",
+      "group": "path",
+      "x": 96,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-B",
+      "group": "path",
+      "x": 128,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-C",
+      "group": "path",
+      "x": 160,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-D",
+      "group": "path",
+      "x": 192,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-E",
+      "group": "path",
+      "x": 224,
+      "y": 64,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "path-edge-F",
+      "group": "path",
+      "x": 0,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "curve-ne",
+      "group": "curve",
+      "x": 32,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "curve-es",
+      "group": "curve",
+      "x": 64,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "curve-sw",
+      "group": "curve",
+      "x": 96,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "curve-wn",
+      "group": "curve",
+      "x": 128,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "garden-ring-h",
+      "group": "garden",
+      "x": 160,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "garden-ring-v",
+      "group": "garden",
+      "x": 192,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "garden-shortcut-v",
+      "group": "garden",
+      "x": 224,
+      "y": 96,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "garden-center-motif",
+      "group": "garden",
+      "x": 0,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "flowerbed-edge-h",
+      "group": "garden",
+      "x": 32,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "flowerbed-edge-v",
+      "group": "garden",
+      "x": 64,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "gate-approach",
+      "group": "garden",
+      "x": 96,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    },
+    {
+      "name": "stage-approach",
+      "group": "garden",
+      "x": 128,
+      "y": 128,
+      "w": 32,
+      "h": 32
+    }
+  ]
+}

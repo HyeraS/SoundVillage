@@ -1,0 +1,339 @@
+{
+  "version": 3,
+  "assetCount": 37,
+  "assets": [
+    {
+      "id": "building-library",
+      "src": "/assets/world/sound-archive-garden-v3/building-library.webp",
+      "width": 1534,
+      "height": 1010,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/library-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-home",
+      "src": "/assets/world/sound-archive-garden-v3/building-home.webp",
+      "width": 1479,
+      "height": 1004,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/home-cottage-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-animal",
+      "src": "/assets/world/sound-archive-garden-v3/building-animal.webp",
+      "width": 1536,
+      "height": 1019,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-animal-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-nature",
+      "src": "/assets/world/sound-archive-garden-v3/building-nature.webp",
+      "width": 1520,
+      "height": 1020,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-nature-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-human",
+      "src": "/assets/world/sound-archive-garden-v3/building-human.webp",
+      "width": 1497,
+      "height": 967,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-human-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-urban",
+      "src": "/assets/world/sound-archive-garden-v3/building-urban.webp",
+      "width": 1438,
+      "height": 1064,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-urban-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-music",
+      "src": "/assets/world/sound-archive-garden-v3/building-music.webp",
+      "width": 1536,
+      "height": 1007,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-music-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "building-lab",
+      "src": "/assets/world/sound-archive-garden-v3/building-lab.webp",
+      "width": 1486,
+      "height": 984,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/gateway-lab-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "foreground-arch",
+      "src": "/assets/world/sound-archive-garden-v3/foreground-arch.webp",
+      "width": 1523,
+      "height": 1010,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/foreground-arch-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-broadleaf-a",
+      "src": "/assets/world/sound-archive-garden-v3/tree-broadleaf-a.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#0,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-broadleaf-b",
+      "src": "/assets/world/sound-archive-garden-v3/tree-broadleaf-b.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#1,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-broadleaf-c",
+      "src": "/assets/world/sound-archive-garden-v3/tree-broadleaf-c.webp",
+      "width": 384,
+      "height": 507,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#2,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-pine-a",
+      "src": "/assets/world/sound-archive-garden-v3/tree-pine-a.webp",
+      "width": 382,
+      "height": 501,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#3,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-pine-b",
+      "src": "/assets/world/sound-archive-garden-v3/tree-pine-b.webp",
+      "width": 371,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#0,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "tree-flowering",
+      "src": "/assets/world/sound-archive-garden-v3/tree-flowering.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#1,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "shrub-flower",
+      "src": "/assets/world/sound-archive-garden-v3/shrub-flower.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#2,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "rock-flower",
+      "src": "/assets/world/sound-archive-garden-v3/rock-flower.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/nature-atlas-source.png#3,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-bench",
+      "src": "/assets/world/sound-archive-garden-v3/prop-bench.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#0,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-lamp",
+      "src": "/assets/world/sound-archive-garden-v3/prop-lamp.webp",
+      "width": 380,
+      "height": 475,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#1,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-sign",
+      "src": "/assets/world/sound-archive-garden-v3/prop-sign.webp",
+      "width": 384,
+      "height": 493,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#2,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "fence-straight",
+      "src": "/assets/world/sound-archive-garden-v3/fence-straight.webp",
+      "width": 384,
+      "height": 495,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#3,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "fence-corner",
+      "src": "/assets/world/sound-archive-garden-v3/fence-corner.webp",
+      "width": 384,
+      "height": 509,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#0,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "fence-gate",
+      "src": "/assets/world/sound-archive-garden-v3/fence-gate.webp",
+      "width": 384,
+      "height": 512,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#1,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "water-cattails",
+      "src": "/assets/world/sound-archive-garden-v3/water-cattails.webp",
+      "width": 384,
+      "height": 490,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/props-atlas-source.png#3,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "flower-cluster",
+      "src": "/assets/world/sound-archive-garden-v3/flower-cluster.webp",
+      "width": 443,
+      "height": 443,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#0,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "mushroom-cluster",
+      "src": "/assets/world/sound-archive-garden-v3/mushroom-cluster.webp",
+      "width": 443,
+      "height": 440,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#1,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-plant-pot",
+      "src": "/assets/world/sound-archive-garden-v3/prop-plant-pot.webp",
+      "width": 443,
+      "height": 432,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#2,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-banner",
+      "src": "/assets/world/sound-archive-garden-v3/prop-banner.webp",
+      "width": 439,
+      "height": 438,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#3,0",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-market-crates",
+      "src": "/assets/world/sound-archive-garden-v3/prop-market-crates.webp",
+      "width": 424,
+      "height": 398,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#0,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "prop-research-apparatus",
+      "src": "/assets/world/sound-archive-garden-v3/prop-research-apparatus.webp",
+      "width": 443,
+      "height": 424,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#1,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "water-lilies",
+      "src": "/assets/world/sound-archive-garden-v3/water-lilies.webp",
+      "width": 443,
+      "height": 426,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#2,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "cliff-mossy",
+      "src": "/assets/world/sound-archive-garden-v3/cliff-mossy.webp",
+      "width": 439,
+      "height": 436,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/supplement-atlas-source.png#3,1",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "bridge-wood",
+      "src": "/assets/world/sound-archive-garden-v3/bridge-wood.webp",
+      "width": 1534,
+      "height": 1017,
+      "hasAlpha": true,
+      "source": "design/world-map-v3/source-assets/bridge-wood-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    },
+    {
+      "id": "terrain-grass",
+      "src": "/assets/world/sound-archive-garden-v3/terrain-grass.webp",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": true,
+      "source": "public/assets/world/sound-archive-garden-v1/ground-grass-base.png",
+      "generation": "OpenAI built-in ImageGen (2026-09-18, preserved source)"
+    },
+    {
+      "id": "terrain-plaza",
+      "src": "/assets/world/sound-archive-garden-v3/terrain-plaza.webp",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": true,
+      "source": "public/assets/world/sound-archive-garden-v1/ground-cream-stone.png",
+      "generation": "OpenAI built-in ImageGen (2026-09-18, preserved source)"
+    },
+    {
+      "id": "terrain-path",
+      "src": "/assets/world/sound-archive-garden-v3/terrain-path.webp",
+      "width": 1024,
+      "height": 1024,
+      "hasAlpha": true,
+      "source": "public/assets/world/sound-archive-garden-v1/ground-honey-path.png",
+      "generation": "OpenAI built-in ImageGen (2026-09-18, preserved source)"
+    },
+    {
+      "id": "terrain-water",
+      "src": "/assets/world/sound-archive-garden-v3/terrain-water.webp",
+      "width": 1254,
+      "height": 1254,
+      "hasAlpha": false,
+      "source": "design/world-map-v3/source-assets/terrain-water-source.png",
+      "generation": "OpenAI built-in ImageGen"
+    }
+  ]
+}

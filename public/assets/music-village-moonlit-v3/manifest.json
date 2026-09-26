@@ -1,0 +1,2119 @@
+{
+  "version": "music-moonlit-v3.0.0",
+  "productionUse": true,
+  "geometry": {
+    "width": 1536,
+    "height": 1152,
+    "tiles": {
+      "width": 48,
+      "height": 36
+    },
+    "tileSize": 32
+  },
+  "artAuthority": {
+    "selectedStyleframe": "design/concepts/music-village-cozy-2026-09-17/01-moonlit-concert-garden-v2-music.png",
+    "cleanMaster": "design/2d-map-redesign/sources/music-moonlit-v3/clean-production-master.png",
+    "edit": "Only the five baked example sound orbs were removed; composition and environment were preserved."
+  },
+  "generation": {
+    "script": "design/2d-map-redesign/tools/build_music_moonlit_v3.mjs",
+    "runtimePackaging": "1536x1152 nearest-neighbor ground chunks plus per-object polygon alpha foreground; 4px terrain navigation cells"
+  },
+  "stage": {
+    "x": 18,
+    "y": 3,
+    "w": 12,
+    "h": 7,
+    "collision": {
+      "x": 18,
+      "y": 3,
+      "w": 12,
+      "h": 5,
+      "tag": "stage-rear"
+    },
+    "approach": {
+      "x": 23,
+      "y": 8,
+      "w": 3,
+      "h": 5,
+      "tag": "stage-approach"
+    }
+  },
+  "gate": {
+    "x": 22,
+    "y": 32,
+    "w": 4,
+    "h": 3,
+    "opening": {
+      "x": 23,
+      "y": 32,
+      "w": 2,
+      "h": 4,
+      "tag": "gate-opening"
+    },
+    "colliders": [
+      {
+        "x": 21,
+        "y": 32,
+        "w": 2,
+        "h": 4,
+        "tag": "gate-left-post"
+      },
+      {
+        "x": 25,
+        "y": 32,
+        "w": 2,
+        "h": 4,
+        "tag": "gate-right-post"
+      }
+    ]
+  },
+  "buildings": [
+    {
+      "id": "record-archive",
+      "label": "Record Archive",
+      "x": 3,
+      "y": 3,
+      "w": 10,
+      "h": 7,
+      "entrance": "south",
+      "clearance": {
+        "x": 6,
+        "y": 10,
+        "w": 3,
+        "h": 3,
+        "tag": "record-archive-entrance"
+      }
+    },
+    {
+      "id": "listening-cafe",
+      "label": "Listening Cafe",
+      "x": 35,
+      "y": 4,
+      "w": 11,
+      "h": 6,
+      "entrance": "south",
+      "clearance": {
+        "x": 38,
+        "y": 10,
+        "w": 3,
+        "h": 3,
+        "tag": "listening-cafe-entrance"
+      }
+    },
+    {
+      "id": "community-studio",
+      "label": "Community Studio",
+      "x": 2,
+      "y": 27,
+      "w": 11,
+      "h": 6,
+      "entrance": "east",
+      "clearance": {
+        "x": 12,
+        "y": 29,
+        "w": 4,
+        "h": 3,
+        "tag": "community-studio-entrance"
+      }
+    },
+    {
+      "id": "sound-workshop",
+      "label": "Sound Workshop",
+      "x": 36,
+      "y": 27,
+      "w": 10,
+      "h": 6,
+      "entrance": "west",
+      "clearance": {
+        "x": 33,
+        "y": 29,
+        "w": 4,
+        "h": 3,
+        "tag": "sound-workshop-entrance"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "flowerbed-low-a",
+      "x": 18,
+      "y": 14,
+      "category": "flowerbeds",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 2.84,
+        "h": 0.54
+      },
+      "top": 14,
+      "markerAvoidance": {
+        "x": 578.56,
+        "y": 460.16,
+        "w": 90.88,
+        "h": 17.28,
+        "id": "prop:flowerbed-low-a:0",
+        "tag": "prop:flowerbed-low-a:0",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "flowerbed-low-a",
+      "x": 27,
+      "y": 14,
+      "category": "flowerbeds",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 2.84,
+        "h": 0.54
+      },
+      "top": 14,
+      "markerAvoidance": {
+        "x": 866.56,
+        "y": 460.16,
+        "w": 90.88,
+        "h": 17.28,
+        "id": "prop:flowerbed-low-a:1",
+        "tag": "prop:flowerbed-low-a:1",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "flowerbed-low-a",
+      "x": 18,
+      "y": 21,
+      "category": "flowerbeds",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 2.84,
+        "h": 0.54
+      },
+      "top": 21,
+      "markerAvoidance": {
+        "x": 578.56,
+        "y": 684.16,
+        "w": 90.88,
+        "h": 17.28,
+        "id": "prop:flowerbed-low-a:2",
+        "tag": "prop:flowerbed-low-a:2",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "flowerbed-low-a",
+      "x": 27,
+      "y": 21,
+      "category": "flowerbeds",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 2.84,
+        "h": 0.54
+      },
+      "top": 21,
+      "markerAvoidance": {
+        "x": 866.56,
+        "y": 684.16,
+        "w": 90.88,
+        "h": 17.28,
+        "id": "prop:flowerbed-low-a:3",
+        "tag": "prop:flowerbed-low-a:3",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 14,
+      "y": 13,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 13,
+      "markerAvoidance": {
+        "x": 451.2,
+        "y": 433.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:4",
+        "tag": "prop:bench-low-a:4",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 31,
+      "y": 13,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 13,
+      "markerAvoidance": {
+        "x": 995.2,
+        "y": 433.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:5",
+        "tag": "prop:bench-low-a:5",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 15,
+      "y": 16,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 16,
+      "markerAvoidance": {
+        "x": 483.2,
+        "y": 529.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:6",
+        "tag": "prop:bench-low-a:6",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 30,
+      "y": 16,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 16,
+      "markerAvoidance": {
+        "x": 963.2,
+        "y": 529.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:7",
+        "tag": "prop:bench-low-a:7",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 14,
+      "y": 23,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 23,
+      "markerAvoidance": {
+        "x": 451.2,
+        "y": 753.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:8",
+        "tag": "prop:bench-low-a:8",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 31,
+      "y": 23,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 23,
+      "markerAvoidance": {
+        "x": 995.2,
+        "y": 753.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:9",
+        "tag": "prop:bench-low-a:9",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 2,
+      "y": 14,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 14,
+      "markerAvoidance": {
+        "x": 67.2,
+        "y": 465.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:10",
+        "tag": "prop:bench-low-a:10",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 43,
+      "y": 14,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 14,
+      "markerAvoidance": {
+        "x": 1379.2,
+        "y": 465.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:11",
+        "tag": "prop:bench-low-a:11",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 2,
+      "y": 23,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 23,
+      "markerAvoidance": {
+        "x": 67.2,
+        "y": 753.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:12",
+        "tag": "prop:bench-low-a:12",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "bench-low-a",
+      "x": 43,
+      "y": 23,
+      "category": "benches",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 2.8,
+        "h": 0.36
+      },
+      "top": 23,
+      "markerAvoidance": {
+        "x": 1379.2,
+        "y": 753.92,
+        "w": 89.6,
+        "h": 11.52,
+        "id": "prop:bench-low-a:13",
+        "tag": "prop:bench-low-a:13",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 17,
+      "y": 9,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 9,
+      "markerAvoidance": {
+        "x": 549.76,
+        "y": 303.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:14",
+        "tag": "prop:planter-low-a:14",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 30,
+      "y": 9,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 9,
+      "markerAvoidance": {
+        "x": 965.76,
+        "y": 303.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:15",
+        "tag": "prop:planter-low-a:15",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 20,
+      "y": 11,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 11,
+      "markerAvoidance": {
+        "x": 645.76,
+        "y": 367.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:16",
+        "tag": "prop:planter-low-a:16",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 27,
+      "y": 11,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 11,
+      "markerAvoidance": {
+        "x": 869.76,
+        "y": 367.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:17",
+        "tag": "prop:planter-low-a:17",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 20,
+      "y": 22,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 22,
+      "markerAvoidance": {
+        "x": 645.76,
+        "y": 719.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:18",
+        "tag": "prop:planter-low-a:18",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 27,
+      "y": 22,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 22,
+      "markerAvoidance": {
+        "x": 869.76,
+        "y": 719.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:19",
+        "tag": "prop:planter-low-a:19",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 20,
+      "y": 29,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 29,
+      "markerAvoidance": {
+        "x": 645.76,
+        "y": 943.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:20",
+        "tag": "prop:planter-low-a:20",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "planter-low-a",
+      "x": 27,
+      "y": 29,
+      "category": "planters",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "top": 29,
+      "markerAvoidance": {
+        "x": 869.76,
+        "y": 943.36,
+        "w": 20.48,
+        "h": 14.08,
+        "id": "prop:planter-low-a:21",
+        "tag": "prop:planter-low-a:21",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 14,
+      "y": 9,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 8,
+      "markerAvoidance": {
+        "x": 458.24,
+        "y": 307.84000000000003,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:22",
+        "tag": "prop:lamp-low-a:22",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 33,
+      "y": 9,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 8,
+      "markerAvoidance": {
+        "x": 1066.24,
+        "y": 307.84000000000003,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:23",
+        "tag": "prop:lamp-low-a:23",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 17,
+      "y": 13,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 12,
+      "markerAvoidance": {
+        "x": 554.24,
+        "y": 435.84000000000003,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:24",
+        "tag": "prop:lamp-low-a:24",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 30,
+      "y": 13,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 12,
+      "markerAvoidance": {
+        "x": 970.24,
+        "y": 435.84000000000003,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:25",
+        "tag": "prop:lamp-low-a:25",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 14,
+      "y": 19,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 18,
+      "markerAvoidance": {
+        "x": 458.24,
+        "y": 627.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:26",
+        "tag": "prop:lamp-low-a:26",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 33,
+      "y": 19,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 18,
+      "markerAvoidance": {
+        "x": 1066.24,
+        "y": 627.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:27",
+        "tag": "prop:lamp-low-a:27",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 15,
+      "y": 26,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 25,
+      "markerAvoidance": {
+        "x": 490.24,
+        "y": 851.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:28",
+        "tag": "prop:lamp-low-a:28",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 32,
+      "y": 26,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 25,
+      "markerAvoidance": {
+        "x": 1034.24,
+        "y": 851.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:29",
+        "tag": "prop:lamp-low-a:29",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 20,
+      "y": 30,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 29,
+      "markerAvoidance": {
+        "x": 650.24,
+        "y": 979.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:30",
+        "tag": "prop:lamp-low-a:30",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "lamp-low-a",
+      "x": 27,
+      "y": 30,
+      "category": "lamps",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 29,
+      "markerAvoidance": {
+        "x": 874.24,
+        "y": 979.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:lamp-low-a:31",
+        "tag": "prop:lamp-low-a:31",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "shrub-low-a",
+      "x": 6,
+      "y": 11,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "top": 11,
+      "markerAvoidance": {
+        "x": 196.48,
+        "y": 368,
+        "w": 23.04,
+        "h": 13.44,
+        "id": "prop:shrub-low-a:32",
+        "tag": "prop:shrub-low-a:32",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "shrub-low-a",
+      "x": 41,
+      "y": 11,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "top": 11,
+      "markerAvoidance": {
+        "x": 1316.48,
+        "y": 368,
+        "w": 23.04,
+        "h": 13.44,
+        "id": "prop:shrub-low-a:33",
+        "tag": "prop:shrub-low-a:33",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "shrub-low-a",
+      "x": 7,
+      "y": 24,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "top": 24,
+      "markerAvoidance": {
+        "x": 228.48,
+        "y": 784,
+        "w": 23.04,
+        "h": 13.44,
+        "id": "prop:shrub-low-a:34",
+        "tag": "prop:shrub-low-a:34",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "shrub-low-a",
+      "x": 40,
+      "y": 24,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 1,
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "top": 24,
+      "markerAvoidance": {
+        "x": 1284.48,
+        "y": 784,
+        "w": 23.04,
+        "h": 13.44,
+        "id": "prop:shrub-low-a:35",
+        "tag": "prop:shrub-low-a:35",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 3,
+      "y": 13,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 10,
+      "markerAvoidance": {
+        "x": 135.04,
+        "y": 427.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:36",
+        "tag": "prop:tree-low-a:36",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 8,
+      "y": 15,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 12,
+      "markerAvoidance": {
+        "x": 295.04,
+        "y": 491.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:37",
+        "tag": "prop:tree-low-a:37",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 13,
+      "y": 18,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 15,
+      "markerAvoidance": {
+        "x": 455.04,
+        "y": 587.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:38",
+        "tag": "prop:tree-low-a:38",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 32,
+      "y": 18,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 15,
+      "markerAvoidance": {
+        "x": 1063.04,
+        "y": 587.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:39",
+        "tag": "prop:tree-low-a:39",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 37,
+      "y": 15,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 12,
+      "markerAvoidance": {
+        "x": 1223.04,
+        "y": 491.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:40",
+        "tag": "prop:tree-low-a:40",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 42,
+      "y": 13,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 10,
+      "markerAvoidance": {
+        "x": 1383.04,
+        "y": 427.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:41",
+        "tag": "prop:tree-low-a:41",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 4,
+      "y": 22,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 19,
+      "markerAvoidance": {
+        "x": 167.04,
+        "y": 715.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:42",
+        "tag": "prop:tree-low-a:42",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 9,
+      "y": 24,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 21,
+      "markerAvoidance": {
+        "x": 327.04,
+        "y": 779.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:43",
+        "tag": "prop:tree-low-a:43",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 36,
+      "y": 24,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 21,
+      "markerAvoidance": {
+        "x": 1191.04,
+        "y": 779.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:44",
+        "tag": "prop:tree-low-a:44",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 41,
+      "y": 22,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 19,
+      "markerAvoidance": {
+        "x": 1351.04,
+        "y": 715.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:45",
+        "tag": "prop:tree-low-a:45",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 7,
+      "y": 29,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 26,
+      "markerAvoidance": {
+        "x": 263.04,
+        "y": 939.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:46",
+        "tag": "prop:tree-low-a:46",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "tree-low-a",
+      "x": 38,
+      "y": 29,
+      "category": "vegetation",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 4,
+      "collision": {
+        "x": 1.22,
+        "y": 3.35,
+        "w": 0.56,
+        "h": 0.48
+      },
+      "top": 26,
+      "markerAvoidance": {
+        "x": 1255.04,
+        "y": 939.2,
+        "w": 17.92,
+        "h": 15.36,
+        "id": "prop:tree-low-a:47",
+        "tag": "prop:tree-low-a:47",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "garden-resonance-low",
+      "x": 19,
+      "y": 20,
+      "category": "garden",
+      "movementBlocking": false,
+      "w": 10,
+      "h": 7,
+      "collision": {
+        "x": 0.5,
+        "y": 1.45,
+        "w": 9,
+        "h": 5.35
+      },
+      "top": 14,
+      "markerAvoidance": {
+        "x": 624,
+        "y": 494.4,
+        "w": 288,
+        "h": 171.2,
+        "id": "prop:garden-resonance-low:48",
+        "tag": "prop:garden-resonance-low:48",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "gate-vegetation-low",
+      "x": 19,
+      "y": 34,
+      "category": "gate-vegetation",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "top": 34,
+      "markerAvoidance": {
+        "x": 610.56,
+        "y": 1104,
+        "w": 58.88,
+        "h": 13.44,
+        "id": "prop:gate-vegetation-low:49",
+        "tag": "prop:gate-vegetation-low:49",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "gate-vegetation-low",
+      "x": 27,
+      "y": 34,
+      "category": "gate-vegetation",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "top": 34,
+      "markerAvoidance": {
+        "x": 866.56,
+        "y": 1104,
+        "w": 58.88,
+        "h": 13.44,
+        "id": "prop:gate-vegetation-low:50",
+        "tag": "prop:gate-vegetation-low:50",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "stage-vegetation-low",
+      "x": 15,
+      "y": 8,
+      "category": "stage-vegetation",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "top": 8,
+      "markerAvoidance": {
+        "x": 482.56,
+        "y": 272,
+        "w": 58.88,
+        "h": 13.44,
+        "id": "prop:stage-vegetation-low:51",
+        "tag": "prop:stage-vegetation-low:51",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "stage-vegetation-low",
+      "x": 31,
+      "y": 8,
+      "category": "stage-vegetation",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "top": 8,
+      "markerAvoidance": {
+        "x": 994.56,
+        "y": 272,
+        "w": 58.88,
+        "h": 13.44,
+        "id": "prop:stage-vegetation-low:52",
+        "tag": "prop:stage-vegetation-low:52",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 0,
+      "y": 3,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 3,
+      "markerAvoidance": {
+        "x": 0,
+        "y": 114.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:53",
+        "tag": "prop:fence-low-a:53",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 12,
+      "y": 2,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 2,
+      "markerAvoidance": {
+        "x": 384,
+        "y": 82.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:54",
+        "tag": "prop:fence-low-a:54",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 33,
+      "y": 2,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 2,
+      "markerAvoidance": {
+        "x": 1056,
+        "y": 82.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:55",
+        "tag": "prop:fence-low-a:55",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 45,
+      "y": 3,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 3,
+      "markerAvoidance": {
+        "x": 1440,
+        "y": 114.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:56",
+        "tag": "prop:fence-low-a:56",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 0,
+      "y": 34,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 34,
+      "markerAvoidance": {
+        "x": 0,
+        "y": 1106.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:57",
+        "tag": "prop:fence-low-a:57",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "fence-low-a",
+      "x": 45,
+      "y": 34,
+      "category": "fences",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0,
+        "y": 0.58,
+        "w": 3,
+        "h": 0.32
+      },
+      "top": 34,
+      "markerAvoidance": {
+        "x": 1440,
+        "y": 1106.56,
+        "w": 96,
+        "h": 10.24,
+        "id": "prop:fence-low-a:58",
+        "tag": "prop:fence-low-a:58",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "record-crates-low-a",
+      "x": 2,
+      "y": 9,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 1,
+      "collision": {
+        "x": 0.1,
+        "y": 0.46,
+        "w": 1.8,
+        "h": 0.42
+      },
+      "top": 9,
+      "markerAvoidance": {
+        "x": 67.2,
+        "y": 302.72,
+        "w": 57.6,
+        "h": 13.44,
+        "id": "prop:record-crates-low-a:59",
+        "tag": "prop:record-crates-low-a:59",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "cafe-table-low-a",
+      "x": 44,
+      "y": 11,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 2,
+      "h": 2,
+      "collision": {
+        "x": 0.28,
+        "y": 1.35,
+        "w": 1.44,
+        "h": 0.48
+      },
+      "top": 10,
+      "markerAvoidance": {
+        "x": 1416.96,
+        "y": 363.2,
+        "w": 46.08,
+        "h": 15.36,
+        "id": "prop:cafe-table-low-a:60",
+        "tag": "prop:cafe-table-low-a:60",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "instrument-case-low-a",
+      "x": 1,
+      "y": 31,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.24,
+        "y": 1.35,
+        "w": 0.52,
+        "h": 0.48
+      },
+      "top": 30,
+      "markerAvoidance": {
+        "x": 39.68,
+        "y": 1003.2,
+        "w": 16.64,
+        "h": 15.36,
+        "id": "prop:instrument-case-low-a:61",
+        "tag": "prop:instrument-case-low-a:61",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "repair-bench-low-a",
+      "x": 44,
+      "y": 30,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 1,
+      "collision": {
+        "x": 0.08,
+        "y": 0.45,
+        "w": 2.84,
+        "h": 0.4
+      },
+      "top": 30,
+      "markerAvoidance": {
+        "x": 1410.56,
+        "y": 974.4,
+        "w": 90.88,
+        "h": 12.8,
+        "id": "prop:repair-bench-low-a:62",
+        "tag": "prop:repair-bench-low-a:62",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "laundry-bike-low-a",
+      "x": 14,
+      "y": 32,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 2,
+      "collision": {
+        "x": 0.22,
+        "y": 1.5,
+        "w": 2.56,
+        "h": 0.34
+      },
+      "top": 31,
+      "markerAvoidance": {
+        "x": 455.04,
+        "y": 1040,
+        "w": 81.92,
+        "h": 10.88,
+        "id": "prop:laundry-bike-low-a:63",
+        "tag": "prop:laundry-bike-low-a:63",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "mailbox-low-a",
+      "x": 32,
+      "y": 31,
+      "category": "lifestyle",
+      "movementBlocking": false,
+      "w": 1,
+      "h": 2,
+      "collision": {
+        "x": 0.32,
+        "y": 1.62,
+        "w": 0.36,
+        "h": 0.3
+      },
+      "top": 30,
+      "markerAvoidance": {
+        "x": 1034.24,
+        "y": 1011.84,
+        "w": 11.52,
+        "h": 9.6,
+        "id": "prop:mailbox-low-a:64",
+        "tag": "prop:mailbox-low-a:64",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "foreground-edge-cluster",
+      "x": 0,
+      "y": 32,
+      "category": "foreground",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 2,
+      "foreground": true,
+      "collision": {
+        "x": 0.05,
+        "y": 1.58,
+        "w": 2.9,
+        "h": 0.34
+      },
+      "top": 31,
+      "markerAvoidance": {
+        "x": 1.6,
+        "y": 1042.56,
+        "w": 92.8,
+        "h": 10.88,
+        "id": "prop:foreground-edge-cluster:65",
+        "tag": "prop:foreground-edge-cluster:65",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    },
+    {
+      "id": "foreground-edge-cluster",
+      "x": 45,
+      "y": 31,
+      "category": "foreground",
+      "movementBlocking": false,
+      "w": 3,
+      "h": 2,
+      "foreground": true,
+      "collision": {
+        "x": 0.05,
+        "y": 1.58,
+        "w": 2.9,
+        "h": 0.34
+      },
+      "top": 30,
+      "markerAvoidance": {
+        "x": 1441.6,
+        "y": 1010.56,
+        "w": 92.8,
+        "h": 10.88,
+        "id": "prop:foreground-edge-cluster:66",
+        "tag": "prop:foreground-edge-cluster:66",
+        "type": "prop",
+        "movementBlocking": false
+      }
+    }
+  ],
+  "sceneTrees": [
+    {
+      "cx": 155,
+      "cy": 350,
+      "rx": 82,
+      "ry": 82,
+      "sortY": 432,
+      "movementBlocking": true
+    },
+    {
+      "cx": 270,
+      "cy": 405,
+      "rx": 70,
+      "ry": 78,
+      "sortY": 483,
+      "movementBlocking": true
+    },
+    {
+      "cx": 392,
+      "cy": 500,
+      "rx": 64,
+      "ry": 84,
+      "sortY": 584,
+      "movementBlocking": true
+    },
+    {
+      "cx": 535,
+      "cy": 560,
+      "rx": 76,
+      "ry": 100,
+      "sortY": 660,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1380,
+      "cy": 350,
+      "rx": 82,
+      "ry": 82,
+      "sortY": 432,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1270,
+      "cy": 405,
+      "rx": 70,
+      "ry": 78,
+      "sortY": 483,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1146,
+      "cy": 500,
+      "rx": 64,
+      "ry": 84,
+      "sortY": 584,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1004,
+      "cy": 560,
+      "rx": 76,
+      "ry": 100,
+      "sortY": 660,
+      "movementBlocking": true
+    },
+    {
+      "cx": 165,
+      "cy": 720,
+      "rx": 78,
+      "ry": 84,
+      "sortY": 804,
+      "movementBlocking": true
+    },
+    {
+      "cx": 292,
+      "cy": 742,
+      "rx": 64,
+      "ry": 76,
+      "sortY": 818,
+      "movementBlocking": true
+    },
+    {
+      "cx": 456,
+      "cy": 750,
+      "rx": 62,
+      "ry": 78,
+      "sortY": 828,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1080,
+      "cy": 750,
+      "rx": 62,
+      "ry": 78,
+      "sortY": 828,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1245,
+      "cy": 742,
+      "rx": 64,
+      "ry": 76,
+      "sortY": 818,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1374,
+      "cy": 720,
+      "rx": 78,
+      "ry": 84,
+      "sortY": 804,
+      "movementBlocking": true
+    },
+    {
+      "cx": 80,
+      "cy": 1000,
+      "rx": 88,
+      "ry": 80,
+      "sortY": 1080,
+      "movementBlocking": true
+    },
+    {
+      "cx": 245,
+      "cy": 1040,
+      "rx": 76,
+      "ry": 72,
+      "sortY": 1112,
+      "movementBlocking": true
+    },
+    {
+      "cx": 430,
+      "cy": 1008,
+      "rx": 70,
+      "ry": 76,
+      "sortY": 1084,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1100,
+      "cy": 1008,
+      "rx": 70,
+      "ry": 76,
+      "sortY": 1084,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1285,
+      "cy": 1040,
+      "rx": 76,
+      "ry": 72,
+      "sortY": 1112,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1455,
+      "cy": 1000,
+      "rx": 88,
+      "ry": 80,
+      "sortY": 1080,
+      "movementBlocking": true
+    },
+    {
+      "cx": 515,
+      "cy": 446,
+      "rx": 58,
+      "ry": 82,
+      "sortY": 528,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1018,
+      "cy": 446,
+      "rx": 58,
+      "ry": 82,
+      "sortY": 528,
+      "movementBlocking": true
+    },
+    {
+      "cx": 418,
+      "cy": 590,
+      "rx": 48,
+      "ry": 68,
+      "sortY": 658,
+      "movementBlocking": true
+    },
+    {
+      "cx": 1120,
+      "cy": 590,
+      "rx": 48,
+      "ry": 68,
+      "sortY": 658,
+      "movementBlocking": true
+    }
+  ],
+  "drawOrder": [
+    "ground chunks",
+    "foreground decoration",
+    "vignette",
+    "runtime sound markers",
+    "runtime player",
+    "HUD"
+  ],
+  "exclusions": [
+    "baked sound markers",
+    "characters",
+    "UI",
+    "collision guides",
+    "review overlays"
+  ],
+  "files": [
+    {
+      "path": "foreground/occlusion.png",
+      "bytes": 1538528,
+      "sha256": "7221a5d73c66b33d125daef1a69d1eb94e79bf815537351668c8f3bb2a912ba5"
+    },
+    {
+      "path": "ground/chunk-ne.png",
+      "bytes": 1109939,
+      "sha256": "a0a78cc0f81c655441af4a072f72c831098eb0fd63c6053a3233012857e96a7a"
+    },
+    {
+      "path": "ground/chunk-nw.png",
+      "bytes": 1111674,
+      "sha256": "6f2aca094077b33ecd68cd8fb9fe2a8ffe84d3f0995fce2afb725fc3591e62fc"
+    },
+    {
+      "path": "ground/chunk-se.png",
+      "bytes": 1111279,
+      "sha256": "021450733af0851dc07296028fb8a7bd6bfb19ba2d1eb61b8a523fabaecf4556"
+    },
+    {
+      "path": "ground/chunk-sw.png",
+      "bytes": 1117003,
+      "sha256": "c61d84aa29a2cd1d149e54d03a47667a8b8adc76f131ccc4ac8ef2d055ba77a0"
+    }
+  ]
+}

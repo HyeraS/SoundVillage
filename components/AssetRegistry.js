@@ -219,6 +219,68 @@ export const WORLD_BUILDINGS = {
 }
 
 /* ─────────────────────────────────────────────
+   Sound Archive Garden 월드맵 리스킨 v1
+   · ImageGen으로 제작한 투명 PNG를 개별 파일로 분리해 등록한다.
+   · w/h는 원본 픽셀 크기, anchor는 월드 배치 시 발치 기준 정렬점(0..1)이다.
+   · ground는 반복 가능한 재료, landmarks/props/foreground는 독립 레이어다.
+───────────────────────────────────────────── */
+const SOUND_ARCHIVE_ROOT = '/assets/world/sound-archive-garden-v1'
+const standalone = (file, w, h, anchorX = 0.5, anchorY = 0.94) => ({
+  src: `${SOUND_ARCHIVE_ROOT}/${file}`,
+  sheetW: w,
+  sheetH: h,
+  x: 0,
+  y: 0,
+  w,
+  h,
+  anchor: { x: anchorX, y: anchorY },
+})
+
+export const SOUND_ARCHIVE_GARDEN = {
+  ground: {
+    grass: standalone('ground-grass-base.png', 1024, 1024, 0, 0),
+    creamStone: standalone('ground-cream-stone.png', 1024, 1024, 0, 0),
+    honeyPath: standalone('ground-honey-path.png', 1024, 1024, 0, 0),
+  },
+  landmarks: {
+    Museum: standalone('library-v2.png', 1267, 1157, 0.5, 0.96),
+    Lab: standalone('gateway-lab.png', 459, 395, 0.5, 0.96),
+    Animal: standalone('gateway-animal.png', 459, 421, 0.5, 0.96),
+    Urban: standalone('gateway-urban.png', 448, 429, 0.5, 0.97),
+    Nature: standalone('gateway-nature.png', 433, 422, 0.5, 0.96),
+    Human: standalone('gateway-human.png', 466, 401, 0.5, 0.96),
+    Music: standalone('gateway-music.png', 506, 407, 0.5, 0.96),
+  },
+  props: {
+    broadleaf: standalone('props-broadleaf.png', 505, 516),
+    pine: standalone('props-pine.png', 528, 519),
+    hedge: standalone('props-hedge.png', 528, 495),
+    benchLamp: standalone('props-bench-lamp.png', 528, 519),
+    signpost: standalone('props-signpost.png', 528, 528),
+  },
+  foreground: {
+    arch: standalone('foreground-arch.png', 528, 473, 0.5, 0.98),
+  },
+}
+
+/* Sound Archive Garden v2 — the clean 4:3 concept master is the environment.
+   Interactive actors and state remain separate runtime layers in WorldMap. */
+export const SOUND_ARCHIVE_GARDEN_V2 = {
+  base: {
+    src: '/assets/world/sound-archive-garden-v2/world-base-hd.webp',
+    width: 5792,
+    height: 4344,
+  },
+  collisionMask: {
+    src: '/assets/world/sound-archive-garden-v2/world-walkable-mask.png',
+    debugSrc: '/assets/world/sound-archive-garden-v2/world-collision-debug.png',
+    width: 960,
+    height: 720,
+    worldPxPerCell: 4,
+  },
+}
+
+/* ─────────────────────────────────────────────
    "100 Nature Things" 팩 — WorldMap 장식이 나무 3종/덤불 2종/꽃 3종뿐이라 배리에이션이
    부족했던 문제를 해결하려고 도입. 10종류 카테고리가 균일 그리드로 들어있음:
    나무만 5열×2행(32×32), 나머지(덤불/꽃/버섯/바위/크리스탈)는 10열×1행(16×16) —
@@ -724,6 +786,21 @@ export const LIBRARY_DECOR = {
   painting:   { src: '/assets/library/painting.png',   w: 31, h: 23 },
   armchair:   { src: '/assets/library/armchair.png',   w: 19, h: 15 },
   rug:        { src: '/assets/library/rug.png',        w: 46, h: 33 },
+}
+
+// Sound Museum Final B runtime plates. Placement, anchors, collisions and
+// interactions live in lib/soundMuseumFinalBLayout.mjs so rendering and
+// physics share the same 1672x941 coordinate system.
+export const SOUND_MUSEUM_FINAL_B = {
+  architecture: '/assets/sound-museum-final-b/architecture/room-shell@2x.png',
+  listeningLounge: '/assets/sound-museum-final-b/left-listening/l-shaped-listening-lounge.png',
+  curatorDesk: '/assets/sound-museum-final-b/center-archive/curator-desk-ledger.png',
+  owlIdle: '/assets/sound-museum-final-b/center-archive/owl-curator-idle-4f.png',
+  waveformFrame: '/assets/sound-museum-final-b/center-archive/waveform-frame.png',
+  costumeShop: '/assets/sound-museum-final-b/right-shop/costume-shop.png',
+  secondMannequin: '/assets/sound-museum-final-b/right-shop/mannequin-vest-skirt.png',
+  readingLounge: '/assets/sound-museum-final-b/lounge/reading-lounge.png',
+  foregroundRail: '/assets/sound-museum-final-b/foreground/rail-bookshelf.png',
 }
 
 /* ─────────────────────────────────────────────

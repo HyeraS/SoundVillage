@@ -1,0 +1,4 @@
+participant_id,group_id,access_scope
+LOCAL_DEMO_A,A,group
+LOCAL_DEMO_B,B,group
+LOCAL_RESEARCHER,A,all

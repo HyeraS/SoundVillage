@@ -1,0 +1,107 @@
+{
+  "version": 2,
+  "status": "accepted-after-original-resolution-review",
+  "base": "ground/ground-only-first-pass-source.png",
+  "partitionComposite": "ground/ground-only-clean-v2-source.png",
+  "source": "ground/ground-only-source.png",
+  "runtime": "ground/ground-only-runtime.png",
+  "canvas": {
+    "width": 1448,
+    "height": 1086
+  },
+  "partitionCoverage": "100%",
+  "regions": [
+    {
+      "id": "north",
+      "mask": "ground/masks-cleanup/north.png",
+      "candidate": "candidates/ground-cleanup-north-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/north-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "id": "west-mid",
+      "mask": "ground/masks-cleanup/west-mid.png",
+      "candidate": "candidates/ground-cleanup-west-mid-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/west-mid-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "id": "center-mid",
+      "mask": "ground/masks-cleanup/center-mid.png",
+      "candidate": "candidates/ground-cleanup-center-mid-v2.png",
+      "acceptedPatch": "accepted/ground-cleanup/center-mid-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "rejectedCandidates": [
+        "candidates/ground-cleanup-center-mid-v1.png"
+      ],
+      "rejectionReason": "wrong dimensions"
+    },
+    {
+      "id": "east-mid",
+      "mask": "ground/masks-cleanup/east-mid.png",
+      "candidate": "candidates/ground-cleanup-east-mid-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/east-mid-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "id": "west-south",
+      "mask": "ground/masks-cleanup/west-south.png",
+      "candidate": "candidates/ground-cleanup-west-south-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/west-south-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "id": "center-south",
+      "mask": "ground/masks-cleanup/center-south.png",
+      "candidate": "candidates/ground-cleanup-center-south-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/center-south-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    },
+    {
+      "id": "east-south",
+      "mask": "ground/masks-cleanup/east-south.png",
+      "candidate": "candidates/ground-cleanup-east-south-v1.png",
+      "acceptedPatch": "accepted/ground-cleanup/east-south-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "dimensions": [
+        1448,
+        1086
+      ]
+    }
+  ],
+  "finalRepair": {
+    "id": "east-edge-repair",
+    "mask": "ground/masks-cleanup/east-edge-repair.png",
+    "candidate": "candidates/ground-cleanup-east-edge-repair-v1.png",
+    "acceptedPatch": "accepted/ground-cleanup/east-edge-repair-patch.png",
+    "status": "accepted-after-original-resolution-review",
+    "dimensions": [
+      1448,
+      1086
+    ]
+  }
+}

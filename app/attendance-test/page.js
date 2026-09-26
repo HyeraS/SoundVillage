@@ -13,7 +13,7 @@ import { getClient } from '@/lib/supabase'
 
    쿼리 파라미터:
    - ?pid=AUDIOTEST_E2E_ATTEND (기본값)
-   - ?mode=checkin (기본) — ensureTodayCheckIn 1회 호출 + 현재 상태 표시
+   - ?mode=checkin (기본) — 실행 버튼 클릭 후 ensureTodayCheckIn 1회 호출 + 현재 상태 표시
    - ?mode=peek — 체크인 없이 getAttendanceStatus만 조회(자정/스트릭 리셋
      검증용, 브라우저 Date를 강제로 바꾼 뒤 재방문해서 확인하는 시나리오)
    - ?mode=cleanup — 이 pid의 participant_attendance/currency_transactions
@@ -27,24 +27,31 @@ function TestInner() {
 
   const [log, setLog] = useState([])
   const [result, setResult] = useState(null)
+  const [runRequested, setRunRequested] = useState(false)
   const ranRef = useRef(false)
 
   useEffect(() => {
+    if (!runRequested) return
     if (ranRef.current) return
     ranRef.current = true
     const push = (msg) => setLog(l => [...l, msg])
 
     ;(async () => {
-      push(`시작 — participant=${pid}, mode=${mode}, 브라우저 Date=${new Date().toString()}`)
+      const client = getClient()
+      const { data: me, error: meError } = await client.rpc('get_my_study_participant')
+      if (meError) throw meError
+      const participant = Array.isArray(me) ? me[0] : me
+      if (!participant || participant.participant_id !== pid.toUpperCase()) throw new Error('먼저 루트에서 동일한 테스트 참가자로 인증하세요.')
+      const claimedPid = participant.participant_id
+      push(`시작 — participant=${claimedPid}, mode=${mode}, 브라우저 Date=${new Date().toString()}`)
 
       if (mode === 'cleanup') {
-        const client = getClient()
         const { count: attendCount } = await client
           .from('participant_attendance').select('*', { count: 'exact', head: true })
-          .eq('participant_id', pid)
+          .eq('participant_id', claimedPid)
         const { count: txCount } = await client
           .from('currency_transactions').select('*', { count: 'exact', head: true })
-          .eq('participant_id', pid).eq('type', 'earn_attendance')
+          .eq('participant_id', claimedPid).eq('type', 'earn_attendance')
         push(`participant_attendance ${attendCount ?? 0}행, earn_attendance 거래 ${txCount ?? 0}행 — 삭제는 Supabase SQL Editor에서 수행할 것`)
         setResult({ attendCount, txCount })
         push('=== 완료(cleanup 조회) ===')
@@ -52,35 +59,43 @@ function TestInner() {
       }
 
       if (mode === 'peek') {
-        const status = await getAttendanceStatus(pid)
+        const status = await getAttendanceStatus(claimedPid)
         setResult(status)
         push(`오늘 상태: ${status.today ? `streak_day=${status.today.streak_day}, reward=${status.today.reward_currency}` : '아직 출석 안 함'}`)
         push('=== 완료(peek) ===')
         return
       }
 
-      const before = await getCurrencyBalance(pid)
+      const before = await getCurrencyBalance(claimedPid)
       push(`체크인 전 잔액: ${before}`)
 
-      const { row, isNew } = await ensureTodayCheckIn(pid)
+      const first = await ensureTodayCheckIn(claimedPid)
+      if (!first.ok) throw new Error(first.error.message)
+      const { row, isNew } = first.data
       push(`ensureTodayCheckIn 결과: isNew=${isNew}, streak_day=${row?.streak_day}, reward=${row?.reward_currency}`)
 
       // 같은 날 두 번째 호출 — 중복 지급 방지 확인
-      const second = await ensureTodayCheckIn(pid)
-      push(`재호출(같은 날) 결과: isNew=${second.isNew} (false여야 정상, 중복 지급 없음)`)
+      const second = await ensureTodayCheckIn(claimedPid)
+      if (!second.ok) throw new Error(second.error.message)
+      push(`재호출(같은 날) 결과: isNew=${second.data.isNew} (동일 키 재호출은 기존 성공 결과를 반환)`)
 
-      const after = await getCurrencyBalance(pid)
+      const after = await getCurrencyBalance(claimedPid)
       push(`체크인 후 잔액: ${after} (증가분 ${after - before})`)
 
-      const status = await getAttendanceStatus(pid)
+      const status = await getAttendanceStatus(claimedPid)
       setResult({ before, after, delta: after - before, checkIn: row, status })
       push('=== 완료 ===')
     })().catch(err => { push('ERROR: ' + (err?.message || String(err))); console.error(err) })
-  }, [pid, mode])
+  }, [pid, mode, runRequested])
 
   return (
     <div style={{ padding: '24px', fontFamily: 'monospace', fontSize: '13px', whiteSpace: 'pre-wrap' }}>
       <h2>출석 보상 E2E 테스트 — pid={pid}, mode={mode}</h2>
+      {!runRequested && (
+        <button type="button" onClick={() => setRunRequested(true)} style={{ marginBottom: 16, padding: '8px 12px' }}>
+          이 참가자로 테스트 실행
+        </button>
+      )}
       <div style={{ marginBottom: '16px' }}>
         {log.map((l, i) => <div key={i}>{l}</div>)}
       </div>

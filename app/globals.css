@@ -10,7 +10,9 @@
    기본값 리셋이 거기까지 번지면 안 된다. utilities만 있으면 className들은 정상
    동작하고, 리셋은 우리 자체 리셋(바로 아래 * 룰)만 적용된다. */
 @import "tailwindcss/theme" layer(theme);
-@import "tailwindcss/utilities" layer(utilities);
+@import "tailwindcss/utilities" layer(utilities) source(none);
+@source "./**/*.{js,jsx,ts,tsx}";
+@source "../components/**/*.{js,jsx,ts,tsx}";
 
 *, *::before, *::after {
   box-sizing: border-box;
@@ -190,4 +192,170 @@ a { color: inherit; text-decoration: none; }
 }
 .interior-grid-cell:hover {
   background: rgba(255,255,255,.22);
+}
+
+.world-map-hud button:focus-visible,
+.world-map-dpad button:focus-visible {
+  outline: 3px solid #2f6fbd;
+  outline-offset: 2px;
+}
+
+.world-map-hud__home-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  padding: 2px 5px;
+  color: #fff;
+  font: 800 8px/1.2 Nunito, sans-serif;
+  white-space: nowrap;
+  background: #d8654a;
+  border: 1px solid #fff3d6;
+  border-radius: 7px;
+  box-shadow: 0 2px 5px #0004;
+}
+
+.world-home-welcome {
+  position: absolute;
+  top: 112px;
+  left: 50%;
+  z-index: 18;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  width: min(470px, calc(100vw - 32px));
+  padding: 10px 11px 10px 13px;
+  color: #3a2a14;
+  font-family: Nunito, sans-serif;
+  background: #fff8e8f2;
+  border: 2px solid #e98265;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px #0005;
+  transform: translateX(-50%);
+  backdrop-filter: blur(7px);
+  animation: popIn .25s cubic-bezier(.34,1.56,.64,1);
+}
+
+.world-home-welcome__icon { font-size: 30px; }
+.world-home-welcome__copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
+.world-home-welcome__copy strong { font-size: 13px; }
+.world-home-welcome__copy span { color: #765838; font-size: 11px; line-height: 1.35; }
+.world-home-welcome button {
+  min-width: 48px;
+  min-height: 36px;
+  color: #fff;
+  font: 800 11px Nunito, sans-serif;
+  background: #b95f49;
+  border: 0;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .world-map-dpad {
+    display: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .world-map-enter-prompt,
+  .world-map-direction__arrow,
+  .world-map-hud *,
+  .world-map-objective * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Sound Archive Garden 월드맵 HUD — 모바일에서는 핵심 진행/재화/행동만 남겨
+   390px 세로 화면과 낮은 가로 화면에서도 한 줄 안에 유지한다. */
+@media (max-width: 720px) {
+  .world-map-hud {
+    gap: 6px !important;
+    padding: 0 8px !important;
+  }
+  .world-map-hud__brand,
+  .world-map-hud__divider,
+  .world-map-hud__zones {
+    display: none !important;
+  }
+  .world-map-hud__progress {
+    min-width: 84px !important;
+  }
+  .world-map-hud__stat {
+    gap: 1px !important;
+  }
+  .world-map-hud__stat > span {
+    font-size: 16px !important;
+  }
+  .world-map-hud__stat > div > div:last-child,
+  .world-map-hud__action:not(.world-map-hud__action--home) .world-map-hud__action-label {
+    display: none !important;
+  }
+  .world-map-hud__action--home {
+    min-width: 54px;
+    padding: 3px 5px !important;
+    background: #fff8e8 !important;
+    border: 1px solid #c8a96e !important;
+  }
+  .world-map-hud__action--home .world-map-hud__action-label {
+    display: inline !important;
+    font-size: 9px !important;
+  }
+  .world-map-hud__home-badge { display: none; }
+  .world-map-hud__action {
+    padding: 4px !important;
+  }
+  .world-map-enter-prompt {
+    bottom: 112px !important;
+    max-width: calc(100vw - 28px) !important;
+    padding: 10px 16px !important;
+    gap: 8px !important;
+    font-size: 14px !important;
+  }
+  .world-map-enter-prompt > span:first-child {
+    font-size: 20px !important;
+  }
+  .world-map-enter-prompt > span:last-child {
+    font-size: 13px !important;
+    padding: 4px 9px !important;
+  }
+  .world-map-objective {
+    width: 168px !important;
+    right: 10px !important;
+    bottom: 10px !important;
+    padding: 9px !important;
+  }
+  .world-map-direction {
+    max-width: calc(100vw - 24px) !important;
+    top: 66px !important;
+  }
+  .world-map-dpad {
+    display: grid !important;
+    left: 10px !important;
+    bottom: 10px !important;
+    transform: scale(1);
+    transform-origin: bottom left;
+  }
+  .world-home-welcome {
+    top: 70px;
+    width: calc(100vw - 20px);
+    gap: 7px;
+    padding: 8px 9px;
+  }
+  .world-home-welcome__icon { font-size: 23px; }
+  .world-home-welcome__copy strong { font-size: 11px; }
+  .world-home-welcome__copy span { font-size: 9px; }
+  .world-home-welcome button { min-width: 44px; min-height: 34px; }
+}
+
+@media (max-height: 440px) and (orientation: landscape) {
+  .world-map-hud__brand,
+  .world-map-hud__divider,
+  .world-map-hud__zones {
+    display: none !important;
+  }
+  .world-map-hud {
+    gap: 8px !important;
+    padding: 0 10px !important;
+  }
 }

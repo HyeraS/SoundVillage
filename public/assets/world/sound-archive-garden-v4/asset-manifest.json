@@ -1,0 +1,638 @@
+{
+  "version": 4,
+  "reference": {
+    "width": 2896,
+    "height": 2172
+  },
+  "world": {
+    "width": 3840,
+    "height": 2880
+  },
+  "scale": {
+    "x": 1.3259668508287292,
+    "y": 1.3259668508287292
+  },
+  "source": "design/concepts/world-map-reskin-2026-09-18/02-sound-archive-garden-hd-master.png",
+  "panels": [
+    {
+      "id": "terrain-panel-0-0",
+      "x": 0,
+      "y": 0,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-0-1",
+      "x": 724,
+      "y": 0,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-0-2",
+      "x": 1448,
+      "y": 0,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-0-3",
+      "x": 2172,
+      "y": 0,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-1-0",
+      "x": 0,
+      "y": 724,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-1-1",
+      "x": 724,
+      "y": 724,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-1-2",
+      "x": 1448,
+      "y": 724,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-1-3",
+      "x": 2172,
+      "y": 724,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-2-0",
+      "x": 0,
+      "y": 1448,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-2-1",
+      "x": 724,
+      "y": 1448,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-2-2",
+      "x": 1448,
+      "y": 1448,
+      "width": 724,
+      "height": 724
+    },
+    {
+      "id": "terrain-panel-2-3",
+      "x": 2172,
+      "y": 1448,
+      "width": 724,
+      "height": 724
+    }
+  ],
+  "semanticLayers": [
+    {
+      "id": "landmark-home",
+      "category": "landmark",
+      "box": [
+        285,
+        70,
+        900,
+        520
+      ],
+      "sortReferenceY": 502
+    },
+    {
+      "id": "landmark-lab",
+      "category": "landmark",
+      "box": [
+        1010,
+        0,
+        1950,
+        535
+      ],
+      "sortReferenceY": 517
+    },
+    {
+      "id": "landmark-animal",
+      "category": "landmark",
+      "box": [
+        2210,
+        65,
+        2896,
+        565
+      ],
+      "sortReferenceY": 547
+    },
+    {
+      "id": "landmark-nature",
+      "category": "landmark",
+      "box": [
+        0,
+        425,
+        725,
+        1465
+      ],
+      "sortReferenceY": 1447
+    },
+    {
+      "id": "landmark-library",
+      "category": "landmark",
+      "box": [
+        865,
+        625,
+        2030,
+        1165
+      ],
+      "sortReferenceY": 1147
+    },
+    {
+      "id": "landmark-urban",
+      "category": "landmark",
+      "box": [
+        2310,
+        620,
+        2896,
+        1345
+      ],
+      "sortReferenceY": 1327
+    },
+    {
+      "id": "landmark-human",
+      "category": "landmark",
+      "box": [
+        0,
+        1375,
+        900,
+        2110
+      ],
+      "sortReferenceY": 2092
+    },
+    {
+      "id": "landmark-music",
+      "category": "landmark",
+      "box": [
+        2160,
+        1360,
+        2896,
+        2115
+      ],
+      "sortReferenceY": 2097
+    },
+    {
+      "id": "landmark-home-hub",
+      "category": "landmark",
+      "worldBox": [
+        1440,
+        1368,
+        1888,
+        1752
+      ],
+      "sortWorldY": 1752
+    },
+    {
+      "id": "environment-north-forest",
+      "category": "environment",
+      "box": [
+        0,
+        0,
+        2896,
+        430
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-west-stream-forest",
+      "category": "environment",
+      "box": [
+        0,
+        380,
+        720,
+        1480
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-east-forest",
+      "category": "environment",
+      "box": [
+        2180,
+        300,
+        2896,
+        1510
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-central-gardens",
+      "category": "environment",
+      "box": [
+        650,
+        430,
+        2250,
+        1640
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-southwest-garden",
+      "category": "environment",
+      "box": [
+        0,
+        1320,
+        1150,
+        2172
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-southeast-garden",
+      "category": "environment",
+      "box": [
+        1800,
+        1280,
+        2896,
+        2172
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-south-center-garden",
+      "category": "environment",
+      "box": [
+        1050,
+        1580,
+        1850,
+        1900
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "environment-south-forest",
+      "category": "environment",
+      "box": [
+        720,
+        1780,
+        2180,
+        2172
+      ],
+      "sortReferenceY": 0
+    },
+    {
+      "id": "foreground-south-gate",
+      "category": "foreground",
+      "box": [
+        1100,
+        1840,
+        1835,
+        2172
+      ],
+      "sortReferenceY": 999999
+    }
+  ],
+  "assets": [
+    {
+      "id": "terrain-underlay",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-underlay.png",
+      "width": 5792,
+      "height": 4344,
+      "hasAlpha": false,
+      "category": "source-underlay",
+      "source": "design/world-map-v4/source-assets/terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "terrain-panel-0-0",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-0-0.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 0,
+      "referenceY": 0
+    },
+    {
+      "id": "terrain-panel-0-1",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-0-1.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 724,
+      "referenceY": 0
+    },
+    {
+      "id": "terrain-panel-0-2",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-0-2.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 1448,
+      "referenceY": 0
+    },
+    {
+      "id": "terrain-panel-0-3",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-0-3.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 2172,
+      "referenceY": 0
+    },
+    {
+      "id": "terrain-panel-1-0",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-1-0.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 0,
+      "referenceY": 724
+    },
+    {
+      "id": "terrain-panel-1-1",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-1-1.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 724,
+      "referenceY": 724
+    },
+    {
+      "id": "terrain-panel-1-2",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-1-2.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 1448,
+      "referenceY": 724
+    },
+    {
+      "id": "terrain-panel-1-3",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-1-3.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 2172,
+      "referenceY": 724
+    },
+    {
+      "id": "terrain-panel-2-0",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-2-0.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 0,
+      "referenceY": 1448
+    },
+    {
+      "id": "terrain-panel-2-1",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-2-1.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 724,
+      "referenceY": 1448
+    },
+    {
+      "id": "terrain-panel-2-2",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-2-2.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 1448,
+      "referenceY": 1448
+    },
+    {
+      "id": "terrain-panel-2-3",
+      "src": "/assets/world/sound-archive-garden-v4/terrain-panel-2-3.png",
+      "width": 1448,
+      "height": 1448,
+      "hasAlpha": false,
+      "category": "terrain-panel",
+      "source": "terrain-underlay-imagegen.png",
+      "generation": "exact crop from the ImageGen reference master",
+      "referenceX": 2172,
+      "referenceY": 1448
+    },
+    {
+      "id": "landmark-home",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-home.png",
+      "width": 1230,
+      "height": 900,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (570, 140, 1800, 1040)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-lab",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-lab.png",
+      "width": 1880,
+      "height": 1070,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (2020, 0, 3900, 1070)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-animal",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-animal.png",
+      "width": 1372,
+      "height": 1000,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (4420, 130, 5792, 1130)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-nature",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-nature.png",
+      "width": 1450,
+      "height": 2080,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (0, 850, 1450, 2930)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-library",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-library.png",
+      "width": 2330,
+      "height": 1080,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (1730, 1250, 4060, 2330)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-urban",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-urban.png",
+      "width": 1172,
+      "height": 1450,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (4620, 1240, 5792, 2690)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-human",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-human.png",
+      "width": 1800,
+      "height": 1470,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (0, 2750, 1800, 4220)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-music",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-music.png",
+      "width": 1472,
+      "height": 1510,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "HD reference crop (4320, 2720, 5792, 4230)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "landmark-home-hub",
+      "src": "/assets/world/sound-archive-garden-v4/landmark-home-hub.png",
+      "width": 1331,
+      "height": 1045,
+      "hasAlpha": true,
+      "category": "landmark",
+      "source": "design/world-map-v4/source-assets/landmark-home-player-hub-v1.png",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-north-forest",
+      "src": "/assets/world/sound-archive-garden-v4/environment-north-forest.png",
+      "width": 5792,
+      "height": 860,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (0, 0, 5792, 860)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-west-stream-forest",
+      "src": "/assets/world/sound-archive-garden-v4/environment-west-stream-forest.png",
+      "width": 1440,
+      "height": 2200,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (0, 760, 1440, 2960)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-east-forest",
+      "src": "/assets/world/sound-archive-garden-v4/environment-east-forest.png",
+      "width": 1432,
+      "height": 2420,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (4360, 600, 5792, 3020)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-central-gardens",
+      "src": "/assets/world/sound-archive-garden-v4/environment-central-gardens.png",
+      "width": 3200,
+      "height": 2420,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (1300, 860, 4500, 3280)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-southwest-garden",
+      "src": "/assets/world/sound-archive-garden-v4/environment-southwest-garden.png",
+      "width": 2300,
+      "height": 1704,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (0, 2640, 2300, 4344)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-southeast-garden",
+      "src": "/assets/world/sound-archive-garden-v4/environment-southeast-garden.png",
+      "width": 2192,
+      "height": 1784,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (3600, 2560, 5792, 4344)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-south-center-garden",
+      "src": "/assets/world/sound-archive-garden-v4/environment-south-center-garden.png",
+      "width": 1600,
+      "height": 640,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (2100, 3160, 3700, 3800)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "environment-south-forest",
+      "src": "/assets/world/sound-archive-garden-v4/environment-south-forest.png",
+      "width": 2920,
+      "height": 784,
+      "hasAlpha": true,
+      "category": "environment-cluster",
+      "source": "HD reference crop (1440, 3560, 4360, 4344)",
+      "generation": "exact crop from the ImageGen reference master"
+    },
+    {
+      "id": "foreground-south-gate",
+      "src": "/assets/world/sound-archive-garden-v4/foreground-south-gate.png",
+      "width": 1470,
+      "height": 664,
+      "hasAlpha": true,
+      "category": "foreground",
+      "source": "HD reference crop (2200, 3680, 3670, 4344)",
+      "generation": "exact crop from the ImageGen reference master"
+    }
+  ]
+}

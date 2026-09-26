@@ -1,22 +1,29 @@
 'use client'
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import StartPanel      from '@/components/StartPanel'
 import WorldMap        from '@/components/WorldMap'
 import ZoneMap         from '@/components/ZoneMap'
 import MusicZoneMap    from '@/components/MusicZoneMap'
 import NatureZoneMap   from '@/components/NatureZoneMap'
+import HumanZoneMap    from '@/components/HumanZoneMap'
+import UrbanZoneMap    from '@/components/UrbanZoneMap'
+import AnimalZoneMap   from '@/components/AnimalZoneMap'
+import LabZoneMap      from '@/components/LabZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import SoundMuseum     from '@/components/SoundMuseum'
 import FeedbackPanel   from '@/components/FeedbackPanel'
 import InteriorDecorRoom from '@/components/InteriorDecorRoom'
-import { getTotalCount, getCountByZone, getAnnotatedSoundIds, getAnnotationCountForSound, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
+import { getMyExperimentProgress, getMuseumAnnotationCounts, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
 import { ensureTodayCheckIn } from '@/lib/attendance'
-import { getRoom } from '@/lib/interiorDecor'
-import { FRIEND_ROOM } from '@/lib/interiorFixtures'
+import { getOrCreateRoomShare, getRoom, getSharedRoom } from '@/lib/interiorDecor'
 import { probeHost } from '@/lib/duoSession'
+import { claimParticipantSession, restoreParticipantSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
+import { completeStudySession, flushEvents, setUserEventContext, startStudySession, trackEvent } from '@/lib/userEvents'
+import { canonicalAudioId, uniqueSoundsByCanonicalAudio } from '@/lib/soundIdentity.mjs'
+import { FRIEND_ROOM } from '@/lib/interiorFixtures'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -24,9 +31,13 @@ import soundMetadata from '@/data/sound_metadata.json'
 ───────────────────────────────────────────── */
 const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 
-// 처음엔 Music 마을만 열려있고, Music 구역 1을 전사 완료해야 나머지가 열림
+// 임시 플레이테스트: 일반 플레이에서는 모든 마을을 처음부터 열어 둔다.
+// false로 바꾸면 기존 Music 구역 1 완료 기반 순차 해금으로 즉시 복귀한다.
 const FIRST_ZONE          = 'Music'
 const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
+const TEMPORARILY_UNLOCK_ALL_ZONES = true
+const NATURE_QA_PARTICIPANT_ID = 'NATURE_QA_LOCAL'
+const HUMAN_QA_PARTICIPANT_ID = 'HUMAN_QA_LOCAL'
 
 // Sound Museum에 올라가려면 오디오 하나당 이 인원수만큼 전사가 완료돼야 한다.
 // 원래는 그룹당 5명 기준이었는데, P/Q 그룹에 결원이 생겨 4명으로 낮춤(2026-07-31).
@@ -42,6 +53,16 @@ function buildZoneMap(sounds) {
 }
 const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 
+async function initializeUserLogging(initialScreen, zone = null) {
+  const session = await startStudySession(initialScreen).catch(() => null)
+  if (!session) return null
+  setUserEventContext({ screen: initialScreen, zone })
+  trackEvent('screen_viewed', { screen: initialScreen, zone, target_type: 'screen', target_id: initialScreen }, {
+    dedupeKey: `screen:${session.studySessionId}:${initialScreen}:initial`,
+  })
+  return session
+}
+
 // 그룹 필터: groupId가 없으면 전체, 있으면 해당 그룹만.
 // 그룹 무관 연구용 접근 ID(RESEARCHER 등)일 때만 필터를 완전히 우회한다 — 이 경우
 // ZoneMap의 아이템 배치는 실제 참여자 화면과 일치하지 않는다(배치 시드가 사운드
@@ -49,21 +70,25 @@ const ZONE_SOUND_MAP = buildZoneMap(soundMetadata.sounds)
 // bypassAll=false로 호출해서 실제 그룹 참여자와 동일한 목록·배치를 보게 한다.
 function getGroupSounds(zone, groupId, bypassAll = false) {
   const all = ZONE_SOUND_MAP[zone] || []
-  if (bypassAll || !groupId) return all
+  // Lab placement and study progress are keyed by the real sound_id. Two A
+  // records intentionally share canonical audio, so canonical de-duplication
+  // would silently turn the contracted 84 items into 82 in the live HUD.
+  const preserveLabSoundIds = sounds => zone === 'Lab' ? sounds : uniqueSoundsByCanonicalAudio(sounds)
+  if (bypassAll || !groupId) return preserveLabSoundIds(all)
   const g = groupId.trim().toUpperCase().replace(/^G/i, '')  // "G1"→"1", "A"→"A"
   const label = g === '1' ? 'A' : g === '2' ? 'B' : g      // 그룹 번호 → 라벨 변환
-  return all.filter(s => !s.group || s.group === label)
+  return preserveLabSoundIds(all.filter(s => !s.group || s.group === label))
 }
 
 // Museum용: 다른 그룹 사운드 전체 목록
 function getOtherGroupSounds(groupId, bypassAll = false) {
   const all = soundMetadata.sounds || []
-  if (bypassAll || !groupId) return all
+  if (bypassAll || !groupId) return uniqueSoundsByCanonicalAudio(all)
   const g = groupId.trim().toUpperCase().replace(/^G/i, '')
   const myLabel    = g === '1' ? 'A' : g === '2' ? 'B' : g
-  if (!myLabel) return all
+  if (!myLabel) return uniqueSoundsByCanonicalAudio(all)
   const otherLabel = myLabel === 'A' ? 'B' : 'A'
-  return all.filter(s => !s.group || s.group === otherLabel)
+  return uniqueSoundsByCanonicalAudio(all.filter(s => !s.group || s.group === otherLabel))
 }
 
 /* ─────────────────────────────────────────────
@@ -79,6 +104,108 @@ export default function HomePage() {
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
+  const [natureQaEnabled, setNatureQaEnabled] = useState(false)
+  const [humanQaOptions, setHumanQaOptions] = useState(null)
+  const [worldOverviewQa, setWorldOverviewQa] = useState(false)
+  const [worldLockQaEnabled, setWorldLockQaEnabled] = useState(false)
+  const [worldHomeQaState] = useState(() => (
+    typeof window !== 'undefined' && process.env.NODE_ENV === 'development'
+      ? new URLSearchParams(window.location.search).get('worldHomeState') || ''
+      : ''
+  ))
+  const [worldRoomShareQa] = useState(() => (
+    typeof window !== 'undefined' && process.env.NODE_ENV === 'development'
+      ? new URLSearchParams(window.location.search).get('worldShareQa') || ''
+      : ''
+  ))
+  const localQaRef = useRef(false)
+  const worldLockQaRef = useRef(false)
+  const [activeZone,    setActiveZone]    = useState(null)
+  const [activeSound,   setActiveSound]   = useState(null)
+  const [myExpression,  setMyExpression]  = useState('')
+  const [museumSource,  setMuseumSource]  = useState(null) // 'zone' | 'world'
+  const [unlockedBlock,   setUnlockedBlock]   = useState({})  // { zone: blockNum }
+  const [blockUnlockInfo, setBlockUnlockInfo] = useState(null) // { block, zone } 완료 오버레이용
+  const [zoneLoading,     setZoneLoading]     = useState(false)
+  const [villagesUnlocked, setVillagesUnlocked] = useState(false)
+  const [authRestoring, setAuthRestoring] = useState(true)
+  const [authError, setAuthError] = useState('')
+  const [experimentProgress, setExperimentProgress] = useState(null)
+  const [progressError, setProgressError] = useState('')
+  const [roomShareToken, setRoomShareToken] = useState(null)
+  const [roomShareState, setRoomShareState] = useState({ status:'idle', message:'' })
+  const [homePlacedCount, setHomePlacedCount] = useState(0)
+  const [realtimeSelfId] = useState(() => `peer-${crypto.randomUUID()}`)
+  const [duoUrlToken] = useState(() => (
+    typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('duo')?.trim() || null
+  ))
+  const trackedParticipantRef = useRef(null)
+  const previousScreenRef = useRef(null)
+
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      const query = new URLSearchParams(window.location.search)
+      setWorldOverviewQa(process.env.NODE_ENV === 'development' && (
+        query.get('worldOverview') === '1' || query.get('worldCapture') === '1' || query.get('worldClean') === '1'
+      ))
+      const natureEnabled = process.env.NODE_ENV === 'development' && query.get('natureQa') === '1'
+      const worldLockQa = process.env.NODE_ENV === 'development' && query.get('worldLockQa') === '1'
+      worldLockQaRef.current = worldLockQa
+      setWorldLockQaEnabled(worldLockQa)
+      const humanMode = process.env.NODE_ENV === 'development' ? query.get('humanQa') : null
+      const humanEnabled = ['world', 'gameplay', 'static'].includes(humanMode)
+      localQaRef.current = natureEnabled || humanEnabled
+      setNatureQaEnabled(natureEnabled)
+      if (humanEnabled) {
+        const [tx, ty] = (query.get('start') || '').split(',').map(Number)
+        setHumanQaOptions({
+          mode: humanMode,
+          block: Math.max(1, Math.min(6, Number(query.get('block')) || 6)),
+          overview: query.get('overview') === '1',
+          collision: query.get('collision') === '1',
+          spawns: query.get('spawns') === '1',
+          start: Number.isFinite(tx) && Number.isFinite(ty) ? { tx, ty } : null,
+        })
+        setParticipantId(HUMAN_QA_PARTICIPANT_ID)
+        setGroupId('A')
+        setVillagesUnlocked(true)
+        setUnlockedBlock(prev => ({ ...prev, Human: Math.max(1, Math.min(6, Number(query.get('block')) || 6)) }))
+        if (humanMode === 'world') {
+          setScreen('world')
+        } else {
+          setActiveZone('Human')
+          setScreen('zone')
+        }
+        setAuthRestoring(false)
+        return
+      }
+      if (natureEnabled) {
+        setParticipantId(NATURE_QA_PARTICIPANT_ID)
+        setGroupId('A')
+        setVillagesUnlocked(!worldLockQa)
+        setScreen('world')
+        setAuthRestoring(false)
+        return
+      }
+
+      restoreParticipantSession()
+        .then(async participant => {
+          if (!participant) return
+          await initializeUserLogging('world')
+          const progress = await getMyExperimentProgress()
+          trackedParticipantRef.current = participant.participantId
+          previousScreenRef.current = 'world'
+          setParticipantId(participant.participantId)
+          setGroupId(participant.groupId)
+          setExperimentProgress(progress)
+          setVillagesUnlocked(isStudyAccessParticipantId(participant.participantId))
+          setScreen('world')
+        })
+        .catch(error => setAuthError(error?.code || 'session_restore_failed'))
+        .finally(() => setAuthRestoring(false))
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [])
 
   // 집꾸미기 초대 링크(?house=<호스트>)로 들어온 경우 — app/interior-test/page.js가
   // 검증용으로 먼저 갖고 있던 로직을 실제 앱(루트 경로)에도 그대로 옮긴 것.
@@ -92,7 +219,7 @@ export default function HomePage() {
   // 움직이는 걸 그 자리에서 실시간으로 보게 된다. 호스트가 아예 오프라인이면
   // 저장된 방을 읽기 전용으로 보여준다(기존과 동일) — 이땐 duo 채널에 아무도
   // 없으니 그냥 조용히 비어 있을 뿐이다.
-  const [visiting,      setVisiting]      = useState(null) // null | { id, room }
+  const [visiting,      setVisiting]      = useState(null) // null | { token, room }
   const [visitRedirecting, setVisitRedirecting] = useState(false)
   // 방문 중이던 방(집 안)에서 호스트가 다른 화면(주로 월드맵)으로 나가버리면
   // 방문객이 방 안에만 혼자 남는 문제가 있었다 — 호스트를 따라 그 화면으로
@@ -100,29 +227,91 @@ export default function HomePage() {
   // URL을 새로고침하지 않고(=재로그인 없이) 바로 그 호스트와 짝지어진다.
   const [followHostId, setFollowHostId] = useState(null)
 
+  const prepareRoomShare = useCallback(async () => {
+    if (authRestoring || !participantId || experimentProgress?.isComplete) return
+    if (localQaRef.current) {
+      setRoomShareToken(null)
+      setRoomShareState(worldRoomShareQa === 'error'
+        ? { status:'error', message:'네트워크 연결이 없어 초대 토큰을 받지 못했어요.' }
+        : { status:'qa', message:'QA 모드에서는 실제 공유 링크를 만들지 않아요.' })
+      return
+    }
+    setRoomShareState({ status:'loading', message:'' })
+    try {
+      const share = await getOrCreateRoomShare()
+      const token = share?.shareToken?.trim()
+      if (!token) throw new Error('empty_share_token')
+      setRoomShareToken(token)
+      setRoomShareState({ status:'ready', message:'' })
+    } catch (error) {
+      console.error('[room-share] 공유 토큰 준비 실패:', error)
+      setRoomShareToken(null)
+      setRoomShareState({ status:'error', message:'초대 링크를 만들지 못했어요. 연결을 확인한 뒤 다시 시도해주세요.' })
+    }
+  }, [authRestoring, experimentProgress?.isComplete, participantId, worldRoomShareQa])
+
   useEffect(() => {
-    const houseId = new URLSearchParams(window.location.search).get('house')?.trim()
-    if (!houseId) return
+    if (authRestoring || !participantId || experimentProgress?.isComplete) return
+    const id = window.setTimeout(() => { prepareRoomShare().catch(() => {}) }, 0)
+    return () => window.clearTimeout(id)
+  }, [authRestoring, experimentProgress?.isComplete, participantId, prepareRoomShare])
+
+  const refreshHomeHub = useCallback(async () => {
+    if (!participantId || localQaRef.current) return
+    try {
+      const room = await getRoom(participantId)
+      setHomePlacedCount(Array.isArray(room?.items) ? room.items.length : 0)
+    } catch (error) {
+      console.error('[home-hub] 방 준비 상태 조회 실패:', error)
+    }
+  }, [participantId])
+
+  useEffect(() => {
+    if (!participantId || experimentProgress?.isComplete) return
+    const id = window.setTimeout(() => { refreshHomeHub() }, 0)
+    return () => window.clearTimeout(id)
+  }, [experimentProgress?.isComplete, participantId, refreshHomeHub])
+
+  useEffect(() => {
+    const shareToken = new URLSearchParams(window.location.search).get('house')?.trim()
+    if (!shareToken || authRestoring || !participantId || experimentProgress?.isComplete) return
     let cancelled = false
-    probeHost(houseId).then(({ screen }) => {
-      if (cancelled) return
-      if (screen === 'worldmap') {
-        setVisitRedirecting(true)
-        window.location.assign(`/?duo=${encodeURIComponent(houseId)}`)
-        return
-      }
-      getRoom(houseId).then(room => {
+    trackEvent('friend_room_open_attempted', { target_type: 'friend_room', target_id: 'shared-room' })
+    getSharedRoom(shareToken).then((shared) => {
+      if (cancelled || !shared?.room) return
+      return probeHost(shareToken).then(({ screen }) => {
         if (cancelled) return
-        setVisiting({ id: houseId, room: room ?? FRIEND_ROOM })
+        if (screen === 'worldmap') {
+          setVisitRedirecting(true)
+          window.location.assign(`/?duo=${encodeURIComponent(shareToken)}`)
+          return
+        }
+        trackEvent('friend_room_open_succeeded', { target_type: 'friend_room', target_id: 'shared-room', outcome: 'succeeded' })
+        setVisiting({ token: shareToken, room: shared.room })
       })
+    }).catch((error) => {
+      if (cancelled) return
+      console.error('[room-share] 공유 방 조회 실패:', error)
+      trackEvent('friend_room_open_failed', { target_type: 'friend_room', target_id: 'shared-room', outcome: 'failed', error_code: 'shared_room_load_failed' })
     })
     return () => { cancelled = true }
-  }, [])
+  }, [authRestoring, experimentProgress?.isComplete, participantId])
 
-  const [activeZone,    setActiveZone]    = useState(null)
-  const [activeSound,   setActiveSound]   = useState(null)
-  const [myExpression,  setMyExpression]  = useState('')
-  const [museumSource,  setMuseumSource]  = useState(null) // 'zone' | 'world'
+  useEffect(() => {
+    if (!participantId || localQaRef.current || trackedParticipantRef.current === participantId) return
+    trackedParticipantRef.current = participantId
+    initializeUserLogging(screen, activeZone).catch(() => {})
+  }, [participantId, screen, activeZone])
+
+  useEffect(() => {
+    if (!participantId || localQaRef.current) return
+    const previous = previousScreenRef.current
+    if (previous === screen) return
+    if (previous) trackEvent('screen_exited', { screen: previous, zone: activeZone, target_type: 'screen', target_id: previous })
+    previousScreenRef.current = screen
+    setUserEventContext({ screen, zone: activeZone })
+    trackEvent('screen_viewed', { screen, zone: activeZone, target_type: 'screen', target_id: screen })
+  }, [participantId, screen, activeZone])
 
   // 피드백 오버레이
   const [showFeedback,  setShowFeedback]  = useState(false)
@@ -133,14 +322,6 @@ export default function HomePage() {
 
   // 세션 중 수집 완료된 sound_id Set
   const [collectedIds,  setCollectedIds]  = useState(new Set())
-
-  // 블록 퀘스트 상태
-  const [unlockedBlock,   setUnlockedBlock]   = useState({})  // { zone: blockNum }
-  const [blockUnlockInfo, setBlockUnlockInfo] = useState(null) // { block, zone } 완료 오버레이용
-  const [zoneLoading,     setZoneLoading]     = useState(false)
-
-  // 마을 잠금 상태 — Music 구역 1을 전사 완료해야 나머지 마을이 열림
-  const [villagesUnlocked, setVillagesUnlocked] = useState(false)
 
   // 카운트
   const [totalCount,    setTotalCount]    = useState(0)
@@ -157,23 +338,32 @@ export default function HomePage() {
   const studyAccessGroup   = getStudyAccessGroup(participantId)
   const effectiveGroupId   = studyAccessGroup || groupId
   const bypassGroupFilter  = studyAccessEnabled && !studyAccessGroup
+  // worldLockQa는 잠금 UI 회귀 테스트를 위해 임시 전체 해금보다 우선한다.
+  const allZonesUnlocked = !worldLockQaEnabled && (
+    TEMPORARILY_UNLOCK_ALL_ZONES || natureQaEnabled || studyAccessEnabled || villagesUnlocked
+  )
 
   /* ── 카운트 갱신 (현재 참여자 + 그룹 기준) ── */
   const refreshCounts = useCallback(async () => {
-    if (!participantId) return
+    if (!participantId || localQaRef.current) return
     try {
-      const total = await getTotalCount(participantId)
-      setTotalCount(total)
-      const entries = await Promise.all(
-        ZONES.map(async z => {
-          const zoneMax = getGroupSounds(z, effectiveGroupId, bypassGroupFilter).length || 100
-          const count   = await getCountByZone(z, participantId)
-          return [z, count, zoneMax]
-        })
-      )
-      setZoneProgress(Object.fromEntries(entries.map(([z, count, zoneMax]) => [z, Math.min(count / zoneMax, 1)])))
-      setZoneCounts(Object.fromEntries(entries.map(([z, count, zoneMax]) => [z, { collected: count, total: zoneMax }])))
-    } catch {}
+      const progress = await getMyExperimentProgress()
+      const counts = progress?.zoneCounts || {}
+      setExperimentProgress(progress)
+      setProgressError('')
+      setTotalCount(Number(progress?.completedCount) || 0)
+      setZoneProgress(Object.fromEntries(ZONES.map(zone => {
+        const count = counts[zone] || {}
+        return [zone, count.assigned ? Math.min(count.completed / count.assigned, 1) : 0]
+      })))
+      setZoneCounts(Object.fromEntries(ZONES.map(zone => {
+        const count = counts[zone] || {}
+        return [zone, { collected: Number(count.completed) || 0, total: Number(count.assigned) || 0 }]
+      })))
+    } catch (error) {
+      console.error('[progress] 실험 진행 조회 실패:', error)
+      setProgressError('experiment_progress_load_failed')
+    }
 
     try {
       const [bal, outfitId] = await Promise.all([
@@ -183,22 +373,44 @@ export default function HomePage() {
       setBalance(bal)
       setEquippedOutfitId(outfitId)
     } catch {}
-  }, [participantId, effectiveGroupId, bypassGroupFilter])
+  }, [participantId])
 
-  useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
+  useEffect(() => {
+    if (!participantId || experimentProgress?.isComplete) return
+    const id = window.setTimeout(() => { refreshCounts() }, 0)
+    return () => window.clearTimeout(id)
+  }, [participantId, experimentProgress?.isComplete, refreshCounts])
 
   // 출석 체크인 — 오늘 처음 월드에 들어왔을 때 한 번만 자동 지급.
   // lib/attendance.js가 "이미 오늘 체크인했음"을 자체적으로 판별하므로
   // 여기서는 그냥 참여자가 정해질 때마다 호출하기만 하면 됨(멱등).
   useEffect(() => {
-    if (!participantId) return
-    ensureTodayCheckIn(participantId).then(({ row, isNew }) => {
+    if (!participantId || localQaRef.current || experimentProgress?.isComplete) return
+    trackEvent('attendance_check_attempted', {
+      target_type: 'attendance', target_id: 'daily-check-in', operation_type: 'attendance_claim',
+    }, { critical: true })
+    ensureTodayCheckIn(participantId).then((result) => {
+      if (!result.ok) {
+        trackEvent('attendance_check_failed', {
+          target_type: 'attendance', target_id: 'daily-check-in', outcome: 'failed',
+          operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+          error_code: result.error.code, metadata: { retryable: result.error.retryable },
+        }, { critical: true, flush: true })
+        throw new Error(result.error.code)
+      }
+      const { row, isNew } = result.data
+      trackEvent('attendance_check_succeeded', {
+        target_type: 'attendance', target_id: 'daily-check-in', outcome: 'succeeded',
+        operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+        result_entity_type: row?.id ? 'attendance' : undefined, result_entity_id: row?.id,
+        metadata: { is_new: !!isNew, reward_amount: row?.reward_currency, transaction_id: result.data?.reward?.transactionId },
+      }, { critical: true, flush: true })
       if (isNew && row) {
         setAttendanceToast({ streakDay: row.streak_day, reward: row.reward_currency })
         refreshCounts()
       }
-    })
-  }, [participantId, refreshCounts])
+    }).catch(error => console.error('[attendance] 인증된 체크인 처리 실패:', error))
+  }, [participantId, experimentProgress?.isComplete, refreshCounts])
 
   // Museum 관람 완료 토스트 자동 닫힘
   useEffect(() => {
@@ -215,12 +427,20 @@ export default function HomePage() {
   }, [attendanceToast])
 
   /* ── StartPanel → WorldMap ── */
-  const handleStart = (pid, gid) => {
-    const enabled = isStudyAccessParticipantId(pid)
-    setParticipantId(pid)
-    setGroupId(gid)
+  const handleStart = async (pid, gid) => {
+    const participant = await claimParticipantSession(pid, gid)
+    await initializeUserLogging('world')
+    const progress = await getMyExperimentProgress()
+    trackedParticipantRef.current = participant.participantId
+    previousScreenRef.current = 'world'
+    const enabled = isStudyAccessParticipantId(participant.participantId)
+    setParticipantId(participant.participantId)
+    setGroupId(participant.groupId)
+    setExperimentProgress(progress)
+    setProgressError('')
     setVillagesUnlocked(enabled)
     setScreen('world')
+    setAuthError('')
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
 
@@ -229,36 +449,34 @@ export default function HomePage() {
      참여자ID/그룹을 다시 물어보지 않는다. */
   const handlePartnerLeftScreen = useCallback(hostScreen => {
     if (hostScreen !== 'worldmap' || !visiting) return
-    setFollowHostId(visiting.id)
+    setFollowHostId(visiting.token)
     window.history.replaceState(null, '', window.location.pathname)
     setVisiting(null)
     setScreen('world')
   }, [visiting])
 
   /* ── sound_id 포맷 무관하게 메타데이터 소리를 찾는 헬퍼 ── */
-  const findSoundByDbId = useCallback((dbId, all) => {
-    // 먼저 exact match
-    const exact = all.find(s => s.sound_id === dbId)
-    if (exact) return exact
-    // 파일번호(숫자)로 fallback — 구버전(Forest_066514) ↔ 신버전(Animal_66514) 브리지
-    const dbNum = parseInt(String(dbId).split('_').pop(), 10)
-    if (isNaN(dbNum)) return null
-    return all.find(s => parseInt(String(s.sound_id).split('_').pop(), 10) === dbNum) || null
-  }, [])
+  const findSoundByCanonicalId = useCallback((canonicalId, all) => (
+    all.find(sound => canonicalAudioId(sound) === canonicalId) || null
+  ), [])
 
   /* ── Music 구역 1 전사 완료 여부 확인 → 나머지 마을 잠금 해제 ── */
   const checkVillagesUnlocked = useCallback(async () => {
     if (!participantId) return
+    if (localQaRef.current) {
+      if (!worldLockQaRef.current) setVillagesUnlocked(true)
+      return
+    }
     if (studyAccessEnabled) {
       setVillagesUnlocked(true)
       return
     }
     try {
-      const dbIds = await getAnnotatedByParticipantZone(participantId, FIRST_ZONE)
+      const canonicalIds = await getAnnotatedByParticipantZone(participantId, FIRST_ZONE)
       const all   = soundMetadata.sounds
       const annotatedSet = new Set()
-      for (const dbId of dbIds) {
-        const found = findSoundByDbId(dbId, all)
+      for (const canonicalId of canonicalIds) {
+        const found = findSoundByCanonicalId(canonicalId, all)
         if (found) annotatedSet.add(found.sound_id)
       }
       const firstZoneSounds = getGroupSounds(FIRST_ZONE, effectiveGroupId, bypassGroupFilter)
@@ -269,38 +487,48 @@ export default function HomePage() {
     } catch (e) {
       console.error('[Village] 잠금 상태 확인 오류:', e)
     }
-  }, [participantId, effectiveGroupId, bypassGroupFilter, studyAccessEnabled, findSoundByDbId])
+  }, [participantId, effectiveGroupId, bypassGroupFilter, studyAccessEnabled, findSoundByCanonicalId])
 
-  useEffect(() => { if (participantId) checkVillagesUnlocked() }, [participantId, checkVillagesUnlocked])
+  useEffect(() => {
+    if (!participantId || experimentProgress?.isComplete) return
+    const id = window.setTimeout(() => { checkVillagesUnlocked() }, 0)
+    return () => window.clearTimeout(id)
+  }, [participantId, experimentProgress?.isComplete, checkVillagesUnlocked])
 
   /* ── DB sound_id → 재생 가능한 sound 오브젝트 (메타데이터에 없으면 합성) ── */
-  const resolveSoundFromDbId = useCallback((dbId, all) => {
-    const fromMeta = findSoundByDbId(dbId, all)
-    if (fromMeta) return fromMeta
-    // 메타데이터에 없는 구버전 sound_id → 파일번호로 경로 합성
-    const fileNum = parseInt(String(dbId).split('_').pop(), 10)
-    if (isNaN(fileNum)) return null
-    return {
-      sound_id:     dbId,
-      file_path:    `Audio/Forest/${fileNum}`,
-      game_zone:    'Lab',
-      sub_category: String(dbId),
-    }
-  }, [findSoundByDbId])
-
   /* ── WorldMap → ZoneMap (ENTER로 진입) ── */
   const handleEnterZone = useCallback(async (zone) => {
+    trackEvent('zone_entry_attempted', { zone, target_type: 'zone', target_id: `zone-${zone.toLowerCase()}` })
     setZoneLoading(true)
     setActiveZone(zone)
+    if (localQaRef.current) {
+      const zoneSounds = getGroupSounds(zone, effectiveGroupId, bypassGroupFilter)
+      const maxBlock = zoneSounds.reduce((m, sound) => Math.max(m, sound.block || 1), 1)
+      setUnlockedBlock(prev => ({ ...prev, [zone]: maxBlock }))
+      setCollectedIds(new Set())
+      setZoneLoading(false)
+      setScreen('zone')
+      trackEvent('zone_entry_succeeded', { zone, target_type: 'zone', target_id: `zone-${zone.toLowerCase()}`, outcome: 'succeeded' })
+      return
+    }
     try {
-      const dbIds = await getAnnotatedByParticipantZone(participantId, zone)
+      const canonicalIds = await getAnnotatedByParticipantZone(participantId, zone)
       const all   = soundMetadata.sounds
 
       // DB sound_id → 메타데이터 sound_id 변환 (구버전 포맷 브리지)
       const annotatedSet = new Set()
-      for (const dbId of dbIds) {
-        const found = findSoundByDbId(dbId, all)
-        if (found) annotatedSet.add(found.sound_id)
+      for (const canonicalId of canonicalIds) {
+        if (zone === 'Lab') {
+          // Lab intentionally keeps every real sound_id even when two records
+          // share one audio source. Restore all matching group records instead
+          // of collapsing each canonical identity to the first catalog row.
+          for (const sound of getGroupSounds(zone, effectiveGroupId, bypassGroupFilter)) {
+            if (canonicalAudioId(sound) === canonicalId) annotatedSet.add(sound.sound_id)
+          }
+        } else {
+          const found = findSoundByCanonicalId(canonicalId, all)
+          if (found) annotatedSet.add(found.sound_id)
+        }
       }
 
       // 현재 언락된 블록 계산 (완료된 블록의 다음 블록)
@@ -323,55 +551,77 @@ export default function HomePage() {
       console.error('[Zone] 블록 로드 오류:', e)
       setUnlockedBlock(prev => ({ ...prev, [zone]: prev[zone] || 1 }))
       setCollectedIds(new Set())
+      trackEvent('navigation_failed', { zone, target_type: 'zone', target_id: `zone-${zone.toLowerCase()}`, outcome: 'failed', error_code: 'zone_progress_load_failed' })
     }
     setZoneLoading(false)
     setScreen('zone')
-  }, [participantId, effectiveGroupId, bypassGroupFilter, studyAccessEnabled, findSoundByDbId])
+    trackEvent('zone_entry_succeeded', { zone, target_type: 'zone', target_id: `zone-${zone.toLowerCase()}`, outcome: 'succeeded' })
+  }, [participantId, effectiveGroupId, bypassGroupFilter, studyAccessEnabled, findSoundByCanonicalId, setActiveZone, setZoneLoading, setUnlockedBlock, setCollectedIds, setScreen])
 
   /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
   const handleExitZone = useCallback(() => {
+    trackEvent('zone_exited', { zone: activeZone, target_type: 'button', target_id: 'zone-exit' })
     setActiveZone(null)
     setActiveSound(null)
     setScreen('world')
-  }, [])
+  }, [activeZone, setActiveZone, setActiveSound, setScreen])
 
   /* ── ZoneMap에서 소리 줍기 → AnnotationPanel 오버레이 ── */
   const handleCollectSound = useCallback((sound) => {
+    trackEvent('collectible_activated', {
+      zone: activeZone, sound_id: sound?.sound_id, target_type: 'sound_collectible',
+      target_id: sound?.sound_id, outcome: 'succeeded',
+    })
     setActiveSound(sound)
     setScreen('annotate')
-  }, [])
+  }, [activeZone])
 
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
   const handleEnterMuseum = useCallback(async () => {
+    trackEvent('museum_candidate_load_attempted', { target_type: 'museum', target_id: 'museum-entry' })
     setMuseumEmpty(false)
     const all = soundMetadata.sounds
     if (!all || all.length === 0) return
 
+    // Browser QA runs intentionally have no Supabase session. Keep the product
+    // navigation real, but do not turn that expected offline state into a
+    // console error while validating the world-map entry flow.
+    if (localQaRef.current) {
+      setActiveSound(null)
+      setActiveZone('Lab')
+      setMyExpression('')
+      setMuseumSource('world')
+      setScreen('museum')
+      return
+    }
+
     // 내 그룹이 아닌 그룹의 사운드만 Museum에 표시
     const otherGroupSounds = getOtherGroupSounds(effectiveGroupId, bypassGroupFilter)
-    const otherIds = new Set(otherGroupSounds.map(s => s.sound_id))
+    const otherSoundsByIdentity = new Map()
+    for (const candidateSound of otherGroupSounds) {
+      const identity = canonicalAudioId(candidateSound)
+      if (!otherSoundsByIdentity.has(identity)) otherSoundsByIdentity.set(identity, candidateSound)
+    }
 
     let sound = null
     try {
-      const [annotatedIds, votedIds] = await Promise.all([
-        getAnnotatedSoundIds(),
+      const [rawCounts, votedIds] = await Promise.all([
+        getMuseumAnnotationCounts(),
         getVotedSoundIdsByParticipant(participantId),
       ])
       const votedSet = new Set(votedIds)
 
-      // 후보: 다른 그룹 소리이면서, 내가 이 소리에 대해 아직 Stage 2 투표를 안 한 것만
-      // (한 번 투표한 소리는 다시 뜨지 않게)
-      const candidates = annotatedIds
-        .map(dbId => resolveSoundFromDbId(dbId, all))
-        .filter(found => found && otherIds.has(found.sound_id) && !votedSet.has(found.sound_id))
+      // 후보: 최소 전사 수를 충족한 다른 그룹 오디오 중 아직 투표하지 않은 것.
+      const candidates = Object.entries(rawCounts)
+        .filter(([identity, count]) => count >= MUSEUM_MIN_ANNOTATIONS && otherSoundsByIdentity.has(identity) && !votedSet.has(identity))
+        .map(([identity]) => otherSoundsByIdentity.get(identity))
+        .filter(Boolean)
 
       const shuffled = [...candidates].sort(() => Math.random() - 0.5)
-      for (const found of shuffled) {
-        const count = await getAnnotationCountForSound(found.sound_id)
-        if (count >= MUSEUM_MIN_ANNOTATIONS) { sound = found; break }
-      }
+      sound = shuffled[0] || null
     } catch (e) {
       console.error('[Museum] 진입 오류:', e)
+      trackEvent('museum_candidate_load_failed', { target_type: 'museum', target_id: 'museum-entry', outcome: 'failed', error_code: 'museum_sound_load_failed' })
     }
 
     // 투표할 소리가 아직 없어도(데이터 미달) Museum 자체는 들어갈 수 있게 한다 —
@@ -382,10 +632,14 @@ export default function HomePage() {
     setMyExpression('')
     setMuseumSource('world')
     setScreen('museum')
-  }, [effectiveGroupId, bypassGroupFilter, participantId, findSoundByDbId, resolveSoundFromDbId])
+    trackEvent(sound ? 'museum_candidate_loaded' : 'museum_candidate_empty', {
+      zone: sound?.game_zone || 'Lab', sound_id: sound?.sound_id,
+      target_type: 'museum', target_id: 'museum-entry', outcome: sound ? 'succeeded' : 'empty',
+    })
+  }, [effectiveGroupId, bypassGroupFilter, participantId, setMuseumEmpty, setActiveSound, setActiveZone, setMyExpression, setMuseumSource, setScreen])
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
-  const handleAnnotateComplete = useCallback(() => {
+  const handleAnnotateComplete = useCallback(({ persistence } = {}) => {
     const newCollected = new Set([...collectedIds, ...(activeSound ? [activeSound.sound_id] : [])])
     setCollectedIds(newCollected)
 
@@ -408,41 +662,57 @@ export default function HomePage() {
       }
     }
 
-    setFeedbackZone(activeZone)
-    setShowFeedback(true)
+    const progress = persistence?.progress
+    if (progress) setExperimentProgress(progress)
     setActiveSound(null)
     setMyExpression('')
-    setScreen('zone')
+    if (progress?.isComplete) {
+      void completeStudySession('all_assigned_annotations_completed', {
+        operationType: 'annotation_submit', idempotencyKey: persistence?.operationIdempotencyKey,
+        annotationId: persistence?.annotationId,
+      })
+      setScreen('complete')
+    } else {
+      setFeedbackZone(activeZone)
+      setShowFeedback(true)
+      setScreen('zone')
+    }
     refreshCounts()
-  }, [activeSound, activeZone, collectedIds, effectiveGroupId, bypassGroupFilter, unlockedBlock, villagesUnlocked, refreshCounts])
+  }, [activeSound, activeZone, collectedIds, effectiveGroupId, bypassGroupFilter, unlockedBlock, villagesUnlocked, refreshCounts, setUnlockedBlock])
 
   /* ── SoundMuseum 완료 → WorldMap 복귀 (+ "오늘은 여기까지" 토스트) ── */
   const handleMuseumDone = useCallback(() => {
+    trackEvent('museum_exited', { zone: activeZone, sound_id: activeSound?.sound_id, target_type: 'button', target_id: 'museum-next-candidate', close_reason: 'submitted' })
     setActiveSound(null)
     setMyExpression('')
     setMuseumSource(null)
     setScreen('world')
     setMuseumDoneToast(true)
-  }, [])
+  }, [activeZone, activeSound])
 
   /* ── SoundMuseum에서 월드맵 직접 이동 ── */
   const handleMuseumExit = useCallback(() => {
+    trackEvent('museum_exited', { zone: activeZone, sound_id: activeSound?.sound_id, target_type: 'button', target_id: 'museum-exit', close_reason: 'navigation' })
     setActiveSound(null)
     setMyExpression('')
     setMuseumSource(null)
     setScreen('world')
-  }, [])
+  }, [activeZone, activeSound])
 
   /* ── WorldMap → 우리 집 (ENTER로 진입) ── */
   const handleEnterHouse = useCallback(() => {
+    trackEvent('interior_entered', { target_type: 'building', target_id: 'my-house' })
     setScreen('house')
   }, [])
 
   /* ── 우리 집 → WorldMap (뒤로가기/ESC) — 가구를 샀을 수 있으니 코인 잔액을 새로 읽는다 ── */
   const handleExitHouse = useCallback(() => {
+    trackEvent('interior_exited', { target_type: 'button', target_id: 'interior-exit' })
     setScreen('world')
+    void flushEvents()
     refreshCounts()
-  }, [refreshCounts])
+    refreshHomeHub()
+  }, [refreshCounts, refreshHomeHub])
 
   /* ── AnnotationPanel 닫기 (X, 제출 없이 취소) → ZoneMap 복귀. 제출 안 했으므로 collectedIds에 넣지 않음 ── */
   const handleAnnotateClose = useCallback(() => {
@@ -472,9 +742,25 @@ export default function HomePage() {
       </main>
     )
   }
+  if (participantId && progressError) {
+    return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'#3A2A14',color:'#F5EDD8',fontFamily:'Nunito, sans-serif',textAlign:'center',padding:24}}>
+      <div><h1 style={{fontSize:24}}>진행 상태를 불러오지 못했어요</h1><p>완료한 과제가 다시 표시되지 않도록 진행을 멈췄습니다.</p><button onClick={() => window.location.reload()} style={{padding:'10px 18px'}}>다시 불러오기</button></div>
+    </main>
+  }
+  if (participantId && experimentProgress?.isComplete) {
+    return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'linear-gradient(160deg,#87CEEB,#5A9A3A)',fontFamily:'Nunito, sans-serif',padding:24}}>
+      <section style={{maxWidth:520,background:'#F5EDD8',border:'3px solid #C8A96E',borderRadius:24,padding:'38px 42px',textAlign:'center',boxShadow:'0 16px 50px #0004'}}>
+        <div style={{fontSize:52}}>🎉</div><h1 style={{color:'#3A2A14'}}>모든 소리 과제를 완료했어요</h1>
+        <p style={{color:'#8B6A3A',lineHeight:1.7}}>배정된 {experimentProgress.assignedCount}개 음원의 응답이 안전하게 저장되었습니다.<br/>참여해 주셔서 감사합니다.</p>
+      </section>
+    </main>
+  }
+  if (participantId && !natureQaEnabled && !humanQaOptions && !experimentProgress) {
+    return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'#3A2A14',color:'#F5EDD8',fontFamily:'Nunito, sans-serif'}}>실험 진행 상태 확인 중…</main>
+  }
   if (visiting) {
     if (!participantId) {
-      return <StartPanel onStart={handleStart} />
+      return <StartPanel onStart={handleStart} restoring={authRestoring} initialError={authError} />
     }
     return (
       <main style={{
@@ -487,8 +773,9 @@ export default function HomePage() {
       }}>
         <InteriorDecorRoom
           visitorMode
-          visitorName={visiting.id}
-          visitorParticipantId={participantId}
+          visitorName="친구"
+          roomShareToken={visiting.token}
+          realtimeSelfId={realtimeSelfId}
           initialRoom={visiting.room}
           onLeaveVisit={() => {
             // 이미 참여자ID/그룹을 받았으니(handleStart가 screen도 'world'로
@@ -509,7 +796,7 @@ export default function HomePage() {
 
   // 1. 시작 화면
   if (screen === 'start') {
-    return <StartPanel onStart={handleStart} />
+    return <StartPanel onStart={handleStart} restoring={authRestoring} initialError={authError} />
   }
 
   // 2. 월드맵 (zone 진입 로딩 포함)
@@ -524,10 +811,22 @@ export default function HomePage() {
           zoneProgress={zoneProgress}
           balance={balance}
           outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
-          lockedZones={studyAccessEnabled || villagesUnlocked ? [] : ZONES_LOCKED_AT_START}
+          lockedZones={allZonesUnlocked ? [] : ZONES_LOCKED_AT_START}
           participantId={participantId}
-          duoHostId={followHostId}
+          roomShareToken={roomShareToken}
+          homeHubStatus={{ placedCount:homePlacedCount, shareStatus:roomShareState.status }}
+          realtimeSelfId={realtimeSelfId}
+          duoHostId={followHostId || duoUrlToken}
         />
+        {!worldOverviewQa && !worldLockQaEnabled && (natureQaEnabled || humanQaOptions?.mode === 'world') && (
+          <button type="button" onClick={() => handleEnterZone(natureQaEnabled ? 'Nature' : 'Human')} style={{
+            position:'fixed', right:16, bottom:16, zIndex:199,
+            border:'2px solid #5f8d42', borderRadius:8, background:'#eef8d6',
+            color:'#29401f', padding:'8px 12px', fontWeight:800, cursor:'pointer',
+          }}>
+            QA · {natureQaEnabled ? 'Nature' : 'Human'} 제품 경로 진입
+          </button>
+        )}
         {/* Zone 진입 로딩 */}
         {zoneLoading && (
           <div style={{
@@ -630,7 +929,8 @@ export default function HomePage() {
         backgroundSize: '8px 8px',
         padding: '24px',
       }}>
-        <InteriorDecorRoom participantId={participantId} onExit={handleExitHouse} onCurrencyChange={refreshCounts} />
+        <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare} realtimeSelfId={realtimeSelfId}
+          dryRun={natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
       </main>
     )
   }
@@ -642,12 +942,14 @@ export default function HomePage() {
     return (
       <>
         <SoundMuseum
+          key={activeSound ? canonicalAudioId(activeSound) : 'museum-empty'}
           sound={activeSound}
           zone={activeZone}
           myExpression={myExpression}
           participantId={participantId}
           sessionId={groupId}
           zoneCounts={zoneCounts}
+          outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
           onCurrencyChange={refreshCounts}
           onDone={handleMuseumDone}
           onExit={handleMuseumExit}
@@ -661,24 +963,43 @@ export default function HomePage() {
     const currentBlock = unlockedBlock[activeZone] || 1
     const zoneSounds   = getGroupSounds(activeZone, effectiveGroupId, bypassGroupFilter)
     const maxBlock     = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
+    const zoneInputBlocked = screen === 'annotate' || showFeedback || Boolean(blockUnlockInfo)
     return (
       <>
         {/* ZoneMap — zone의 모든 소리를 한 화면에 유지. 잠긴/해제된 구역 표시는
             blockNum prop으로 ZoneMap 내부에서 처리하므로 리마운트하지 않는다.
-            Music/Nature만 예외 — 전용 캔버스 엔진을 쓴다(Music: 절차적 드로잉
-            handoff를 이식한 MusicZoneMap/lib/musicVillage.js. Nature: 구매
-            에셋 기반 타일맵 handoff를 이식한 NatureZoneMap/lib/natureVillage.js).
-            소리 데이터·전사 흐름(onCollectSound/AnnotationPanel)은 다른 Zone과
-            완전히 동일. */}
+            Music/Nature/Human/Urban/Animal만 예외 — 전용 캔버스 엔진을 쓴다(Music: 절차적
+            드로잉 handoff를 이식한 MusicZoneMap/lib/musicVillage.js. Nature: 구매
+            에셋 기반 타일맵 handoff를 이식한 NatureZoneMap/lib/natureVillage.js.
+            Human: 모듈형 픽셀 에셋 기반 공동 회관 광장 캔버스.
+            Urban: ImageGen 래스터 에셋 기반 Midnight Metro Media Core 캔버스.
+            Animal: 최종 기준 PNG를 정적 월드 레이어로 쓰는
+            AnimalZoneMap/lib/animalVillage.js). 소리 데이터·전사 흐름
+            (onCollectSound/AnnotationPanel)은 다른 Zone과 완전히 동일. */}
         {activeZone === 'Music' ? (
           <MusicZoneMap
             sounds={zoneSounds}
             onCollectSound={handleCollectSound}
             onExit={handleExitZone}
             collectedIds={collectedIds}
-            isAnnotating={screen === 'annotate'}
+            isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+          />
+        ) : activeZone === 'Human' ? (
+          <HumanZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={zoneInputBlocked}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+            debugOverview={humanQaOptions?.overview}
+            debugCollision={humanQaOptions?.collision}
+            debugSpawns={humanQaOptions?.spawns}
+            debugStart={humanQaOptions?.start}
+            staticArt={humanQaOptions?.mode === 'static'}
           />
         ) : activeZone === 'Nature' ? (
           <NatureZoneMap
@@ -686,7 +1007,38 @@ export default function HomePage() {
             onCollectSound={handleCollectSound}
             onExit={handleExitZone}
             collectedIds={collectedIds}
-            isAnnotating={screen === 'annotate'}
+            isAnnotating={zoneInputBlocked}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+            debugFirstItem={natureQaEnabled}
+          />
+        ) : activeZone === 'Urban' ? (
+          <UrbanZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={zoneInputBlocked}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+          />
+        ) : activeZone === 'Animal' ? (
+          <AnimalZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={zoneInputBlocked}
+            blockNum={currentBlock}
+            blockTotal={maxBlock}
+          />
+        ) : activeZone === 'Lab' ? (
+          <LabZoneMap
+            sounds={zoneSounds}
+            onCollectSound={handleCollectSound}
+            onExit={handleExitZone}
+            collectedIds={collectedIds}
+            isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
           />
@@ -697,7 +1049,7 @@ export default function HomePage() {
             onCollectSound={handleCollectSound}
             onExit={handleExitZone}
             collectedIds={collectedIds}
-            isAnnotating={screen === 'annotate'}
+            isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
           />
@@ -710,6 +1062,7 @@ export default function HomePage() {
             zone={activeZone}
             participantId={participantId}
             sessionId={groupId}
+            dryRun={natureQaEnabled || Boolean(humanQaOptions)}
             onClose={handleAnnotateClose}
             onComplete={handleAnnotateComplete}
           />
@@ -754,6 +1107,7 @@ export default function HomePage() {
         {/* 완료 피드백 토스트 */}
         {showFeedback && (
           <FeedbackPanel
+            key={feedbackZone}
             zone={feedbackZone}
             onClose={handleFeedbackClose}
           />

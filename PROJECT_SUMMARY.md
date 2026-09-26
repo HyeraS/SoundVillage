@@ -2,13 +2,14 @@
 
 > 소리를 탐험하고, 의성어로 표현하고, 다른 참여자의 표현에 공감 투표하는 웹 기반 사운드 어노테이션 연구용 게임.
 > 요약 작성 기준: 2026-08-05 (`main` 커밋 `79adf70` / `asset-swap` 커밋 `ca5d129` + 미커밋 WIP, 두 브랜치 상태를 함께 정리)
+> 최근 갱신: 2026-08-30 — 13장(house-decor-2d 집꾸미기·실시간 동행)에 이어 **14장(Zone 내부 맵 리스킨: Music/Nature/Human/Animal)** 추가. 9장 `house-decor-2d` 커밋 로그 갱신.
 
 `docs/notion/` 아래 2026-06-05 기준 상세 문서 7편이 있으나, 이후 커밋(Sound Museum, 블록 퀘스트, 그룹 A/B, 마을 잠금, 연구용 접근 ID, 실 접속자 장애 대응, WorldMap 비주얼 전면 개편 등)으로 Zone 체계·흐름·비주얼이 크게 바뀌었다. 이 문서는 **현재 코드 기준**으로 다시 정리한 것이다.
 
 **브랜치 상태가 세 갈래로 갈라져 있음 — 중요:**
 - `main`: 실제 실험 참여자들이 접속하는 배포 브랜치. 게임플레이/백엔드 로직(1~11장 내용)은 이 브랜치 기준.
 - `asset-swap`: `main`의 `fabc721`에서 분기, 아직 push/merge 전인 **로컬 전용 WIP 브랜치**. WorldMap·Lab 존을 구매한 itch.io 픽셀 에셋으로 전면 리스킨하는 작업에 더해, 현재는 **동물 마을(Animal) 길 버그 수정**과 **자연 마을(Nature) 존 전면 교체**까지 진행 중이다(12장 참고). 이 두 항목은 아직 커밋되지 않은 워킹 트리 변경사항(`app/page.js`, `components/AssetRegistry.js`, `components/WorldMap.js`, `components/ZoneMap.js`)이다. **`main`에만 있는 커밋 2개(`fb2fb1c`, `79adf70` — 접속 장애 수정, Museum 로딩 인디케이터)가 `asset-swap`에는 없으므로**, 이후 `main`에 merge하거나 `main`을 다시 베이스로 rebase할 때 반드시 반영 확인 필요.
-- `house-decor-2d`: `asset-swap`의 `50ce34a`에서 분기, **별도 git worktree**(`SoundVillage-house-decor-2d/`)에서 작업 중인 브랜치. 3D 리서치 프로토타입(`codex/3d-research-prototype`)과 완전히 분리하기 위해 만들어졌으며, 집꾸미기(Cozy Room)와 실시간 동행("초대") 기능을 담고 있다(13장 참고). **이미 별도 Vercel 프로젝트(`new-soundvillage.vercel.app`, GitHub `HyeraS/new_soundvillage`)의 `main`에 push되어 배포 중** — `main`/`asset-swap`이 배포되는 원래 Vercel 프로젝트(Supabase 프로젝트 ref `nzzesrjneqsbkgtbaoxy`)와는 완전히 다른 배포·다른 Supabase 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)를 쓴다 — 실제 실험 데이터와 물리적으로 분리하기 위한 의도적 선택.
+- `house-decor-2d`: `asset-swap`의 `50ce34a`에서 분기, **별도 git worktree**(`SoundVillage-house-decor-2d/`)에서 작업 중인 브랜치. 3D 리서치 프로토타입(`codex/3d-research-prototype`)과 완전히 분리하기 위해 만들어졌으며, 집꾸미기(Cozy Room)와 실시간 동행("초대") 기능(13장) + **Zone 내부 맵 리스킨(Music/Nature/Human/Animal, 14장)** + WorldMap 지면 디테일 폴리시를 담고 있다. **이미 별도 Vercel 프로젝트(`new-soundvillage.vercel.app`, GitHub `HyeraS/new_soundvillage`)의 `main`에 push되어 배포 중** — `main`/`asset-swap`이 배포되는 원래 Vercel 프로젝트(Supabase 프로젝트 ref `nzzesrjneqsbkgtbaoxy`)와는 완전히 다른 배포·다른 Supabase 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)를 쓴다 — 실제 실험 데이터와 물리적으로 분리하기 위한 의도적 선택.
 
 ---
 
@@ -161,7 +162,10 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 | `app/globals.css` | Nunito 폰트, 전역 리셋, 애니메이션 |
 | `components/StartPanel.js` | 참여자/그룹 입력, 연구용 접근 미리보기 |
 | `components/WorldMap.js` | 월드맵, Zone 포털 + Museum 입구, HUD (`asset-swap`: 1310줄로 대폭 확장 — 오토타일 지형·카메라·건물 스프라이트 렌더링 + 역할 기반 마을 오브젝트 배치 포함, 12장 참고) |
-| `components/ZoneMap.js` (`main` 1291줄 / `asset-swap` 2305줄, 최대 파일) | 블록 격자 계산, 소리 아이템 스폰, 충돌, 잠금 연출 (`asset-swap`: Lab 존 전용 가구/포스터 오브젝트 타입, Animal 존 길 렌더링, Nature 존 전면 재구현(`buildNatureZone`) 추가, 12.5·12.6절 참고) |
+| `components/ZoneMap.js` (최대 파일) | Human/Urban/Lab 존 렌더 + 공용 블록 격자 계산·소리 아이템 스폰·충돌·잠금 연출. (`house-decor-2d`: Human 존을 크리스마스 마켓으로 리스킨 → 14.4, 풀스크린 렌더 방식 14.7절로 조정) |
+| `components/MusicZoneMap.js` + `lib/musicVillage.js` (`house-decor-2d`) | Music 존 전용 캔버스 엔진 — 절차적 밤 네온 마을 handoff 이식 (14.2). ※ 미커밋 재작업 진행 중(14.8) |
+| `components/NatureZoneMap.js` + `lib/natureVillage.js` (`house-decor-2d`) | Nature 존 전용 캔버스 엔진 — 구매 에셋 타일맵 handoff 이식, 비동기 이미지 로딩 게이트 (14.3) |
+| `components/AnimalZoneMap.js` + `lib/animalVillage.js` (`house-decor-2d`) | Animal 존 전용 캔버스 엔진 — 절차적 농장맵 handoff 이식(레이아웃 B), 6블록 격자 스폰/안개 재구현 (14.5) |
 | `components/AnnotationPanel.js` | Stage 1 표현/자신감 제출 |
 | `components/SoundMuseum.js` (614줄, 신규) | Stage 2 성격의 투표 룸, Zone별 테마/NPC |
 | `components/FeedbackPanel.js` | 완료 토스트 |
@@ -228,6 +232,26 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 | `f63d17d` | 맵 2배 확장 + 플레이어 추적 카메라, 잔디 색상 얼룩으로 자연스러운 초원 질감 |
 | `07c8b3e` | WorldMap에 실제 오토타일 지형·존별 테마 장식·포털 건물·레이어드 캐릭터 적용(구매 에셋 첫 도입) |
 
+### `house-decor-2d` (배포 브랜치 = `new-soundvillage.vercel.app`, 최신)
+
+| 커밋 | 날짜 | 내용 |
+|---|---|---|
+| *(미커밋 WIP)* | | Music 마을 재작업(`musicVillageConfig.mjs` 등), Lab observatory 리디자인 프리뷰 — 14.8절 |
+| `a8b8091` | 08-30 | WorldMap Nature 연못을 타일 오토타일 대신 `<NaturePond/>` 레이어 스택으로 (14.6) |
+| `e733ba9` | 08-30 | 포털 근접 `<EnterCue>`를 모든 지면색에서 읽히게 — 접촉 그림자 + 링 핑 (14.6) |
+| `f451471` | 08-30 | 다져진 길·판석 질감·경계 페더링 (WorldMap + Animal 마을) (14.6) |
+| `592d656` | 08-30 | 포털 호버 박스 → 발밑 글로우 + 까딱이는 진입 쐐기 (14.6) |
+| `f957bc5` | 08-30 | 톤 잔디 얼룩 + 클러스터 지면 디테일 (WorldMap + Animal 마을) (14.6) |
+| `bad3cb9` | 08-27 | Human 존을 크리스마스 마켓으로 리스킨 + 픽셀아트 정수배 스케일링 (14.4) |
+| `67904b0` | 08-25 | Nature 존 길/잔디 경계 타일 flip 비트 반전 수정 (14.3) |
+| `c756db4` | 08-25 | Music/Nature 존 맵을 전용 캔버스 엔진으로 리스킨 + Museum "데이터 부족" 상태 (14.2·14.3) |
+| `3434726` | 08-24 | 새 Supabase 프로젝트 env var 반영 재배포 트리거 |
+| `cc3244c` | 08-24 | Cozy Room 인테리어 시스템 + 실시간 동행 (13장) |
+| `ab94d3a` | 08-23 | 집꾸미기를 별도 테스트 라우트 대신 WorldMap에서 진입 (13.4) |
+| `6a2dfa6` | 08-23 | 집꾸미기 프로토타입을 배포된 2D(asset-swap) 빌드로 이식 (13장) |
+
+> 이 세션에서 추가로 `ZoneMap.js` 풀스크린 렌더 조정(14.7, 미커밋)을 함.
+
 ---
 
 ## 10. 알려진 리스크 / 미해결 사항 (구 문서 대비 최신화)
@@ -245,6 +269,8 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
 | `asset-swap`이 `main`에 없는 프로덕션 수정 2건을 못 받고 있음 | **신규** — `main`은 `fabc721` 이후 `fb2fb1c`(커넥션 풀 고갈 수정)·`79adf70`(Museum 로딩 인디케이터)가 추가됐지만 `asset-swap`은 `fabc721`에서 분기한 뒤 그대로라 이 두 수정이 없음. `asset-swap`을 `main`에 합칠 계획이면 rebase나 merge로 반드시 반영해야 함 |
 | anon 키만으로 `participant_currency.balance`를 임의 조작 가능(화폐 시스템, 신규) | **신규, 기존 패턴 계승** — 브라우저에 노출되는 건 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 하나뿐이고 서버 측 검증 계층이 없어서, 이 키로 `increment_currency_balance` RPC나 `currency_transactions` insert를 직접 호출하면 서버 로직(`calculateReward` 고정값 5/2)을 거치지 않고 임의 금액을 자기 잔액에 얹을 수 있다. 새로 만든 문제가 아니라 **`annotations`/`votes`가 이미 처음부터 이 구조**였다는 걸 실측으로 확인함(anon 키 SELECT count가 service_role과 완전히 동일, `increment_vote_count`도 anon이 별도 GRANT 없이 EXECUTE 가능 — `scripts/currency_schema.sql` 상단 주석 참고) — 즉 참여자가 마음만 먹으면 지금도 자기 annotation을 무한정 위조 제출하거나 `vote_count`를 직접 올릴 수 있는 것과 동일한 신뢰 모델. `currency_transactions`에 `UNIQUE(participant_id, related_id, type)` 제약을 걸어 "같은 소리/투표에 대한 중복 지급"만은 DB 레벨에서 막아뒀지만, 애초에 존재하지 않는 `related_id`로 여러 번 호출하는 것 자체는 못 막는다. 근본 해결은 지급 판단을 서버(Edge Function 등)로 옮기고 클라이언트는 결과만 받는 구조가 필요하지만, 지금 화폐 시스템은 UI 이전 데이터 계층 단계라 범위 밖 — 참여자 실험 데이터 자체의 신뢰도가 이미 같은 전제 위에 있다는 점만 명시해둠 |
 | `asset-swap`이 로컬에만 있고 원격에 push되지 않음 | **신규** — 사용자 확인 없이 push하지 않는 게 지금까지의 작업 방침. 머지 전 원본 구매 에셋 폴더(`full version/`, `town full/`, `interior full/`, `nature full/`, `fishing_full/`, `winter full/`)가 `.gitignore`에 걸려있는지, `public/assets/`에 복사된 파일만 커밋됐는지 재확인 필요 |
+| `house-decor-2d` 워킹 트리에 미커밋 병렬 WIP 다수 (2026-08-30) | **신규** — Music 마을 재작업(`musicVillage.js` −1409/+541, `musicVillageConfig.mjs` 신설, 실 에셋), Lab observatory 리디자인 프리뷰 5종, `GameEngine.js`/`LibraryRoom.js`/`natureVillage.js` 소규모 변경이 커밋 안 된 채로 있음. 다른 세션 작업이라 이 요약(14.8)엔 파일 목록만, 동작·검증 상태 미확인 |
+| `house-decor-2d`에 12.5·12.6절과 실제 코드가 불일치 | 12.5(asset-swap Animal 길 수정)·12.6(`buildNatureZone`)은 이후 14장 방식으로 대체됨 — 12장은 asset-swap 히스토리로만 읽고, 현재 Zone 맵 구현은 14장 기준 |
 
 ---
 
@@ -388,3 +414,62 @@ Lab 존 작업 이후, Animal 존의 길(path) 렌더링에서 두 가지 버그
 | 상점 구매 확인 단계 없음(가격 버튼 즉시 결제) | 미해결 |
 | 다중 방문객(3인 이상) 동시 접속 | 미검증 — 설계 자체가 1:1 전제(presence에서 "나 아닌 첫 번째 키"만 상대로 취급) |
 | `nzzesrjneqsbkgtbaoxy` 쪽 예전 house-decor 코드/테이블 | 정리 안 됨 — 코드는 안 쓰이지만 파일/테이블 그대로 존재 |
+
+---
+
+## 14. Zone 내부 맵 리스킨 — Music / Nature / Human / Animal (2026-08-25 ~ 08-30, `house-decor-2d`)
+
+> 12장이 다룬 건 `asset-swap` 시절 `ZoneMap.js` 안에서 `buildNatureZone()` 식으로 손그린 SVG를 재배치한 접근이었다. 이후 `house-decor-2d`에서 각 Zone 내부 맵을 **HANDOFF 디자인 이식** 방식으로 다시 갈아엎었다 — 12.5·12.6절(asset-swap의 Animal 길 수정 / Nature `buildNatureZone`)은 이 장으로 대체된다.
+> **불변 제약(계속 지켜짐)**: 소리 수집/블록 잠금/어노테이션/투표/집계 등 게임·데이터 로직은 한 줄도 안 건드림. `app/page.js`는 Zone별 렌더 분기만 늘어나고, `spawnSoundItems`/`computeBlockGrid`(`ZoneMap.js`) 같은 공용 함수는 import/수정하지 않고 공식만 각 엔진에서 독립 재구현한다.
+
+### 14.1 공통 패턴
+
+- Zone별 두 파일 쌍: `lib/{zone}Village.js`(맵 생성·충돌·Canvas 드로잉, 프레임워크 의존성 없는 순수 모듈) + `components/{Zone}ZoneMap.js`(입력 루프·추적 카메라·HUD — 다른 Zone과 동일한 `ZoneHUD`/`DPad`/`PixelChar`/`CompleteModal`/`ExitConfirmModal` 재사용). 캐릭터는 캔버스 y-정렬 합성 대신 다른 Zone처럼 DOM `PixelChar` 오버레이.
+- `app/page.js`의 `screen==='zone'` 블록에 `activeZone==='Music' | 'Nature' | 'Animal'` 분기 추가(그 외 Human/Urban/Lab은 기존 `ZoneMap.js`). 소리 데이터(`getGroupSounds`)·수집 콜백(`handleCollectSound`)·`AnnotationPanel` 흐름은 전부 공유.
+- 격리 검증 라우트(실 데이터, 영구 보존): `app/music-test`, `app/nature-test`, `app/animal-test`.
+- 블록(구역) 격자: 각 엔진이 `ZoneMap.js`의 `computeBlockGrid` 공식(cols≈√(n·W/H) → 6블록이면 3열×2행, 여백 2타일)을 **독립 재구현**. 아이템은 `spawn{Zone}Items(sounds, village)`가 실제 `SOUND_ITEMS.{Zone}`(그룹 필터 통과분)를 격자 셀에 **입구(스폰)-거리순**으로 배정하고(안개가 입구에서부터 걷힘), 시드는 `zone + 정렬된 sound_id 목록`으로 고정해 재입장 시 배치가 동일.
+
+### 14.2 Music Zone — 밤 네온 마을 (`c756db4`, 2026-08-25)
+
+`design_handoff_music_zone_map`(Claude Design 산출물, **절차적 Canvas 드로잉** — 외부 이미지 0개)을 `components/MusicZoneMap.js` + `lib/musicVillage.js`로 이식. 절차적이라 비동기 로딩 게이트 없이 동기 빌드로 충분한 게 Nature와의 유일한 구조적 차이.
+
+### 14.3 Nature Zone — 구매 에셋 타일맵 (`c756db4` + `67904b0`)
+
+- **이식**(`c756db4`): handoff 패키지(48×36 타일, `terrain.png`/`nature.png` 스프라이트시트 + 사전계산된 tiles/objects/collision JSON)를 `components/NatureZoneMap.js` + `lib/natureVillage.js`로. Music과 달리 **비동기 이미지 로딩 게이트**(`loadNatureVillage`) + 정적 레이어 오프스크린 프리렌더가 필요.
+- **flip 버그 수정**(`67904b0`): handoff JSON의 흙↔잔디 경계 타일(가로 분할/세로 분할 + 꽃 프린지 변형)의 `flipX/flipY`가 실제 이웃 채움 타일 대비 전부 반대였음(약 200개 인스턴스 100% — 알파 스캔으로 이웃 대조해 확인, 육안 아님). 잘못된 flip 때문에 울타리 경계가 길 입구를 봉쇄하고 있었음. `data/nature_village_map.json`에서 비트만 반전(물 경계 타일은 영향 없었음).
+
+### 14.4 Human Zone — 크리스마스 마켓 (`bad3cb9`, 2026-08-27)
+
+- HANDOFF 겨울 마켓 디자인(`Cozy Christmas Market Map Design/` — winter 팩 지형 + 마켓 소품)을 **`ZoneMap.js` 안에서 직접** 리스킨(Music/Nature처럼 전용 컴포넌트를 분리하지 않고, `ZoneMap.js`의 Human 분기 렌더를 교체). 이전 Lynch풍 스텁 팔레트를 대체. `public/assets/winter/global.png` 추가, `AssetRegistry.js` +94줄, `ZoneMap.js` 대폭 개편.
+- **픽셀아트 스케일링(정수배 레터박스)**: 같은 커밋에서, 게임 캔버스 SVG가 `width/height:100%`로 창을 채우며 비정수 배율일 때 스프라이트가 흐려지던 문제를 → 컨테이너 크기를 재서 **정수배(1x/2x/3x)로만** 렌더하고 남는 공간은 레터박스로 두는 방식으로 변경. → 14.7에서 다시 조정됨.
+
+### 14.5 Animal Zone — 절차적 농장 맵 (2026-08-28~, 이후 `f957bc5`/`f451471`에 편입)
+
+- `cozy animal village map design/` handoff(`animal-village.js` — 의존성 없는 **절차적** 농장맵 엔진: 중앙 폴리곤 연못을 도는 고리 도로 + 세로 목교 + 우리 6곳(가축 100% 울타리 안) + 밭·과수원 + 가장자리 편향 숲 스캐터)를 `lib/animalVillage.js` + `components/AnimalZoneMap.js`로 이식. 레이아웃 B(연못 고리길) 확정, `layoutA`는 미호출로 보존.
+- handoff의 목업 5구역 하드코딩(`v.districts` / `spawnItems` / district 기반 `drawLockFog`)은 **미사용** — 제품 Animal 존은 6블록이라 Nature와 같은 `computeBlockGrid` 방식으로 `spawnAnimalItems` + 격자 `drawLockFog`(농장 톤 크림빛 안개) 재구현.
+- 스폰을 진입로 위쪽(23,30)으로 올려 입장 즉시 나가기 팝업 방지, 남쪽 '입구' 팻말은 컴포넌트가 ENTRANCE 마커로 직접 그려 중복 제거. 에셋 26장 전부 이미 저장소에 존재(신규 복사 0).
+- **튜닝**: 가축 스프라이트 `scale` 1.5→2.25, 숲 스캐터 확률(`edgeBias`) 절반(0.78/0.4/0.12 → 0.39/0.2/0.06), 새싹 텍스처 밀도 0.34→0.24, per-tile 꽃/버섯/덤불 굴림을 WorldMap과 공유하는 클러스터 스캐터로 교체(`f957bc5`/`f451471`).
+- 검증: `app/animal-test` + 실제 앱 흐름(`ALLAUDIO_A` 로그인 → WorldMap 도보 → 동물 마을 포털 ENTER → AnimalZoneMap "구역 6/6") headless 스크린샷, 콘솔 에러 0.
+
+### 14.6 공유 WorldMap / Animal 마을 비주얼 폴리시 (`f957bc5` ~ `a8b8091`, 2026-08-30)
+
+WorldMap(SVG)과 Animal 마을(canvas)에 나란히 적용한 지면 디테일 패스. 지형 코드·`PATH_SET`/`WALKABLE_SET`/`STONE_SET`·충돌·오토타일·walkable·소리 로직은 전부 불변, 튜닝 상수는 각 파일 상단에 모여 있음.
+
+| 커밋 | 내용 |
+|---|---|
+| `f957bc5` | 톤 잔디 얼룩(밝음/중간/어두움 3톤, 크고작은 반경 혼합) + 열린 잔디에만(길·물·포털/뮤지엄 마당·테두리 나무칸 제외) 꽃/덤불/버섯 3~6개씩 뭉치는 시드 클러스터 스캐터. Animal은 `drawStatic`에 저주파 방사 그라디언트 톤 레이어를 굽고 per-tile 굴림을 같은 클러스터 헬퍼로 교체 |
+| `592d656` | 포털/뮤지엄/집 근접 표시를 "디자인 툴 선택 박스"처럼 읽히던 라운드 사각 테두리+그림자 → 공유 `<EnterCue>`: 발밑 존 강조색 방사 글로우(잠김=회색, 0.25s 페이드) + 라벨 위에 SMIL로 위아래 까딱이는 작은 강조색 쐐기(JS 틱 없음). 잠긴 포털은 기존 grayscale+🔒 유지 |
+| `f451471` | 스포크/링 중앙선에 반투명 2타일 "다져진 길" 띠, 흙 타일에 자갈·바퀴자국·마른 풀 스캐터, 잔디↔흙 경계 타일에 흙 알갱이/풀잎 상호 침투. 뮤지엄 판석 마당 바깥 링을 흙+돌조각으로(멤버십/충돌 불변), 안쪽 판석에 균열·이끼·바랜 자국 + 중앙→입구 축 그라디언트. Animal은 2×2 블록별 길 타일 색 변주(단일 타일 반복 제거) + `featherEdges` 강화(7→14개, 깊이 9→16px) |
+| `e733ba9` | Urban(`#C4B99A`)·Lab(`#D4883A`)처럼 강조색이 지면색과 비슷한 존은 글로우만으론 근접 표시가 안 보여서, `<EnterCue>`에 대비용 어두운 접촉 그림자 타원 + 존 강조색 링 "핑"(SMIL rx/ry/opacity 확장) 추가, 글로우 불투명도 0.30→0.34 |
+| `a8b8091` | WorldMap Nature 연못을 물 오토타일(수련잎/거품 장식 크롭이 대부분이라 작은 blob에선 수련잎 더미처럼 보이던 것) 대신 `animalVillage.js`의 `drawPond` 레이어 스택을 SVG `<NaturePond/>`로 포팅(흙 둔치→잔디 프린지→blob 클립 평면 물+블루 틴트+얕은 물 띠+시드 반짝임→수련잎→갈대). `WATER_TILES`/`WATER_SET`은 통행 차단 마스크로 유지. 연못 확대(rx 5→7, ry 4→6)·중심 이동 + 풍차 북쪽 물가로 이동 |
+
+### 14.7 Zone 맵 풀스크린 렌더 조정 (2026-08-29)
+
+`bad3cb9`의 정수배 레터박스가 흔한 노트북 해상도(예: 1440×844)에서 거의 항상 1x로 떨어져 화면의 절반 이상이 여백이 되는 문제. `ZoneMap.js`(Human/Urban/Lab)를 캔버스 기반 존(Music/Nature/Animal)과 같은 방식으로 변경 — 세로로 보이는 월드 범위(`VIEW_H`=18타일)만 고정하고 가로는 창 비율에 맞춰 확장(`viewWorldW = min(PX_W, round(VIEW_H·컨테이너W/컨테이너H))`), SVG는 컨테이너 픽셀 크기 그대로 + `preserveAspectRatio="xMidYMid slice"` + `imageRendering:pixelated`. 레터박스 제거, 세로 줌·캐릭터 크기는 그대로.
+
+### 14.8 진행 중 (미커밋, 다른 세션) — 상세 미정리
+
+이 요약 갱신 시점(2026-08-30)에 워킹 트리에 다음 대규모 WIP가 있으나 미검토:
+- **Music 마을 재작업**: `lib/musicVillageConfig.mjs` 신설(STAGE/GATE 등 좌표를 `Object.freeze`로 뽑은 설정 모듈), `lib/musicVillage.js` 대폭 축소(−1409/+541), `components/MusicZoneMap.js` 재작성, 실 에셋 `public/assets/music-village/`, 검증 라우트 `app/music-whitebox-preview`·`app/music-responsive-test`, `scripts/test_music_production.mjs`(+ `package.json`에 `test:music-production` 스크립트).
+- **Lab observatory 리디자인**: `app/lab-observatory-{art,cohesion,identity,pixel}-preview` + `app/lab-whitebox-preview` 프리뷰 라우트, `design/2d-map-redesign`·`design/concepts` 폴더.
+- `components/GameEngine.js`·`components/LibraryRoom.js`·`lib/natureVillage.js`(+154)에도 소규모 미커밋 변경.

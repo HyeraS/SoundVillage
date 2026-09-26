@@ -1,0 +1,460 @@
+.page {
+  min-height: 100vh;
+  padding: 24px;
+  color: #f6f0ff;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(91, 80, 147, 0.42), transparent 30%),
+    linear-gradient(145deg, #17182b 0%, #242440 54%, #151625 100%);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.header {
+  max-width: 1440px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.header h1,
+.inspector h2,
+.notes h3 {
+  margin: 0;
+}
+
+.header h1 {
+  font-size: clamp(28px, 4vw, 54px);
+  letter-spacing: -0.04em;
+}
+
+.header p:not(.eyebrow) {
+  margin: 8px 0 0;
+  color: #bcb6d4;
+}
+
+.eyebrow {
+  margin: 0 0 7px;
+  color: #7ee7f2;
+  font: 700 11px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  letter-spacing: 0.13em;
+}
+
+.metric {
+  min-width: 168px;
+  padding: 14px 18px;
+  border: 1px solid #6f668d;
+  border-radius: 14px;
+  background: rgba(19, 20, 37, 0.82);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 14px;
+}
+
+.metric span,
+.metric small {
+  color: #bcb6d4;
+  font-size: 12px;
+}
+
+.metric strong {
+  grid-row: span 2;
+  font-size: 30px;
+  color: #ffe18a;
+}
+
+.toolbar {
+  max-width: 1440px;
+  margin: 0 auto 18px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  border: 1px solid #4f4b6d;
+  border-radius: 14px;
+  background: rgba(20, 21, 38, 0.88);
+}
+
+.toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #d8d2e8;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.layerControlGroup {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.layerControlGroup > span {
+  min-width: 84px;
+  color: #bcb6d4;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.toolbar select,
+.toolbar button,
+.stateGrid button,
+.mockPanel button {
+  min-height: 40px;
+  border: 1px solid #5b5677;
+  border-radius: 9px;
+  padding: 8px 11px;
+  color: #e8e2f5;
+  background: #292a48;
+  font: inherit;
+  cursor: pointer;
+}
+
+.toolbar button:hover,
+.toolbar button:focus-visible,
+.stateGrid button:hover,
+.stateGrid button:focus-visible,
+.mockPanel button:focus-visible {
+  outline: 3px solid #ffe18a;
+  outline-offset: 2px;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toolbar .activeControl {
+  border-color: #7ee7f2;
+  color: #111426;
+  background: #7ee7f2;
+}
+
+.workspace {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 290px;
+  align-items: start;
+  gap: 18px;
+}
+
+.previewColumn {
+  min-width: 0;
+}
+
+.viewportFrame {
+  position: relative;
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 8px solid #0e0f1d;
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+  background: #292844;
+}
+
+.viewportFrame[data-viewport="laptop"] {
+  max-width: 960px;
+  aspect-ratio: 4 / 3;
+}
+
+.viewportFrame[data-viewport="portrait"] {
+  max-width: 390px;
+  aspect-ratio: 14 / 25;
+}
+
+.viewportFrame[data-viewport="landscape"] {
+  max-width: 844px;
+  aspect-ratio: 28 / 13;
+}
+
+.map {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #292844;
+  touch-action: manipulation;
+}
+
+.grayscale {
+  filter: grayscale(1);
+}
+
+.zoneLabel,
+.smallZoneLabel,
+.buildingLabel,
+.markerId,
+.foregroundLayer text {
+  fill: #f7f1ff;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  paint-order: stroke;
+  stroke: #1d1e34;
+  stroke-width: 7px;
+  stroke-linejoin: round;
+}
+
+.clearanceLayer circle {
+  fill: rgba(34, 124, 157, 0.08);
+  stroke: #227c9d;
+  stroke-width: 4px;
+  pointer-events: none;
+}
+
+.clearanceLayer .clearanceOuter {
+  fill: none;
+  stroke-width: 2px;
+  stroke-dasharray: 8 8;
+  opacity: 0.58;
+}
+
+.zoneLabel { font-size: 22px; }
+.smallZoneLabel { font-size: 18px; fill: #bdc6d4; }
+.buildingLabel { font-size: 18px; }
+.markerId { font-size: 12px; stroke-width: 4px; }
+
+.marker {
+  cursor: pointer;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.marker:focus-visible {
+  outline: none;
+}
+
+.markerGlyph {
+  font: 900 28px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.selectedMarker circle:first-child {
+  filter: url(#soft-glow);
+}
+
+.pulse {
+  animation: markerPulse 1.8s ease-in-out infinite;
+}
+
+.nearby {
+  animation: markerNearby 1.1s ease-in-out infinite;
+}
+
+.spin .markerGlyph {
+  animation: markerSpin 1.1s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.collisionLayer rect {
+  fill: rgba(255, 82, 118, 0.24);
+  stroke: #ff5276;
+  stroke-width: 5px;
+  stroke-dasharray: 10 7;
+}
+
+.foregroundLayer rect {
+  fill: rgba(97, 220, 175, 0.2);
+  stroke: #61dcaf;
+  stroke-width: 5px;
+  stroke-dasharray: 14 8;
+}
+
+.foregroundLayer text {
+  fill: #8ce8c4;
+  font-size: 15px;
+  stroke-width: 5px;
+}
+
+.mockPanel {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  z-index: 4;
+  width: min(620px, calc(100% - 28px));
+  transform: translateX(-50%);
+  padding: 14px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid #d4b2ff;
+  border-radius: 14px;
+  color: #f6f0ff;
+  background: rgba(17, 18, 34, 0.96);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4);
+}
+
+.mockPanel p {
+  margin: 3px 0 0;
+  color: #bcb6d4;
+  font-size: 12px;
+}
+
+.mockPanel .secondaryButton {
+  background: transparent;
+}
+
+.captionRow {
+  padding: 9px 4px 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #a9a3c0;
+  font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.inspector {
+  position: sticky;
+  top: 18px;
+  padding: 18px;
+  display: grid;
+  gap: 18px;
+  border: 1px solid #5b5677;
+  border-radius: 16px;
+  background: rgba(20, 21, 38, 0.94);
+}
+
+.inspector p {
+  color: #bcb6d4;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.stateGrid {
+  display: grid;
+  gap: 7px;
+}
+
+.stateGrid button {
+  min-height: 46px;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+}
+
+.stateGrid .selectedState {
+  border-color: #ffe18a;
+  background: #3b3658;
+  box-shadow: inset 3px 0 #ffe18a;
+}
+
+.stateGlyph {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--state-color);
+  border-radius: 50%;
+  color: var(--state-color);
+  font: 900 17px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.notes {
+  padding-top: 16px;
+  border-top: 1px solid #45415f;
+}
+
+.notes ol {
+  margin: 10px 0 0;
+  padding-left: 21px;
+  color: #d6d0e5;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+@keyframes markerPulse {
+  0%, 100% { opacity: 0.82; }
+  50% { opacity: 1; filter: brightness(1.22); }
+}
+
+@keyframes markerNearby {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.35); }
+}
+
+@keyframes markerSpin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+
+  .inspector {
+    position: static;
+  }
+
+  .stateGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 12px;
+  }
+
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .metric {
+    width: 100%;
+  }
+
+  .toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .buttonGroup {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .toolbar button,
+  .toolbar select,
+  .stateGrid button,
+  .mockPanel button {
+    min-height: 44px;
+  }
+
+  .stateGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .captionRow {
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .mockPanel {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mockPanel > div {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pulse,
+  .nearby,
+  .spin .markerGlyph {
+    animation: none;
+  }
+}

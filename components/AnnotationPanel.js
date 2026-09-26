@@ -1,10 +1,10 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetListeningTime } from '@/lib/audioManager';
+import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetAudio, resetListeningTime } from '@/lib/audioManager';
 import { saveAnnotation } from '@/lib/supabase';
-import { awardAnnotationCurrency } from '@/lib/currency';
-import { recordAnnotationQuestProgress } from '@/lib/dailyQuests';
+import { newOperationKey } from '@/lib/persistenceResult';
+import { trackEvent } from '@/lib/userEvents';
 
 /* ─────────────────────────────────────────────
    Zone 팔레트 — Mystery 포함
@@ -46,6 +46,11 @@ const SEG_COLORS = {
   outro:  '#e8b488',
 };
 
+const WAVEFORM_HEIGHTS = Array.from(
+  { length: 44 },
+  (_, index) => 18 + ((index * 37 + 11) % 66),
+);
+
 function computeSegments(dur) {
   if (!dur || dur <= 4) return null;
   const INTRO = Math.min(dur * 0.20, 2.5);
@@ -70,7 +75,6 @@ function segRatios(segs) {
 ───────────────────────────────────────────── */
 function SegmentedWaveform({ accent, progress, segLabel, isSegmented, segs, onSeek }) {
   const BAR = 44;
-  const heights = useRef(Array.from({ length: BAR }, () => 18 + Math.random() * 65));
   const wrapRef = useRef(null);
 
   // 파형 내 세그먼트 경계 비율 (0~1)
@@ -130,7 +134,7 @@ function SegmentedWaveform({ accent, progress, segLabel, isSegmented, segs, onSe
           userSelect: 'none',
         }}
       >
-        {heights.current.map((h, i) => (
+        {WAVEFORM_HEIGHTS.map((h, i) => (
           <div
             key={i}
             style={{
@@ -199,7 +203,7 @@ function ConfidenceSelector({ value, onChange, accent }) {
    - ≤4s: 전체 재생, 끝나면 다시듣기 버튼
    - >4s: 가변 세그먼트 (도입→핵심→마무리)
 ───────────────────────────────────────────── */
-function useSegmentedPlayer(filePath) {
+function useSegmentedPlayer(filePath, eventContext) {
   const [playing,     setPlaying]     = useState(false);
   const [progress,    setProgress]    = useState(null);
   const [playCount,   setPlayCount]   = useState(0);
@@ -207,6 +211,7 @@ function useSegmentedPlayer(filePath) {
   const [isSegmented, setIsSegmented] = useState(false);
   const [segLabel,    setSegLabel]    = useState('');
   const [isShort,     setIsShort]     = useState(false);
+  const [segments,    setSegments]    = useState(null);
 
   const durationRef = useRef(null);
   const segsRef     = useRef(null);
@@ -224,7 +229,8 @@ function useSegmentedPlayer(filePath) {
     setPlaying(false);
     setProgress(1);
     setSegLabel('');
-  }, []);
+    trackEvent('audio_completed', { ...eventContext, outcome: 'succeeded' });
+  }, [eventContext]);
 
   const startPoll = useCallback(() => {
     clearPoll();
@@ -265,6 +271,7 @@ function useSegmentedPlayer(filePath) {
 
   const toggle = useCallback(async () => {
     if (playing) {
+      trackEvent('audio_paused', eventContext);
       stopSound();
       clearPoll();
       playingRef.current = false;
@@ -274,6 +281,7 @@ function useSegmentedPlayer(filePath) {
 
     setAudioError('');
     setProgress(0);
+    trackEvent('audio_play_attempted', eventContext);
 
     try {
       const dur = await playSound(filePath, {
@@ -286,17 +294,19 @@ function useSegmentedPlayer(filePath) {
       segIdxRef.current  = 0;
       playingRef.current = true;
 
+      setSegments(segs);
       setIsShort(dur <= 4);
       setIsSegmented(!!segs);
       setSegLabel(segs ? segs[0].label : '');
       setPlaying(true);
       setPlayCount(c => c + 1);
+      trackEvent('audio_play_started', { ...eventContext, outcome: 'succeeded' });
       startPoll();
     } catch {
       setAudioError('오디오 파일을 불러올 수 없어요.');
+      trackEvent('audio_failed', { ...eventContext, outcome: 'failed', error_code: 'audio_load_failed' });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [playing, filePath, finish, startPoll]);
+  }, [playing, filePath, finish, startPoll, eventContext]);
 
   const seekVirtual = useCallback((ratio) => {
     if (!playingRef.current) return;
@@ -322,11 +332,14 @@ function useSegmentedPlayer(filePath) {
     }
   }, []);
 
-  useEffect(() => () => { stopSound(); clearPoll(); }, []);
+  useEffect(() => {
+    resetAudio();
+    return () => { clearPoll(); resetAudio(); };
+  }, [filePath]);
 
   const getDuration = useCallback(() => durationRef.current, []);
 
-  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual, getDuration };
+  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segments, toggle, seekVirtual, getDuration };
 }
 
 /* ─────────────────────────────────────────────
@@ -338,68 +351,91 @@ const SEG_STATUS = {
   outro:  '마무리 부분 🎵',
 };
 
-function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit, onSkip }) {
+function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, onSubmit, onSkip, skipSubmitting, skipError }) {
   const [text, setText]             = useState('');
   const [confidence, setConfidence] = useState('medium');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError]           = useState('');
   const inputRef                    = useRef(null);
+  const submitKeyRef                = useRef(newOperationKey());
+  const inFlightRef                 = useRef(false);
+  const mountedRef                  = useRef(true);
+  const inputStartedRef             = useRef(false);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual, getDuration } =
-    useSegmentedPlayer(sound.file_path);
+  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual } =
+    useSegmentedPlayer(sound.file_path, { zone, sound_id: sound.sound_id, target_type: 'audio', target_id: 'annotation-audio' });
 
   const played = playCount > 0;
 
   // 재생해야 입력창이 활성화되므로, 첫 재생이 끝나는 시점에 포커스
   useEffect(() => { if (played) inputRef.current?.focus(); }, [played]);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => { mountedRef.current = false; };
+  }, []);
 
   const handleSubmit = async () => {
+    if (inFlightRef.current) return;
     if (!played) { setError('먼저 소리를 들어주세요 🎧'); return; }
     if (!text.trim()) { setError('의성어를 입력해주세요 🎵'); return; }
     setSubmitting(true);
+    inFlightRef.current = true;
     setError('');
+    const operationKey = submitKeyRef.current;
+    let persistence = null;
+    trackEvent('annotation_submit_attempted', {
+      zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-submit',
+      operation_type: 'annotation_submit', operation_idempotency_key: operationKey,
+    }, { critical: true });
     try {
       const confMap = { low: 1, medium: 3, high: 5 };
-      await saveAnnotation({
-        participant_id:     participantId,
-        session_id:         sessionId,
-        sound_id:           sound.sound_id,
-        zone,
-        source_type:        sound.source_type    || '',
-        sub_category:       sound.sub_category   || '',
-        audioset_class:     sound.audioset_class || '',
-        expression_text:    text.trim(),
-        confidence:         confMap[confidence],
-        play_count:         playCount,
-        listening_time_sec: getListeningTime(),
-        stage:              1,
-        is_verified:        false,
-        version:            'v0.4-web',
-      });
+      if (!dryRun) {
+        const result = await saveAnnotation({
+          idempotencyKey:     operationKey,
+          participant_id:     participantId,
+          session_id:         sessionId,
+          sound_id:           sound.sound_id,
+          zone,
+          source_type:        sound.source_type    || '',
+          sub_category:       sound.sub_category   || '',
+          audioset_class:     sound.audioset_class || '',
+          expression_text:    text.trim(),
+          confidence:         confMap[confidence],
+          play_count:         playCount,
+          listening_time_sec: getListeningTime(),
+          stage:              1,
+          is_verified:        false,
+          version:            'v0.4-web',
+        });
+        if (!result.ok) {
+          trackEvent('annotation_submit_failed', {
+            zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-submit', outcome: 'failed',
+            operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+            error_code: result.error.code, metadata: { retryable: result.error.retryable },
+          }, { critical: true, flush: true });
+        }
+        if (!result.ok) throw new Error(result.error.message);
+        persistence = { ...result.data, operationIdempotencyKey: result.idempotencyKey };
+        trackEvent('annotation_submit_succeeded', {
+          zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-submit', outcome: 'succeeded',
+          operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+          result_entity_type: 'annotation', result_entity_id: result.data?.annotationId,
+          metadata: { transaction_id: result.data?.reward?.transactionId, reward_amount: result.data?.reward?.awarded },
+        }, { critical: true, flush: true });
+      }
       resetListeningTime();
-      // 화폐 지급은 완전히 별도 흐름 — 실패해도 이미 여기까지 저장은 끝났고,
-      // await하지 않아 제출 흐름 속도에도 영향 없음(내부에서 절대 throw 안 함).
-      awardAnnotationCurrency({
-        participantId:     participantId,
-        soundId:           sound.sound_id,
-        subCategory:       sound.sub_category || '',
-        soundDurationSec:  getDuration(),
-        confidence:        confMap[confidence],
+      submitKeyRef.current = newOperationKey();
+      if (mountedRef.current) onSubmit({
+        expression_text: text.trim(), confidence,
+        persistence,
       });
-      // 일일 퀘스트 진행도 갱신도 화폐 지급과 동일하게 완전 별도 흐름 —
-      // await하지 않고, 내부에서 절대 throw 안 함.
-      recordAnnotationQuestProgress({
-        participantId,
-        zone,
-        subCategory: sound.sub_category || '',
-      });
-      onSubmit({ expression_text: text.trim(), confidence });
     } catch (err) {
       console.error('[AnnotationPanel] 제출 오류:', err);
-      setError(`저장 오류: ${err?.message || '네트워크를 확인해주세요.'}`);
+      if (mountedRef.current) setError(`저장 오류: ${err?.message || '네트워크를 확인해주세요.'}`);
     } finally {
-      setSubmitting(false);
+      inFlightRef.current = false;
+      if (mountedRef.current) setSubmitting(false);
     }
   };
 
@@ -516,13 +552,25 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
           type="text"
           value={text}
           disabled={!played}
-          onChange={(e) => { setText(e.target.value); setError(''); }}
+          onChange={(e) => {
+            const next = e.target.value;
+            const before = text.length;
+            setText(next); setError('');
+            if (!inputStartedRef.current && next.length > 0) {
+              inputStartedRef.current = true;
+              trackEvent('expression_input_started', { zone, sound_id: sound.sound_id, target_type: 'input', target_id: 'annotation-expression' });
+            }
+            trackEvent(next.length === 0 && before > 0 ? 'expression_input_cleared' : 'expression_input_changed', {
+              zone, sound_id: sound.sound_id, target_type: 'input', target_id: 'annotation-expression',
+              value_before: { length: before, empty: before === 0 }, value_after: { length: next.length, empty: next.length === 0 },
+            });
+          }}
           onKeyDown={(e) => {
             if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(e.key)) {
               e.stopPropagation()
               return
             }
-            if (e.key === 'Enter' && !submitting) handleSubmit()
+            if (e.key === 'Enter' && !e.repeat && !submitting) handleSubmit()
           }}
           placeholder={!played ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
           maxLength={80}
@@ -540,7 +588,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
           <span style={{ fontSize: '11px', color: error ? '#E24B4A' : '#6B6660' }}>
-            {error || '자유롭게 입력 — 정답은 없어요 😊'}
+            {error || skipError || '자유롭게 입력 — 정답은 없어요 😊'}
           </span>
           <span style={{ fontSize: '11px', color: '#6B6660' }}>{text.length}/80</span>
         </div>
@@ -551,20 +599,27 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
         <label style={{ fontSize: '12px', color: '#9A9585', display: 'block', marginBottom: '7px', fontWeight: 600 }}>
           🎯 내 표현에 얼마나 자신 있나요?
         </label>
-        <ConfidenceSelector value={confidence} onChange={setConfidence} accent={accent} />
+        <ConfidenceSelector value={confidence} onChange={(next) => {
+          trackEvent(confidence === next ? 'confidence_deselected' : 'confidence_changed', {
+            zone, sound_id: sound.sound_id, target_type: 'confidence', target_id: `confidence-${next}`,
+            value_before: { confidence }, value_after: { confidence: next },
+          });
+          setConfidence(next);
+        }} accent={accent} />
       </div>
 
       {/* 버튼 행 */}
       <div style={{ display: 'flex', gap: '10px' }}>
         <button
           onClick={onSkip}
+          disabled={submitting || skipSubmitting}
           style={{
             flex: '0 0 80px', padding: '12px', borderRadius: '12px',
             background: 'transparent', border: '1.5px solid #ffffff15',
             color: '#6B6660', fontSize: '13px', fontFamily: 'Nunito, sans-serif', cursor: 'pointer',
           }}
         >
-          건너뛰기
+          {skipSubmitting ? '저장 중...' : '건너뛰기'}
         </button>
         <button
           onClick={handleSubmit}
@@ -590,20 +645,54 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, onSubmit,
    메인 AnnotationPanel — Stage 1 (표현 입력)만 담당
    Stage 2는 SoundMuseum으로 이전
 ───────────────────────────────────────────── */
-export default function AnnotationPanel({ sound, zone, participantId, sessionId, onClose, onComplete }) {
+export default function AnnotationPanel({ sound, zone, participantId, sessionId, dryRun = false, onClose, onComplete }) {
   const [visible, setVisible] = useState(false);
+  const [skipSubmitting, setSkipSubmitting] = useState(false);
+  const [skipError, setSkipError] = useState('');
+  const skipKeyRef = useRef(newOperationKey());
+  const skipInFlightRef = useRef(false);
+  const mountedRef = useRef(true);
+  const modalInstanceRef = useRef(crypto.randomUUID());
+  const closedRef = useRef(false);
+  const transitionTimerRef = useRef(null);
   const palette = ZONE_PALETTE[zone] || ZONE_PALETTE.Lab;
 
-  useEffect(() => { requestAnimationFrame(() => setVisible(true)); }, []);
+  useEffect(() => {
+    requestAnimationFrame(() => setVisible(true));
+    trackEvent('annotation_modal_opened', {
+      zone, sound_id: sound?.sound_id, target_type: 'modal', target_id: 'annotation-modal',
+      metadata: { modal_instance_id: modalInstanceRef.current },
+    }, { dedupeKey: `annotation-modal:${modalInstanceRef.current}` });
+  }, [sound?.sound_id, zone]);
+  useEffect(() => {
+    mountedRef.current = true;
+    const modalInstanceId = modalInstanceRef.current;
+    return () => {
+      mountedRef.current = false;
+    clearTimeout(transitionTimerRef.current);
+    if (!closedRef.current) trackEvent('annotation_modal_closed', {
+      zone, sound_id: sound?.sound_id, target_type: 'modal', target_id: 'annotation-modal', close_reason: 'component_unmounted',
+      metadata: { modal_instance_id: modalInstanceId },
+    });
+    };
+  }, [sound?.sound_id, zone]);
 
-  const handleClose = useCallback(() => {
+  const handleClose = useCallback((reason = 'unknown') => {
+    if (closedRef.current) return;
+    closedRef.current = true;
+    resetAudio();
+    trackEvent('annotation_modal_closed', {
+      zone, sound_id: sound?.sound_id, target_type: 'modal', target_id: 'annotation-modal', close_reason: reason,
+      metadata: { modal_instance_id: modalInstanceRef.current },
+    }, { critical: reason === 'submitted' || reason === 'skipped' });
     setVisible(false);
-    setTimeout(() => onClose?.(), 300);
-  }, [onClose]);
+    clearTimeout(transitionTimerRef.current);
+    transitionTimerRef.current = setTimeout(() => onClose?.(reason), 300);
+  }, [onClose, sound?.sound_id, zone]);
 
   // ESC — 전사 패널만 닫고 구역 화면으로 복귀 (마을 목록 화면으로 나가지 않음)
   useEffect(() => {
-    const h = (e) => { if (e.key === 'Escape') handleClose(); };
+    const h = (e) => { if (e.key === 'Escape' && !e.repeat) handleClose('escape'); };
     window.addEventListener('keydown', h);
     return () => window.removeEventListener('keydown', h);
   }, [handleClose]);
@@ -611,36 +700,75 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
   if (!sound) return null;
 
   // Stage 1 제출 → 패널 슬라이드다운 후 뮤지엄 전환
-  const handleStage1Submit = ({ expression_text }) => {
+  const handleStage1Submit = ({ expression_text, persistence }) => {
+    closedRef.current = true;
+    resetAudio();
+    trackEvent('annotation_modal_closed', {
+      zone, sound_id: sound?.sound_id, target_type: 'modal', target_id: 'annotation-modal', close_reason: 'submitted',
+      metadata: { modal_instance_id: modalInstanceRef.current },
+    }, { critical: true });
     setVisible(false);
-    setTimeout(() => onComplete?.({ expression_text }), 280);
+    clearTimeout(transitionTimerRef.current);
+    transitionTimerRef.current = setTimeout(() => onComplete?.({ expression_text, persistence }), 280);
   };
 
   const handleSkip = async () => {
+    if (skipInFlightRef.current) return;
+    skipInFlightRef.current = true;
+    setSkipSubmitting(true);
+    setSkipError('');
+    const operationKey = skipKeyRef.current;
+    trackEvent('annotation_skip_attempted', {
+      zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-skip',
+      operation_type: 'annotation_skip', operation_idempotency_key: operationKey,
+    }, { critical: true });
     try {
-      await saveAnnotation({
-        participant_id:  participantId,
-        session_id:      sessionId,
-        sound_id:        sound.sound_id,
-        zone,
-        source_type:     sound.source_type    || '',
-        sub_category:    sound.sub_category   || '',
-        audioset_class:  sound.audioset_class || '',
-        expression_text: '',
-        is_skipped:      true,
-        skip_reason:     'user_skip',
-        stage:           1,
-        version:         'v0.4-web',
-      });
-    } catch {}
-    handleClose();
+      if (!dryRun) {
+        const result = await saveAnnotation({
+          idempotencyKey: operationKey,
+          participant_id:  participantId,
+          session_id:      sessionId,
+          sound_id:        sound.sound_id,
+          zone,
+          source_type:     sound.source_type    || '',
+          sub_category:    sound.sub_category   || '',
+          audioset_class:  sound.audioset_class || '',
+          expression_text: '',
+          is_skipped:      true,
+          skip_reason:     'user_skip',
+          stage:           1,
+          version:         'v0.4-web',
+        });
+        if (!result.ok) {
+          trackEvent('annotation_skip_failed', {
+            zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-skip', outcome: 'failed',
+            operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+            error_code: result.error.code, metadata: { retryable: result.error.retryable },
+          }, { critical: true, flush: true });
+        }
+        if (!result.ok) throw new Error(result.error.message);
+        trackEvent('annotation_skip_succeeded', {
+          zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-skip', outcome: 'succeeded',
+          operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
+          result_entity_type: 'annotation', result_entity_id: result.data?.annotationId,
+        }, { critical: true, flush: true });
+      }
+      skipKeyRef.current = newOperationKey();
+      handleClose('skipped');
+    } catch (error) {
+      console.error('[AnnotationPanel] 건너뛰기 저장 오류:', error);
+      if (mountedRef.current) setSkipError('건너뛰기를 저장하지 못했습니다. 다시 시도해주세요.');
+    } finally {
+      skipInFlightRef.current = false;
+      if (mountedRef.current) setSkipSubmitting(false);
+    }
   };
 
   return (
     <>
       {/* 딤 오버레이 */}
       <div
-        onClick={handleClose}
+        onClick={() => handleClose('backdrop')}
         style={{
           position: 'fixed', inset: 0,
           background: '#000000aa',
@@ -687,7 +815,7 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
             <span style={{ fontSize: '12px', color: '#9A9585' }}>소리 전사 · 표현 입력</span>
           </div>
           <button
-            onClick={handleClose}
+            onClick={() => handleClose('close_button')}
             style={{
               background: '#ffffff10', border: 'none',
               color: '#9A9585', cursor: 'pointer',
@@ -705,7 +833,9 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
           <Stage1Panel
             sound={sound} zone={zone} palette={palette}
             participantId={participantId} sessionId={sessionId}
+            dryRun={dryRun}
             onSubmit={handleStage1Submit} onSkip={handleSkip}
+            skipSubmitting={skipSubmitting} skipError={skipError}
           />
         </div>
       </div>

@@ -1,25 +1,26 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import HouseDecorRoom, { HouseMark } from '@/components/HouseDecorRoom'
 
 export default function HouseDecorTestPage() {
-  const [participantIdInput, setParticipantIdInput] = useState('AUDIOTEST')
-  const [participantId, setParticipantId] = useState('')
-  const [visitorMode, setVisitorMode] = useState(false)
+  return <Suspense fallback={null}><HouseDecorTestContent /></Suspense>
+}
 
-  useEffect(() => {
-    const invitedHouse = new URLSearchParams(window.location.search).get('house')?.trim()
-    if (!invitedHouse) return
-    setVisitorMode(true)
-    setParticipantId(invitedHouse)
-  }, [])
+function HouseDecorTestContent() {
+  const searchParams = useSearchParams()
+  const invitedHouse = searchParams.get('house')?.trim() || ''
+  const [participantIdInput, setParticipantIdInput] = useState('AUDIOTEST')
+  const [selectedParticipantId, setSelectedParticipantId] = useState('')
+  const participantId = invitedHouse || selectedParticipantId
+  const visitorMode = Boolean(invitedHouse)
 
   const handleEnter = event => {
     event?.preventDefault()
     const pid = participantIdInput.trim()
     if (!pid) return
-    setParticipantId(pid)
+    setSelectedParticipantId(pid)
   }
 
   if (!participantId) {
@@ -49,7 +50,7 @@ export default function HouseDecorTestPage() {
     <HouseDecorRoom
       participantId={participantId}
       visitorMode={visitorMode}
-      onExit={() => visitorMode ? window.location.assign(window.location.pathname) : setParticipantId('')}
+      onExit={() => visitorMode ? window.location.assign(window.location.pathname) : setSelectedParticipantId('')}
     />
   )
 }

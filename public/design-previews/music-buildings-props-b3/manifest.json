@@ -1,0 +1,527 @@
+{
+  "version": "2C-B3.1-v1",
+  "productionUse": false,
+  "tileSize": 32,
+  "map": {
+    "width": 1536,
+    "height": 1152,
+    "tiles": {
+      "width": 48,
+      "height": 36
+    }
+  },
+  "timeOfDay": "bright-soft-late-afternoon",
+  "palette": {
+    "ground": "#AAB490",
+    "groundVariant": "#B3BC98",
+    "soil": "#B89E7C",
+    "stone": "#D9C7A8",
+    "stoneHi": "#E8DABF",
+    "stoneShade": "#B7A383",
+    "teal": "#668F8A",
+    "tealHi": "#86ABA4",
+    "lavender": "#A89BC0",
+    "lavenderHi": "#C4B9D5",
+    "gold": "#C69A45",
+    "plaster": "#E2D3B8",
+    "plasterHi": "#EFE4CF",
+    "wood": "#A97856",
+    "woodHi": "#C28E64",
+    "navy": "#3F4358",
+    "outline": "#655F62",
+    "shadow": "#5D554A",
+    "foliage": "#6E8B68",
+    "foliageHi": "#91A878",
+    "flower": "#C2A5BF",
+    "emissive": "#F2D38B",
+    "collision": "#E85D75",
+    "clearance": "#61B89A",
+    "markerGuide": "#227C9D"
+  },
+  "approvedLandmarks": {
+    "stage": "S1 low double-wave",
+    "gate": "G1 open wave rail"
+  },
+  "buildings": [
+    {
+      "id": "record-archive",
+      "label": "Record Archive",
+      "x": 4,
+      "y": 4,
+      "w": 8,
+      "h": 6,
+      "entrance": "south",
+      "clearance": {
+        "x": 6,
+        "y": 10,
+        "width": 3,
+        "height": 3
+      },
+      "collision": {
+        "x": 4,
+        "y": 4,
+        "width": 8,
+        "height": 6
+      },
+      "pixelRect": {
+        "x": 128,
+        "y": 128,
+        "width": 256,
+        "height": 192
+      },
+      "canvas": {
+        "width": 256,
+        "height": 192
+      },
+      "anchor": {
+        "x": 128,
+        "y": 192
+      },
+      "layers": [
+        "contact-shadow",
+        "body",
+        "roof",
+        "door-window",
+        "trim",
+        "foreground",
+        "emissive",
+        "collision",
+        "entrance-clearance"
+      ]
+    },
+    {
+      "id": "listening-cafe",
+      "label": "Listening Cafe",
+      "x": 35,
+      "y": 5,
+      "w": 10,
+      "h": 5,
+      "entrance": "south",
+      "clearance": {
+        "x": 38,
+        "y": 10,
+        "width": 3,
+        "height": 3
+      },
+      "collision": {
+        "x": 35,
+        "y": 5,
+        "width": 10,
+        "height": 5
+      },
+      "pixelRect": {
+        "x": 1120,
+        "y": 160,
+        "width": 320,
+        "height": 160
+      },
+      "canvas": {
+        "width": 320,
+        "height": 160
+      },
+      "anchor": {
+        "x": 160,
+        "y": 160
+      },
+      "layers": [
+        "contact-shadow",
+        "body",
+        "roof",
+        "door-window",
+        "trim",
+        "foreground",
+        "emissive",
+        "collision",
+        "entrance-clearance"
+      ]
+    },
+    {
+      "id": "community-studio",
+      "label": "Community Studio",
+      "x": 3,
+      "y": 28,
+      "w": 10,
+      "h": 5,
+      "entrance": "east",
+      "doorEdge": {
+        "x": 12,
+        "y": 28,
+        "width": 1,
+        "height": 3
+      },
+      "clearance": {
+        "x": 13,
+        "y": 28,
+        "width": 3,
+        "height": 3
+      },
+      "collision": {
+        "x": 3,
+        "y": 28,
+        "width": 10,
+        "height": 5
+      },
+      "pixelRect": {
+        "x": 96,
+        "y": 896,
+        "width": 320,
+        "height": 160
+      },
+      "canvas": {
+        "width": 320,
+        "height": 160
+      },
+      "anchor": {
+        "x": 160,
+        "y": 160
+      },
+      "layers": [
+        "contact-shadow",
+        "body",
+        "roof",
+        "door-window",
+        "trim",
+        "foreground",
+        "emissive",
+        "collision",
+        "entrance-clearance"
+      ]
+    },
+    {
+      "id": "sound-workshop",
+      "label": "Sound Workshop",
+      "x": 36,
+      "y": 27,
+      "w": 8,
+      "h": 6,
+      "entrance": "west",
+      "doorEdge": {
+        "x": 36,
+        "y": 28,
+        "width": 1,
+        "height": 3
+      },
+      "clearance": {
+        "x": 33,
+        "y": 28,
+        "width": 3,
+        "height": 3
+      },
+      "collision": {
+        "x": 36,
+        "y": 27,
+        "width": 8,
+        "height": 6
+      },
+      "pixelRect": {
+        "x": 1152,
+        "y": 864,
+        "width": 256,
+        "height": 192
+      },
+      "canvas": {
+        "width": 256,
+        "height": 192
+      },
+      "anchor": {
+        "x": 128,
+        "y": 192
+      },
+      "layers": [
+        "contact-shadow",
+        "body",
+        "roof",
+        "door-window",
+        "trim",
+        "foreground",
+        "emissive",
+        "collision",
+        "entrance-clearance"
+      ]
+    }
+  ],
+  "props": [
+    {
+      "category": "flowerbeds",
+      "id": "flowerbed-low-a",
+      "canvas": {
+        "width": 64,
+        "height": 32
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "category": "benches",
+      "id": "bench-low-a",
+      "canvas": {
+        "width": 64,
+        "height": 32
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "category": "planters",
+      "id": "planter-low-a",
+      "canvas": {
+        "width": 32,
+        "height": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 32
+      }
+    },
+    {
+      "category": "lamps",
+      "id": "lamp-low-a",
+      "canvas": {
+        "width": 32,
+        "height": 64
+      },
+      "anchor": {
+        "x": 16,
+        "y": 64
+      }
+    },
+    {
+      "category": "vegetation",
+      "id": "shrub-low-a",
+      "canvas": {
+        "width": 32,
+        "height": 32
+      },
+      "anchor": {
+        "x": 16,
+        "y": 32
+      }
+    },
+    {
+      "category": "vegetation",
+      "id": "tree-low-a",
+      "canvas": {
+        "width": 64,
+        "height": 64
+      },
+      "anchor": {
+        "x": 32,
+        "y": 64
+      }
+    },
+    {
+      "category": "garden",
+      "id": "garden-resonance-low",
+      "canvas": {
+        "width": 64,
+        "height": 32
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "category": "gate-vegetation",
+      "id": "gate-vegetation-low",
+      "canvas": {
+        "width": 64,
+        "height": 32
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "category": "stage-vegetation",
+      "id": "stage-vegetation-low",
+      "canvas": {
+        "width": 64,
+        "height": 32
+      },
+      "anchor": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "category": "foreground",
+      "id": "foreground-edge-cluster",
+      "canvas": {
+        "width": 96,
+        "height": 64
+      },
+      "anchor": {
+        "x": 48,
+        "y": 64
+      }
+    }
+  ],
+  "placements": [
+    [
+      "flowerbed-low-a",
+      3,
+      12
+    ],
+    [
+      "flowerbed-low-a",
+      42,
+      12
+    ],
+    [
+      "bench-low-a",
+      18,
+      22
+    ],
+    [
+      "bench-low-a",
+      28,
+      16
+    ],
+    [
+      "planter-low-a",
+      13,
+      9
+    ],
+    [
+      "planter-low-a",
+      34,
+      9
+    ],
+    [
+      "planter-low-a",
+      13,
+      31
+    ],
+    [
+      "planter-low-a",
+      34,
+      31
+    ],
+    [
+      "lamp-low-a",
+      2,
+      14
+    ],
+    [
+      "lamp-low-a",
+      46,
+      14
+    ],
+    [
+      "lamp-low-a",
+      6,
+      24
+    ],
+    [
+      "lamp-low-a",
+      42,
+      24
+    ],
+    [
+      "shrub-low-a",
+      3,
+      18
+    ],
+    [
+      "shrub-low-a",
+      44,
+      18
+    ],
+    [
+      "shrub-low-a",
+      4,
+      22
+    ],
+    [
+      "shrub-low-a",
+      43,
+      22
+    ],
+    [
+      "tree-low-a",
+      2,
+      14
+    ],
+    [
+      "tree-low-a",
+      44,
+      14
+    ],
+    [
+      "tree-low-a",
+      1,
+      26
+    ],
+    [
+      "tree-low-a",
+      45,
+      26
+    ],
+    [
+      "garden-resonance-low",
+      23,
+      16
+    ],
+    [
+      "gate-vegetation-low",
+      19,
+      34
+    ],
+    [
+      "gate-vegetation-low",
+      27,
+      34
+    ],
+    [
+      "stage-vegetation-low",
+      14,
+      3
+    ],
+    [
+      "stage-vegetation-low",
+      32,
+      3
+    ],
+    [
+      "foreground-edge-cluster",
+      0,
+      32
+    ],
+    [
+      "foreground-edge-cluster",
+      45,
+      31
+    ]
+  ],
+  "guides": [
+    "collision-guide",
+    "entrances-guide",
+    "markers-guide",
+    "foreground-guide",
+    "mock-character"
+  ],
+  "drawOrder": [
+    "B1 ground/path",
+    "B2 Stage/Gate",
+    "building contact shadow",
+    "building body",
+    "building roof",
+    "door/window",
+    "trim",
+    "props",
+    "foreground",
+    "emissive",
+    "guides",
+    "character",
+    "marker/UI"
+  ],
+  "conceptReferences": [
+    "variants/imagegen-four-building-concept.png"
+  ]
+}

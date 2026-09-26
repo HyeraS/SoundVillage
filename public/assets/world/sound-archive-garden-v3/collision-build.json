@@ -1,0 +1,10 @@
+{
+  "source": "lib/worldMapV3Manifest.mjs",
+  "cellSize": 4,
+  "width": 960,
+  "height": 720,
+  "rawWalkableCells": 239006,
+  "clearanceCells": 207007,
+  "obstacleCells": 15553,
+  "colliderCount": 145
+}

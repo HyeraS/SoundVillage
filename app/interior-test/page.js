@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Suspense, useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import InteriorDecorRoom from '@/components/InteriorDecorRoom'
 import { FRIEND_ROOM } from '@/lib/interiorFixtures'
 import { getRoom } from '@/lib/interiorDecor'
@@ -22,20 +23,21 @@ import { probeHost } from '@/lib/duoSession'
        픽스처로 대체).
 ───────────────────────────────────────────── */
 export default function InteriorTestPage() {
+  return <Suspense fallback={null}><InteriorTestContent /></Suspense>
+}
+
+function InteriorTestContent() {
+  const searchParams = useSearchParams()
+  const houseId = searchParams.get('house')?.trim() || ''
+  const meId = searchParams.get('me')?.trim() || 'AUDIOTEST'
   const [visiting, setVisiting] = useState(null) // null | { id, room }
-  const [checkedVisit, setCheckedVisit] = useState(false)
+  const [checkedVisit, setCheckedVisit] = useState(!houseId)
   const [redirecting, setRedirecting] = useState(false)
   // 내 방 테스트용 참여자ID — ?me=로 바꿔가며 실제 Supabase 저장/구매 연동을
   // 여러 계정으로 확인할 수 있게 한다(기본값은 지금까지 쓰던 AUDIOTEST 그대로).
   // SSR에서는 window가 없으니 기본값으로 시작하고, 마운트 후 실제 쿼리로 갱신한다.
-  const [meId, setMeId] = useState('AUDIOTEST')
   useEffect(() => {
-    setMeId(new URLSearchParams(window.location.search).get('me')?.trim() || 'AUDIOTEST')
-  }, [])
-
-  useEffect(() => {
-    const houseId = new URLSearchParams(window.location.search).get('house')?.trim()
-    if (!houseId) { setCheckedVisit(true); return }
+    if (!houseId) return
     let cancelled = false
     probeHost(houseId).then(({ screen }) => {
       if (cancelled) return
@@ -51,7 +53,7 @@ export default function InteriorTestPage() {
       })
     })
     return () => { cancelled = true }
-  }, [])
+  }, [houseId])
 
   if (redirecting) {
     return (

@@ -10,6 +10,9 @@ import {
 import { getCurrencyBalance } from '@/lib/currency'
 import { getRoom, saveRoom, getOwnedInteriorItems, purchaseInteriorItem, purchaseInteriorSet } from '@/lib/interiorDecor'
 import { useDuoSession } from '@/lib/duoSession'
+import { newOperationKey } from '@/lib/persistenceResult'
+import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
+import { HOME_INVITE_REQUIRED_COUNT, getHomeInviteState } from '@/lib/homeHub.mjs'
 
 /* ─────────────────────────────────────────────
    픽셀 버튼 — README "버튼 상호작용" 스펙(hover 1px 이동+그림자 강화,
@@ -63,6 +66,7 @@ function TrayCard({ item, active, applied, editable, onClick }) {
 
   return (
     <div
+      data-interior-tray-item={item.id}
       onClick={onClick}
       style={{
         display: 'flex', flexDirection: 'column', cursor: 'pointer',
@@ -260,14 +264,39 @@ function RewardPopup({ reward, onClose, onPlace }) {
 /* 초대(공유 링크) 모달 — 예전 house-decor(HouseDecorRoom.js)의 ?house= 링크
    방식을 그대로 재사용. 진짜 실시간 동시 접속이 아니라, 상대가 이 링크로
    들어오면 내가 저장해 둔 방을 읽기전용으로 보는 방식(async 방문). */
-function InviteModal({ inviteUrl, onClose }) {
+function InviteModal({ inviteUrl, inviteState, onRetry, onClose }) {
   const [copied, setCopied] = useState(false)
-  const copy = async () => {
+  const [copyError, setCopyError] = useState('')
+  const copyInFlightRef = useRef(false)
+  const copiedTimerRef = useRef(null)
+  const mountedRef = useRef(true)
+  useEffect(() => () => {
+    mountedRef.current = false
+    clearTimeout(copiedTimerRef.current)
+  }, [])
+  const copy = async (event) => {
+    if (copyInFlightRef.current || !inviteState.copyEnabled || !inviteUrl) return
+    copyInFlightRef.current = true
+    setCopyError('')
     try {
       await navigator.clipboard.writeText(inviteUrl)
+      trackEvent('invite_link_copy_succeeded', {
+        target_type: 'button', target_id: 'interior-invite-copy', outcome: 'succeeded',
+        interaction_method: inferInteractionMethod(event.nativeEvent),
+      })
+      if (!mountedRef.current) return
       setCopied(true)
-      setTimeout(() => setCopied(false), 1800)
-    } catch {}
+      clearTimeout(copiedTimerRef.current)
+      copiedTimerRef.current = setTimeout(() => setCopied(false), 1800)
+    } catch {
+      trackEvent('invite_link_copy_failed', {
+        target_type: 'button', target_id: 'interior-invite-copy', outcome: 'failed',
+        interaction_method: inferInteractionMethod(event.nativeEvent), error_code: 'clipboard_write_failed',
+      })
+      if (mountedRef.current) setCopyError('링크를 복사하지 못했어요. 브라우저 권한을 확인해주세요.')
+    } finally {
+      copyInFlightRef.current = false
+    }
   }
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'rgba(30,20,10,.62)', display: 'grid', placeItems: 'center', zIndex: 70, padding: 32 }}>
@@ -280,10 +309,15 @@ function InviteModal({ inviteUrl, onClose }) {
         <div style={{ fontSize: 12.5, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', lineHeight: 1.6, marginBottom: 16 }}>
           지금 접속해 있으면 친구가 월드맵에서 나와 실시간으로 같이 돌아다닐 수 있어요. 자리를 비웠을 땐 꾸며진 방을 읽기 전용으로 구경만 할 수 있어요(가구는 못 옮겨요).
         </div>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 8px 8px 14px', background: 'var(--panel-bright)', border: '3px solid var(--border-warm)', marginBottom: 14 }}>
-          <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', textAlign: 'left' }}>{inviteUrl}</span>
-          <PixelButton tone={copied ? 'confirm' : 'default'} onClick={copy} style={{ fontSize: 12, padding: '9px 12px', flexShrink: 0 }}>{copied ? '복사됨' : '복사'}</PixelButton>
-        </div>
+        {inviteState.copyEnabled ? <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 8px 8px 14px', background: 'var(--panel-bright)', border: '3px solid var(--border-warm)', marginBottom: 14 }}>
+          <span data-testid="invite-url" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', textAlign: 'left' }}>{inviteUrl}</span>
+          <PixelButton tone={copied ? 'confirm' : 'default'} onClick={copy} style={{ fontSize: 12, padding: '9px 12px', flexShrink: 0 }}>{copied ? '복사됨' : '링크 복사'}</PixelButton>
+        </div> : <div role={inviteState.id === 'share-error' ? 'alert' : 'status'} data-testid="invite-unavailable" style={{ padding: 14, background: 'var(--panel-bright)', border: '3px solid var(--border-warm)', marginBottom: 14, textAlign:'left' }}>
+          <strong style={{ display:'block', fontSize:13, marginBottom:5 }}>{inviteState.title}</strong>
+          <span style={{ display:'block', color:'var(--text-mid)', fontSize:12, lineHeight:1.5 }}>{inviteState.detail}</span>
+          {inviteState.id === 'share-error' && onRetry && <PixelButton tone="accent" onClick={onRetry} style={{ width:'100%', marginTop:12, fontSize:12, padding:9 }}>초대 링크 다시 만들기</PixelButton>}
+        </div>}
+        {copyError && <div role="alert" style={{ margin: '-6px 0 12px', color: 'var(--interior-danger)', fontSize: 12 }}>{copyError}</div>}
         <PixelButton onClick={onClose} style={{ width: '100%' }}>닫기</PixelButton>
       </div>
     </div>
@@ -306,8 +340,6 @@ function footprintsOverlap(a, b) {
   return a.colStart <= b.colEnd && b.colStart <= a.colEnd && a.rowStart <= b.rowEnd && b.rowStart <= a.rowEnd
 }
 
-const ROOM_READY_COUNT = 4 // 예전 house-decor(HouseDecorRoom.js)의 INVITE_READY_COUNT와 동일한 개념
-
 /* ─────────────────────────────────────────────
    집꾸미기 방 — 상태·이벤트 컨테이너(design_handoff_cozy_room의 Component 클래스에
    대응). InteriorRoom(순수 스테이지 렌더)을 감싸서 mode/room/saved/tool/selected/
@@ -326,33 +358,29 @@ const ROOM_READY_COUNT = 4 // 예전 house-decor(HouseDecorRoom.js)의 INVITE_RE
 ───────────────────────────────────────────── */
 export default function InteriorDecorRoom({
   initialRoom, initialOwned = [], initialBalance = 1240, participantId = 'AUDIOTEST',
-  visitorMode = false, visitorName = '친구', visitorParticipantId, onLeaveVisit, onCurrencyChange, onExit,
-  onPartnerLeftScreen,
+  visitorMode = false, visitorName = '친구', roomShareToken, roomShareState = { status:'idle', message:'' }, onRetryRoomShare, realtimeSelfId, onLeaveVisit, onCurrencyChange, onExit,
+  onPartnerLeftScreen, onRoomStatusChange, dryRun = false,
 }) {
   // 방문 모드는 호출부(예: app/interior-test/page.js)가 그 사람이 실제로 저장한
   // 방을 이미 비동기로 읽어와서 initialRoom으로 넘겨준다 — 여기선 그대로 쓰면
   // 된다. 내 방(방문 아님)은 이 컴포넌트가 직접 실제 데이터를 불러온다(아래
   // refresh 이펙트) — initialRoom/initialOwned/initialBalance는 그 경우엔
   // 안 쓰인다(로딩 중 화면에도 아무것도 안 보여준다, 654행 근처 loaded 가드 참고).
-  const [loaded, setLoaded] = useState(visitorMode)
+  const qaRoom = initialRoom ?? { wallpaper: STARTER_WALLPAPER_ID, floor: STARTER_FLOOR_ID, items: [] }
+  const [loaded, setLoaded] = useState(visitorMode || dryRun)
+  const [loadError, setLoadError] = useState(false)
 
   // 4단계(집 안 실시간 동기화) — WorldMap과 같은 lib/duoSession.js를 그대로
   // 쓴다. 채널은 항상 "이 방의 주인" 기준(duo:<호스트 참여자ID>)이라, 방
-  // 주인이 자기 방에 있을 때도(자기 자신과 자동 pairing, WorldMap과 동일한
-  // 관례) 방문객이 들어왔을 때도 같은 채널에서 만난다. 방문객도 이제 실제
-  // 앱(app/page.js)에서는 StartPanel로 참여자ID/그룹을 먼저 받으므로
-  // visitorParticipantId로 넘어온다 — presence 키도 이 진짜ID를 쓴다.
-  // (interior-test 같은 검증 라우트가 그 값 없이 그냥 부를 수도 있으니,
-  // 안 넘어온 경우에만 이 세션 한정 임시 id로 대체한다.)
-  const [ephemeralVisitorId] = useState(() => `visitor-${Math.random().toString(36).slice(2, 10)}`)
-  const duoScreen = `interior:${visitorMode ? visitorName : participantId}`
-  const { partnerId, partnerPos, sendPosition } = useDuoSession(
-    visitorMode ? visitorName : participantId,
-    visitorMode ? (visitorParticipantId || ephemeralVisitorId) : participantId,
+  // 주인과 방문객은 participant ID가 아닌 불투명 공유 토큰의 private 채널에서
+  // 만난다. presence key 역시 연구 ID가 아니라 세션 한정 무작위 값이다.
+  const [ephemeralVisitorId] = useState(() => `peer-${crypto.randomUUID()}`)
+  const duoScreen = 'interior'
+  const { partnerPos, sendPosition } = useDuoSession(
+    roomShareToken,
+    realtimeSelfId || ephemeralVisitorId,
   )
-  // 방 주인 쪽에서 보는 방문객 이름표는 실제 partnerId(=방문객이 입력한
-  // 참여자ID)를 그대로 쓴다 — 아직 presence가 안 잡혔을 때만 일반 라벨.
-  const partnerLabel = visitorMode ? visitorName : (partnerId || '방문객')
+  const partnerLabel = visitorMode ? visitorName : '방문객'
 
   // 방문객 전용 — 호스트가 이 방을 나가서 다른 화면(주로 월드맵)으로
   // 옮겨가면, 방문객은 여기 방 안에 그대로 남아서 더 이상 안 보이던 문제가
@@ -367,15 +395,15 @@ export default function InteriorDecorRoom({
   }, [visitorMode, onPartnerLeftScreen, partnerPos, duoScreen])
 
   const [mode, setMode] = useState('view') // 'view' | 'edit' (visitorMode일 땐 항상 읽기 전용으로 취급)
-  const [room, setRoom] = useState(() => (visitorMode ? deepClone(initialRoom) : null))
-  const [saved, setSaved] = useState(() => (visitorMode ? deepClone(initialRoom) : null))
+  const [room, setRoom] = useState(() => (visitorMode || dryRun ? deepClone(qaRoom) : null))
+  const [saved, setSaved] = useState(() => (visitorMode || dryRun ? deepClone(qaRoom) : null))
   const [tool, setTool] = useState(null)
   const [selected, setSelected] = useState(null)
   const [hoverCell, setHoverCell] = useState(null)
   const [toast, setToast] = useState('')
-  const [owned, setOwned] = useState(() => (visitorMode ? initialOwned : []))
+  const [owned, setOwned] = useState(() => (visitorMode || dryRun ? [STARTER_WALLPAPER_ID, STARTER_FLOOR_ID, ...initialOwned] : []))
   const [cat, setCat] = useState('큰가구')
-  const [balance, setBalance] = useState(() => (visitorMode ? initialBalance : 0))
+  const [balance, setBalance] = useState(() => (visitorMode || dryRun ? initialBalance : 0))
   const [modal, setModal] = useState(null) // null | 'shop' | 'invite'
   const [reward, setReward] = useState(null) // { id, name, msg } | null
   const dailyDeal = useMemo(() => getInteriorDailyDeal(), [])
@@ -390,7 +418,7 @@ export default function InteriorDecorRoom({
   // 에러를 삼키고 null/[]를 돌려주므로, 그 경우 "빈 방 + 무료 시작 벽지·바닥재"로
   // 시작한다(STARTER_WALLPAPER_ID/STARTER_FLOOR_ID).
   useEffect(() => {
-    if (visitorMode || !participantId) return
+    if (visitorMode || dryRun || !participantId) return
     let cancelled = false
     Promise.all([
       getCurrencyBalance(participantId),
@@ -406,12 +434,27 @@ export default function InteriorDecorRoom({
       setOwned(nextOwned)
       setRoom(deepClone(nextRoom))
       setSaved(deepClone(nextRoom))
+      setLoadError(false)
+      setLoaded(true)
+    }).catch((error) => {
+      console.error('[InteriorDecorRoom] 방 초기화 실패:', error)
+      if (cancelled) return
+      const fallbackRoom = { wallpaper: STARTER_WALLPAPER_ID, floor: STARTER_FLOOR_ID, items: [] }
+      setBalance(0)
+      setOwned([STARTER_WALLPAPER_ID, STARTER_FLOOR_ID])
+      setRoom(deepClone(fallbackRoom))
+      setSaved(deepClone(fallbackRoom))
+      setLoadError(true)
       setLoaded(true)
     })
     return () => { cancelled = true }
-  }, [participantId, visitorMode])
+  }, [participantId, visitorMode, dryRun])
   const [purchasing, setPurchasing] = useState(false)
   const purchasingRef = useRef(false) // 리렌더 전에 두 번째 클릭이 들어와도 balance/owned 클로저가 낡은 값을 또
+  const purchaseKeysRef = useRef(new Map())
+  const roomSaveKeyRef = useRef(newOperationKey())
+  const roomSaveInFlightRef = useRef(false)
+  const [roomSaving, setRoomSaving] = useState(false)
   // 읽고 이중 지급하는 걸 막는 재진입 잠금. purchasing(state)은 버튼을 즉시
   // disabled로 만들어 화면상으로도 다시 못 누르게 한다.
 
@@ -435,13 +478,17 @@ export default function InteriorDecorRoom({
   }, [])
   useEffect(() => () => clearTimeout(toastTimerRef.current), [])
 
-  const isEdit = !visitorMode && mode === 'edit'
+  const isEdit = !visitorMode && !loadError && mode === 'edit'
   const placedCount = room ? room.items.length : 0
-  const isReady = placedCount >= ROOM_READY_COUNT
-  const readyProgress = Math.min(100, Math.round((placedCount / ROOM_READY_COUNT) * 100))
   const inviteUrl = typeof window === 'undefined'
     ? ''
-    : `${window.location.origin}${window.location.pathname}?house=${encodeURIComponent(participantId)}`
+    : roomShareToken
+      ? `${window.location.origin}${window.location.pathname}?house=${encodeURIComponent(roomShareToken)}`
+      : ''
+  const inviteState = getHomeInviteState({ placedCount, shareStatus:roomShareState?.status, shareMessage:roomShareState?.message, inviteUrl })
+  const isReady = inviteState.decorated
+  const readyProgress = inviteState.progress
+  useEffect(() => { onRoomStatusChange?.(placedCount) }, [onRoomStatusChange, placedCount])
   const praiseFriend = useCallback(() => say(`${visitorName}에게 칭찬을 남겼어요`), [say, visitorName])
 
   // isEdit 가드는 여기서 걸지 않는다 — Cozy Room.dc.html의 chooseTool도 가드가
@@ -457,12 +504,16 @@ export default function InteriorDecorRoom({
       setSelected(null)
       movePendingRef.current = false
       say(it.name + '을(를) 방 전체에 입혔어요')
+      trackEvent('interior_item_selected', { target_type: it.kind, target_id: id })
       return
     }
     movePendingRef.current = false
     setSelected(null)
     setTool(prev => (prev === id ? null : id))
-  }, [say, pushHistory])
+    trackEvent(tool === id ? 'interior_item_deselected' : 'interior_item_selected', {
+      target_type: 'interior_item', target_id: id,
+    })
+  }, [say, pushHistory, tool])
 
   const placeAt = useCallback((layer, col, row) => {
     if (!tool) { setSelected(null); return }
@@ -483,13 +534,17 @@ export default function InteriorDecorRoom({
       return footprintsOverlap(fp, footprintOf(getInteriorItem(p.itemId), p.col, p.row))
     })
     if (blocked) { say('이미 다른 소품이 놓여 있어요'); return }
-    if (!movePendingRef.current) pushHistory()
+    const wasMove = movePendingRef.current
+    if (!wasMove) pushHistory()
     movePendingRef.current = false
     const uid = nextUidRef.current++
     setRoom(prev => ({ ...prev, items: prev.items.concat([{ uid, itemId: tool, layer: it.layer, col: c, row: r, flip: false }]) }))
     setSelected(uid)
     setTool(null)
     setHoverCell(null)
+    trackEvent(wasMove ? 'interior_item_moved' : 'interior_item_added', {
+      target_type: 'interior_item', target_id: tool, metadata: { position: { layer: it.layer, col: c, row: r } },
+    })
   }, [tool, say, room, pushHistory])
 
   const selectPlaced = useCallback(uid => {
@@ -508,7 +563,11 @@ export default function InteriorDecorRoom({
     }
     setSelected(prev => (prev === uid ? null : uid))
     setTool(null)
-  }, [isEdit, say, tool, room, placeAt])
+    const target = room.items.find(item => item.uid === uid)
+    trackEvent(selected === uid ? 'interior_item_deselected' : 'interior_item_selected', {
+      target_type: 'interior_item', target_id: target?.itemId,
+    })
+  }, [isEdit, say, tool, room, placeAt, selected])
 
   const mutateSelected = useCallback(fn => {
     pushHistory()
@@ -517,7 +576,10 @@ export default function InteriorDecorRoom({
 
   const selectedItem = room ? room.items.find(i => i.uid === selected) || null : null
 
-  const flipSelected = useCallback(() => mutateSelected(i => ({ ...i, flip: !i.flip })), [mutateSelected])
+  const flipSelected = useCallback(() => {
+    if (selectedItem) trackEvent('interior_item_rotated', { target_type: 'interior_item', target_id: selectedItem.itemId, value_before: { flipped: selectedItem.flip }, value_after: { flipped: !selectedItem.flip } })
+    mutateSelected(i => ({ ...i, flip: !i.flip }))
+  }, [mutateSelected, selectedItem])
   const pickUpSelected = useCallback(() => {
     if (!selectedItem) return
     const itemId = selectedItem.itemId
@@ -528,11 +590,12 @@ export default function InteriorDecorRoom({
     say('놓을 칸을 눌러 주세요')
   }, [selectedItem, mutateSelected, say])
   const storeSelected = useCallback(() => {
+    if (selectedItem) trackEvent('interior_item_removed', { target_type: 'interior_item', target_id: selectedItem.itemId })
     mutateSelected(() => null)
     movePendingRef.current = false
     setSelected(null)
     say('보관함으로 넣었어요')
-  }, [mutateSelected, say])
+  }, [mutateSelected, say, selectedItem])
 
   const undoLast = useCallback(() => {
     if (history.length === 0) return
@@ -542,6 +605,7 @@ export default function InteriorDecorRoom({
     setTool(null)
     movePendingRef.current = false
     say('방금 동작을 취소했어요')
+    trackEvent('interior_change_undone', { target_type: 'button', target_id: 'interior-undo' })
   }, [history, say])
 
   // ESC로 맨 위에 떠 있는 오버레이부터 하나씩 닫는다 — 획득 팝업 > 상점/초대
@@ -551,7 +615,7 @@ export default function InteriorDecorRoom({
   // 편집 중(오버레이가 없을 때)엔 Cmd/Ctrl+Z로 실행취소도 누를 수 있다.
   useEffect(() => {
     function onKeyDown(e) {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !e.repeat) {
         if (reward) { setReward(null); return }
         if (modal) { setModal(null); return }
         if (selected) { setSelected(null); return }
@@ -582,19 +646,50 @@ export default function InteriorDecorRoom({
     setMode('view')
   }, [saved])
   const saveEdit = useCallback(async () => {
+    if (roomSaveInFlightRef.current) return
+    roomSaveInFlightRef.current = true
+    setRoomSaving(true)
     // 실패하면(스키마 미실행/네트워크 오류 등) 편집 모드를 빠져나가지 않는다 —
     // 여기서 view로 돌려버리면 화면상으론 "저장됨"처럼 보이지만 실제로는
     // 서버에 반영이 안 된 채로 편집 세션(되돌리기 스냅샷/실행취소 스택)만
     // 날아가서, 사용자가 다시 손댈 방법이 없어진다.
-    const ok = await saveRoom({ participantId, room })
-    if (!ok) { say('저장에 실패했어요. 다시 시도해주세요'); return }
-    setSaved(deepClone(room))
-    setTool(null)
-    setSelected(null)
-    setHistory([])
-    movePendingRef.current = false
-    setMode('view')
-    say('방을 저장했어요')
+    const operationKey = roomSaveKeyRef.current
+    trackEvent('room_save_attempted', {
+      target_type: 'button', target_id: 'room-save', operation_type: 'room_save', operation_idempotency_key: operationKey,
+      metadata: { item_type: 'room', candidate_count: room.items.length },
+    }, { critical: true })
+    try {
+      const result = await saveRoom({ participantId, room, idempotencyKey: operationKey })
+      if (!result.ok) {
+        trackEvent('room_save_failed', {
+          target_type: 'button', target_id: 'room-save', outcome: 'failed', operation_type: result.operationType,
+          operation_idempotency_key: result.idempotencyKey, error_code: result.error.code, metadata: { retryable: result.error.retryable },
+        }, { critical: true, flush: true })
+        say('저장에 실패했어요. 다시 시도해주세요'); return
+      }
+      trackEvent('room_save_succeeded', {
+        target_type: 'button', target_id: 'room-save', outcome: 'succeeded', operation_type: result.operationType,
+        operation_idempotency_key: result.idempotencyKey, result_entity_type: 'participant_room',
+      }, { critical: true, flush: true })
+      roomSaveKeyRef.current = newOperationKey()
+      setSaved(deepClone(room))
+      setTool(null)
+      setSelected(null)
+      setHistory([])
+      movePendingRef.current = false
+      setMode('view')
+      say('방을 저장했어요')
+    } catch (error) {
+      console.error('[InteriorDecorRoom] 방 저장 오류:', error)
+      trackEvent('room_save_failed', {
+        target_type: 'button', target_id: 'room-save', outcome: 'failed', operation_type: 'room_save',
+        operation_idempotency_key: operationKey, error_code: 'room_save_failed', metadata: { retryable: true },
+      }, { critical: true, flush: true })
+      say('저장에 실패했어요. 다시 시도해주세요')
+    } finally {
+      roomSaveInFlightRef.current = false
+      setRoomSaving(false)
+    }
   }, [room, say, participantId])
 
   const clearRoom = useCallback(() => {
@@ -646,26 +741,35 @@ export default function InteriorDecorRoom({
       const price = getInteriorPrice(item.id, dailyDeal)
       if (owned.includes(item.id)) { say('이미 보관함에 있어요'); return }
       if (balance < price) { say(`음표가 ${price - balance}개 더 필요해요`); return }
-      const result = await purchaseInteriorItem({ participantId, itemId: item.id, price })
+      const scope = `item:${item.id}`
+      const idempotencyKey = purchaseKeysRef.current.get(scope) || newOperationKey()
+      purchaseKeysRef.current.set(scope, idempotencyKey)
+      trackEvent('purchase_attempted', { target_type: 'interior_item', target_id: item.id, operation_type: 'purchase:interior_item', operation_idempotency_key: idempotencyKey, metadata: { item_type: 'interior_item', price_displayed: price, balance } }, { critical: true })
+      const result = await purchaseInteriorItem({ itemId: item.id, idempotencyKey })
       if (result.ok) {
+        trackEvent('purchase_succeeded', { target_type: 'interior_item', target_id: item.id, outcome: 'succeeded', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, result_entity_type: 'interior_item', result_entity_id: item.id, metadata: { price_displayed: price, price_confirmed: price, balance: result.newBalance, transaction_id: result.transactionId } }, { critical: true, flush: true })
+        purchaseKeysRef.current.delete(scope)
         setBalance(result.newBalance)
         setOwned(prev => prev.concat([item.id]))
         setReward({ id: item.id, name: item.name, msg: `♪ ${price}을 썼어요. 남은 음표 ${result.newBalance}개` })
         onCurrencyChange?.()
       } else if (result.reason === 'insufficient_funds') {
+        trackEvent('purchase_failed', { target_type: 'interior_item', target_id: item.id, outcome: 'failed', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, error_code: result.reason, metadata: { price_displayed: price, price_confirmed: result.price, balance: result.balance } }, { critical: true, flush: true })
         setBalance(result.balance)
         say(`음표가 ${result.price - result.balance}개 더 필요해요`)
       } else if (result.reason === 'already_owned') {
+        trackEvent('purchase_failed', { target_type: 'interior_item', target_id: item.id, outcome: 'failed', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, error_code: result.reason }, { critical: true, flush: true })
         setOwned(prev => (prev.includes(item.id) ? prev : prev.concat([item.id])))
         say('이미 보관함에 있어요')
       } else {
+        trackEvent('purchase_failed', { target_type: 'interior_item', target_id: item.id, outcome: 'failed', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, error_code: result.error?.code || result.reason || 'purchase_failed', metadata: { retryable: result.error?.retryable } }, { critical: true, flush: true })
         say('구매 중 오류가 발생했어요. 다시 시도해주세요')
       }
     } finally {
       purchasingRef.current = false
       setPurchasing(false)
     }
-  }, [owned, balance, dailyDeal, say, participantId, onCurrencyChange])
+  }, [owned, balance, dailyDeal, say, onCurrencyChange])
 
   // 세트 구매 — 이미 다 갖고 있으면 과금 없이 바로 적용, 아니면
   // purchaseInteriorSet이 미보유 아이템만 지급하고 세트가만 1회 차감한다.
@@ -682,24 +786,32 @@ export default function InteriorDecorRoom({
         return
       }
       if (balance < set.price) { say(`음표가 ${set.price - balance}개 더 필요해요`); return }
-      const result = await purchaseInteriorSet({ participantId, setId, ownedIds: owned })
+      const scope = `set:${setId}`
+      const idempotencyKey = purchaseKeysRef.current.get(scope) || newOperationKey()
+      purchaseKeysRef.current.set(scope, idempotencyKey)
+      trackEvent('purchase_attempted', { target_type: 'interior_set', target_id: setId, operation_type: 'purchase:interior_set', operation_idempotency_key: idempotencyKey, metadata: { item_type: 'interior_set', price_displayed: set.price, balance } }, { critical: true })
+      const result = await purchaseInteriorSet({ setId, idempotencyKey })
       if (result.ok) {
+        trackEvent('purchase_succeeded', { target_type: 'interior_set', target_id: setId, outcome: 'succeeded', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, result_entity_type: 'interior_set', result_entity_id: setId, metadata: { price_displayed: set.price, price_confirmed: set.price, balance: result.newBalance, transaction_id: result.transactionId } }, { critical: true, flush: true })
+        purchaseKeysRef.current.delete(scope)
         setBalance(result.newBalance)
         setOwned(prev => Array.from(new Set(prev.concat(result.grantedItemIds || []))))
         applySet(setId)
         say(`${set.name} 테마를 방에 적용했어요`)
         onCurrencyChange?.()
       } else if (result.reason === 'insufficient_funds') {
+        trackEvent('purchase_failed', { target_type: 'interior_set', target_id: setId, outcome: 'failed', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, error_code: result.reason, metadata: { price_displayed: set.price, price_confirmed: result.price, balance: result.balance } }, { critical: true, flush: true })
         setBalance(result.balance)
         say(`음표가 ${result.price - result.balance}개 더 필요해요`)
       } else {
+        trackEvent('purchase_failed', { target_type: 'interior_set', target_id: setId, outcome: 'failed', operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey, error_code: result.error?.code || result.reason || 'purchase_failed', metadata: { retryable: result.error?.retryable } }, { critical: true, flush: true })
         say('구매 중 오류가 발생했어요. 다시 시도해주세요')
       }
     } finally {
       purchasingRef.current = false
       setPurchasing(false)
     }
-  }, [owned, balance, applySet, say, participantId, onCurrencyChange])
+  }, [owned, balance, applySet, say, onCurrencyChange])
 
   const closeReward = useCallback(() => setReward(null), [])
   const placeReward = useCallback(() => {
@@ -758,7 +870,23 @@ export default function InteriorDecorRoom({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+    <div
+      data-interior-room="ready"
+      data-room-load-state={loadError ? 'fallback' : 'loaded'}
+      data-interior-mode={mode}
+      data-room-wallpaper={room.wallpaper}
+      data-room-floor={room.floor}
+      data-room-item-count={room.items.length}
+      style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+    >
+      {loadError && (
+        <div role="status" style={{
+          padding: '10px 14px', background: '#FFF1CC', border: '3px solid var(--text-dark)',
+          color: 'var(--text-dark)', fontFamily: "'Gothic A1', sans-serif", fontSize: 13, fontWeight: 700,
+        }}>
+          방 데이터를 불러오지 못해 임시 빈 방을 읽기 전용으로 열었어요. 나가기는 안전하게 사용할 수 있어요.
+        </div>
+      )}
       {/* HUD 바 — README 헤더 스펙 중 상점/초대 진입에 필요한 요소만(잔액 pill +
           상점/초대 버튼). 방문 아바타/방 이름/도움말 버튼은 해당 기능이 구현되는
           단계에서 추가한다. visitorMode일 땐 전부 숨기고 구경 중 배지만 보여준다. */}
@@ -788,11 +916,11 @@ export default function InteriorDecorRoom({
                 <span style={{ fontSize: 18, fontFamily: "'Press Start 2P', monospace", letterSpacing: -1 }}>{balance}</span>
               </div>
               <PixelButton
-                tone={isReady ? 'confirm' : 'default'} disabled={!isReady}
+                tone={inviteState.id === 'ready' ? 'confirm' : 'default'} disabled={loadError || !isReady}
                 onClick={() => setModal('invite')}
-                title={isReady ? undefined : `가구를 ${ROOM_READY_COUNT}개 이상 놓으면 초대할 수 있어요`}
-              >{isReady ? '초대' : `초대 (${placedCount}/${ROOM_READY_COUNT})`}</PixelButton>
-              <PixelButton tone="accent" onClick={() => setModal('shop')}>상점</PixelButton>
+                title={isReady ? inviteState.detail : `가구를 ${HOME_INVITE_REQUIRED_COUNT}개 이상 놓으면 초대할 수 있어요`}
+              >{!isReady ? `초대 (${placedCount}/${HOME_INVITE_REQUIRED_COUNT})` : inviteState.id === 'ready' ? '초대' : inviteState.id === 'share-error' ? '초대 링크 확인' : inviteState.id === 'qa-unavailable' ? '초대 미리보기' : '초대 준비 중'}</PixelButton>
+              <PixelButton tone="accent" disabled={loadError} onClick={() => setModal('shop')}>상점</PixelButton>
             </div>
           </>
         )}
@@ -817,6 +945,7 @@ export default function InteriorDecorRoom({
             selectedUid={selected}
             onSelectItem={selectPlaced}
             popover={popoverNode}
+            inputBlocked={Boolean(modal || reward)}
             duoScreen={duoScreen}
             sendPosition={sendPosition}
             partnerPos={partnerPos}
@@ -834,10 +963,10 @@ export default function InteriorDecorRoom({
                 <>
                   <PixelButton onClick={undoLast} disabled={history.length === 0} title="방금 한 동작 하나만 취소해요 (Cmd/Ctrl+Z)">실행 취소</PixelButton>
                   <PixelButton onClick={cancelEdit}>되돌리기</PixelButton>
-                  <PixelButton tone="confirm" onClick={saveEdit} style={{ padding: '11px 22px' }}>저장하기</PixelButton>
+                  <PixelButton tone="confirm" onClick={saveEdit} disabled={roomSaving} style={{ padding: '11px 22px' }}>{roomSaving ? '저장 중...' : '저장하기'}</PixelButton>
                 </>
               ) : (
-                <PixelButton tone="accent" onClick={startEdit} style={{ fontSize: 16, padding: '12px 26px' }}>꾸미기 시작</PixelButton>
+                <PixelButton tone="accent" disabled={loadError} onClick={startEdit} style={{ fontSize: 16, padding: '12px 26px' }}>꾸미기 시작</PixelButton>
               )}
             </div>
           </div>
@@ -854,7 +983,7 @@ export default function InteriorDecorRoom({
                 <div style={{ fontSize: 20 }}>{isReady ? '🎉' : '🛠️'}</div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: 12.5, fontFamily: "'Gothic A1', sans-serif", fontWeight: 700 }}>
-                    <span>{isReady ? '친구를 초대할 준비가 됐어요!' : '친구를 맞을 준비 중이에요'}</span>
+                    <span>{inviteState.title}</span>
                     <span style={{ color: 'var(--text-mid)' }}>{readyProgress}%</span>
                   </div>
                   <div style={{ marginTop: 6, height: 8, background: 'var(--beige-dark)', overflow: 'hidden' }}>
@@ -863,7 +992,7 @@ export default function InteriorDecorRoom({
                 </div>
               </div>
               <p style={{ margin: '8px 0 0', fontSize: 11, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)' }}>
-                가구 {ROOM_READY_COUNT}개를 놓으면 초대 링크를 만들 수 있어요(놓인 소품 {placedCount}개).
+                {inviteState.decorated ? inviteState.detail : `가구 ${HOME_INVITE_REQUIRED_COUNT}개를 놓으면 초대 링크를 만들 수 있어요(놓인 소품 ${placedCount}개).`}
               </p>
             </div>
           )}
@@ -967,7 +1096,7 @@ export default function InteriorDecorRoom({
       )}
 
       {modal === 'invite' && (
-        <InviteModal inviteUrl={inviteUrl} onClose={() => setModal(null)} />
+        <InviteModal inviteUrl={inviteUrl} inviteState={inviteState} onRetry={onRetryRoomShare} onClose={() => setModal(null)} />
       )}
 
       {reward && (
@@ -981,7 +1110,7 @@ export default function InteriorDecorRoom({
           border: '3px solid var(--beige)', fontSize: 14, zIndex: 120,
           fontFamily: "'Gothic A1', sans-serif", fontWeight: 700,
           animation: 'rise 0.18s ease both',
-        }}>{toast}</div>
+        }} data-room-toast>{toast}</div>
       )}
     </div>
   )

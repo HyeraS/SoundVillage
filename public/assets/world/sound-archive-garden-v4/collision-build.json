@@ -1,0 +1,70 @@
+{
+  "status": "PASS",
+  "source": "semantic-building-footprints",
+  "width": 960,
+  "height": 720,
+  "cellSize": 4,
+  "totalCells": 691200,
+  "walkableCells": 634273,
+  "blockedCells": 56927,
+  "walkablePercent": 91.76,
+  "blockedPercent": 8.24,
+  "blockers": [
+    {
+      "id": "Lab",
+      "left": 1792,
+      "top": 416,
+      "right": 2048,
+      "bottom": 630
+    },
+    {
+      "id": "Animal",
+      "left": 3072,
+      "top": 448,
+      "right": 3392,
+      "bottom": 702
+    },
+    {
+      "id": "Urban",
+      "left": 3392,
+      "top": 1152,
+      "right": 3712,
+      "bottom": 1514
+    },
+    {
+      "id": "Music",
+      "left": 3040,
+      "top": 2080,
+      "right": 3392,
+      "bottom": 2430
+    },
+    {
+      "id": "Human",
+      "left": 224,
+      "top": 2048,
+      "right": 640,
+      "bottom": 2458
+    },
+    {
+      "id": "Nature",
+      "left": 352,
+      "top": 1120,
+      "right": 736,
+      "bottom": 1290
+    },
+    {
+      "id": "Library",
+      "left": 1728,
+      "top": 1184,
+      "right": 2112,
+      "bottom": 1398
+    },
+    {
+      "id": "Home",
+      "left": 1536,
+      "top": 1472,
+      "right": 1792,
+      "bottom": 1752
+    }
+  ]
+}

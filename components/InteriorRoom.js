@@ -132,6 +132,7 @@ export default function InteriorRoom({
   onHoverCell, onClickCell,
   selectedUid = null, onSelectItem,
   popover = null,
+  inputBlocked = false,
   // 4단계(집 안 실시간 동기화) — WorldMap과 동일한 lib/duoSession.js를
   // 그대로 쓴다. 이 컴포넌트는 자신이 호스트 방인지 방문 중인지 모르고,
   // duoScreen 문자열과 sendPosition/partnerPos만 그대로 전달받아 쓴다.
@@ -162,7 +163,7 @@ export default function InteriorRoom({
   const [avatarPos, setAvatarPos] = useState({ x: 2 * CELL + 8, y: 2 })
   const [facingLeft, setFacingLeft] = useState(false)
   const avatarPosRef = useRef(avatarPos)
-  const { keys } = useKeys()
+  const { keys } = useKeys({ disabled: inputBlocked, screen: 'interior' })
 
   useEffect(() => {
     const maxX = STAGE_W - AVATAR_W

@@ -1,0 +1,1543 @@
+{
+  "version": "music-moonlit-v2.0.0",
+  "productionUse": true,
+  "generatedAt": "2026-09-18T00:00:00.000Z",
+  "geometry": {
+    "width": 1536,
+    "height": 1152,
+    "tiles": {
+      "width": 48,
+      "height": 36
+    },
+    "tileSize": 32
+  },
+  "artDirection": {
+    "styleframe": "design/concepts/music-village-cozy-2026-09-17/01-moonlit-concert-garden-v2-music.png",
+    "imagegenReference": "design/2d-map-redesign/sources/music-moonlit-v2/imagegen-material-prop-reference.png",
+    "promptUse": "material, prop, palette, and pixel-cluster reference only; runtime geometry is config-authoritative"
+  },
+  "generation": {
+    "script": "design/2d-map-redesign/tools/build_music_moonlit_v2.mjs",
+    "deterministicAssembly": true
+  },
+  "stage": {
+    "x": 18,
+    "y": 3,
+    "width": 12,
+    "height": 7,
+    "collision": {
+      "x": 18,
+      "y": 3,
+      "w": 12,
+      "h": 5,
+      "tag": "stage-rear"
+    },
+    "approach": {
+      "x": 23,
+      "y": 10,
+      "w": 3,
+      "h": 3,
+      "tag": "stage-approach"
+    }
+  },
+  "gate": {
+    "x": 22,
+    "y": 32,
+    "width": 4,
+    "height": 3,
+    "opening": {
+      "x": 23,
+      "y": 32,
+      "w": 2,
+      "h": 3,
+      "tag": "gate-opening"
+    },
+    "colliders": [
+      {
+        "x": 22,
+        "y": 32,
+        "w": 1,
+        "h": 3,
+        "tag": "gate-left-post"
+      },
+      {
+        "x": 25,
+        "y": 32,
+        "w": 1,
+        "h": 3,
+        "tag": "gate-right-post"
+      }
+    ]
+  },
+  "buildings": [
+    {
+      "id": "record-archive",
+      "label": "Record Archive",
+      "x": 4,
+      "y": 4,
+      "width": 8,
+      "height": 6,
+      "entrance": "south",
+      "clearance": {
+        "x": 6,
+        "y": 10,
+        "w": 3,
+        "h": 3,
+        "tag": "record-archive-entrance"
+      }
+    },
+    {
+      "id": "listening-cafe",
+      "label": "Listening Cafe",
+      "x": 35,
+      "y": 5,
+      "width": 10,
+      "height": 5,
+      "entrance": "south",
+      "clearance": {
+        "x": 38,
+        "y": 10,
+        "w": 3,
+        "h": 3,
+        "tag": "listening-cafe-entrance"
+      }
+    },
+    {
+      "id": "community-studio",
+      "label": "Community Studio",
+      "x": 3,
+      "y": 28,
+      "width": 10,
+      "height": 5,
+      "entrance": "east",
+      "clearance": {
+        "x": 13,
+        "y": 28,
+        "w": 3,
+        "h": 3,
+        "tag": "community-studio-entrance"
+      }
+    },
+    {
+      "id": "sound-workshop",
+      "label": "Sound Workshop",
+      "x": 36,
+      "y": 27,
+      "width": 8,
+      "height": 6,
+      "entrance": "west",
+      "clearance": {
+        "x": 33,
+        "y": 28,
+        "w": 3,
+        "h": 3,
+        "tag": "sound-workshop-entrance"
+      }
+    }
+  ],
+  "props": [
+    {
+      "id": "flowerbed-low-a",
+      "category": "flowerbeds",
+      "x": 14,
+      "y": 13,
+      "top": 13,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 1.84,
+        "h": 0.54
+      },
+      "worldCollision": {
+        "x": 450.56,
+        "y": 428.16,
+        "w": 58.88,
+        "h": 17.28,
+        "tag": "prop:flowerbed-low-a:0"
+      },
+      "foreground": false
+    },
+    {
+      "id": "flowerbed-low-a",
+      "category": "flowerbeds",
+      "x": 32,
+      "y": 13,
+      "top": 13,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 1.84,
+        "h": 0.54
+      },
+      "worldCollision": {
+        "x": 1026.56,
+        "y": 428.16,
+        "w": 58.88,
+        "h": 17.28,
+        "tag": "prop:flowerbed-low-a:1"
+      },
+      "foreground": false
+    },
+    {
+      "id": "flowerbed-low-a",
+      "category": "flowerbeds",
+      "x": 15,
+      "y": 25,
+      "top": 25,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 1.84,
+        "h": 0.54
+      },
+      "worldCollision": {
+        "x": 482.56,
+        "y": 812.16,
+        "w": 58.88,
+        "h": 17.28,
+        "tag": "prop:flowerbed-low-a:2"
+      },
+      "foreground": false
+    },
+    {
+      "id": "flowerbed-low-a",
+      "category": "flowerbeds",
+      "x": 31,
+      "y": 25,
+      "top": 25,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.38,
+        "w": 1.84,
+        "h": 0.54
+      },
+      "worldCollision": {
+        "x": 994.56,
+        "y": 812.16,
+        "w": 58.88,
+        "h": 17.28,
+        "tag": "prop:flowerbed-low-a:3"
+      },
+      "foreground": false
+    },
+    {
+      "id": "bench-low-a",
+      "category": "benches",
+      "x": 14,
+      "y": 17,
+      "top": 17,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 1.8,
+        "h": 0.36
+      },
+      "worldCollision": {
+        "x": 451.2,
+        "y": 561.92,
+        "w": 57.6,
+        "h": 11.52,
+        "tag": "prop:bench-low-a:4"
+      },
+      "foreground": false
+    },
+    {
+      "id": "bench-low-a",
+      "category": "benches",
+      "x": 32,
+      "y": 17,
+      "top": 17,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 1.8,
+        "h": 0.36
+      },
+      "worldCollision": {
+        "x": 1027.2,
+        "y": 561.92,
+        "w": 57.6,
+        "h": 11.52,
+        "tag": "prop:bench-low-a:5"
+      },
+      "foreground": false
+    },
+    {
+      "id": "bench-low-a",
+      "category": "benches",
+      "x": 17,
+      "y": 26,
+      "top": 26,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 1.8,
+        "h": 0.36
+      },
+      "worldCollision": {
+        "x": 547.2,
+        "y": 849.92,
+        "w": 57.6,
+        "h": 11.52,
+        "tag": "prop:bench-low-a:6"
+      },
+      "foreground": false
+    },
+    {
+      "id": "bench-low-a",
+      "category": "benches",
+      "x": 29,
+      "y": 26,
+      "top": 26,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.1,
+        "y": 0.56,
+        "w": 1.8,
+        "h": 0.36
+      },
+      "worldCollision": {
+        "x": 931.2,
+        "y": 849.92,
+        "w": 57.6,
+        "h": 11.52,
+        "tag": "prop:bench-low-a:7"
+      },
+      "foreground": false
+    },
+    {
+      "id": "planter-low-a",
+      "category": "planters",
+      "x": 13,
+      "y": 10,
+      "top": 10,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "worldCollision": {
+        "x": 421.76,
+        "y": 335.36,
+        "w": 20.48,
+        "h": 14.08,
+        "tag": "prop:planter-low-a:8"
+      },
+      "foreground": false
+    },
+    {
+      "id": "planter-low-a",
+      "category": "planters",
+      "x": 34,
+      "y": 10,
+      "top": 10,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "worldCollision": {
+        "x": 1093.76,
+        "y": 335.36,
+        "w": 20.48,
+        "h": 14.08,
+        "tag": "prop:planter-low-a:9"
+      },
+      "foreground": false
+    },
+    {
+      "id": "planter-low-a",
+      "category": "planters",
+      "x": 13,
+      "y": 31,
+      "top": 31,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "worldCollision": {
+        "x": 421.76,
+        "y": 1007.36,
+        "w": 20.48,
+        "h": 14.08,
+        "tag": "prop:planter-low-a:10"
+      },
+      "foreground": false
+    },
+    {
+      "id": "planter-low-a",
+      "category": "planters",
+      "x": 34,
+      "y": 31,
+      "top": 31,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.18,
+        "y": 0.48,
+        "w": 0.64,
+        "h": 0.44
+      },
+      "worldCollision": {
+        "x": 1093.76,
+        "y": 1007.36,
+        "w": 20.48,
+        "h": 14.08,
+        "tag": "prop:planter-low-a:11"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 15,
+      "y": 12,
+      "top": 11,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 488.96,
+        "y": 402.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:12"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 32,
+      "y": 12,
+      "top": 11,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 1032.96,
+        "y": 402.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:13"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 12,
+      "y": 21,
+      "top": 20,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 392.96,
+        "y": 690.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:14"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 35,
+      "y": 21,
+      "top": 20,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 1128.96,
+        "y": 690.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:15"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 19,
+      "y": 29,
+      "top": 28,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 616.96,
+        "y": 946.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:16"
+      },
+      "foreground": false
+    },
+    {
+      "id": "lamp-low-a",
+      "category": "lamps",
+      "x": 28,
+      "y": 29,
+      "top": 28,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.28,
+        "y": 1.58,
+        "w": 0.44,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 904.96,
+        "y": 946.56,
+        "w": 14.08,
+        "h": 10.88,
+        "tag": "prop:lamp-low-a:17"
+      },
+      "foreground": false
+    },
+    {
+      "id": "shrub-low-a",
+      "category": "vegetation",
+      "x": 5,
+      "y": 14,
+      "top": 14,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 164.48,
+        "y": 464,
+        "w": 23.04,
+        "h": 13.44,
+        "tag": "prop:shrub-low-a:18"
+      },
+      "foreground": false
+    },
+    {
+      "id": "shrub-low-a",
+      "category": "vegetation",
+      "x": 42,
+      "y": 14,
+      "top": 14,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1348.48,
+        "y": 464,
+        "w": 23.04,
+        "h": 13.44,
+        "tag": "prop:shrub-low-a:19"
+      },
+      "foreground": false
+    },
+    {
+      "id": "shrub-low-a",
+      "category": "vegetation",
+      "x": 6,
+      "y": 24,
+      "top": 24,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 196.48,
+        "y": 784,
+        "w": 23.04,
+        "h": 13.44,
+        "tag": "prop:shrub-low-a:20"
+      },
+      "foreground": false
+    },
+    {
+      "id": "shrub-low-a",
+      "category": "vegetation",
+      "x": 41,
+      "y": 24,
+      "top": 24,
+      "visual": {
+        "width": 1,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.14,
+        "y": 0.5,
+        "w": 0.72,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1316.48,
+        "y": 784,
+        "w": 23.04,
+        "h": 13.44,
+        "tag": "prop:shrub-low-a:21"
+      },
+      "foreground": false
+    },
+    {
+      "id": "tree-low-a",
+      "category": "vegetation",
+      "x": 1,
+      "y": 15,
+      "top": 13,
+      "visual": {
+        "width": 2,
+        "height": 3
+      },
+      "collision": {
+        "x": 0.58,
+        "y": 2.32,
+        "w": 0.84,
+        "h": 0.6
+      },
+      "worldCollision": {
+        "x": 50.56,
+        "y": 490.24,
+        "w": 26.88,
+        "h": 19.2,
+        "tag": "prop:tree-low-a:22"
+      },
+      "foreground": false
+    },
+    {
+      "id": "tree-low-a",
+      "category": "vegetation",
+      "x": 45,
+      "y": 15,
+      "top": 13,
+      "visual": {
+        "width": 2,
+        "height": 3
+      },
+      "collision": {
+        "x": 0.58,
+        "y": 2.32,
+        "w": 0.84,
+        "h": 0.6
+      },
+      "worldCollision": {
+        "x": 1458.56,
+        "y": 490.24,
+        "w": 26.88,
+        "h": 19.2,
+        "tag": "prop:tree-low-a:23"
+      },
+      "foreground": false
+    },
+    {
+      "id": "tree-low-a",
+      "category": "vegetation",
+      "x": 1,
+      "y": 26,
+      "top": 24,
+      "visual": {
+        "width": 2,
+        "height": 3
+      },
+      "collision": {
+        "x": 0.58,
+        "y": 2.32,
+        "w": 0.84,
+        "h": 0.6
+      },
+      "worldCollision": {
+        "x": 50.56,
+        "y": 842.24,
+        "w": 26.88,
+        "h": 19.2,
+        "tag": "prop:tree-low-a:24"
+      },
+      "foreground": false
+    },
+    {
+      "id": "tree-low-a",
+      "category": "vegetation",
+      "x": 45,
+      "y": 26,
+      "top": 24,
+      "visual": {
+        "width": 2,
+        "height": 3
+      },
+      "collision": {
+        "x": 0.58,
+        "y": 2.32,
+        "w": 0.84,
+        "h": 0.6
+      },
+      "worldCollision": {
+        "x": 1458.56,
+        "y": 842.24,
+        "w": 26.88,
+        "h": 19.2,
+        "tag": "prop:tree-low-a:25"
+      },
+      "foreground": false
+    },
+    {
+      "id": "garden-resonance-low",
+      "category": "garden",
+      "x": 22,
+      "y": 19,
+      "top": 17,
+      "visual": {
+        "width": 4,
+        "height": 3
+      },
+      "collision": {
+        "x": 0.22,
+        "y": 1.34,
+        "w": 3.56,
+        "h": 1.56
+      },
+      "worldCollision": {
+        "x": 711.04,
+        "y": 586.88,
+        "w": 113.92,
+        "h": 49.92,
+        "tag": "prop:garden-resonance-low:26"
+      },
+      "foreground": false
+    },
+    {
+      "id": "gate-vegetation-low",
+      "category": "gate-vegetation",
+      "x": 19,
+      "y": 34,
+      "top": 34,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 610.56,
+        "y": 1104,
+        "w": 58.88,
+        "h": 13.44,
+        "tag": "prop:gate-vegetation-low:27"
+      },
+      "foreground": false
+    },
+    {
+      "id": "gate-vegetation-low",
+      "category": "gate-vegetation",
+      "x": 27,
+      "y": 34,
+      "top": 34,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 866.56,
+        "y": 1104,
+        "w": 58.88,
+        "h": 13.44,
+        "tag": "prop:gate-vegetation-low:28"
+      },
+      "foreground": false
+    },
+    {
+      "id": "stage-vegetation-low",
+      "category": "stage-vegetation",
+      "x": 14,
+      "y": 5,
+      "top": 5,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 450.56,
+        "y": 176,
+        "w": 58.88,
+        "h": 13.44,
+        "tag": "prop:stage-vegetation-low:29"
+      },
+      "foreground": false
+    },
+    {
+      "id": "stage-vegetation-low",
+      "category": "stage-vegetation",
+      "x": 32,
+      "y": 5,
+      "top": 5,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.08,
+        "y": 0.5,
+        "w": 1.84,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1026.56,
+        "y": 176,
+        "w": 58.88,
+        "h": 13.44,
+        "tag": "prop:stage-vegetation-low:30"
+      },
+      "foreground": false
+    },
+    {
+      "id": "fence-low-a",
+      "category": "fences",
+      "x": 0,
+      "y": 3,
+      "top": 3,
+      "visual": {
+        "width": 3,
+        "height": 1
+      },
+      "collision": {
+        "x": 0,
+        "y": 0.5,
+        "w": 3,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 0,
+        "y": 112,
+        "w": 96,
+        "h": 13.44,
+        "tag": "prop:fence-low-a:31"
+      },
+      "foreground": false
+    },
+    {
+      "id": "fence-low-a",
+      "category": "fences",
+      "x": 45,
+      "y": 3,
+      "top": 3,
+      "visual": {
+        "width": 3,
+        "height": 1
+      },
+      "collision": {
+        "x": 0,
+        "y": 0.5,
+        "w": 3,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1440,
+        "y": 112,
+        "w": 96,
+        "h": 13.44,
+        "tag": "prop:fence-low-a:32"
+      },
+      "foreground": false
+    },
+    {
+      "id": "fence-low-a",
+      "category": "fences",
+      "x": 0,
+      "y": 34,
+      "top": 34,
+      "visual": {
+        "width": 3,
+        "height": 1
+      },
+      "collision": {
+        "x": 0,
+        "y": 0.5,
+        "w": 3,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 0,
+        "y": 1104,
+        "w": 96,
+        "h": 13.44,
+        "tag": "prop:fence-low-a:33"
+      },
+      "foreground": false
+    },
+    {
+      "id": "fence-low-a",
+      "category": "fences",
+      "x": 45,
+      "y": 34,
+      "top": 34,
+      "visual": {
+        "width": 3,
+        "height": 1
+      },
+      "collision": {
+        "x": 0,
+        "y": 0.5,
+        "w": 3,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1440,
+        "y": 1104,
+        "w": 96,
+        "h": 13.44,
+        "tag": "prop:fence-low-a:34"
+      },
+      "foreground": false
+    },
+    {
+      "id": "record-crates-low-a",
+      "category": "lifestyle",
+      "x": 2,
+      "y": 9,
+      "top": 9,
+      "visual": {
+        "width": 2,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.06,
+        "y": 0.34,
+        "w": 1.88,
+        "h": 0.58
+      },
+      "worldCollision": {
+        "x": 65.92,
+        "y": 298.88,
+        "w": 60.16,
+        "h": 18.56,
+        "tag": "prop:record-crates-low-a:35"
+      },
+      "foreground": false
+    },
+    {
+      "id": "cafe-table-low-a",
+      "category": "lifestyle",
+      "x": 44,
+      "y": 11,
+      "top": 10,
+      "visual": {
+        "width": 2,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.2,
+        "y": 1.2,
+        "w": 1.6,
+        "h": 0.7
+      },
+      "worldCollision": {
+        "x": 1414.4,
+        "y": 358.4,
+        "w": 51.2,
+        "h": 22.4,
+        "tag": "prop:cafe-table-low-a:36"
+      },
+      "foreground": false
+    },
+    {
+      "id": "instrument-case-low-a",
+      "category": "lifestyle",
+      "x": 1,
+      "y": 31,
+      "top": 30,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.16,
+        "y": 1.18,
+        "w": 0.68,
+        "h": 0.72
+      },
+      "worldCollision": {
+        "x": 37.12,
+        "y": 997.76,
+        "w": 21.76,
+        "h": 23.04,
+        "tag": "prop:instrument-case-low-a:37"
+      },
+      "foreground": false
+    },
+    {
+      "id": "repair-bench-low-a",
+      "category": "lifestyle",
+      "x": 44,
+      "y": 30,
+      "top": 30,
+      "visual": {
+        "width": 3,
+        "height": 1
+      },
+      "collision": {
+        "x": 0.06,
+        "y": 0.36,
+        "w": 2.88,
+        "h": 0.56
+      },
+      "worldCollision": {
+        "x": 1409.92,
+        "y": 971.52,
+        "w": 92.16,
+        "h": 17.92,
+        "tag": "prop:repair-bench-low-a:38"
+      },
+      "foreground": false
+    },
+    {
+      "id": "laundry-bike-low-a",
+      "category": "lifestyle",
+      "x": 14,
+      "y": 32,
+      "top": 31,
+      "visual": {
+        "width": 3,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.18,
+        "y": 1.42,
+        "w": 2.64,
+        "h": 0.48
+      },
+      "worldCollision": {
+        "x": 453.76,
+        "y": 1037.44,
+        "w": 84.48,
+        "h": 15.36,
+        "tag": "prop:laundry-bike-low-a:39"
+      },
+      "foreground": false
+    },
+    {
+      "id": "mailbox-low-a",
+      "category": "lifestyle",
+      "x": 32,
+      "y": 31,
+      "top": 30,
+      "visual": {
+        "width": 1,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.25,
+        "y": 1.5,
+        "w": 0.5,
+        "h": 0.42
+      },
+      "worldCollision": {
+        "x": 1032,
+        "y": 1008,
+        "w": 16,
+        "h": 13.44,
+        "tag": "prop:mailbox-low-a:40"
+      },
+      "foreground": false
+    },
+    {
+      "id": "foreground-edge-cluster",
+      "category": "foreground",
+      "x": 0,
+      "y": 32,
+      "top": 31,
+      "visual": {
+        "width": 3,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.05,
+        "y": 1.58,
+        "w": 2.9,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 1.6,
+        "y": 1042.56,
+        "w": 92.8,
+        "h": 10.88,
+        "tag": "prop:foreground-edge-cluster:41"
+      },
+      "foreground": true
+    },
+    {
+      "id": "foreground-edge-cluster",
+      "category": "foreground",
+      "x": 45,
+      "y": 31,
+      "top": 30,
+      "visual": {
+        "width": 3,
+        "height": 2
+      },
+      "collision": {
+        "x": 0.05,
+        "y": 1.58,
+        "w": 2.9,
+        "h": 0.34
+      },
+      "worldCollision": {
+        "x": 1441.6,
+        "y": 1010.56,
+        "w": 92.8,
+        "h": 10.88,
+        "tag": "prop:foreground-edge-cluster:42"
+      },
+      "foreground": true
+    }
+  ],
+  "drawOrder": [
+    "ground/path",
+    "contact-shadows",
+    "stage/gate structure",
+    "building body/roof/door-window/trim",
+    "low props",
+    "foreground occlusion",
+    "emissive",
+    "runtime player",
+    "runtime sound markers",
+    "HUD"
+  ],
+  "exclusions": [
+    "characters",
+    "sound orbs",
+    "UI",
+    "labels",
+    "guides",
+    "collision overlays",
+    "review imagery"
+  ],
+  "files": [
+    {
+      "path": "buildings/community-studio/body.png",
+      "bytes": 321,
+      "sha256": "82e9062d51800a2d1907eb7388d6e46115fdd4360673c0e5a5e50672dfd05d63"
+    },
+    {
+      "path": "buildings/community-studio/contact-shadow.png",
+      "bytes": 393,
+      "sha256": "d30f2a33224487502d0a8e84c1e70cfbbc679a63d01de9c5207384bbbbd69ff2"
+    },
+    {
+      "path": "buildings/community-studio/door-window.png",
+      "bytes": 338,
+      "sha256": "c3f7695da41e9d7062db2e30097ceaf5b1af6dbc032edfded1a3977577692d39"
+    },
+    {
+      "path": "buildings/community-studio/emissive.png",
+      "bytes": 1603,
+      "sha256": "da0c75cb067c1a1ee90b5aec4612f4896dbb064fef527cc244bb1569e8fd6a71"
+    },
+    {
+      "path": "buildings/community-studio/foreground.png",
+      "bytes": 375,
+      "sha256": "189b19287a8db84a021efaa71a9ffcfad98232432bf306295181b5d316107600"
+    },
+    {
+      "path": "buildings/community-studio/roof.png",
+      "bytes": 528,
+      "sha256": "5be546652f1474a2b6504029f46dd3bbaf5a8b903a3a090d016930604a823f24"
+    },
+    {
+      "path": "buildings/community-studio/trim.png",
+      "bytes": 442,
+      "sha256": "574bc67775f8cb793304aba6e3946ea2814bd1ffc86c0b7dd489425aac98cf5d"
+    },
+    {
+      "path": "buildings/listening-cafe/body.png",
+      "bytes": 321,
+      "sha256": "77942ec38a2d8fb5badb49da222f8bd32d626687b3ddbdda811d8e8a12fbd306"
+    },
+    {
+      "path": "buildings/listening-cafe/contact-shadow.png",
+      "bytes": 393,
+      "sha256": "d30f2a33224487502d0a8e84c1e70cfbbc679a63d01de9c5207384bbbbd69ff2"
+    },
+    {
+      "path": "buildings/listening-cafe/door-window.png",
+      "bytes": 353,
+      "sha256": "b91085ddfa1ef206d2821fdc30d8b6068be1b8d1b9927214f695730710afeb70"
+    },
+    {
+      "path": "buildings/listening-cafe/emissive.png",
+      "bytes": 1603,
+      "sha256": "da0c75cb067c1a1ee90b5aec4612f4896dbb064fef527cc244bb1569e8fd6a71"
+    },
+    {
+      "path": "buildings/listening-cafe/foreground.png",
+      "bytes": 375,
+      "sha256": "189b19287a8db84a021efaa71a9ffcfad98232432bf306295181b5d316107600"
+    },
+    {
+      "path": "buildings/listening-cafe/roof.png",
+      "bytes": 528,
+      "sha256": "fcbec1f32df7e8d92748f905249ad08b30aff62b9102c0cb660ed0c1305b344e"
+    },
+    {
+      "path": "buildings/listening-cafe/trim.png",
+      "bytes": 482,
+      "sha256": "4e87c769f5590d439d3511b03f8fee1f5013d250d426a44477fb2abd159aa19c"
+    },
+    {
+      "path": "buildings/record-archive/body.png",
+      "bytes": 324,
+      "sha256": "52760b95f244df3b6b7ca380e68ab2ab8d9dbc6db9dda6e70842c362fd389df0"
+    },
+    {
+      "path": "buildings/record-archive/contact-shadow.png",
+      "bytes": 406,
+      "sha256": "a2a3a52965cf2f7bc5a9e3983e36d6e3eb645fd340dfa47a3b3e5bf69024f83d"
+    },
+    {
+      "path": "buildings/record-archive/door-window.png",
+      "bytes": 334,
+      "sha256": "aae126425de4557ad58be5aa96c5c62e21b423a1896365e169fffe18b009d625"
+    },
+    {
+      "path": "buildings/record-archive/emissive.png",
+      "bytes": 1545,
+      "sha256": "d4b017d94ee4c62d4ebe1c85cb75d9367296389ce3f00c9fd5945a21724bfcbe"
+    },
+    {
+      "path": "buildings/record-archive/foreground.png",
+      "bytes": 377,
+      "sha256": "a3963827732621d8b9a2d2891f32ebc6f0a17909952f256914de1f7c8246002e"
+    },
+    {
+      "path": "buildings/record-archive/roof.png",
+      "bytes": 544,
+      "sha256": "8515344059266bb39f2e9ca72316d67ee8df36e8b0e14d29255651c3cd44f794"
+    },
+    {
+      "path": "buildings/record-archive/trim.png",
+      "bytes": 421,
+      "sha256": "ad0acc6ff016e6b150926ec4fc58d682dcee9a264637ce61ab1f8570587fc132"
+    },
+    {
+      "path": "buildings/sound-workshop/body.png",
+      "bytes": 324,
+      "sha256": "f2169175370835168c34960a5af33f5786d4f21fe6bc140675ce4e5ae8887c33"
+    },
+    {
+      "path": "buildings/sound-workshop/contact-shadow.png",
+      "bytes": 406,
+      "sha256": "a2a3a52965cf2f7bc5a9e3983e36d6e3eb645fd340dfa47a3b3e5bf69024f83d"
+    },
+    {
+      "path": "buildings/sound-workshop/door-window.png",
+      "bytes": 313,
+      "sha256": "2fc866f5ea9cb0bd0dd5d2b9fd9894d57718dbcc2a8d365c2365237393acfccd"
+    },
+    {
+      "path": "buildings/sound-workshop/emissive.png",
+      "bytes": 1545,
+      "sha256": "d4b017d94ee4c62d4ebe1c85cb75d9367296389ce3f00c9fd5945a21724bfcbe"
+    },
+    {
+      "path": "buildings/sound-workshop/foreground.png",
+      "bytes": 377,
+      "sha256": "a3963827732621d8b9a2d2891f32ebc6f0a17909952f256914de1f7c8246002e"
+    },
+    {
+      "path": "buildings/sound-workshop/roof.png",
+      "bytes": 544,
+      "sha256": "fcfe7dddee71ee18e14773d86d65b20bce54e609df63a325943a7a33801fa01c"
+    },
+    {
+      "path": "buildings/sound-workshop/trim.png",
+      "bytes": 344,
+      "sha256": "fa3629d7c2fa342b0699c07c043b71550f7958d1d425c09fd63c8bc6ed586beb"
+    },
+    {
+      "path": "gate/contact-shadow.png",
+      "bytes": 235,
+      "sha256": "b9c3f267cd50bb2b5c27d325688b27962153179762f4fd054ad5995bacf41083"
+    },
+    {
+      "path": "gate/emissive.png",
+      "bytes": 3186,
+      "sha256": "31058fcaad3ac7fd04c7a1f32c0b99ad28c582781cf323e1ce702b00fe1aeaf1"
+    },
+    {
+      "path": "gate/foreground.png",
+      "bytes": 290,
+      "sha256": "afe15ef27399862b50d1314bed015f5d5601cb990a3e94cb0a7b1fdd880f960a"
+    },
+    {
+      "path": "gate/posts.png",
+      "bytes": 211,
+      "sha256": "c0b560f550ef774ef734de459520f37278bf8afeb5791138e2a3f16866498e13"
+    },
+    {
+      "path": "gate/rail-g1.png",
+      "bytes": 361,
+      "sha256": "02c29f3ddf0d8ab62b8129d133dea734d5b2bb748332e75564b641b0ca4e999d"
+    },
+    {
+      "path": "gate/trim.png",
+      "bytes": 232,
+      "sha256": "1a58e7decc15898f1cca7421dea32fb59468e50f171d2686532a6f424ed68ec9"
+    },
+    {
+      "path": "ground/music-ground-path-map.png",
+      "bytes": 62840,
+      "sha256": "b3be43e88b1cb8c04026ebabc380d8b896ccb7cdd148b4fa3b639765cc06da78"
+    },
+    {
+      "path": "props/benches/bench-low-a.png",
+      "bytes": 162,
+      "sha256": "a6050760fa5745d9e3edef9649a1cc75c92770e904a79d600cad004cb883cfd3"
+    },
+    {
+      "path": "props/fences/fence-low-a.png",
+      "bytes": 182,
+      "sha256": "d75ae5d495dc10d0581a02373aa153f49c65f49197e2c80dfba6d05ac30ffa4d"
+    },
+    {
+      "path": "props/flowerbeds/flowerbed-low-a.png",
+      "bytes": 235,
+      "sha256": "a31d6ae27cbf23221db102fa9c44372c3804738c2048e2a4e98808d15481773b"
+    },
+    {
+      "path": "props/foreground/foreground-edge-cluster.png",
+      "bytes": 332,
+      "sha256": "a6403fe4653394ff745275121c88c6f1050bc8231b688ffc8c08ba1adc55bfa2"
+    },
+    {
+      "path": "props/garden/garden-resonance-low.png",
+      "bytes": 553,
+      "sha256": "01620de33f563ab858163111d551ceac79674879042a54e44f03daf26efe46c3"
+    },
+    {
+      "path": "props/gate-vegetation/gate-vegetation-low.png",
+      "bytes": 235,
+      "sha256": "a31d6ae27cbf23221db102fa9c44372c3804738c2048e2a4e98808d15481773b"
+    },
+    {
+      "path": "props/lamps/lamp-low-a.png",
+      "bytes": 174,
+      "sha256": "0ad88993664e52ded73a414dccc3f6b10c339e4f3dc582e4d64ac4717e1c3f12"
+    },
+    {
+      "path": "props/lifestyle/cafe-table-low-a.png",
+      "bytes": 324,
+      "sha256": "1552072e32a4c2edbbd73c681753746de28e5ec95d96c98016aa98cd9c89980f"
+    },
+    {
+      "path": "props/lifestyle/instrument-case-low-a.png",
+      "bytes": 261,
+      "sha256": "d7215d233424077d23b2c7c6a616b22da124933414ca91b760c2225f8d8dbbad"
+    },
+    {
+      "path": "props/lifestyle/laundry-bike-low-a.png",
+      "bytes": 381,
+      "sha256": "81a3ba2c12e107f2b1484faaa7dc81bfaac03e3ae67ca695a3d5086d4407fa0a"
+    },
+    {
+      "path": "props/lifestyle/mailbox-low-a.png",
+      "bytes": 172,
+      "sha256": "942d1fbd0fd2a1775a46994848b6dd4966a0c34261d29e9ca71819f25812056f"
+    },
+    {
+      "path": "props/lifestyle/record-crates-low-a.png",
+      "bytes": 220,
+      "sha256": "3f9b6d16624c8ad38d162a8f6574224a37326b72b1517012651f0c57ceb68bfc"
+    },
+    {
+      "path": "props/lifestyle/repair-bench-low-a.png",
+      "bytes": 238,
+      "sha256": "8f664bf9fe39522fec1e8beddf3b9f3876f253dc8dc0bc79f28ecbf049772605"
+    },
+    {
+      "path": "props/planters/planter-low-a.png",
+      "bytes": 217,
+      "sha256": "d25f7c1a07e5bb5b0aa6c7f8270f2cda998295a8186194730d3708c9b8d8d5a4"
+    },
+    {
+      "path": "props/stage-vegetation/stage-vegetation-low.png",
+      "bytes": 235,
+      "sha256": "a31d6ae27cbf23221db102fa9c44372c3804738c2048e2a4e98808d15481773b"
+    },
+    {
+      "path": "props/vegetation/shrub-low-a.png",
+      "bytes": 247,
+      "sha256": "fffd33b1203ff4103bca1d3dabf384b456c04b0f9e9af38c23da007a4814a16a"
+    },
+    {
+      "path": "props/vegetation/tree-low-a.png",
+      "bytes": 394,
+      "sha256": "61a01685e572fa3a0abd2713c3027fd5d9b7fe15728a689c0c07625aab1f5d6a"
+    },
+    {
+      "path": "stage/base-platform.png",
+      "bytes": 358,
+      "sha256": "0bdee01d96b574a0b0b1e6a127d1de9f24019211c3a74e65fd0862357d5ecb8c"
+    },
+    {
+      "path": "stage/canopy-s1.png",
+      "bytes": 984,
+      "sha256": "1906dedb861c74785a0ed0c61d66441e332267df321450bda22ee232d4d38e3e"
+    },
+    {
+      "path": "stage/contact-shadow.png",
+      "bytes": 529,
+      "sha256": "277bbfa832a5ca55607d8e3dccc0beb49e83d8d7526f3a009e891bb7c3181b93"
+    },
+    {
+      "path": "stage/emissive.png",
+      "bytes": 7886,
+      "sha256": "5f9742793470c0559ece8a40b726e68bd7a616421ddae5db3af898b057081cb4"
+    },
+    {
+      "path": "stage/foreground.png",
+      "bytes": 470,
+      "sha256": "e4402d45ef74ff6db8ecfb99826039dced994dbd923b6b37f3134ce2c3848a73"
+    },
+    {
+      "path": "stage/front-stair.png",
+      "bytes": 268,
+      "sha256": "1a04f1c23c3377e274f6467637ffc2fb0546cd147397239c2dee720fe1b8f6bd"
+    },
+    {
+      "path": "stage/opening.png",
+      "bytes": 356,
+      "sha256": "75ed107d9198aebb405f2dcebdc3fbff73968d654094302525d671483523fec8"
+    },
+    {
+      "path": "stage/rear-body.png",
+      "bytes": 399,
+      "sha256": "2224791151e24173e3c7c8fbcd7907788adbef79fd07fd27745bc52856239a98"
+    },
+    {
+      "path": "stage/trim.png",
+      "bytes": 606,
+      "sha256": "1f257524c916022c35122f13bd078973d5709bf1fdbbbe912cdf7c13239777b5"
+    }
+  ]
+}

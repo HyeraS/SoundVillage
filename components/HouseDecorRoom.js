@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Image from 'next/image'
 import { getCurrencyBalance } from '@/lib/currency'
 import { GENERATED_HOUSE_ITEM_COUNT, HOUSE_ITEMS, HOUSE_ITEM_CATEGORIES } from '@/lib/houseCatalog'
@@ -12,6 +12,7 @@ import {
   applyHouseWallpaper,
   removeHouseItem,
 } from '@/lib/houseDecor'
+import { newOperationKey } from '@/lib/persistenceResult'
 
 const GRID_COLS = 6
 const GRID_ROWS = 5
@@ -309,6 +310,7 @@ function HouseRoom({ layout, selectedItemId, selectedPlacedId, previewItem, visi
    onExit: 뒤로가기 버튼 / ESC 키 — "나가서 어디로 갈지"는 호출부가 결정한다.
 ───────────────────────────────────────────── */
 export default function HouseDecorRoom({ participantId, visitorMode = false, onExit }) {
+  const purchaseKeysRef = useRef(new Map())
   const [balance, setBalance] = useState(0)
   const [owned, setOwned] = useState([])
   const [layout, setLayout] = useState([])
@@ -401,11 +403,14 @@ export default function HouseDecorRoom({ participantId, visitorMode = false, onE
     setMessage('')
     setPendingPurchaseIds(prev => new Set(prev).add(item.id))
     try {
-      const result = await purchaseHouseItem({ participantId, itemId: item.id })
+      const idempotencyKey = purchaseKeysRef.current.get(item.id) || newOperationKey()
+      purchaseKeysRef.current.set(item.id, idempotencyKey)
+      const result = await purchaseHouseItem({ itemId: item.id, idempotencyKey })
       if (!result.ok) {
         setMessage(REASON_MESSAGES[result.reason] ?? result.reason)
         return
       }
+      purchaseKeysRef.current.delete(item.id)
       await refreshAll()
       setPurchaseTarget(null)
       setSelectedItemId(item.id)
@@ -501,10 +506,9 @@ export default function HouseDecorRoom({ participantId, visitorMode = false, onE
     setShopFamilyId(familyId)
     setShopLimit(SHOP_PAGE_SIZE)
   }
-  // 초대 링크는 항상 독립 방문 라우트(/house-decor-test?house=)를 가리킨다 —
-  // 이 컴포넌트가 메인 게임 화면(screen==='house')에 마운트돼 있을 때도
-  // window.location.pathname을 그대로 쓰면 '/'가 되어 방문 흐름이 깨지기 때문.
-  const inviteUrl = typeof window === 'undefined' || !participantId ? '' : `${window.location.origin}/house-decor-test?house=${encodeURIComponent(participantId)}`
+  // 루트의 실제 참가자 방문 흐름이 ?house=를 처리한다. 내부 테스트 라우트를
+  // 공개 초대 링크로 노출하지 않는다.
+  const inviteUrl = typeof window === 'undefined' || !participantId ? '' : `${window.location.origin}/?house=${encodeURIComponent(participantId)}`
   const copyInvite = async () => {
     if (!inviteUrl) return
     try {

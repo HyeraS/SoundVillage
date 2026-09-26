@@ -1,4 +1,6 @@
 'use client'
+import { useState } from 'react'
+import AnnotationPanel from '@/components/AnnotationPanel'
 import ZoneMap from '@/components/ZoneMap'
 import soundMetadata from '@/data/sound_metadata.json'
 
@@ -9,15 +11,45 @@ import soundMetadata from '@/data/sound_metadata.json'
 const labSounds = (soundMetadata.sounds || []).filter(s => s.game_zone === 'Lab')
 
 export default function LabTestPage() {
+  const [revision, setRevision] = useState(0)
+  const [blockNum, setBlockNum] = useState(6)
+  const [collectedIds, setCollectedIds] = useState(() => new Set())
+  const [activeSound, setActiveSound] = useState(null)
+  // Deliberately rebuild an equivalent array/object graph on every parent
+  // render. ZoneMap placement must ignore this reference-only change.
+  const equivalentSounds = labSounds.map(sound => ({ ...sound }))
   return (
-    <ZoneMap
-      zone="Lab"
-      sounds={labSounds}
-      onCollectSound={() => {}}
-      onExit={() => {}}
-      collectedIds={new Set()}
-      blockNum={6}
-      blockTotal={6}
-    />
+    <main data-zone-regression-revision={revision}>
+      <ZoneMap
+        zone="Lab"
+        sounds={equivalentSounds}
+        onCollectSound={setActiveSound}
+        onExit={() => setRevision(value => value + 1)}
+        collectedIds={collectedIds}
+        isAnnotating={Boolean(activeSound)}
+        blockNum={blockNum}
+        blockTotal={6}
+      />
+      <div style={{ position: 'fixed', right: 12, bottom: 12, zIndex: 70, display: 'flex', gap: 6 }}>
+        <button data-testid="zone-parent-rerender" onClick={() => setRevision(value => value + 1)}>Parent rerender</button>
+        <button data-testid="zone-progress-change" onClick={() => setCollectedIds(previous => {
+          const next = new Set(previous)
+          const first = equivalentSounds[0]?.sound_id
+          if (first) next.has(first) ? next.delete(first) : next.add(first)
+          return next
+        })}>Progress change</button>
+        <button data-testid="zone-block-change" onClick={() => setBlockNum(value => value === 6 ? 1 : 6)}>Block change</button>
+      </div>
+      {activeSound && (
+        <AnnotationPanel
+          sound={activeSound}
+          zone="Lab"
+          participantId="ZONE_BROWSER_QA"
+          sessionId="A"
+          onClose={() => setActiveSound(null)}
+          onComplete={() => setActiveSound(null)}
+        />
+      )}
+    </main>
   )
 }

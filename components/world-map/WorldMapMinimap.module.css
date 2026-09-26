@@ -1,0 +1,315 @@
+.minimapShell {
+  position: absolute;
+  top: 68px;
+  left: 16px;
+  z-index: 16;
+  width: 240px;
+  overflow: hidden;
+  color: #3a2a14;
+  font-family: Nunito, sans-serif;
+  background: #f5edd8ee;
+  border: 2px solid #c8a96e;
+  border-radius: 12px;
+  box-shadow: 0 5px 18px #0005;
+  backdrop-filter: blur(5px);
+}
+
+.minimapHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 6px 0 9px;
+  font-size: 11px;
+  border-bottom: 1px solid #c8a96e88;
+}
+
+.minimapHeader strong { flex: 1; }
+
+.collapseButton,
+.closeButton {
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: #3a2a14;
+  background: #0000000d;
+  cursor: pointer;
+}
+
+.collapseButton {
+  width: 23px;
+  height: 23px;
+  border-radius: 7px;
+  font-size: 15px;
+}
+
+.collapsed { width: 132px; }
+.collapsed .minimapHeader { border-bottom: 0; }
+
+.openButton {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.diagram {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #879d68;
+  isolation: isolate;
+}
+
+.roads { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ground { fill: #829968; }
+.roadEdge { fill: none; stroke: #725d3b; stroke-width: 108; stroke-linecap: round; stroke-linejoin: round; opacity: .72; }
+.road { fill: none; stroke: #dec993; stroke-width: 78; stroke-linecap: round; stroke-linejoin: round; }
+.objectiveLine { stroke: #fff5b2; stroke-width: 24; stroke-dasharray: 52 38; stroke-linecap: round; filter: drop-shadow(0 0 16px #5b3518); }
+.arrivedLine { stroke: #fff5b2; stroke-width: 20; stroke-dasharray: 18 36; opacity: .55; }
+
+.marker {
+  position: absolute;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 18px;
+  min-height: 18px;
+  padding: 0;
+  transform: translate(-50%, -50%);
+  color: #fff;
+  font-family: Nunito, sans-serif;
+  background: transparent;
+  border: 0;
+  filter: drop-shadow(0 1px 2px #000c);
+}
+
+button.marker { cursor: default; }
+
+.markerIcon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  font-size: 12px;
+  line-height: 1;
+  background: var(--marker-color);
+  border: 2px solid #fff5d6;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px #0008;
+}
+
+.homeMarker { z-index: 3; }
+.homeMarker .markerIcon {
+  width: 27px;
+  height: 27px;
+  font-size: 15px;
+  border-color: #fff0c8;
+  box-shadow: 0 0 0 3px #7b4737, 0 2px 7px #0009;
+}
+.homeReady .markerIcon { box-shadow: 0 0 0 3px #b84f39, 0 0 0 6px #ffc787aa, 0 2px 7px #0009; }
+.homeVisitor .markerIcon { box-shadow: 0 0 0 3px #7053b3, 0 0 0 6px #c7b5ffaa, 0 2px 7px #0009; }
+.homeStateDot {
+  position: absolute;
+  top: -4px;
+  left: 20px;
+  width: 8px;
+  height: 8px;
+  background: #ffdf75;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 7px #ffb13b;
+}
+
+.markerName {
+  padding: 2px 5px;
+  color: #fffdf4;
+  font-size: clamp(8px, 1.2vw, 11px);
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+  background: #2d2518df;
+  border: 1px solid #fff4;
+  border-radius: 6px;
+}
+
+.locked { opacity: .55; filter: grayscale(.75) drop-shadow(0 1px 2px #000b); }
+.locked .markerIcon { background: #716b60; border-style: dashed; }
+.near .markerIcon { box-shadow: 0 0 0 4px #fff8, 0 1px 4px #0008; }
+
+.current .markerIcon {
+  border-color: #fff4a7;
+  box-shadow: 0 0 0 4px #5a3f18, 0 0 0 7px #fff4a7;
+  animation: minimapPulse 1.8s ease-in-out infinite;
+}
+
+.player {
+  position: absolute;
+  z-index: 4;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  border: 3px solid #2a5eaa;
+  border-radius: 50%;
+  box-shadow: 0 0 0 2px #fff9, 0 2px 6px #000a;
+}
+
+.player > span {
+  position: absolute;
+  inset: 4px;
+  background: #ef5d4d;
+  border-radius: 50%;
+}
+
+.north {
+  position: absolute;
+  top: 5px;
+  right: 6px;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  color: #fff8d3;
+  font: 900 10px/1 Nunito, sans-serif;
+  background: #3a2a14cc;
+  border-radius: 50%;
+}
+
+.openHint {
+  position: absolute;
+  right: 6px;
+  bottom: 5px;
+  z-index: 5;
+  padding: 2px 5px;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 800;
+  background: #2d2518c9;
+  border-radius: 5px;
+}
+
+.overlayBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: #20170fa8;
+  backdrop-filter: blur(5px);
+}
+
+.overlay {
+  width: min(960px, calc(100vw - 48px));
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  color: #3a2a14;
+  font-family: Nunito, sans-serif;
+  background: #f5edd8;
+  border: 3px solid #c8a96e;
+  border-radius: 20px;
+  box-shadow: 0 18px 70px #0009;
+}
+
+.overlayHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px 18px;
+  border-bottom: 1px solid #c8a96e88;
+}
+
+.overlayHeader p { margin: 0 0 1px; color: #8b6a3a; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; }
+.overlayHeader h2 { margin: 0; font-size: 18px; }
+
+.closeButton {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 16px;
+}
+
+.overlayMap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: calc(100vh - 170px);
+  overflow: hidden;
+  background: #829968;
+}
+
+.legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  min-height: 46px;
+  padding: 8px 16px;
+  color: #6e5530;
+  font-size: 11px;
+}
+
+.legend span { display: inline-flex; align-items: center; gap: 5px; }
+.legend strong { margin-left: auto; color: #3a2a14; }
+.legendPlayer, .legendTarget { display: inline-block; width: 11px; height: 11px; border-radius: 50%; background: #ef5d4d; border: 2px solid #fff; box-shadow: 0 0 0 1px #2a5eaa; }
+.legendTarget { background: #fff4a7; box-shadow: 0 0 0 2px #5a3f18; }
+
+.minimapShell button:focus-visible,
+.overlay button:focus-visible {
+  outline: 3px solid #2f6fbd;
+  outline-offset: 2px;
+}
+
+@keyframes minimapPulse {
+  50% { transform: scale(1.12); }
+}
+
+@media (max-width: 720px) {
+  .minimapShell {
+    top: 104px;
+    right: 8px;
+    left: auto;
+    width: 144px;
+  }
+
+  .minimapHeader { height: 27px; }
+  .collapsed { width: 126px; }
+  .markerIcon { width: 17px; height: 17px; font-size: 9px; border-width: 1.5px; }
+  .player { width: 14px; height: 14px; border-width: 2px; }
+  .player > span { inset: 3px; }
+  .openHint { display: none; }
+  .north { width: 15px; height: 15px; font-size: 8px; }
+
+  .overlayBackdrop { padding: 10px; }
+  .overlay { width: calc(100vw - 20px); max-height: calc(100vh - 20px); border-radius: 15px; }
+  .overlayHeader { padding: 8px 10px 7px 13px; }
+  .overlayHeader h2 { font-size: 15px; }
+  .closeButton { width: 31px; height: 31px; }
+  .overlayMap { max-height: calc(100vh - 139px); }
+  .markerName { padding: 1px 3px; font-size: clamp(6px, 2.2vw, 9px); }
+  .overlayMap .markerIcon { width: 18px; height: 18px; font-size: 10px; }
+  .legend { min-height: 38px; padding: 6px 10px; gap: 5px 10px; font-size: 9px; }
+  .legend strong { width: 100%; margin-left: 0; }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .minimapShell { top: 64px; width: 132px; }
+  .overlay { display: grid; grid-template-columns: minmax(0, 1fr) 190px; grid-template-rows: auto 1fr; width: min(920px, calc(100vw - 20px)); }
+  .overlayHeader { grid-column: 1 / -1; }
+  .overlayMap { max-height: calc(100vh - 79px); }
+  .legend { align-content: center; }
+  .legend strong { margin-left: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .current .markerIcon { animation: none; }
+}

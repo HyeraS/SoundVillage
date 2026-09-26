@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useRef, useState, useMemo, memo } from 'react'
-import { useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
+import { useCollectiblePromptLogging, useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
 import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER_GROUND, WINTER_TILES, WINTER_MARKET } from '@/components/AssetRegistry'
 import { SHEET_CODES, LAB_DUNGEON_SHEET_META, LAB_STATIC, LAB_TORCHES, LAB_TRAPS, LAB_PROPS, LAB_ANIM, LAB_FLOOR_CELLS } from '@/components/labDungeonData'
 
@@ -2401,14 +2401,16 @@ function SoundItem({ item, zone, tick, state = 'active' }) {
   const items = ITEMS[zone] || []
   const imgSrc = items[item.index % items.length]
   const hasProduce = zone === 'Animal' || zone === 'Nature' || zone === 'Urban'
+  const stableFrameValue = value => Number(value.toFixed(4))
 
   // 잠긴(아직 구역 해제 안 된) 아이템 — 실제 아이콘을 옅게 보여줘 어디에
   // 분포되어 있는지는 알 수 있게 하되, 흐림 효과 자체는 구역 전체를 덮는
   // BlockCloud가 담당하고 여기서는 살짝 톤다운만 한다. 상호작용은 불가.
   if (state === 'locked') {
-    const drift = Math.sin(tick * 0.02 + item.pulse) * 2
+    const drift = stableFrameValue(Math.sin(tick * 0.02 + item.pulse) * 2)
     return (
-      <g transform={`translate(${px}, ${py + drift})`} opacity="0.55">
+      <g data-sound-item-id={item.id} data-sound-tx={item.tx} data-sound-ty={item.ty}
+        data-sound-state={state} transform={`translate(${px}, ${py + drift})`} opacity="0.55">
         {hasProduce ? (
           <g style={{ filter: 'grayscale(0.6)' }}>
             <LabSprite x={-11} y={-11} sprite={zoneProduceSprite(zone, item)} scale={22/16}/>
@@ -2433,15 +2435,16 @@ function SoundItem({ item, zone, tick, state = 'active' }) {
   }
 
   const done  = state === 'done'
-  const bobY  = done ? 0 : Math.sin(tick * 0.06 + item.pulse) * 4
-  const glow  = done ? 0.5 : Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7
+  const bobY  = done ? 0 : stableFrameValue(Math.sin(tick * 0.06 + item.pulse) * 4)
+  const glow  = done ? 0.5 : stableFrameValue(Math.sin(tick * 0.08 + item.pulse) * 0.2 + 0.7)
 
   // 제출 완료된 아이템은 게임 전체에서 쓰는 파라미지 금색/세피아 톤으로 표시
   const border = done ? '#C8A96E' : si.itemBorder
   const bg     = done ? '#F0E4C8' : si.itemBg
 
   return (
-    <g transform={`translate(${px}, ${py + bobY})`} opacity={glow}>
+    <g data-sound-item-id={item.id} data-sound-tx={item.tx} data-sound-ty={item.ty}
+      data-sound-state={state} transform={`translate(${px}, ${py + bobY})`} opacity={glow}>
       {/* 후광 + 파티클 — Animal/Nature는 원형 배경 대신 아이템 자체에 glow 필터만 입힌다
           (둥근 배경 도형 없이 "아이템에 효과만" 달라는 요청, Animal에서 확정된 스타일을
           Nature에도 동일 적용) */}
@@ -2450,10 +2453,10 @@ function SoundItem({ item, zone, tick, state = 'active' }) {
           <circle r="20" fill={border} opacity="0.12"/>
           {!done && [0,1,2].map(i => (
             <circle key={i}
-              cx={Math.cos(tick * 0.05 + i * 2.09) * 18}
-              cy={Math.sin(tick * 0.05 + i * 2.09) * 18}
+              cx={stableFrameValue(Math.cos(tick * 0.05 + i * 2.09) * 18)}
+              cy={stableFrameValue(Math.sin(tick * 0.05 + i * 2.09) * 18)}
               r="2" fill={si.itemBorder}
-              opacity={0.35 + Math.sin(tick * 0.1 + i) * 0.25}
+              opacity={stableFrameValue(0.35 + Math.sin(tick * 0.1 + i) * 0.25)}
             />
           ))}
         </>
@@ -2493,7 +2496,10 @@ function SoundItem({ item, zone, tick, state = 'active' }) {
           </text>
         </>
       )}
-      {!done && <circle cx="-5" cy="-7" r="2" fill="white" opacity={0.3 + Math.sin(tick*0.12)*0.3}/>}
+      {!done && (
+        <circle cx="-5" cy="-7" r="2" fill="white"
+          opacity={stableFrameValue(0.3 + Math.sin(tick*0.12)*0.3)}/>
+      )}
       {done && (
         <circle cx="9" cy="-9" r="7" fill="#7A9A6A" stroke="#F5EDD8" strokeWidth="1.2"/>
       )}
@@ -2559,17 +2565,17 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-export function PixelChar({ dir, moving }) {
-  const tick  = Math.floor(Date.now() / 160) % 2
-  const frame = moving ? tick : 0
+export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null }) {
+  const frame = moving ? Math.floor(animationTick / 10) % 2 : 0
 
   if (ASSET_READY.world) {
     const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
     const row = rows[dir] ?? rows.down
-    const walkTick = Math.floor(Date.now() / 100) % cols.length
+    const walkTick = Math.floor(animationTick / 6) % cols.length
     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
     return (
-      <svg width={SPRITE_W} height={SPRITE_H} viewBox={`0 0 ${fs} ${fs}`}
+      <svg width={displayWidth} height={displayHeight}
+        viewBox={sourceViewBox ? `${sourceViewBox.x} ${sourceViewBox.y} ${sourceViewBox.w} ${sourceViewBox.h}` : `0 0 ${fs} ${fs}`}
         style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs>
           <clipPath id="zonePlayerClip"><rect width={fs} height={fs}/></clipPath>
@@ -2587,7 +2593,7 @@ export function PixelChar({ dir, moving }) {
     const frameX = frameOffsets[frame] ?? frameOffsets[0]
     const { frameW, frameH, sheetW, sheetH } = CHAR_CFG
     return (
-      <svg width={SPRITE_W} height={SPRITE_H} viewBox={`0 0 ${frameW} ${frameH}`}
+      <svg width={displayWidth} height={displayHeight} viewBox={`0 0 ${frameW} ${frameH}`}
         style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs>
           <clipPath id="zoneCharClip"><rect width={frameW} height={frameH}/></clipPath>
@@ -2603,7 +2609,7 @@ export function PixelChar({ dir, moving }) {
   const legRY = frame === 0 ? 21 : 18
   const flip  = dir === 'left' ? 'scale(-1,1) translate(-22,0)' : ''
   return (
-    <svg width={SPRITE_W} height={SPRITE_H} viewBox="0 0 22 28"
+    <svg width={displayWidth} height={displayHeight} viewBox="0 0 22 28"
       style={{ imageRendering:'pixelated', overflow:'visible' }}>
       <g transform={flip}>
         <ellipse cx="11" cy="27" rx="7" ry="2" fill="#00000033"/>
@@ -2649,7 +2655,7 @@ export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTot
   const meta = ZONE_META[zone]
   const pct  = total > 0 ? Math.round((collected / total) * 100) : 0
   return (
-    <div style={{
+    <div data-zone-hud={zone} style={{
       position:'absolute', top:0, left:0, right:0, height:`${HUD_H}px`,
       background:'#F5EDD8', borderBottom:'3px solid #C8A96E',
       display:'flex', alignItems:'center', padding:'0 16px', gap:'14px',
@@ -2657,7 +2663,7 @@ export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTot
       boxShadow:'0 2px 8px #00000033',
     }}>
       {/* 뒤로가기 */}
-      <button onClick={onExit} style={{
+      <button data-zone-hud-back onClick={onExit} style={{
         padding:'6px 14px', borderRadius:'8px',
         background:'#E8D8B8', border:'2px solid #C8A96E',
         color:'#3A2A14', fontSize:'12px', fontWeight:700,
@@ -2667,10 +2673,10 @@ export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTot
         ← 월드맵
       </button>
 
-      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <div data-zone-hud-separator style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
 
       {/* Zone 정보 */}
-      <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+      <div data-zone-hud-info style={{ display:'flex', alignItems:'center', gap:'8px' }}>
         <span style={{ fontSize:'22px' }}>{meta.emoji}</span>
         <div>
           <div style={{ fontSize:'13px', fontWeight:800, color:'#3A2A14', lineHeight:1.1 }}>{meta.label}</div>
@@ -2680,10 +2686,10 @@ export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTot
         </div>
       </div>
 
-      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <div data-zone-hud-separator style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
 
       {/* 진행도 */}
-      <div style={{ flex:1, minWidth:0 }}>
+      <div data-zone-hud-progress style={{ flex:1, minWidth:0 }}>
         <div style={{ display:'flex', justifyContent:'space-between', marginBottom:'3px' }}>
           <span style={{ fontSize:'11px', fontWeight:700, color:'#3A2A14' }}>소리 수집</span>
           <span style={{ fontSize:'11px', color:'#8B6A3A' }}>{collected}/{total} ({pct}%)</span>
@@ -2697,10 +2703,10 @@ export function ZoneHUD({ zone, collected, total, onExit, blockNum = 1, blockTot
         </div>
       </div>
 
-      <div style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
+      <div data-zone-hud-separator style={{ width:'1px', height:'36px', background:'#C8A96E' }}/>
 
       {/* 조작 힌트 */}
-      <div style={{ fontSize:'10px', color:'#8B6A3A', lineHeight:1.7, textAlign:'right' }}>
+      <div data-zone-hud-controls style={{ fontSize:'10px', color:'#8B6A3A', lineHeight:1.7, textAlign:'right' }}>
         방향키 / WASD 이동<br/>
         ESC 나가기
       </div>
@@ -2717,6 +2723,16 @@ function hashSeed(str) {
   let h = 5381
   for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0
   return Math.abs(h) || 1
+}
+
+// Placement depends only on stable sound identity and experiment block.
+// Parent components may rebuild equivalent sound objects while changing HUD
+// or overlay state; those reference-only changes must not respawn items.
+function soundLayoutKey(sounds) {
+  return [...sounds]
+    .map(sound => `${String(sound.sound_id)}:${Number(sound.block || 1)}`)
+    .sort()
+    .join('|')
 }
 
 function spawnSoundItems(sounds, zone) {
@@ -2917,11 +2933,12 @@ export function ExitConfirmModal({ zone, onConfirm, onCancel }) {
 export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
   const meta   = ZONE_META[zone]
   const theme  = ZONE_THEME[zone]
-  const { keys, press, release } = useKeys()
-
   // 오브젝트 (한 번만 생성)
-  const zoneObjects = useRef(buildZoneObjects(zone))
-  const pathTiles   = useRef(buildPaths(sounds))
+  const zoneObjects = useMemo(() => buildZoneObjects(zone), [zone])
+  const layoutKey = soundLayoutKey(sounds)
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- layoutKey captures every placement input and intentionally ignores equivalent array references.
+  const layoutSounds = useMemo(() => sounds, [layoutKey])
+  const pathTiles = useMemo(() => buildPaths(layoutSounds), [layoutSounds])
 
   // Human Zone 지형 프리렌더(2단계) — global.png/global2.png 두 장을 비동기로
   // 로드한 뒤 prerenderMarketGround()로 한 번만 합성해 dataURL로 굳힌다. 로드
@@ -2951,19 +2968,20 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const [moving,     setMoving]    = useState(false)
   const [tick,       setTick]      = useState(0)
 
-  // 픽셀아트 정수배 스케일링 — SVG를 width/height:100%로 늘리면 컨테이너 크기가
-  // VIEW_W×VIEW_H(768×576)의 정수배가 아닐 때 브라우저가 어중간한 배율로
-  // 리샘플링해 image-rendering:pixelated를 걸어도 타일/스프라이트 가장자리가
-  // 흐려진다. 컨테이너 크기를 관찰해 항상 정수배(1x,2x,3x...)로만 그리고,
-  // 남는 공간은 레터박스(테마 border색 배경)로 남긴다.
+  // 뷰포트 — 컨테이너를 꽉 채운다. 세로로 보이는 월드 범위는 VIEW_H(18타일)로
+  // 고정해 줌 레벨·캐릭터 크기는 그대로 두고, 가로 범위만 창 비율에 맞춰 늘려
+  // 레터박스 여백을 없앤다(캔버스 기반 존 MusicZoneMap/NatureZoneMap과 동일
+  // 방식). 정수배 스케일링은 흔한 노트북 해상도(예: 1440×844)에서 거의 항상
+  // 1x로 떨어져 화면 대부분이 여백이 되는 문제 때문에 폐기했다. imageRendering:
+  // pixelated + 대개 DPR>=2라 비정수 배율에서도 스프라이트는 충분히 선명하다.
   const canvasWrapRef = useRef(null)
-  const [scale, setScale] = useState(1)
+  const [viewPx, setViewPx] = useState({ w: VIEW_W, h: VIEW_H })
   useEffect(() => {
     const el = canvasWrapRef.current
     if (!el) return
     const compute = () => {
       const { width, height } = el.getBoundingClientRect()
-      setScale(Math.max(1, Math.floor(Math.min(width / VIEW_W, height / VIEW_H))))
+      setViewPx({ w: Math.max(1, Math.round(width)), h: Math.max(1, Math.round(height)) })
     }
     compute()
     const ro = new ResizeObserver(compute)
@@ -2973,29 +2991,30 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
   // 아이템은 초기화 후 위치가 변하지 않으므로 ref로 관리
   // 가시성은 부모의 collectedIds(제출 완료 후 갱신)로만 결정
-  const itemsRef     = useRef(null)
-  if (itemsRef.current === null) itemsRef.current = spawnSoundItems(sounds, zone)
-  const zoneRegions = itemsRef.current.regions
+  const spawnedItems = useMemo(() => spawnSoundItems(layoutSounds, zone), [layoutSounds, zone])
+  const zoneRegions = spawnedItems.regions
   // 셀프체크 — spawnSoundItems() 자체는 절대 건드리지 않고, 그 결과값만 읽어서
   // 던전 바닥 칸(LAB_FLOOR_CELLS) 밖에 스폰된 아이템이 없는지 검증한다.
-  if (zone === 'Lab') {
-    const labItems = itemsRef.current.items
+  useEffect(() => {
+    if (zone !== 'Lab') return
+    const labItems = spawnedItems.items
     const labIntrusions = labItems.filter(it => !isLabFloorTile(it.tx, it.ty))
     console.log(
       `[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 ${labItems.length}개 중 바닥 밖 배치 ${labIntrusions.length}개` +
       (labIntrusions.length ? ` FAIL: ${JSON.stringify(labIntrusions.map(i => ({ tx:i.tx, ty:i.ty })))}` : ' PASS')
     )
-  }
+  }, [spawnedItems, zone])
   // 나무가 소리 아이템 칸과 겹쳐서 혼란스럽다는 피드백 — spawnSoundItems(위치/개수/block
   // 잠금 연동)는 그대로 두고, 순수 렌더링 단계에서 그 칸에 해당하는 natureTree만 걸러낸다
   // (buildZoneObjects()는 sounds/아이템 위치를 모르는 채로 한 번만 생성되는 정적 목록이라
   // 이렇게 그리는 시점에 교차 필터링하는 게 가장 안전한 지점).
-  const itemTileKeys = new Set(itemsRef.current.items.map(it => `${it.tx},${it.ty}`))
-  const visibleZoneObjects = zoneObjects.current.filter(
+  const itemTileKeys = useMemo(() => new Set(spawnedItems.items.map(it => `${it.tx},${it.ty}`)), [spawnedItems])
+  const visibleZoneObjects = useMemo(() => zoneObjects.filter(
     obj => !(obj.type === 'natureTree' && itemTileKeys.has(`${obj.tx},${obj.ty}`))
-  )
+  ), [itemTileKeys, zoneObjects])
 
   const [collecting, setCollecting]= useState(null)
+  useCollectiblePromptLogging(collecting, zone)
   // 현재 수집 진행 중(annotation 열려 있는 동안) 새 충돌 차단
   const collectingRef     = useRef(false)
   // 발견된 아이템 ref (RAF 루프에서 접근용)
@@ -3005,6 +3024,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
   // 입구 확인 팝업 — 캐릭터가 입구 타일에 들어서면 표시
   const [exitConfirm, setExitConfirm] = useState(false)
+  const { keys, press, release } = useKeys({ disabled: isAnnotating || exitConfirm, screen: 'zone', zone })
   // 입구 영역에 이미 들어와 있는지(연속 프레임에서 팝업 재발생 방지용)
   const inExitZoneRef = useRef(false)
 
@@ -3020,8 +3040,8 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   useEffect(() => {
     const h = e => {
       // 전사 패널이 열려 있는 동안 ESC는 AnnotationPanel이 자체 처리 (마을 밖으로 나가지 않음)
-      if (e.key === 'Escape') { if (!isAnnotatingRef.current) onExit(); return }
-      if (e.key === 'Enter' && collectingItemRef.current && !isAnnotatingRef.current) {
+      if (e.key === 'Escape' && !e.repeat) { if (!isAnnotatingRef.current) onExit(); return }
+      if (e.key === 'Enter' && !e.repeat && collectingItemRef.current && !isAnnotatingRef.current) {
         const item = collectingItemRef.current
         collectingItemRef.current = null
         setCollecting(null)
@@ -3042,9 +3062,9 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
   // 게임 루프
   useEffect(() => {
-    let lastTime = performance.now(), tickCount = 0
+    let lastTime = null, tickCount = 0
     const loop = (now) => {
-      const dt = Math.min((now - lastTime) / 16.67, 3)
+      const dt = lastTime === null ? 1 : Math.min((now - lastTime) / 16.67, 3)
       lastTime  = now
       tickCount++
       setTick(tickCount)
@@ -3060,7 +3080,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       // 없으므로(undefined) tryMoveX/Y가 기존과 완전히 동일하게 동작한다(격리된 부가 기능,
       // 기존 zone 이동 로직은 한 글자도 안 바뀜). 축별로 따로 검사해 벽을 스치며
       // 걷는 느낌을 내고 모서리에 끼지 않는다(디자인 원본 blocked() 원칙 그대로).
-      const humanSolid = zoneObjects.current.solid
+      const humanSolid = zoneObjects.solid
       const tryMoveY = (ny) => { if (!humanSolid || !marketBlocked(humanSolid, x, ny)) y = ny }
       const tryMoveX = (nx) => { if (!humanSolid || !marketBlocked(humanSolid, nx, y)) x = nx }
 
@@ -3089,7 +3109,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
         // 새 아이템 충돌 — annotation 열려 있으면 완전 차단
         if (!collectingRef.current) {
-          for (const item of itemsRef.current.items) {
+          for (const item of spawnedItems.items) {
             if (collectedIds.has(item.id)) continue
             if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
@@ -3107,7 +3127,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
         // 정지 상태에서도 충돌 감지 (방향 전환 직후 첫 프레임 등)
         if (!collectingRef.current && !isAnnotatingRef.current) {
           const { x: sx, y: sy } = posRef.current
-          for (const item of itemsRef.current.items) {
+          for (const item of spawnedItems.items) {
             if (collectedIds.has(item.id)) continue
             if ((item.sound.block || 1) > blockNumRef.current) continue
             const ix = item.tx * TILE + TILE / 2 - 12
@@ -3145,31 +3165,38 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dir, collectedIds])
 
-  const remaining = itemsRef.current.items.filter(it => !collectedIds.has(it.id)).length
-  const total     = itemsRef.current.items.length
+  const remaining = spawnedItems.items.filter(it => !collectedIds.has(it.id)).length
+  const total     = spawnedItems.items.length
   const collected = total - remaining
 
+  // 세로로 보이는 월드 범위는 VIEW_H로 고정, 가로는 창 비율에 맞춰 확장.
+  // (맵보다 넓어지는 초광폭 창에선 PX_W로 잘라 맵 밖이 과하게 노출되지 않게 한다.)
+  const viewWorldH = VIEW_H
+  const viewWorldW = Math.min(PX_W, Math.round(VIEW_H * viewPx.w / viewPx.h))
+
   // 카메라: 플레이어 중심, 맵 경계에서 클램프
-  const camX = Math.max(0, Math.min(pos.x + CHAR_W / 2 - VIEW_W / 2, PX_W - VIEW_W))
-  const camY = Math.max(0, Math.min(pos.y + CHAR_H / 2 - VIEW_H / 2, PX_H - VIEW_H))
+  const camX = Math.max(0, Math.min(pos.x + CHAR_W / 2 - viewWorldW / 2, PX_W - viewWorldW))
+  const camY = Math.max(0, Math.min(pos.y + CHAR_H / 2 - viewWorldH / 2, PX_H - viewWorldH))
 
   return (
-    <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
+    <div data-zone-map={zone} data-zone-layout-key={layoutKey}
+      style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
 
       {/* Zone HUD */}
       <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal}/>
 
-      {/* 게임 캔버스 — 정수배 스케일링(위 useEffect)으로 항상 선명하게, 남는
-          공간은 레터박스로 둔다. */}
+      {/* 게임 캔버스 — 컨테이너를 꽉 채운다(레터박스 없음). 세로 줌 고정, 가로만
+          창 비율에 맞춰 확장(위 useEffect + viewWorldW/H). */}
       <div ref={canvasWrapRef} style={{
         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
         background: theme.border, overflow:'hidden',
-        display:'flex', alignItems:'center', justifyContent:'center',
       }}>
         <svg
-          width={VIEW_W * scale} height={VIEW_H * scale}
-          viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
-          style={{ display:'block', imageRendering:'pixelated' }}
+          data-zone-viewport
+          width={viewPx.w} height={viewPx.h}
+          viewBox={`${camX} ${camY} ${viewWorldW} ${viewWorldH}`}
+          preserveAspectRatio="xMidYMid slice"
+          style={{ display:'block', position:'absolute', inset:0, imageRendering:'pixelated' }}
         >
           <defs>
             <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
@@ -3299,7 +3326,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
               쪼개진 것처럼" 보이는 버그로 보고됨. spawnSoundItems의 실제 스폰 제외 계산
               (nearGridLine)은 pathTiles를 그리든 안 그리든 좌표 자체로 독립 동작하므로 이 줄을
               빼도 스폰 로직엔 전혀 영향 없다 — 순수 시각 레이어만 끈다. ──*/}
-          {zone !== 'Animal' && zone !== 'Nature' && zone !== 'Urban' && zone !== 'Human' && zone !== 'Lab' && pathTiles.current.map((p, i) => (
+          {zone !== 'Animal' && zone !== 'Nature' && zone !== 'Urban' && zone !== 'Human' && zone !== 'Lab' && pathTiles.map((p, i) => (
             <rect key={i}
               x={p.tx * TILE} y={p.ty * TILE} width={TILE} height={TILE}
               fill={theme.path} stroke={`${theme.path}88`} strokeWidth="0.5"
@@ -3322,7 +3349,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
           {/* 소리 아이템 — zone 전체가 한 화면에 있고, 잠긴 구역은 안개(회색 점)로,
               해제된 구역은 아이콘으로, 완료된 것은 톤다운된 채로 계속 보임 */}
-          {itemsRef.current.items.map(item => {
+          {spawnedItems.items.map(item => {
             const state = collectedIds.has(item.id)
               ? 'done'
               : (item.sound.block || 1) <= blockNum ? 'active' : 'locked'
@@ -3340,17 +3367,20 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
           {/* 캐릭터 — 스프라이트는 히트박스(CHAR_W/H)보다 크므로, 히트박스 발치에
               스프라이트 발이 오도록 중앙 정렬 + 위쪽으로 오프셋해서 그린다 */}
           <foreignObject
+            data-zone-character data-character-x={Number(pos.x.toFixed(3))}
+            data-character-y={Number(pos.y.toFixed(3))} data-character-dir={dir}
+            data-character-moving={moving ? 'true' : 'false'}
             x={pos.x + CHAR_W/2 - SPRITE_W/2}
             y={pos.y + CHAR_H - SPRITE_H}
             width={SPRITE_W} height={SPRITE_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:SPRITE_W, height:SPRITE_H }}>
-              <PixelChar dir={dir} moving={moving}/>
+              <PixelChar dir={dir} moving={moving} animationTick={tick}/>
             </div>
           </foreignObject>
 
           {/* 발견 이펙트 — 커진 스프라이트 머리 위로 뜨도록 오프셋 조정 */}
           {collecting && (
-            <g transform={`translate(${pos.x + CHAR_W/2}, ${pos.y + CHAR_H - SPRITE_H - 15})`}>
+            <g data-collectible-prompt transform={`translate(${pos.x + CHAR_W/2}, ${pos.y + CHAR_H - SPRITE_H - 15})`}>
               <rect x="-30" y="-22" width="60" height="30" rx="6" fill="#F5EDD8" stroke="#C8A96E" strokeWidth="1.5"/>
               <text textAnchor="middle" y="-7" fontSize="11"
                 fill="#3A2A14" fontFamily="Nunito,sans-serif" fontWeight="700">
@@ -3421,14 +3451,14 @@ export function DPad({ press, release, onExit, onConfirm }) {
     cursor:'pointer', userSelect:'none', touchAction:'none',
   }
   return (
-    <div style={{
+    <div data-zone-dpad style={{
       position:'absolute', bottom:'20px', left:'20px',
       display:'grid', gridTemplateColumns:'repeat(3,44px)',
       gridTemplateRows:'repeat(2,44px)', gap:'4px', zIndex:15,
     }}>
       {BTN.map(b => (
-        <div key={b.dir} style={{ ...s, gridArea:b.gridArea }}
-          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); press(b.dir) }}
+        <div key={b.dir} data-dpad-direction={b.dir} style={{ ...s, gridArea:b.gridArea }}
+          onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); press(b.dir, e.pointerType === 'touch' ? 'touch' : 'mouse') }}
           onPointerUp={() => release(b.dir)}
           onPointerCancel={() => release(b.dir)}
         >{b.label}</div>

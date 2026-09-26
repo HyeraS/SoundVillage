@@ -1,401 +1,471 @@
 'use client'
-import { useEffect, useRef, useState } from 'react'
-import { useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
-import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, CHAR_W, CHAR_H, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
+
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCollectiblePromptLogging, useKeys, SPEED } from '@/components/GameEngine'
+import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad } from '@/components/ZoneMap'
 import {
-  T, MAP_W, MAP_H, mulberry32,
-  buildVillage, moveWithCollision, PLAYER_BOX,
-  drawStatic, drawItem, drawLockFog,
+  T, MAP_W, MAP_H, PLAYER_BOX, MUSIC_PLAYER_SOURCE, MUSIC_PLAYER_W, MUSIC_PLAYER_H,
+  SILHOUETTE_ENTER_RATIO, SILHOUETTE_EXIT_RATIO,
+  buildVillage, spawnMusicItems, moveWithCollisionDetailed, overlapsExitTrigger,
+  distanceToMusicItem, isMusicItemNearby, terrainSpeedAt, getNavigationTypeAtWorld, getNavigationCellAtWorld,
+  preloadMusicAssets, drawStatic, drawDepthLayer, drawEnvironment, drawNavigationDebug, drawExitCue, markerStateFor,
+  splitOcclusionObjects, getOcclusionState,
+  getMusicCamera, worldToMusicScreen, getMusicPlayerPlacement,
 } from '@/lib/musicVillage'
 
-// 화면에서 마을/캐릭터가 차지하는 비율을 다른 Zone(ZoneMap.js)과 똑같이 맞춘다 —
-// 그쪽은 항상 24x18타일(768x576 월드px)을 한 화면에 담고(SVG viewBox), 캐릭터
-// 스프라이트는 그 월드 좌표계 기준 72x88px다. 고정 줌(×2) 대신 "이 FOV를 실제
-// 캔버스 크기에 맞게 얼마나 확대해야 하는가"를 매 프레임 계산해서 쓰면, 화면
-// 크기가 달라져도 마을/캐릭터 비율이 항상 다른 Zone과 동일해진다(비율 유지
-// letterbox — 다른 Zone의 SVG preserveAspectRatio="xMidYMid meet"과 동일 동작).
-const FOV_W = 24 * TILE
-const FOV_H = 18 * TILE
+const soundSetKey = (sounds) => (sounds || [])
+  .map((sound) => `${sound.sound_id}:${sound.block || 1}`)
+  .sort()
+  .join('|')
 
-// 월드맵으로 나가는 입구 — 버스킹 광장(스폰 지점) 남쪽, 맵 최남단 걸을 수 있는
-// 줄(ty=34)에서 스폰과 가까운 걸을 수 있는 칸을 골랐다(alpha 대신 walkable()로
-// 실측 확인). 스폰 지점과 거리를 둬서(9타일) 입장하자마자 바로 나가기 확인
-// 팝업이 뜨지 않게 한다 — 다른 Zone도 스폰을 입구에서 몇 칸 띄워 두는 것과 동일.
-const ENTRANCE = { x: 21 * T + 16, y: 34 * T + 20 }
-const ENTRANCE_RADIUS = 26
+export default function MusicZoneMap({
+  sounds,
+  onCollectSound,
+  onExit,
+  collectedIds = new Set(),
+  isAnnotating = false,
+  blockNum = 1,
+  blockTotal = 1,
+  debug = false,
+}) {
+  const village = useMemo(() => buildVillage(), [])
+  const key = soundSetKey(sounds)
+  // `key`는 입력 배열 순서와 무관하므로 같은 sound set은 항상 같은 memo/배치를 쓴다.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const items = useMemo(() => spawnMusicItems(sounds), [key])
+  const itemsRef = useRef(items)
 
-function hashSeed(str) {
-  let h = 5381
-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0
-  return Math.abs(h) || 1
-}
+  const stageRef = useRef(null)
+  const canvasRef = useRef(null)
+  const behindCanvasRef = useRef(null)
+  const frontCanvasRef = useRef(null)
+  const staticCanvasRef = useRef(null)
+  const assetsRef = useRef(null)
+  const playerWrapRef = useRef(null)
+  const silhouetteWrapRef = useRef(null)
+  const debugPanelRef = useRef(null)
+  const nearbyMarkerButtonRef = useRef(null)
+  const metricsRef = useRef({ cssW: 0, cssH: 0, pixelW: 0, pixelH: 0, dpr: 1 })
+  const cameraRef = useRef(null)
+  const reducedMotionRef = useRef(false)
+  const movementDebugRef = useRef({ blockedAxes: [], collisions: [] })
+  const occlusionStateRef = useRef({ active: false, ratio: 0, objects: [], threshold: SILHOUETTE_ENTER_RATIO })
 
-// district(구역) 영역 안의 걸을 수 있는 타일을 모두 모아 시드 고정 셔플 후,
-// 서로 2칸 이상 떨어진 자리부터 채운다 — 자리가 모자라면(구역이 작아 간격을
-// 다 못 지키면) 남은 아이템은 간격 제약 없이 채우되, walkable 타일 밖으로는
-// 절대 나가지 않는다(빌딩/물 위에 아이템이 놓여 못 줍는 상황 방지).
-function pickPositions(district, count, walkable, rnd) {
-  const pool = []
-  for (let ty = district.area.y; ty < district.area.y + district.area.h; ty++) {
-    for (let tx = district.area.x; tx < district.area.x + district.area.w; tx++) {
-      if (walkable(tx, ty)) pool.push({ tx, ty })
-    }
-  }
-  for (let i = pool.length - 1; i > 0; i--) {
-    const j = Math.floor(rnd() * (i + 1))
-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
-  }
-  const chosen = []
-  for (const p of pool) {
-    if (chosen.length >= count) break
-    if (chosen.every(c => Math.abs(c.tx - p.tx) >= 2 || Math.abs(c.ty - p.ty) >= 2)) chosen.push(p)
-  }
-  if (chosen.length < count) {
-    for (const p of pool) {
-      if (chosen.length >= count) break
-      if (!chosen.some(c => c.tx === p.tx && c.ty === p.ty)) chosen.push(p)
-    }
-  }
-  return chosen
-}
-
-// 실제 SOUND_ITEMS.Music(sounds prop)을 music-village.js가 만든 구역(district)
-// 좌표계에 배치한다. buildVillage() 자체의 절차적 아이템 생성(village.items)은
-// 쓰지 않고 무시 — 소리 데이터는 항상 이 함수가 만든 배열을 통해서만 온다.
-// zone + 소리 id 목록으로 시드를 고정해 같은 참여자가 재입장해도 항상 같은
-// 배치가 나온다(spawnSoundItems의 기존 관례와 동일).
-function spawnMusicItems(sounds, village) {
-  const seed = hashSeed('Music|' + sounds.map(s => s.sound_id).sort().join(','))
-  const rnd  = mulberry32(seed)
-  const byBlock = new Map()
-  sounds.forEach(s => {
-    const b = s.block || 1
-    if (!byBlock.has(b)) byBlock.set(b, [])
-    byBlock.get(b).push(s)
-  })
-  const items = []
-  byBlock.forEach((list, block) => {
-    const district = village.districts.find(d => d.block === block) || village.districts[0]
-    const positions = pickPositions(district, list.length, village.walkable, rnd)
-    list.forEach((s, i) => {
-      const pos = positions[i] || positions[positions.length - 1] || { tx: district.area.x, ty: district.area.y }
-      items.push({
-        id:    s.sound_id,
-        sound: s,
-        tx:    pos.tx,
-        ty:    pos.ty,
-        neon:  district.neon,
-        kind:  hashSeed(s.sound_id) % 2 === 0 ? 'note' : 'tape',
-        phase: rnd() * Math.PI * 2,
-      })
-    })
-  })
-  return items
-}
-
-export default function MusicZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
-  const { keys, press, release } = useKeys()
-
-  const villageRef = useRef(null)
-  if (villageRef.current === null) villageRef.current = buildVillage('B')
-  const village = villageRef.current
-
-  const itemsRef = useRef(null)
-  if (itemsRef.current === null) itemsRef.current = spawnMusicItems(sounds, village)
-  const items = itemsRef.current
-
-  const stageRef         = useRef(null)
-  const canvasRef        = useRef(null)
-  const staticCanvasRef  = useRef(null)
-  useEffect(() => {
-    const off = document.createElement('canvas')
-    off.width  = MAP_W * T
-    off.height = MAP_H * T
-    drawStatic(off.getContext('2d'), village, { neon: true })
-    staticCanvasRef.current = off
-  }, [village])
-
-  // 캔버스를 다른 Zone과 동일하게 컨테이너 실측 크기로 꽉 채운다(고정 960x600
-  // 프레임이 아님) — 리사이즈될 때마다 canvas의 실제 픽셀 크기를 갱신한다.
-  useEffect(() => {
-    const stage = stageRef.current
-    const canvas = canvasRef.current
-    if (!stage || !canvas) return
-    const resize = () => {
-      const w = Math.round(stage.clientWidth)
-      const h = Math.round(stage.clientHeight)
-      if (canvas.width !== w) canvas.width = w
-      if (canvas.height !== h) canvas.height = h
-    }
-    resize()
-    const ro = new ResizeObserver(resize)
-    ro.observe(stage)
-    return () => ro.disconnect()
-  }, [])
-
-  const posRef        = useRef({ ...village.spawn })
-  const dirRef         = useRef('down')
-  const movingRef      = useRef(false)
-  const [dir, setDir]     = useState('down')
+  const posRef = useRef({ x: village.spawn.x, y: village.spawn.y })
+  const dirRef = useRef('down')
+  const movingRef = useRef(false)
+  const [dir, setDir] = useState('down')
   const [moving, setMoving] = useState(false)
-  const [, setAnimTick] = useState(0)
+  const [animTick, setAnimTick] = useState(0)
   const [collecting, setCollecting] = useState(null)
-  const collectingRef     = useRef(false)
+  useCollectiblePromptLogging(collecting, 'Music')
+  const collectingRef = useRef(false)
   const collectingItemRef = useRef(null)
-  const isAnnotatingRef   = useRef(isAnnotating)
-  const blockNumRef       = useRef(blockNum)
-  const collectedIdsRef   = useRef(collectedIds)
-  const playerWrapRef     = useRef(null)
-
-  // 입구(월드맵으로 나가는 곳) — 캐릭터가 걸어서 들어서면 확인 팝업 표시.
-  // ESC는 기존처럼 확인 없이 즉시 나가고, 이건 다른 Zone처럼 "걸어서 나가기"
-  // 대안 경로다.
+  const interactingItemIdRef = useRef(null)
+  const isAnnotatingRef = useRef(isAnnotating)
+  const blockNumRef = useRef(blockNum)
+  const collectedIdsRef = useRef(collectedIds)
   const [exitConfirm, setExitConfirm] = useState(false)
+  const { keys, press, release } = useKeys({ disabled: isAnnotating || exitConfirm, screen: 'zone', zone: 'Music' })
   const inExitZoneRef = useRef(false)
+  const [assetStatus, setAssetStatus] = useState('loading')
 
   useEffect(() => { isAnnotatingRef.current = isAnnotating }, [isAnnotating])
   useEffect(() => { blockNumRef.current = blockNum }, [blockNum])
   useEffect(() => { collectedIdsRef.current = collectedIds }, [collectedIds])
+  useEffect(() => { itemsRef.current = items }, [items])
   useEffect(() => {
-    if (!isAnnotating) { collectingRef.current = false; collectingItemRef.current = null }
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => { reducedMotionRef.current = query.matches }
+    update()
+    query.addEventListener('change', update)
+    return () => query.removeEventListener('change', update)
+  }, [])
+  useEffect(() => {
+    if (!isAnnotating) {
+      collectingRef.current = false
+      collectingItemRef.current = null
+      interactingItemIdRef.current = null
+    }
   }, [isAnnotating])
 
-  // PixelChar의 걷기 프레임은 내부적으로 Date.now()를 읽어서 결정되는데(다른
-  // Zone은 SVG 트리 전체가 매 프레임 다시 렌더링돼서 자연스럽게 갱신됨), 여기는
-  // 캔버스를 ref로 직접 그리느라 dir/moving 값이 바뀔 때만 리렌더한다 — 그러면
-  // 한 방향으로 계속 걷는 동안 PixelChar가 한 번도 다시 안 그려져서 다리가 멈춘
-  // 채로 미끄러지는 것처럼 보인다. WORLD_CHARACTER 걷기 프레임 갱신 주기(100ms)에
-  // 맞춰 리렌더만 강제로 트리거해서 다른 Zone과 같은 걷기 모션을 만든다.
   useEffect(() => {
-    const id = setInterval(() => {
-      if (movingRef.current) setAnimTick(t => t + 1)
-    }, 100)
-    return () => clearInterval(id)
+    let cancelled = false
+    const offscreen = document.createElement('canvas')
+    offscreen.width = MAP_W * T
+    offscreen.height = MAP_H * T
+    const ctx = offscreen.getContext('2d')
+    drawStatic(ctx, village, null)
+    staticCanvasRef.current = offscreen
+    preloadMusicAssets().then((assets) => {
+      if (cancelled) return
+      drawStatic(ctx, village, assets)
+      staticCanvasRef.current = offscreen
+      assetsRef.current = assets
+      setAssetStatus(assets.failed.length ? 'partial' : 'ready')
+    })
+    return () => { cancelled = true }
+  }, [village])
+
+  useEffect(() => {
+    const stage = stageRef.current
+    const canvases = [canvasRef.current, behindCanvasRef.current, frontCanvasRef.current]
+    if (!stage || canvases.some((canvas) => !canvas)) return
+    const resize = () => {
+      const cssW = Math.max(1, Math.round(stage.clientWidth))
+      const cssH = Math.max(1, Math.round(stage.clientHeight))
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const pixelW = Math.round(cssW * dpr)
+      const pixelH = Math.round(cssH * dpr)
+      for (const canvas of canvases) {
+        if (canvas.width !== pixelW) canvas.width = pixelW
+        if (canvas.height !== pixelH) canvas.height = pixelH
+      }
+      metricsRef.current = { cssW, cssH, pixelW, pixelH, dpr }
+    }
+    resize()
+    const observer = new ResizeObserver(resize)
+    observer.observe(stage)
+    return () => observer.disconnect()
   }, [])
 
-  // ESC(나가기) + Enter(전사 패널 열기) — 다른 Zone과 동일한 키 규약
   useEffect(() => {
-    const h = e => {
-      if (e.key === 'Escape') { if (!isAnnotatingRef.current) onExit(); return }
-      if (e.key === 'Enter' && collectingItemRef.current && !isAnnotatingRef.current) {
-        const item = collectingItemRef.current
-        collectingItemRef.current = null
-        setCollecting(null)
-        onCollectSound(item.sound)
-      }
-    }
-    window.addEventListener('keydown', h)
-    return () => window.removeEventListener('keydown', h)
-  }, [onExit, onCollectSound])
+    const timer = setInterval(() => {
+      if (movingRef.current) setAnimTick((tick) => tick + 1)
+    }, 100)
+    return () => clearInterval(timer)
+  }, [])
 
-  const confirmCollect = () => {
-    const item = collectingItemRef.current
-    if (!item) return
+  const beginCollect = (item) => {
+    if (!item || isAnnotatingRef.current) return
+    // Lock synchronously so a second key/pointer event cannot open the same
+    // item again before the parent has rendered the AnnotationPanel.
+    isAnnotatingRef.current = true
+    collectingRef.current = false
     collectingItemRef.current = null
+    interactingItemIdRef.current = item.id
     setCollecting(null)
     onCollectSound(item.sound)
   }
 
-  // 게임 루프 — 캔버스는 매 프레임 직접 그리고(React 리렌더와 분리), 캐릭터
-  // 스프라이트는 별도 DOM 오버레이의 style을 ref로 직접 갱신한다. 전부 ref만
-  // 읽으므로 이펙트는 마운트 시 한 번만 걸면 된다.
   useEffect(() => {
-    let raf
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape' && !event.repeat) {
+        if (!isAnnotatingRef.current) onExit()
+        return
+      }
+      if (event.key === 'Enter' && !event.repeat && collectingItemRef.current && !isAnnotatingRef.current) {
+        beginCollect(collectingItemRef.current)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [onExit, onCollectSound])
+
+  const confirmCollect = () => {
+    if (collectingItemRef.current) beginCollect(collectingItemRef.current)
+  }
+
+  useEffect(() => {
+    let animationFrame
     let lastTime = performance.now()
     const loop = (now) => {
-      // 다른 Zone(ZoneMap.js)과 동일하게 프레임 간 실제 경과 시간으로 속도를
-      // 보정한다(60fps 기준 dt=1, 최대 3배 캡) — 이게 없으면 모니터 주사율에
-      // 따라 이동 속도가 달라져서 다른 마을과 체감 속도가 어긋난다.
-      const dt = Math.min((now - lastTime) / 16.67, 3)
+      const deltaSeconds = Math.min((now - lastTime) / 1000, .05)
+      const dt = deltaSeconds * 60
       lastTime = now
-
-      const k = keys.current
-      let { x, y } = posRef.current
-      let dx = 0, dy = 0, newDir = null
-      const spd = SPEED * dt
-      if (k.up)    { dy -= spd; newDir = 'up' }
-      if (k.down)  { dy += spd; newDir = 'down' }
-      if (k.left)  { dx -= spd; newDir = 'left' }
-      if (k.right) { dx += spd; newDir = 'right' }
+      const pressed = keys.current
+      let dx = 0
+      let dy = 0
+      let nextDir = null
+      const speed = SPEED * dt * terrainSpeedAt(posRef.current)
+      if (pressed.up) { dy -= speed; nextDir = 'up' }
+      if (pressed.down) { dy += speed; nextDir = 'down' }
+      if (pressed.left) { dx -= speed; nextDir = 'left' }
+      if (pressed.right) { dx += speed; nextDir = 'right' }
+      if (dx && dy) { dx *= Math.SQRT1_2; dy *= Math.SQRT1_2 }
       const moved = dx !== 0 || dy !== 0
-
       if (moved) {
-        posRef.current = moveWithCollision(village, { x, y }, dx, dy)
-        if (newDir && newDir !== dirRef.current) { dirRef.current = newDir; setDir(newDir) }
+        const movement = moveWithCollisionDetailed(village, posRef.current, dx, dy)
+        posRef.current = movement.position
+        movementDebugRef.current = movement
+        if (nextDir && nextDir !== dirRef.current) {
+          dirRef.current = nextDir
+          setDir(nextDir)
+        }
       }
-      if (moved !== movingRef.current) { movingRef.current = moved; setMoving(moved) }
+      if (moved !== movingRef.current) {
+        movingRef.current = moved
+        setMoving(moved)
+      }
 
-      const { x: px, y: py } = posRef.current
-
-      // 근접 판정 — annotation 패널이 열려 있는 동안은 새 발견 차단
+      const { x: playerX, y: playerY } = posRef.current
+      const currentItems = itemsRef.current
       if (!collectingRef.current && !isAnnotatingRef.current) {
-        for (const item of items) {
-          if (collectedIdsRef.current.has(item.id)) continue
-          if ((item.sound.block || 1) > blockNumRef.current) continue
-          const ix = item.tx * T + 16 - 12, iy = item.ty * T + 14 - 12
-          if (overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
-            collectingRef.current = true
-            collectingItemRef.current = item
-            setCollecting(item)
-            break
-          }
+        const nearby = currentItems
+          .filter((item) => !collectedIdsRef.current.has(item.id) && item.block <= blockNumRef.current && isMusicItemNearby(posRef.current, item))
+          .sort((a, b) => distanceToMusicItem(posRef.current, a) - distanceToMusicItem(posRef.current, b))[0]
+        if (nearby) {
+          collectingRef.current = true
+          collectingItemRef.current = nearby
+          setCollecting(nearby)
         }
       } else if (collectingRef.current && collectingItemRef.current && !isAnnotatingRef.current) {
-        const fi = collectingItemRef.current
-        const ix = fi.tx * T + 16 - 12, iy = fi.ty * T + 14 - 12
-        if (!overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
+        if (!isMusicItemNearby(posRef.current, collectingItemRef.current)) {
           collectingRef.current = false
           collectingItemRef.current = null
           setCollecting(null)
         }
       }
 
-      // 입구 근접 판정 — annotation 패널이 열려 있는 동안은 확인 팝업을 새로
-      // 띄우지 않는다(다른 Zone과 동일 규칙).
-      if (!isAnnotatingRef.current) {
-        const edx = px - ENTRANCE.x, edy = py - ENTRANCE.y
-        const nearEntrance = edx * edx + edy * edy < ENTRANCE_RADIUS * ENTRANCE_RADIUS
-        if (nearEntrance && !inExitZoneRef.current) {
-          inExitZoneRef.current = true
-          setExitConfirm(true)
-        } else if (!nearEntrance) {
-          inExitZoneRef.current = false
-        }
-      }
+      const inExitZone = overlapsExitTrigger(posRef.current)
+      if (!isAnnotatingRef.current && inExitZone && !inExitZoneRef.current) setExitConfirm(true)
+      inExitZoneRef.current = inExitZone
 
       const canvas = canvasRef.current
-      const off    = staticCanvasRef.current
-      let camX = 0, camY = 0, zoom = 1, offsetX = 0, offsetY = 0
-      if (canvas && off && canvas.width > 0 && canvas.height > 0) {
-        // 다른 Zone과 동일하게 항상 FOV_W x FOV_H(24x18타일) 월드 영역을 화면에
-        // 담는다. 캔버스 실측 크기에 맞춰 얼마나 확대할지(zoom)를 계산하고,
-        // 화면 비율이 FOV 비율(4:3)과 다르면 남는 쪽에 레터박스를 준다 — SVG의
-        // preserveAspectRatio="xMidYMid meet"과 동일한 결과.
-        zoom = Math.min(canvas.width / FOV_W, canvas.height / FOV_H)
-        const contentW = FOV_W * zoom, contentH = FOV_H * zoom
-        offsetX = (canvas.width - contentW) / 2
-        offsetY = (canvas.height - contentH) / 2
+      const behindCanvas = behindCanvasRef.current
+      const frontCanvas = frontCanvasRef.current
+      const staticCanvas = staticCanvasRef.current
+      const metrics = metricsRef.current
+      if (canvas && behindCanvas && frontCanvas && staticCanvas && metrics.pixelW > 0 && metrics.pixelH > 0) {
+        const camera = getMusicCamera({
+          cssWidth: metrics.cssW,
+          cssHeight: metrics.cssH,
+          playerX,
+          playerY,
+          movementX: dx,
+          movementY: dy,
+          previousCamera: cameraRef.current,
+          deltaSeconds,
+        })
+        cameraRef.current = camera
+        const pixelScale = camera.scale * metrics.dpr
+        const pixelOffsetX = camera.offsetX * metrics.dpr
+        const pixelOffsetY = camera.offsetY * metrics.dpr
+        const navigationCell = getNavigationCellAtWorld(playerX, playerY - 4)
+        const occlusionState = getOcclusionState(assetsRef.current, playerX, playerY, occlusionStateRef.current.active)
+        occlusionStateRef.current = occlusionState
+        const movementDebug = movementDebugRef.current
+        const collision = movementDebug.collisions[0] || null
 
-        // 카메라 — 플레이어 중심, 맵 경계에서 클램프. 보이는 월드 영역은 항상
-        // FOV_W x FOV_H로 고정(다른 Zone과 동일 — 화면 크기와 무관하게 town이
-        // 차지하는 비율이 같아진다).
-        camX = Math.max(0, Math.min(px - FOV_W / 2, MAP_W * T - FOV_W))
-        camY = Math.max(0, Math.min(py - FOV_H / 2, MAP_H * T - FOV_H))
-
-        const ctx = canvas.getContext('2d')
-        ctx.imageSmoothingEnabled = false
-        ctx.fillStyle = '#0f0920'
-        ctx.fillRect(0, 0, canvas.width, canvas.height)
-        ctx.save()
-        ctx.translate(offsetX, offsetY)
-        ctx.scale(zoom, zoom)
-        ctx.translate(-camX, -camY)
-        ctx.drawImage(off, 0, 0)
-
-        // 입구 표시 — 다른 Zone의 "↓ 입구" 표시와 같은 역할, 위치만 이 마을의
-        // 실제 걸을 수 있는 남쪽 지점(ENTRANCE)에 맞춰 그린다.
-        ctx.font = 'bold 11px "Courier New", monospace'
-        const entLabel = '↓ 입구'
-        const entW = ctx.measureText(entLabel).width + 20
-        ctx.fillStyle = 'rgba(20,16,48,0.82)'
-        ctx.fillRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
-        ctx.strokeStyle = '#7cf2c4'
-        ctx.lineWidth = 2
-        ctx.strokeRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
-        ctx.fillStyle = '#7cf2c4'
-        ctx.textBaseline = 'middle'
-        ctx.fillText(entLabel, ENTRANCE.x - entW / 2 + 10, ENTRANCE.y)
-
-        for (const item of items) {
-          if ((item.sound.block || 1) > blockNumRef.current) continue
-          const done = collectedIdsRef.current.has(item.id)
-          if (done) ctx.globalAlpha = 0.35
-          drawItem(ctx, item, now)
-          if (done) ctx.globalAlpha = 1
+        if (stageRef.current) {
+          stageRef.current.dataset.cameraX = camera.x.toFixed(2)
+          stageRef.current.dataset.cameraY = camera.y.toFixed(2)
+          stageRef.current.dataset.viewWidth = camera.viewWidth.toFixed(2)
+          stageRef.current.dataset.viewHeight = camera.viewHeight.toFixed(2)
+          stageRef.current.dataset.playerX = playerX.toFixed(2)
+          stageRef.current.dataset.playerY = playerY.toFixed(2)
+          stageRef.current.dataset.navigation = String(navigationCell.type)
+          stageRef.current.dataset.navigationCell = `${navigationCell.col},${navigationCell.row}`
+          stageRef.current.dataset.collisionId = collision?.id || collision?.tag || 'none'
+          stageRef.current.dataset.collisionType = collision?.type || 'none'
+          stageRef.current.dataset.blockedAxes = movementDebug.blockedAxes.join(',') || 'none'
+          stageRef.current.dataset.occlusionIds = occlusionState.objects.map((entry) => entry.id).join(',') || 'none'
+          stageRef.current.dataset.occlusionRatio = occlusionState.ratio.toFixed(4)
+          stageRef.current.dataset.silhouette = occlusionState.active ? 'true' : 'false'
+          stageRef.current.dataset.silhouetteThreshold = occlusionState.threshold.toFixed(2)
+          stageRef.current.dataset.debug = debug ? 'true' : 'false'
         }
-        drawLockFog(ctx, village, blockNumRef.current, now)
-        ctx.restore()
-      }
 
-      // 캐릭터 오버레이 — world → screen 좌표 변환(레터박스 오프셋 + 동적 줌).
-      // 발치(px,py)를 스프라이트 하단 중앙에 맞춘다(음악 마을 엔진의 pos는
-      // 발치 기준점). 스프라이트 크기(72x88)는 다른 Zone과 동일한 월드 단위라,
-      // 같은 zoom을 곱하면 화면 상 캐릭터 비율도 다른 Zone과 항상 같아진다.
-      if (playerWrapRef.current) {
-        const screenLeft = offsetX + (px - SPRITE_W / 2 - camX) * zoom
-        const screenTop  = offsetY + (py - SPRITE_H - camY) * zoom
-        playerWrapRef.current.style.left = `${screenLeft}px`
-        playerWrapRef.current.style.top  = `${screenTop}px`
-        playerWrapRef.current.style.transform = `scale(${zoom})`
-      }
+        const applyWorldTransform = (context) => {
+          context.translate(pixelOffsetX, pixelOffsetY)
+          context.scale(pixelScale, pixelScale)
+          context.translate(-camera.x, -camera.y)
+        }
+        const background = canvas.getContext('2d')
+        background.imageSmoothingEnabled = false
+        background.fillStyle = '#07152f'
+        background.fillRect(0, 0, metrics.pixelW, metrics.pixelH)
+        background.save()
+        applyWorldTransform(background)
+        background.drawImage(staticCanvas, 0, 0)
+        drawEnvironment(background, now, {
+          reducedMotion: reducedMotionRef.current,
+          player: posRef.current,
+          terrain: getNavigationTypeAtWorld(playerX, playerY - 7),
+          moving: moved,
+        })
+        drawExitCue(background)
+        if (debug) drawNavigationDebug(background, {
+          player: posRef.current,
+          collision: movementDebug,
+          occlusion: occlusionState,
+        })
+        background.restore()
 
-      raf = requestAnimationFrame(loop)
+        const markerEntries = currentItems.map((item) => ({
+          item,
+          state: markerStateFor(item, {
+            blockNum: blockNumRef.current,
+            collectedIds: collectedIdsRef.current,
+            nearbyId: collectingItemRef.current?.id,
+            interactingId: isAnnotatingRef.current ? interactingItemIdRef.current : null,
+            distance: distanceToMusicItem(posRef.current, item),
+          }),
+        }))
+        const depth = splitOcclusionObjects(playerY)
+        const behindMarkers = markerEntries.filter(({ item }) => (item.ty + .5) * T <= playerY)
+        const frontMarkers = markerEntries.filter(({ item }) => (item.ty + .5) * T > playerY)
+        for (const [depthCanvas, objects, markers] of [
+          [behindCanvas, depth.behind, behindMarkers],
+          [frontCanvas, depth.front, frontMarkers],
+        ]) {
+          const context = depthCanvas.getContext('2d')
+          context.imageSmoothingEnabled = false
+          context.clearRect(0, 0, metrics.pixelW, metrics.pixelH)
+          context.save()
+          applyWorldTransform(context)
+          drawDepthLayer(context, assetsRef.current, objects, markers, now)
+          context.restore()
+        }
+
+        const placement = getMusicPlayerPlacement(camera, playerX, playerY)
+        for (const wrapper of [playerWrapRef.current, silhouetteWrapRef.current].filter(Boolean)) {
+          wrapper.style.left = `${placement.left}px`
+          wrapper.style.top = `${placement.top}px`
+          wrapper.style.transform = `scale(${camera.scale})`
+        }
+        if (playerWrapRef.current) {
+          playerWrapRef.current.dataset.worldX = playerX.toFixed(2)
+          playerWrapRef.current.dataset.worldY = playerY.toFixed(2)
+          playerWrapRef.current.dataset.footScreenX = placement.footX.toFixed(2)
+          playerWrapRef.current.dataset.footScreenY = placement.footY.toFixed(2)
+        }
+        if (silhouetteWrapRef.current) {
+          silhouetteWrapRef.current.style.display = occlusionState.active ? 'block' : 'none'
+          silhouetteWrapRef.current.dataset.occluded = occlusionState.active ? 'true' : 'false'
+          silhouetteWrapRef.current.dataset.ratio = occlusionState.ratio.toFixed(4)
+          silhouetteWrapRef.current.dataset.threshold = occlusionState.threshold.toFixed(2)
+        }
+        if (debugPanelRef.current) {
+          const nearby = occlusionState.objects.slice(0, 3).map((entry) => `${entry.id} ${(entry.ratio * 100).toFixed(1)}%`).join('\n') || 'none'
+          debugPanelRef.current.textContent = [
+            `foot ${playerX.toFixed(1)},${playerY.toFixed(1)} · ${PLAYER_BOX.w}x${PLAYER_BOX.h}`,
+            `nav [${navigationCell.col},${navigationCell.row}] type=${navigationCell.type}`,
+            `hit ${collision?.id || collision?.tag || 'none'} (${collision?.type || 'none'})`,
+            `blocked axis ${movementDebug.blockedAxes.join(',') || 'none'}`,
+            `occlusion ${nearby}`,
+            `alpha overlap ${(occlusionState.ratio * 100).toFixed(1)}%`,
+            `silhouette ${occlusionState.active ? 'ON' : 'off'} · enter ${(SILHOUETTE_ENTER_RATIO * 100).toFixed(0)}% / exit ${(SILHOUETTE_EXIT_RATIO * 100).toFixed(0)}%`,
+          ].join('\n')
+        }
+
+        if (nearbyMarkerButtonRef.current && collectingItemRef.current) {
+          const item = collectingItemRef.current
+          const marker = worldToMusicScreen(camera, item.tx * T + T / 2, item.ty * T + T / 2)
+          nearbyMarkerButtonRef.current.style.left = `${marker.x - 22}px`
+          nearbyMarkerButtonRef.current.style.top = `${marker.y - 22}px`
+        }
+      }
+      animationFrame = requestAnimationFrame(loop)
     }
-    raf = requestAnimationFrame(loop)
-    return () => cancelAnimationFrame(raf)
+    animationFrame = requestAnimationFrame(loop)
+    return () => cancelAnimationFrame(animationFrame)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [debug])
 
-  const total     = items.length
-  const collected = items.filter(it => collectedIds.has(it.id)).length
+  const total = items.length
+  const collected = items.filter((item) => collectedIds.has(item.id)).length
   const remaining = total - collected
 
   return (
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', userSelect: 'none' }}>
       <ZoneHUD zone="Music" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />
-
-      {/* 다른 Zone(ZoneMap.js)과 동일하게 HUD 아래 전체 화면을 꽉 채운다 —
-          960x600 고정 프레임을 중앙에 띄우지 않는다(화면 비율 불일치 수정). */}
-      <div ref={stageRef} style={{
+      <div ref={stageRef} data-music-assets={assetStatus} data-testid="music-stage" style={{
         position: 'absolute', top: 56, left: 0, right: 0, bottom: 0,
-        background: '#0f0920', overflow: 'hidden',
+        background: '#07152f', overflow: 'hidden',
       }}>
-        <canvas ref={canvasRef}
-          style={{ display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated' }} />
-
-        {/* 캐릭터 — 기존 Zone들과 동일한 PixelChar(현재 게임 캐릭터 에셋) 재사용 */}
-        <div ref={playerWrapRef} style={{
-          position: 'absolute', left: 0, top: 0,
-          width: SPRITE_W, height: SPRITE_H,
-          transformOrigin: '0 0',
-          pointerEvents: 'none',
-        }}>
-          <PixelChar dir={dir} moving={moving} />
-        </div>
-
-        {/* 비네트 */}
-        <div style={{
-          position: 'absolute', inset: 0, pointerEvents: 'none',
-          background: 'radial-gradient(120% 90% at 50% 45%, transparent 40%, rgba(12,6,28,.62) 100%)',
+        <canvas ref={canvasRef} aria-label="Music Village production map" style={{
+          position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
+          imageRendering: 'pixelated', zIndex: 0,
         }} />
-
-        {/* 근접 프롬프트 */}
+        <canvas ref={behindCanvasRef} aria-label="Music Village objects behind player" style={{
+          position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
+          imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 1,
+        }} />
+        <div ref={playerWrapRef} data-testid="music-player" style={{
+          position: 'absolute', left: 0, top: 0, width: MUSIC_PLAYER_W, height: MUSIC_PLAYER_H,
+          transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
+        }}>
+          <div aria-hidden="true" style={{
+            position: 'absolute', left: 4, bottom: -3, width: 28, height: 9,
+            borderRadius: '50%', background: 'rgba(3,8,24,.38)', filter: 'blur(1px)',
+          }} />
+          <div style={{ position: 'absolute', inset: 0, filter: 'drop-shadow(0 0 3px rgba(135,125,255,.48))' }}>
+            <PixelChar
+              dir={dir}
+              moving={moving}
+              animationTick={animTick}
+              displayWidth={MUSIC_PLAYER_W}
+              displayHeight={MUSIC_PLAYER_H}
+              sourceViewBox={MUSIC_PLAYER_SOURCE}
+            />
+          </div>
+        </div>
+        <canvas ref={frontCanvasRef} aria-label="Music Village objects in front of player" style={{
+          position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
+          imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 3,
+        }} />
+        <div ref={silhouetteWrapRef} data-testid="music-player-silhouette" data-occluded="false" aria-hidden="true" style={{
+          position: 'absolute', display: 'none', left: 0, top: 0, width: MUSIC_PLAYER_W, height: MUSIC_PLAYER_H,
+          transformOrigin: '0 0', pointerEvents: 'none', zIndex: 4, opacity: .22,
+          filter: 'brightness(0) drop-shadow(1px 0 0 rgba(216,211,255,.75)) drop-shadow(-1px 0 0 rgba(216,211,255,.75))',
+          mixBlendMode: 'multiply',
+        }}>
+          <PixelChar
+            dir={dir}
+            moving={moving}
+            animationTick={animTick}
+            displayWidth={MUSIC_PLAYER_W}
+            displayHeight={MUSIC_PLAYER_H}
+            sourceViewBox={MUSIC_PLAYER_SOURCE}
+          />
+        </div>
+        {debug && (
+          <pre ref={debugPanelRef} data-testid="music-debug-panel" style={{
+            position: 'absolute', left: 8, top: 8, zIndex: 8, margin: 0,
+            maxWidth: 'min(430px, calc(100% - 16px))', padding: '8px 10px',
+            border: '1px solid #67e8f9', borderRadius: 5,
+            background: 'rgba(2, 6, 23, .88)', color: '#ecfeff',
+            font: '700 10px/1.45 ui-monospace, monospace', whiteSpace: 'pre-wrap',
+            pointerEvents: 'none',
+          }} />
+        )}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 5,
+          background: 'radial-gradient(120% 95% at 50% 45%, transparent 56%, rgba(2,8,23,.34) 100%)',
+        }} />
+        {collecting && !isAnnotating && (
+          <button
+            ref={nearbyMarkerButtonRef}
+            type="button"
+            data-testid="music-active-marker"
+            aria-label={`${collecting.sound.sound_id} 소리 전사하기`}
+            onClick={confirmCollect}
+            style={{
+              position: 'absolute', left: 0, top: 0, width: 44, height: 44,
+              border: 0, padding: 0, borderRadius: '50%', background: 'transparent',
+              cursor: 'pointer', touchAction: 'manipulation', zIndex: 7,
+            }}
+          />
+        )}
         {collecting && !isAnnotating && (
           <div style={{
-            position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)',
-            background: '#1a1033', border: '3px solid #ff5fa2', borderRadius: 4,
-            boxShadow: '0 0 24px rgba(255,95,162,.45)',
-            padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8,
-            fontFamily: 'Nunito, sans-serif', color: '#f4ecff', fontSize: 13, whiteSpace: 'nowrap',
+            position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)', zIndex: 7,
+            background: '#3f4358ee', border: '2px solid #c69a45', borderRadius: 6,
+            boxShadow: '0 4px 18px rgba(63,67,88,.3)', padding: '7px 15px',
+            display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Nunito, sans-serif',
+            color: '#f7f1e7', fontSize: 13, whiteSpace: 'nowrap',
           }}>
-            <span style={{ color: '#ffd166', fontWeight: 800, fontSize: 11 }}>Enter ↵</span>
-            {collecting.kind === 'note' ? '음표' : '카세트'} 소리 전사하기
+            <span style={{ color: '#ffe18a', fontWeight: 800, fontSize: 11 }}>Enter ↵</span>
+            이 소리 전사하기
           </div>
         )}
       </div>
 
-      <DPad press={press} release={release} onExit={onExit}
-        onConfirm={collecting ? confirmCollect : null} />
-
+      <DPad press={press} release={release} onExit={onExit} onConfirm={collecting ? confirmCollect : null} />
       {remaining === 0 && total > 0 && <CompleteModal zone="Music" onExit={onExit} />}
-
-      {exitConfirm && (
-        <ExitConfirmModal
-          zone="Music"
-          onConfirm={onExit}
-          onCancel={() => setExitConfirm(false)}
-        />
-      )}
+      {exitConfirm && <ExitConfirmModal zone="Music" onConfirm={onExit} onCancel={() => setExitConfirm(false)} />}
     </div>
   )
 }

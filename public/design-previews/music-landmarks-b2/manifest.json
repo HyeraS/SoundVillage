@@ -1,0 +1,133 @@
+{
+  "version": "2C-B2-v1",
+  "tileSize": 32,
+  "runtimeScale": 1,
+  "timeOfDay": "bright-soft-late-afternoon",
+  "palette": {
+    "stone": "#D9C7A8",
+    "stoneHi": "#E8DABF",
+    "stoneShade": "#B7A383",
+    "ground": "#AAB490",
+    "soil": "#B89E7C",
+    "teal": "#668F8A",
+    "lavender": "#A89BC0",
+    "gold": "#C69A45",
+    "plaster": "#E2D3B8",
+    "wood": "#A97856",
+    "woodHi": "#C28E64",
+    "navy": "#3F4358",
+    "outline": "#655F62",
+    "shadow": "#5D554A"
+  },
+  "stage": {
+    "x": 576,
+    "y": 96,
+    "width": 384,
+    "height": 224,
+    "anchor": {
+      "x": 192,
+      "y": 224
+    },
+    "tiles": {
+      "width": 12,
+      "height": 7
+    },
+    "layers": [
+      "contact-shadow",
+      "base-platform",
+      "rear-body",
+      "opening",
+      "canopy",
+      "trim",
+      "front-stair",
+      "foreground",
+      "emissive"
+    ],
+    "variants": {
+      "s1": "low-double-wave",
+      "s2": "restrained-triple-wave"
+    },
+    "collisionTiles": {
+      "x": 18,
+      "y": 3,
+      "width": 12,
+      "height": 5
+    },
+    "approachTiles": {
+      "x": 23,
+      "y": 10,
+      "width": 3,
+      "height": 3
+    }
+  },
+  "gate": {
+    "x": 704,
+    "y": 1024,
+    "width": 128,
+    "height": 96,
+    "anchor": {
+      "x": 64,
+      "y": 96
+    },
+    "tiles": {
+      "width": 4,
+      "height": 3
+    },
+    "opening": {
+      "x": 32,
+      "y": 0,
+      "width": 64,
+      "height": 96
+    },
+    "layers": [
+      "contact-shadow",
+      "posts",
+      "top",
+      "trim",
+      "foreground",
+      "emissive"
+    ],
+    "variants": {
+      "g1": "open-wave-rail",
+      "g2": "shallow-wave-canopy"
+    },
+    "collisionTiles": [
+      {
+        "x": 22,
+        "y": 32,
+        "width": 1,
+        "height": 3
+      },
+      {
+        "x": 25,
+        "y": 32,
+        "width": 1,
+        "height": 3
+      }
+    ],
+    "openingTiles": {
+      "x": 23,
+      "y": 32,
+      "width": 2,
+      "height": 3
+    }
+  },
+  "drawOrder": [
+    "ground/path",
+    "contact shadow",
+    "base/body",
+    "opening",
+    "canopy/rail",
+    "trim",
+    "stair",
+    "foreground",
+    "emissive",
+    "guides",
+    "marker/UI"
+  ],
+  "conceptReferences": [
+    "variants/imagegen-stage-s1-s2-concept.png",
+    "variants/imagegen-gate-g1-g2-concept.png"
+  ],
+  "productionUse": false
+}

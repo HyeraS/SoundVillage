@@ -1,0 +1,158 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "id": "hud",
+      "mask": "masks/restoration/hud.png",
+      "prompt": "prompts/restore-hud.md",
+      "candidate": "candidates/restoration-hud-v1.png",
+      "acceptedPatch": "accepted/restoration/hud-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 1448,
+        "h": 65
+      }
+    },
+    {
+      "id": "d-pad",
+      "mask": "masks/restoration/d-pad.png",
+      "prompt": "prompts/restore-d-pad.md",
+      "candidate": "candidates/restoration-d-pad-v1.png",
+      "acceptedPatch": "accepted/restoration/d-pad-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 0,
+        "y": 900,
+        "w": 152,
+        "h": 149
+      }
+    },
+    {
+      "id": "entrance-button",
+      "mask": "masks/restoration/entrance-button.png",
+      "prompt": "prompts/restore-entrance-button.md",
+      "candidate": "candidates/restoration-entrance-button-v1.png",
+      "acceptedPatch": "accepted/restoration/entrance-button-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 665,
+        "y": 1013,
+        "w": 121,
+        "h": 62
+      }
+    },
+    {
+      "id": "player",
+      "mask": "masks/restoration/player.png",
+      "prompt": "prompts/restore-player.md",
+      "candidate": "candidates/restoration-player-v1.png",
+      "acceptedPatch": "accepted/restoration/player-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 685,
+        "y": 888,
+        "w": 70,
+        "h": 101
+      }
+    },
+    {
+      "id": "sound-orb-northwest",
+      "mask": "masks/restoration/sound-orb-northwest.png",
+      "prompt": "prompts/restore-sound-orb-northwest.md",
+      "candidate": "candidates/restoration-sound-orb-northwest-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-northwest-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 419,
+        "y": 210,
+        "w": 97,
+        "h": 107
+      }
+    },
+    {
+      "id": "sound-orb-northeast",
+      "mask": "masks/restoration/sound-orb-northeast.png",
+      "prompt": "prompts/restore-sound-orb-northeast.md",
+      "candidate": "candidates/restoration-sound-orb-northeast-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-northeast-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 899,
+        "y": 210,
+        "w": 97,
+        "h": 107
+      }
+    },
+    {
+      "id": "sound-orb-west",
+      "mask": "masks/restoration/sound-orb-west.png",
+      "prompt": "prompts/restore-sound-orb-west.md",
+      "candidate": "candidates/restoration-sound-orb-west-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-west-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 250,
+        "y": 532,
+        "w": 97,
+        "h": 107
+      }
+    },
+    {
+      "id": "sound-orb-east",
+      "mask": "masks/restoration/sound-orb-east.png",
+      "prompt": "prompts/restore-sound-orb-east.md",
+      "candidate": "candidates/restoration-sound-orb-east-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-east-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 1057,
+        "y": 532,
+        "w": 97,
+        "h": 107
+      }
+    },
+    {
+      "id": "sound-orb-southwest",
+      "mask": "masks/restoration/sound-orb-southwest.png",
+      "prompt": "prompts/restore-sound-orb-southwest.md",
+      "candidate": "candidates/restoration-sound-orb-southwest-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-southwest-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 274,
+        "y": 848,
+        "w": 97,
+        "h": 107
+      }
+    },
+    {
+      "id": "sound-orb-southeast",
+      "mask": "masks/restoration/sound-orb-southeast.png",
+      "prompt": "prompts/restore-sound-orb-southeast.md",
+      "candidate": "candidates/restoration-sound-orb-southeast-v1.png",
+      "acceptedPatch": "accepted/restoration/sound-orb-southeast-patch.png",
+      "status": "accepted-after-original-resolution-review",
+      "outsideMaskPixelIdentity": true,
+      "acceptedBounds": {
+        "x": 1154,
+        "y": 848,
+        "w": 97,
+        "h": 107
+      }
+    }
+  ],
+  "canonicalSource": "reference/canonical-map-art-source.png",
+  "canonicalRuntime": "reference/canonical-map-art-runtime.png",
+  "outsideAllMasksPixelIdentity": true
+}

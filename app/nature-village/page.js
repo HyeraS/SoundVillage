@@ -4,6 +4,7 @@
 // <canvas>에 그리는 최소 로더. 동물 마을(ZoneMap.js)과는 완전히 독립된 별도 경로.
 // Phaser 연동 전, 실제 생성된 맵 데이터가 맞는지 눈으로 확인하기 위한 페이지.
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 
 const MAP_URL = '/assets/maps/nature_village.tmj'
 const TILE = 16
@@ -94,7 +95,7 @@ export default function NatureVillagePage() {
   return (
     <div style={{ minHeight: '100vh', background: '#1b1e24', color: '#eceef2', padding: 20, fontFamily: 'ui-sans-serif, sans-serif' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
-        <a href="/" style={{ color: '#8fbf7a', textDecoration: 'none', fontSize: 13 }}>← 홈</a>
+        <Link href="/" style={{ color: '#8fbf7a', textDecoration: 'none', fontSize: 13 }}>← 홈</Link>
         <h1 style={{ fontSize: 16, margin: 0 }}>자연 마을 (Nature Village) — 독립 맵 미리보기</h1>
         <span style={{ fontSize: 12, color: '#93a0b0' }}>{status}</span>
         <div style={{ marginLeft: 'auto', display: 'flex', gap: 6, alignItems: 'center' }}>

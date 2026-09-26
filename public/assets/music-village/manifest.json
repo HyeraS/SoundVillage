@@ -1,0 +1,562 @@
+{
+  "version": "2C-C-v1",
+  "productionUse": true,
+  "generatedFrom": {
+    "ground": "2C-B1-v1",
+    "landmarks": "2C-B2-v1 (approved S1/G1 only)",
+    "buildingsProps": "2C-B3.1-v1",
+    "integrationFreeze": "2C-B4-v1"
+  },
+  "map": {
+    "width": 1536,
+    "height": 1152,
+    "tiles": {
+      "width": 48,
+      "height": 36
+    },
+    "tileSize": 32
+  },
+  "approvedVariants": {
+    "stage": "S1 low double-wave",
+    "gate": "G1 open wave rail"
+  },
+  "collision": {
+    "stageRear": {
+      "x": 18,
+      "y": 3,
+      "width": 12,
+      "height": 5
+    },
+    "gatePosts": [
+      {
+        "x": 22,
+        "y": 32,
+        "width": 1,
+        "height": 3
+      },
+      {
+        "x": 25,
+        "y": 32,
+        "width": 1,
+        "height": 3
+      }
+    ],
+    "buildings": [
+      {
+        "id": "record-archive",
+        "x": 4,
+        "y": 4,
+        "width": 8,
+        "height": 6
+      },
+      {
+        "id": "listening-cafe",
+        "x": 35,
+        "y": 5,
+        "width": 10,
+        "height": 5
+      },
+      {
+        "id": "community-studio",
+        "x": 3,
+        "y": 28,
+        "width": 10,
+        "height": 5
+      },
+      {
+        "id": "sound-workshop",
+        "x": 36,
+        "y": 27,
+        "width": 8,
+        "height": 6
+      }
+    ]
+  },
+  "entranceClearance": {
+    "stage": {
+      "x": 23,
+      "y": 10,
+      "width": 3,
+      "height": 3
+    },
+    "gateOpening": {
+      "x": 23,
+      "y": 32,
+      "width": 2,
+      "height": 3
+    },
+    "buildings": [
+      {
+        "id": "record-archive",
+        "entrance": "south",
+        "clearance": {
+          "x": 6,
+          "y": 10,
+          "width": 3,
+          "height": 3
+        }
+      },
+      {
+        "id": "listening-cafe",
+        "entrance": "south",
+        "clearance": {
+          "x": 38,
+          "y": 10,
+          "width": 3,
+          "height": 3
+        }
+      },
+      {
+        "id": "community-studio",
+        "entrance": "east",
+        "clearance": {
+          "x": 13,
+          "y": 28,
+          "width": 3,
+          "height": 3
+        }
+      },
+      {
+        "id": "sound-workshop",
+        "entrance": "west",
+        "clearance": {
+          "x": 33,
+          "y": 28,
+          "width": 3,
+          "height": 3
+        }
+      }
+    ]
+  },
+  "placements": [
+    [
+      "flowerbed-low-a",
+      3,
+      12
+    ],
+    [
+      "flowerbed-low-a",
+      42,
+      12
+    ],
+    [
+      "bench-low-a",
+      18,
+      22
+    ],
+    [
+      "bench-low-a",
+      28,
+      16
+    ],
+    [
+      "planter-low-a",
+      13,
+      9
+    ],
+    [
+      "planter-low-a",
+      34,
+      9
+    ],
+    [
+      "planter-low-a",
+      13,
+      31
+    ],
+    [
+      "planter-low-a",
+      34,
+      31
+    ],
+    [
+      "lamp-low-a",
+      2,
+      14
+    ],
+    [
+      "lamp-low-a",
+      46,
+      14
+    ],
+    [
+      "lamp-low-a",
+      6,
+      24
+    ],
+    [
+      "lamp-low-a",
+      42,
+      24
+    ],
+    [
+      "shrub-low-a",
+      3,
+      18
+    ],
+    [
+      "shrub-low-a",
+      44,
+      18
+    ],
+    [
+      "shrub-low-a",
+      4,
+      22
+    ],
+    [
+      "shrub-low-a",
+      43,
+      22
+    ],
+    [
+      "tree-low-a",
+      2,
+      14
+    ],
+    [
+      "tree-low-a",
+      44,
+      14
+    ],
+    [
+      "tree-low-a",
+      1,
+      26
+    ],
+    [
+      "tree-low-a",
+      45,
+      26
+    ],
+    [
+      "garden-resonance-low",
+      23,
+      16
+    ],
+    [
+      "gate-vegetation-low",
+      19,
+      34
+    ],
+    [
+      "gate-vegetation-low",
+      27,
+      34
+    ],
+    [
+      "stage-vegetation-low",
+      14,
+      3
+    ],
+    [
+      "stage-vegetation-low",
+      32,
+      3
+    ],
+    [
+      "foreground-edge-cluster",
+      0,
+      32
+    ],
+    [
+      "foreground-edge-cluster",
+      45,
+      31
+    ]
+  ],
+  "drawOrder": [
+    "ground",
+    "contact-shadow",
+    "structure",
+    "low-props",
+    "foreground",
+    "emissive",
+    "character",
+    "sound-marker",
+    "hud"
+  ],
+  "exclusions": [
+    "SVG",
+    "guides",
+    "collision overlays",
+    "interaction overlays",
+    "mock character",
+    "concept variants",
+    "S2",
+    "G2",
+    "comparisons"
+  ],
+  "files": [
+    {
+      "path": "buildings/community-studio/body.png",
+      "bytes": 1388,
+      "sha256": "b198a84862e65722d6612db37fe178e0180668c8455f6f5c531d1c4236910edf"
+    },
+    {
+      "path": "buildings/community-studio/contact-shadow.png",
+      "bytes": 533,
+      "sha256": "c59724cfde699ccba317084e5b37dbb6ec723de21b4ee8023fd60174c31808ca"
+    },
+    {
+      "path": "buildings/community-studio/door-window.png",
+      "bytes": 930,
+      "sha256": "1da90df5290d1db0cca108d0263344f776b0170bd65b0c601406571e730506a9"
+    },
+    {
+      "path": "buildings/community-studio/emissive.png",
+      "bytes": 452,
+      "sha256": "6d4a1dc4b6f63cd8796e2cd3df1e216d9fbeeffe3f57ecdf37b6e2c5dc5bfe60"
+    },
+    {
+      "path": "buildings/community-studio/foreground.png",
+      "bytes": 440,
+      "sha256": "790e041af4327092d76cb9d4da2a27a81d1fd53ab0259787836a9699c7c77142"
+    },
+    {
+      "path": "buildings/community-studio/roof.png",
+      "bytes": 1192,
+      "sha256": "94090735690adf49cde3d84f8c300dfc5765b4cae0520f323c10a560f3e46b03"
+    },
+    {
+      "path": "buildings/community-studio/trim.png",
+      "bytes": 517,
+      "sha256": "72effaf62a4e6636476499d57dfde6f87fa90e31f68e3e05d3c9e596cfba575e"
+    },
+    {
+      "path": "buildings/listening-cafe/body.png",
+      "bytes": 1469,
+      "sha256": "4dde08607299259e1aa92c1d037b8c63b0e0878b58605b9aca0e25ad882928e8"
+    },
+    {
+      "path": "buildings/listening-cafe/contact-shadow.png",
+      "bytes": 533,
+      "sha256": "c59724cfde699ccba317084e5b37dbb6ec723de21b4ee8023fd60174c31808ca"
+    },
+    {
+      "path": "buildings/listening-cafe/door-window.png",
+      "bytes": 883,
+      "sha256": "e30073661f379573ad4cb983474e9a2653a4040f3a3f02e445037634c21f2033"
+    },
+    {
+      "path": "buildings/listening-cafe/emissive.png",
+      "bytes": 570,
+      "sha256": "ea6ed2419572cbb22f9930a4b996ae4795bb1aa9fbc0bb16ce24f2b25e1930ee"
+    },
+    {
+      "path": "buildings/listening-cafe/foreground.png",
+      "bytes": 443,
+      "sha256": "432823de31e8e4a908c82502fcab6f3a2dc6155061a1f4ac4f2e404303ffefc6"
+    },
+    {
+      "path": "buildings/listening-cafe/roof.png",
+      "bytes": 1104,
+      "sha256": "1d9951cbc8a59b86e23b84fd2b2ddda50a1985954c4a50cbd33f908dcdfbaeb6"
+    },
+    {
+      "path": "buildings/listening-cafe/trim.png",
+      "bytes": 392,
+      "sha256": "b40e06848fd5674173be5fdc4f15d2e2813a4a2de9f34c2ff562418a40e7c236"
+    },
+    {
+      "path": "buildings/record-archive/body.png",
+      "bytes": 1131,
+      "sha256": "a0dbd5e55b8dc80892c044323e729c67bc576e4946352f1bf07748334fe7658b"
+    },
+    {
+      "path": "buildings/record-archive/contact-shadow.png",
+      "bytes": 490,
+      "sha256": "5c41588f76bf9077297a2e4a383d4b8c884fc4cfb618c26f5cbb9f8a07185e33"
+    },
+    {
+      "path": "buildings/record-archive/door-window.png",
+      "bytes": 762,
+      "sha256": "6582ac35bcdc930ff6667ca29c7d0b86037ffb1119d737f035dd841652100f63"
+    },
+    {
+      "path": "buildings/record-archive/emissive.png",
+      "bytes": 407,
+      "sha256": "665fd9526415fbca7ddb225ffd9001e93f056d7d0cc7783855e5d55f73662970"
+    },
+    {
+      "path": "buildings/record-archive/foreground.png",
+      "bytes": 372,
+      "sha256": "5e20cdc0937a2b066a54d0e35d2f34e715942b67796c40094f73f4783a2d1628"
+    },
+    {
+      "path": "buildings/record-archive/roof.png",
+      "bytes": 1282,
+      "sha256": "cf9ff0953d959776ed30d3777fa9c29bdb3b27b7ce46be1ff5b474a88d1d510c"
+    },
+    {
+      "path": "buildings/record-archive/trim.png",
+      "bytes": 376,
+      "sha256": "9118d37d856ed7f8782601ed15332a888bc5cc5d288e91e6e4fde1039b9fd858"
+    },
+    {
+      "path": "buildings/sound-workshop/body.png",
+      "bytes": 1067,
+      "sha256": "36c97ebf4502e2d651b23a0dadbcb00d924dd0de2f8cff3a9ae03aaeaf6e20e1"
+    },
+    {
+      "path": "buildings/sound-workshop/contact-shadow.png",
+      "bytes": 490,
+      "sha256": "5c41588f76bf9077297a2e4a383d4b8c884fc4cfb618c26f5cbb9f8a07185e33"
+    },
+    {
+      "path": "buildings/sound-workshop/door-window.png",
+      "bytes": 772,
+      "sha256": "1aa56fd000f616f1ca0c2cde079e3ec8fd06890d165fb09181f7fad4bbc914f0"
+    },
+    {
+      "path": "buildings/sound-workshop/emissive.png",
+      "bytes": 358,
+      "sha256": "5b52f00c7af26b69174c53956c9f4efda6dea72c5c6532d1a925c1c5a449b05e"
+    },
+    {
+      "path": "buildings/sound-workshop/foreground.png",
+      "bytes": 465,
+      "sha256": "4438fc1e1f0d8b6d30dc59a9af8a35da057514953e8b2c0681d888ea7ffc38cc"
+    },
+    {
+      "path": "buildings/sound-workshop/roof.png",
+      "bytes": 1014,
+      "sha256": "b1029a8c6a0516b5c7a59502708814b9161a321fe4459f82e67d1b2072c8ad01"
+    },
+    {
+      "path": "buildings/sound-workshop/trim.png",
+      "bytes": 498,
+      "sha256": "f0546e9bf188410a4499527dc875382a1c2d7dc2c5ad43f7127bec0d69a8a7bb"
+    },
+    {
+      "path": "gate/contact-shadow.png",
+      "bytes": 248,
+      "sha256": "021b5b65a33edeb8e1845fee40209f1333de37ed6472f504ae73c70a819f2fb3"
+    },
+    {
+      "path": "gate/emissive.png",
+      "bytes": 180,
+      "sha256": "23aef29e465ebf97a47095e7bf292110f752b973b248a6c6a03961b579207eca"
+    },
+    {
+      "path": "gate/foreground.png",
+      "bytes": 201,
+      "sha256": "24d0fdb716b6791ad74ed1385224555815f7f9cd32ff911cbd999b2e1b2462f0"
+    },
+    {
+      "path": "gate/posts.png",
+      "bytes": 636,
+      "sha256": "e5dc70181fc147ae427352b688b80843df6c337c1cda4693e482b42f3f5d2842"
+    },
+    {
+      "path": "gate/rail-g1.png",
+      "bytes": 331,
+      "sha256": "70dc9fa76addf40cc468800e233f50d1feb4f1a7717127e1640502eb56288a95"
+    },
+    {
+      "path": "gate/trim.png",
+      "bytes": 202,
+      "sha256": "ba51313fa5a8cdf4cc754b7cd3e87dcbabe4709fe4bf6682c133d1f3e1112d57"
+    },
+    {
+      "path": "ground/music-ground-path-map.png",
+      "bytes": 62719,
+      "sha256": "5ef1756a3f36acf99cef1c7ba9f8c85c5574a61418f3e6d66368c858586738af"
+    },
+    {
+      "path": "props/benches/bench-low-a.png",
+      "bytes": 244,
+      "sha256": "6fa05112ee60b113cc37a484b1663a691c7ce9d875f6e60ba2c048671175b024"
+    },
+    {
+      "path": "props/flowerbeds/flowerbed-low-a.png",
+      "bytes": 360,
+      "sha256": "bd6c1cbae5ef97736ad3ae78ca3398bd1d77dde39df954f82c6dab76d6aba5b4"
+    },
+    {
+      "path": "props/foreground/foreground-edge-cluster.png",
+      "bytes": 548,
+      "sha256": "4f62c791d511ef9fdd8407978fac27ca28b1ea875c607dae955b01357e414a3c"
+    },
+    {
+      "path": "props/garden/garden-resonance-low.png",
+      "bytes": 272,
+      "sha256": "d5f35e511c46ec764acc858849cdb3182e27591eda44090b8d85e17ceb4517fc"
+    },
+    {
+      "path": "props/gate-vegetation/gate-vegetation-low.png",
+      "bytes": 278,
+      "sha256": "d314a764d0aa5e21fb2c156c01d0980388681335411308df91042bdb292f34df"
+    },
+    {
+      "path": "props/lamps/lamp-low-a.png",
+      "bytes": 244,
+      "sha256": "0f251ace9bc0c552b37c13bb2b73c16c12790db62c1c947c38847a12fc5a2b12"
+    },
+    {
+      "path": "props/planters/planter-low-a.png",
+      "bytes": 246,
+      "sha256": "d8d7a0bc0fdae2ba7939f7221aff778258323c133cb842f156cda509c5fa79bc"
+    },
+    {
+      "path": "props/stage-vegetation/stage-vegetation-low.png",
+      "bytes": 279,
+      "sha256": "62d0465b5a6c442772bf111591240046ae3af36e2f0b9ccd5e9895a2fcdee206"
+    },
+    {
+      "path": "props/vegetation/shrub-low-a.png",
+      "bytes": 251,
+      "sha256": "04c3b87df76b35738ef91852bff2b05681c850f595467b81bd88ccb88e2e73cf"
+    },
+    {
+      "path": "props/vegetation/tree-low-a.png",
+      "bytes": 463,
+      "sha256": "452bddecf35f1c118fb03add4c09a51d58fa0b59dc1a228affe303f94fc95144"
+    },
+    {
+      "path": "stage/base-platform.png",
+      "bytes": 1268,
+      "sha256": "2d9fc5f2a01b8164541cda5408536c881d75ff4f263b356cc5a2cd39a1f4f3c4"
+    },
+    {
+      "path": "stage/canopy-s1.png",
+      "bytes": 1191,
+      "sha256": "128b88cc31032c1803a986107205b9af809ad2e6bdd702aa78aee834f0dafa1b"
+    },
+    {
+      "path": "stage/contact-shadow.png",
+      "bytes": 749,
+      "sha256": "fc0ded69426a6e2507592ebfbc44ee946767b99f1f80cab2397df224e7eb96e5"
+    },
+    {
+      "path": "stage/emissive.png",
+      "bytes": 624,
+      "sha256": "407dd5954e0bbe4b00a371c677d020e2e24512b14e89c9d7386b66992549ee2b"
+    },
+    {
+      "path": "stage/foreground.png",
+      "bytes": 545,
+      "sha256": "5bdfe5b332cac8a402486e5096324ebe89dc95ceeb5ae5d516cac06024262459"
+    },
+    {
+      "path": "stage/front-stair.png",
+      "bytes": 611,
+      "sha256": "c1f1fdb32050dfa11bdfe6bcc91448f7121f9127126d18006a09679bf555aaa8"
+    },
+    {
+      "path": "stage/opening.png",
+      "bytes": 1170,
+      "sha256": "2a87f50d5a3cf4c4f8a9af10ff0a594ebed6668c68eb6f4cd3b46195808b0bae"
+    },
+    {
+      "path": "stage/rear-body.png",
+      "bytes": 1839,
+      "sha256": "c0aa991f7c4ef92661e92de0d2717e24c759cc3a623a78ca05a67dff83589cd6"
+    },
+    {
+      "path": "stage/trim.png",
+      "bytes": 1019,
+      "sha256": "c5b81c6becb8bd1366535df481585e7d6b6439c501f2177baf95e37504a631b5"
+    }
+  ]
+}
