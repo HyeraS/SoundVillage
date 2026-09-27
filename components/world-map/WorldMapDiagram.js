@@ -2,7 +2,10 @@
 
 import { memo } from 'react'
 import { ZONE_META } from '@/components/GameEngine'
-import { WORLD_MAP_V4_PATHS } from '@/lib/worldMapV4Manifest.mjs'
+import {
+  WORLD_MAP_V4_DESTINATION_PRESENTATIONS,
+  WORLD_MAP_V4_PATHS,
+} from '@/lib/worldMapV4Manifest.mjs'
 import {
   WORLD_MINIMAP_DESTINATIONS,
   WORLD_MINIMAP_SIZE,
@@ -10,11 +13,6 @@ import {
   worldToMinimap,
 } from '@/lib/worldMapMinimap.mjs'
 import styles from './WorldMapMinimap.module.css'
-
-const LANDMARK_META = Object.freeze({
-  'Sound Library': Object.freeze({ label: 'Sound Museum', icon: '🏛', color: '#C8A96E' }),
-  Home: Object.freeze({ label: '우리 집 · 꾸미기', icon: '🏠', color: '#E98265' }),
-})
 
 export function getWorldDestinationPresentation(destination) {
   if (destination.zone) {
@@ -25,7 +23,7 @@ export function getWorldDestinationPresentation(destination) {
       color: meta.color,
     }
   }
-  return LANDMARK_META[destination.id]
+  return WORLD_MAP_V4_DESTINATION_PRESENTATIONS[destination.id]
 }
 
 function markerLabel(destination, locked, current, near) {

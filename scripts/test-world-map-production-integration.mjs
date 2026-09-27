@@ -23,6 +23,11 @@ import { WORLD_MAP_V4_ASSET_IDS, WORLD_MAP_V4_ASSETS } from '../lib/worldMapV4As
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const REVIEW_DIR = path.join(ROOT, '_review/world-map-sequential-fix-2026-09-21/03-navigation-open-paths')
+const args = new Set(process.argv.slice(2))
+for (const argument of args) {
+  if (argument !== '--report') throw new Error(`Unknown argument: ${argument}`)
+}
+const writeReport = args.has('--report')
 const read = relativePath => readFile(path.join(ROOT, relativePath), 'utf8')
 
 const [pageSource, worldSource, sceneSource, actorSource, engineSource, interiorSource] = await Promise.all([
@@ -40,7 +45,8 @@ assert.match(sceneSource, /queryWorldMapObjects\(camera\)/)
 assert.match(sceneSource, /data-layer="depth-sorted"/)
 assert.match(sceneSource, /data-layer="foreground"/)
 assert.match(sceneSource, /data-source="reference-registered-panels"/)
-assert.match(sceneSource, /object\.layer === 'gameplay' && \(mode === 'all' \|\| mode === 'objects'\)/)
+assert.match(sceneSource, /planWorldMapRenderLayers\(\{/)
+assert.match(sceneSource, /layerOverrides: WORLD_MAP_V4_LAYER_OVERRIDES/)
 assert.doesNotMatch(sceneSource, /WORLD_MAP_V3|sound-archive-garden-v3/)
 assert.doesNotMatch(sceneSource, /<image href=\{REFERENCE_SRC\}[\s\S]{0,120}?opacity="1"/)
 
@@ -291,7 +297,6 @@ for (const [tx, ty, label] of [[55.5, 43, 'library body'], [100.5, 70.5, 'music 
   assert.equal(walkable(tx, ty), false, `${label} remains blocked for the runtime player foot`)
 }
 
-await mkdir(REVIEW_DIR, { recursive: true })
 const result = {
   status: 'PASS',
   map: { widthTiles: WORLD_MAP_WIDTH_TILES, heightTiles: WORLD_MAP_HEIGHT_TILES, tileSize: WORLD_MAP_TILE_SIZE, mask: WORLD_WALKABLE_MASK_META },
@@ -304,7 +309,10 @@ const result = {
   productionQueryGate: 'development-only',
   inputParity: ['Enter', 'Space', 'mobile confirm'],
 }
-await writeFile(path.join(REVIEW_DIR, 'portal-route-results.json'), `${JSON.stringify(result, null, 2)}\n`)
+if (writeReport) {
+  await mkdir(REVIEW_DIR, { recursive: true })
+  await writeFile(path.join(REVIEW_DIR, 'portal-route-results.json'), `${JSON.stringify(result, null, 2)}\n`)
+}
 console.log(JSON.stringify({
   status: result.status,
   reachablePlayerFootTiles: result.reachablePlayerFootTiles,

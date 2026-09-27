@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-"""Build registered HD world art and its 4-world-pixel navigation mask.
+"""Build registered HD world art and its legacy reference navigation mask.
 
 The source image remains the coordinate authority.  The HD pass is a
 deterministic, invariant-preserving 2x restoration: Lanczos reconstruction plus
 bounded multi-scale luminance detail.  The navigation mask is sampled from the
 same source registration, then manually constrained around the authored yards
 and landmark footprints before player-foot clearance is baked in.
+
+The production v4 collision authority is build-world-map-v4-collision.mjs.
+Do not combine this legacy color-derived mask output with that object-schema
+pipeline.
 """
 
 from __future__ import annotations

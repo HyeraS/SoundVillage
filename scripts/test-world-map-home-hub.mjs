@@ -16,7 +16,7 @@ import {
 } from '../lib/worldMapGeometry.mjs'
 import { getWorldNavigationRoute } from '../lib/worldMapNavigation.mjs'
 import { WORLD_MINIMAP_DESTINATIONS } from '../lib/worldMapMinimap.mjs'
-import { WORLD_MAP_V4_BUILDING_COLLIDERS, WORLD_MAP_V4_DESTINATIONS, WORLD_MAP_V4_OBJECTS, objectBounds, queryWorldMapObjects } from '../lib/worldMapV4Manifest.mjs'
+import { WORLD_MAP_V4_COLLISION_OBJECTS, WORLD_MAP_V4_DESTINATIONS, WORLD_MAP_V4_LAYER_OVERRIDES, WORLD_MAP_V4_OBJECTS, objectBounds, queryWorldMapObjects } from '../lib/worldMapV4Manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const spawn = { x: WORLD_SPAWN.tx * WORLD_MAP_TILE_SIZE, y: WORLD_SPAWN.ty * WORLD_MAP_TILE_SIZE }
@@ -38,12 +38,20 @@ assert.equal(isWorldPlayerWalkable(approachPosition.x, approachPosition.y), true
 
 const homeObject = WORLD_MAP_V4_OBJECTS.find(object => object.id === 'landmark-home')
 const guesthouse = WORLD_MAP_V4_OBJECTS.find(object => object.id === 'landmark-guesthouse')
-const homeCollider = WORLD_MAP_V4_BUILDING_COLLIDERS.find(collider => collider.id === 'Home')
+const homeCollider = WORLD_MAP_V4_COLLISION_OBJECTS.find(collider => collider.objectId === 'landmark-home')
+const homeShape = homeCollider.shapes[0]
+const homeLayers = WORLD_MAP_V4_LAYER_OVERRIDES['landmark-home']
 assert.equal(homeObject.layer, 'gameplay')
-assert.equal(homeObject.assetId, 'landmark-home-hub')
+assert.equal(homeObject.assetId, 'landmark-home-player-building')
+assert.deepEqual(objectBounds(homeObject), { left:1344, top:1344, right:1856, bottom:1824 })
+assert.equal(homeObject.sortY, 1696)
+assert.deepEqual(homeLayers.map(layer => [layer.layerId, layer.assetId, layer.renderBand, layer.x, layer.y, layer.width, layer.height, layer.sortY]), [
+  ['site-ground', 'landmark-home-player-site-ground', 'ground', 1344, 1344, 512, 480, 1695],
+  ['body', 'landmark-home-player-building', 'world', 1472, 1395, 352, 301, 1696],
+])
 assert.equal(guesthouse.interaction, null)
-assert.ok(homeCollider.right <= 1792, 'home collision leaves at least four tiles beside the central road')
-assert.ok(approach.y - homeCollider.bottom >= 40, 'front step keeps a gathering apron')
+assert.deepEqual(homeShape, { type:'rect', left:1520, top:1472, right:1776, bottom:1696 })
+assert.ok(approach.y - homeShape.bottom >= 40, 'front step keeps a gathering apron')
 
 for (const viewport of [{ width:1440, height:900 }, { width:390, height:844 }]) {
   const player = worldPlayerTopLeftAtFoot(WORLD_SPAWN.tx, WORLD_SPAWN.ty)
@@ -62,7 +70,9 @@ for (const viewport of [{ width:1440, height:900 }, { width:390, height:844 }]) 
 }
 
 const sceneSource = await readFile(path.join(ROOT, 'components/world-map/WorldMapScene.js'), 'utf8')
-assert.match(sceneSource, /object\.layer === 'gameplay' && \(mode === 'all' \|\| mode === 'objects'\)/)
+assert.match(sceneSource, /planWorldMapRenderLayers\(\{/)
+assert.match(sceneSource, /layerOverrides: WORLD_MAP_V4_LAYER_OVERRIDES/)
+assert.match(sceneSource, /data-render-band=/)
 
 console.log(JSON.stringify({
   status:'PASS',

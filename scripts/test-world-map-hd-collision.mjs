@@ -20,10 +20,20 @@ import {
   worldRectanglesOverlap,
 } from '../lib/worldMapGeometry.mjs'
 import { WORLD_MAP_V4_ASSETS } from '../lib/worldMapV4Assets.mjs'
-import { WORLD_MAP_V4_BUILDING_COLLIDERS, WORLD_MAP_V4_DESTINATIONS } from '../lib/worldMapV4Manifest.mjs'
+import { shapeBounds } from '../lib/worldMapCollision.mjs'
+import {
+  WORLD_MAP_V4_COLLISION_OBJECTS,
+  WORLD_MAP_V4_DESTINATIONS,
+  worldMapV4BlockingReasonAt,
+} from '../lib/worldMapV4Manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const REVIEW_DIR = path.join(ROOT, '_review/world-map-sequential-fix-2026-09-21/03-navigation-open-paths')
+const REVIEW_DIR = path.join(ROOT, '_review/world-map-object-collision-step2')
+const args = new Set(process.argv.slice(2))
+for (const argument of args) {
+  if (argument !== '--report') throw new Error(`Unknown argument: ${argument}`)
+}
+const writeReport = args.has('--report')
 const MASK = WORLD_WALKABLE_MASK_META
 const SPEED = 5.85
 
@@ -78,9 +88,13 @@ while (head < tail) {
 let walkableCells = 0
 let disconnectedCells = 0
 let oneToTwoCellPinches = 0
+let reasonMismatchCells = 0
 for (let y = 0; y < MASK.height; y += 1) {
   for (let x = 0; x < MASK.width; x += 1) {
-    if (!isWorldWalkableMaskCell(x, y)) continue
+    const walkable = isWorldWalkableMaskCell(x, y)
+    const reason = worldMapV4BlockingReasonAt((x + 0.5) * MASK.cellSize, (y + 0.5) * MASK.cellSize)
+    if (walkable === reason.startsWith('collision:')) reasonMismatchCells += 1
+    if (!walkable) continue
     walkableCells += 1
     if (!seen[indexOf(x, y)]) disconnectedCells += 1
     let horizontal = 1
@@ -95,8 +109,10 @@ for (let y = 0; y < MASK.height; y += 1) {
   }
 }
 assert.equal(disconnectedCells, 0, 'all walkable cells must be one 4-connected network')
-assert.ok(oneToTwoCellPinches <= 8, 'no unintended field of 1-2 cell bottlenecks')
+assert.equal(oneToTwoCellPinches, 0, 'no 1-2 cell bottlenecks')
+assert.equal(reasonMismatchCells, 0, 'collision reason lookup must match every production mask cell')
 assert.ok(walkableCells / (MASK.width * MASK.height) >= 0.9, 'at least 90% of the world remains freely walkable')
+assert.equal(WORLD_MAP_V4_COLLISION_OBJECTS.length, 8, 'all eight destination buildings use the object collision schema')
 
 const cellCenterPosition = (x, y) => {
   const footX = (x + 0.5) * MASK.cellSize
@@ -139,6 +155,7 @@ const pathTo = target => {
 const drivePath = cells => {
   let position = cellCenterPosition(cells[0].x, cells[0].y)
   let stalledFrames = 0
+  let totalStalledFrames = 0
   let maxStalledFrames = 0
   let largeDeltaChecks = 0
   for (let index = 1; index < cells.length; index += 1) {
@@ -147,7 +164,10 @@ const drivePath = cells => {
     const deltaY = target.y - position.y
     const moved = moveWorldPlayer(position, deltaX, deltaY)
     if (moved.moved) stalledFrames = 0
-    else stalledFrames += 1
+    else {
+      stalledFrames += 1
+      totalStalledFrames += 1
+    }
     maxStalledFrames = Math.max(maxStalledFrames, stalledFrames)
     assert.ok(isWorldPlayerWalkable(moved.x, moved.y), 'movement always ends on clearance mask')
     position = { x: moved.x, y: moved.y }
@@ -164,7 +184,8 @@ const drivePath = cells => {
     }
   }
   assert.ok(maxStalledFrames < 30, 'no route stalls for 500ms at 60fps')
-  return { pathCells: cells.length, maxStalledFrames, largeDeltaChecks }
+  assert.equal(totalStalledFrames, 0, 'actual moveWorldPlayer route has zero stopped frames')
+  return { pathCells: cells.length, maxStalledFrames, totalStalledFrames, largeDeltaChecks }
 }
 
 const experientialSamples = [
@@ -213,12 +234,13 @@ for (const sample of openTerrainSamples) {
 }
 
 const buildingSamples = []
-for (const collider of WORLD_MAP_V4_BUILDING_COLLIDERS) {
-  const centerX = (collider.left + collider.right) / 2
-  const centerY = (collider.top + collider.bottom) / 2
+for (const collider of WORLD_MAP_V4_COLLISION_OBJECTS) {
+  const bounds = shapeBounds(collider.shapes[0])
+  const centerX = (bounds.left + bounds.right) / 2
+  const centerY = (bounds.top + bounds.bottom) / 2
   const position = worldPlayerTopLeftAtFoot(centerX / 32, centerY / 32)
-  assert.equal(isWorldPlayerWalkable(position.x, position.y), false, `${collider.id} building body remains blocked`)
-  buildingSamples.push({ id:collider.id, center:{ x:centerX, y:centerY } })
+  assert.equal(isWorldPlayerWalkable(position.x, position.y), false, `${collider.colliderId} building body remains blocked`)
+  buildingSamples.push({ objectId: collider.objectId, colliderId: collider.colliderId, center: { x: centerX, y: centerY } })
 }
 for (const [id, destination] of Object.entries(WORLD_MAP_V4_DESTINATIONS)) {
   const position = worldPlayerTopLeftAtFoot(destination.approach.x / 32, destination.approach.y / 32)
@@ -245,13 +267,15 @@ const report = {
   status: 'PASS',
   registration: MASK,
   modularLandmark: { width: libraryMetadata.width, height: libraryMetadata.height },
-  connectivity: { walkableCells, reachableCells: tail, disconnectedCells, oneToTwoCellPinches },
+  connectivity: { walkableCells, reachableCells: tail, disconnectedCells, oneToTwoCellPinches, reasonMismatchCells },
   movement: { speedPxPerFrame: SPEED, substepPx: WORLD_COLLISION_SUBSTEP_PX, sampledNormalAndLargeDeltaMoves: movementSamples },
   routeCoverage,
   destinations,
   openTerrainSamples,
   buildingSamples,
 }
-await mkdir(REVIEW_DIR, { recursive: true })
-await writeFile(path.join(REVIEW_DIR, 'collision-coverage-validation.json'), `${JSON.stringify(report, null, 2)}\n`)
+if (writeReport) {
+  await mkdir(REVIEW_DIR, { recursive: true })
+  await writeFile(path.join(REVIEW_DIR, 'collision-coverage-validation.json'), `${JSON.stringify(report, null, 2)}\n`)
+}
 console.log(JSON.stringify(report, null, 2))
