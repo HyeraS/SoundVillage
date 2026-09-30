@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetAudio, resetListeningTime } from '@/lib/audioManager';
 import { saveAnnotation } from '@/lib/supabase';
 import { newOperationKey } from '@/lib/persistenceResult';
+import { rewardEventFields } from '@/lib/economyRuntimeState.mjs';
 import { trackEvent } from '@/lib/userEvents';
 
 /* ─────────────────────────────────────────────
@@ -351,7 +352,7 @@ const SEG_STATUS = {
   outro:  '마무리 부분 🎵',
 };
 
-function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, onSubmit, onSkip, skipSubmitting, skipError }) {
+function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMode, dryRun, onSubmit, onSkip, skipSubmitting, skipError }) {
   const [text, setText]             = useState('');
   const [confidence, setConfidence] = useState('medium');
   const [submitting, setSubmitting] = useState(false);
@@ -407,6 +408,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, o
           stage:              1,
           is_verified:        false,
           version:            'v0.4-web',
+          economyMode,
         });
         if (!result.ok) {
           trackEvent('annotation_submit_failed', {
@@ -418,10 +420,10 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, o
         if (!result.ok) throw new Error(result.error.message);
         persistence = { ...result.data, operationIdempotencyKey: result.idempotencyKey };
         trackEvent('annotation_submit_succeeded', {
-          zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-submit', outcome: 'succeeded',
+          sound_id: sound.sound_id, target_type: 'button', target_id: 'annotation-submit', outcome: 'succeeded',
           operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
           result_entity_type: 'annotation', result_entity_id: result.data?.annotationId,
-          metadata: { transaction_id: result.data?.reward?.transactionId, reward_amount: result.data?.reward?.awarded },
+          ...rewardEventFields(result.data),
         }, { critical: true, flush: true });
       }
       resetListeningTime();
@@ -645,7 +647,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, o
    메인 AnnotationPanel — Stage 1 (표현 입력)만 담당
    Stage 2는 SoundMuseum으로 이전
 ───────────────────────────────────────────── */
-export default function AnnotationPanel({ sound, zone, participantId, sessionId, dryRun = false, onClose, onComplete }) {
+export default function AnnotationPanel({ sound, zone, participantId, sessionId, economyMode, dryRun = false, onClose, onComplete }) {
   const [visible, setVisible] = useState(false);
   const [skipSubmitting, setSkipSubmitting] = useState(false);
   const [skipError, setSkipError] = useState('');
@@ -738,6 +740,7 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
           skip_reason:     'user_skip',
           stage:           1,
           version:         'v0.4-web',
+          economyMode,
         });
         if (!result.ok) {
           trackEvent('annotation_skip_failed', {
@@ -833,6 +836,7 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
           <Stage1Panel
             sound={sound} zone={zone} palette={palette}
             participantId={participantId} sessionId={sessionId}
+            economyMode={economyMode}
             dryRun={dryRun}
             onSubmit={handleStage1Submit} onSkip={handleSkip}
             skipSubmitting={skipSubmitting} skipError={skipError}

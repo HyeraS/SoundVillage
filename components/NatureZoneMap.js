@@ -17,7 +17,7 @@ const FOV_H = 18 * TILE
 // 분리되어 있고 collision 그리드 BFS로 도달 가능함을 자동 검증한다.
 const ENTRANCE_RADIUS = 26
 
-export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, debugTarget = null, debugOverview = false, debugStaticArt = false, debugFirstItem = false }) {
+export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, debugTarget = null, debugOverview = false, debugStaticArt = false, debugFirstItem = false, outfitSrc, accessorySrc }) {
   const [village, setVillage] = useState(null)
   const [loadError, setLoadError] = useState('')
   const villageRef = useRef(null)
@@ -318,7 +318,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
                 transformOrigin: '0 0',
                 pointerEvents: 'none', zIndex: 2,
               }}>
-                <PixelChar dir={dir} moving={moving} />
+                <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} />
               </div>
             )}
 

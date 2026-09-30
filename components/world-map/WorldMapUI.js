@@ -6,8 +6,9 @@ import { getTodayQuestSummary } from '@/lib/dailyQuests'
 import { TILE, ZONE_META } from '@/components/GameEngine'
 import { WORLD_CAMERA_HUD_HEIGHT as HUD_H } from '@/lib/worldMapCamera.mjs'
 import { trackEvent } from '@/lib/userEvents'
+import VillageCurrencyIcon, { VILLAGE_ORDER, villageKoreanName } from '@/components/economy-v1/VillageCurrencyIcon'
 
-export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, homeState = 'default', onOpenHome, onOpenQuests, onOpenAttendance }) {
+export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, economyMode = 'legacy', economyBalances = {}, homeState = 'default', onOpenHome, onOpenQuests, onOpenAttendance }) {
   const zones = Object.keys(ZONE_META)
   const percent = Math.round(Object.values(zoneProgress).reduce((sum, value) => sum + value, 0) / zones.length * 100)
   const divider = <div className="world-map-hud__divider" style={{ width:1, height:36, background:'#C8A96E' }}/>
@@ -24,7 +25,9 @@ export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, homeState =
       {divider}
       <HudStat icon="⭐" value={totalCount} label="수집한 소리"/>
       {divider}
-      <HudStat icon="🪙" value={balance} label="보유 화폐" title="상점에서 쓸 수 있는 화폐"/>
+      {economyMode === 'cutover'
+        ? <WorldWalletHUD balances={economyBalances}/>
+        : <HudStat icon="🪙" value={balance} label="보유 화폐" title="상점에서 쓸 수 있는 화폐"/>}
       {divider}
       <HudButton icon="🏠" label="우리 집" ariaLabel="우리 집 꾸미기 열기" onClick={onOpenHome} kind="home" badge={homeState === 'invite-ready' ? '초대 가능' : null}/>
       {divider}
@@ -100,11 +103,39 @@ function PanelShell({ title, closeLabel, onClose, children }) {
   return <><div onClick={event => onClose('backdrop', event)} style={{ position:'fixed', inset:0, zIndex:120 }}/><section aria-label={title} style={{ position:'absolute', top:HUD_H + 10, right:16, width:300, maxHeight:'70vh', overflowY:'auto', background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:16, boxShadow:'0 10px 40px #0005', zIndex:121, fontFamily:'Nunito, sans-serif', padding:14 }}><header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}><strong style={{ fontSize:13, color:'#3A2A14' }}>{title}</strong><button type="button" onClick={event => onClose('close_button', event)} aria-label={closeLabel} style={{ background:'#0001', border:0, borderRadius:'50%', width:28, height:28, cursor:'pointer' }}>✕</button></header>{children}</section></>
 }
 
-export function WorldQuestPanel({ participantId, onClose, instanceId }) {
+export function WorldQuestPanel({ participantId, economyMode = 'legacy', onClose, instanceId }) {
   const [quests, setQuests] = useState(null)
   useEffect(() => { let active = true; getTodayQuestSummary(participantId).then(data => { if (active) setQuests(data) }).catch(() => { if (active) setQuests([]) }); return () => { active = false } }, [participantId])
   useEffect(() => { if (!quests) return; quests.forEach(quest => trackEvent('quest_row_impression', { target_type:'quest', target_id:`quest-${quest.id}`, outcome:quest.completed ? 'completed' : 'active' }, { dedupeKey:`quest-impression:${instanceId}:${quest.id}` })) }, [instanceId, quests])
-  return <PanelShell title="📋 오늘의 퀘스트" closeLabel="오늘의 퀘스트 닫기" onClose={onClose}>{quests === null ? <PanelMessage>불러오는 중...</PanelMessage> : quests.length === 0 ? <PanelMessage>퀘스트를 불러오지 못했어요.</PanelMessage> : <div style={{ display:'grid', gap:7 }}>{quests.map(quest => <div key={quest.id} style={{ padding:'9px 11px', borderRadius:10, border:'1px solid #C8A96E55', background:quest.completed ? '#5B9E3A18' : '#00000006', fontSize:11, color:'#3A2A14' }}><strong>{quest.completed ? '✓ ' : ''}{quest.template?.description}</strong>{quest.template?.reward_currency != null && <span style={{ float:'right', color:'#B8860B' }}>+{quest.template.reward_currency}🪙</span>}</div>)}</div>}</PanelShell>
+  return <PanelShell title="📋 오늘의 퀘스트" closeLabel="오늘의 퀘스트 닫기" onClose={onClose}>{quests === null ? <PanelMessage>불러오는 중...</PanelMessage> : quests.length === 0 ? <PanelMessage>퀘스트를 불러오지 못했어요.</PanelMessage> : <><div style={{ display:'grid', gap:7 }}>{quests.map(quest => <div key={quest.id} style={{ padding:'9px 11px', borderRadius:10, border:'1px solid #C8A96E55', background:quest.completed ? '#5B9E3A18' : '#00000006', fontSize:11, color:'#3A2A14' }}><strong>{quest.completed ? '✓ ' : ''}{quest.template?.description}</strong>{economyMode === 'legacy' && quest.template?.reward_currency != null && <span style={{ float:'right', color:'#B8860B' }}>+{quest.template.reward_currency}🪙</span>}</div>)}</div>{economyMode === 'cutover' && <p style={{fontSize:10,color:'#8B6A3A'}}>신규 경제 모드에서는 퀘스트 진행도만 기록되며 화폐 보상은 지급되지 않습니다.</p>}</>}</PanelShell>
+}
+
+function WorldWalletHUD({ balances }) {
+  return <div className="world-map-hud__wallets" aria-label="여섯 마을 지갑" style={{display:'grid',gridTemplateColumns:'repeat(3,minmax(42px,1fr))',gap:'2px 6px',minWidth:176}}>{VILLAGE_ORDER.map((village) => <div key={village} aria-label={`${villageKoreanName(village)} 화폐 ${Number(balances[village] || 0)}개`} style={{display:'flex',alignItems:'center',gap:3,minWidth:0}}><VillageCurrencyIcon village={village} style={{width:16,height:16,flex:'0 0 auto'}}/><strong style={{fontSize:10,fontVariantNumeric:'tabular-nums',whiteSpace:'nowrap'}}>{Number(balances[village] || 0).toLocaleString('ko-KR')}</strong></div>)}</div>
+}
+
+export function WorldEconomyAttendancePanel({ attendance, onClaim, onClose }) {
+  const [pending, setPending] = useState(false)
+  const [message, setMessage] = useState('')
+  const claims = new Map((attendance?.claims || []).map((claim) => [claim.day, claim]))
+  const today = attendance?.attendanceDay
+  const claimed = claims.get(today)
+  const amounts = [2,2,2,3,3,4,5]
+  const claim = async () => {
+    if (pending || claimed || !onClaim) return
+    setPending(true); setMessage('')
+    trackEvent('attendance_check_attempted', { operation_type:'economy_v1_attendance' }, { critical:true })
+    const result = await onClaim()
+    setPending(false)
+    if (!result?.ok) {
+      setMessage('출석 보상을 받지 못했습니다. 다시 시도해 주세요.')
+      trackEvent('attendance_check_failed', { error_code:result?.code, operation_type:'economy_v1_attendance', operation_idempotency_key:result?.idempotencyKey }, { critical:true })
+      return
+    }
+    setMessage(`${villageKoreanName(result.village)} 화폐 ${result.amount}개를 받았어요.`)
+    trackEvent('attendance_check_succeeded', { operation_type:'economy_v1_attendance', operation_idempotency_key:result.idempotencyKey, metadata:{ reward_amount:result.amount } }, { critical:true })
+  }
+  return <PanelShell title="📅 주간 출석" closeLabel="출석 보상 닫기" onClose={onClose}>{!attendance?.ok ? <PanelMessage>출석 정보를 불러오지 못했어요.</PanelMessage> : <><div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:5}}>{amounts.map((amount,index) => { const day=index+1; const row=claims.get(day); const village=row?.village || (day === today && day <= 6 ? attendance.villagePermutation?.[day-1] : null); return <div key={day} style={{padding:6,border:'1px solid #C8A96E55',borderRadius:8,textAlign:'center',fontSize:9,background:day===today?'#fff4cc':'#fffaf0'}}><b>{day}일</b><div>{village ? <VillageCurrencyIcon village={village} style={{width:22,height:22}}/> : '?'}</div><strong>+{row?.amount || amount}</strong><small style={{display:'block'}}>{row?'받음':day===today?'오늘':'대기'}</small></div> })}</div>{today === 7 && !claimed && <p style={{fontSize:10}}>7일차는 서버가 잔액이 가장 적은 지갑을 결정합니다.</p>}<button type="button" disabled={pending || Boolean(claimed)} onClick={claim} style={{width:'100%',marginTop:10,padding:10,border:0,borderRadius:10,background:'#72503a',color:'#fff',fontWeight:800}}>{claimed?'오늘 보상 받음':pending?'처리 중…':'오늘 출석 보상 받기'}</button>{message && <p role="status" style={{fontSize:10}}>{message}</p>}</>}</PanelShell>
 }
 
 export function WorldAttendancePanel({ participantId, onClose }) {

@@ -1,7 +1,7 @@
 'use client'
 import { useEffect, useRef, useState, useMemo, memo } from 'react'
 import { useCollectiblePromptLogging, useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
-import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER_GROUND, WINTER_TILES, WINTER_MARKET } from '@/components/AssetRegistry'
+import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER_GROUND, WINTER_TILES, WINTER_MARKET, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { SHEET_CODES, LAB_DUNGEON_SHEET_META, LAB_STATIC, LAB_TORCHES, LAB_TRAPS, LAB_PROPS, LAB_ANIM, LAB_FLOOR_CELLS } from '@/components/labDungeonData'
 
 /* ─────────────────────────────────────────────
@@ -2565,11 +2565,12 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null }) {
+export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null, outfitSrc, accessorySrc }) {
   const frame = moving ? Math.floor(animationTick / 10) % 2 : 0
 
   if (ASSET_READY.world) {
-    const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
+    const { frame: fs, rows, cols } = WORLD_CHARACTER
+    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
     const row = rows[dir] ?? rows.down
     const walkTick = Math.floor(animationTick / 6) % cols.length
     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
@@ -2930,7 +2931,7 @@ export function ExitConfirmModal({ zone, onConfirm, onCancel }) {
 /* ─────────────────────────────────────────────
    ZoneMap 메인
 ───────────────────────────────────────────── */
-export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
+export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, outfitSrc, accessorySrc }) {
   const meta   = ZONE_META[zone]
   const theme  = ZONE_THEME[zone]
   // 오브젝트 (한 번만 생성)
@@ -3374,7 +3375,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             y={pos.y + CHAR_H - SPRITE_H}
             width={SPRITE_W} height={SPRITE_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:SPRITE_W, height:SPRITE_H }}>
-              <PixelChar dir={dir} moving={moving} animationTick={tick}/>
+              <PixelChar dir={dir} moving={moving} animationTick={tick} outfitSrc={outfitSrc} accessorySrc={accessorySrc}/>
             </div>
           </foreignObject>
 

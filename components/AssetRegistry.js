@@ -757,8 +757,8 @@ export const WORLD_SLIMES = [
 /* ─────────────────────────────────────────────
    플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(몸/옷/머리)를 같은 32×32
    격자에 겹쳐 그리는 레이어 시스템 — 각 시트가 "walk" 블록만 잘라낸 256×128(8열×4행).
-   info.txt 확인 결과 행 = 방향(0:Down, 1:Up, 2:Left, 3:Right), 열 = 걷기 프레임(0~7).
-   자연스러운 2프레임 걸음만 쓰면 되니 열 0(중립)·4(중간 스트라이드)만 사용.
+   실제 픽셀 방향은 행 0:Down, 1:Up, 2:Right, 3:Left이며 열은 걷기 프레임(0~7).
+   기존 런타임 방향 매핑과 8프레임 재생 순서를 그대로 유지한다.
    옷/머리 원본 파일은 색상 10~14종이 가로로 이어붙어 있는데, 첫 번째(x:0~256)만 사용.
 ───────────────────────────────────────────── */
 export const WORLD_CHARACTER = {
@@ -809,11 +809,56 @@ export const SOUND_MUSEUM_FINAL_B = {
    이 clothes 레이어 한 장만 갈아끼우는 방식이라 sheetW/sheetH·프레임 격자가 완전히 동일.
 ───────────────────────────────────────────── */
 export const OUTFIT_SHEETS = {
-  overalls: { src: '/assets/world/outfits/overalls.png', sheetW: 256, sheetH: 128 },
-  suit:     { src: '/assets/world/outfits/suit.png',     sheetW: 256, sheetH: 128 },
-  sailor:   { src: '/assets/world/outfits/sailor.png',   sheetW: 256, sheetH: 128 },
-  sporty:   { src: '/assets/world/outfits/sporty.png',   sheetW: 256, sheetH: 128 },
-  witch:    { src: '/assets/world/outfits/witch.png',    sheetW: 256, sheetH: 128 },
+  overalls:   { src: '/assets/world/outfits/overalls.png',                  previewSrc: '/assets/economy/previews/outfits/overalls.png',   sheetW: 256, sheetH: 128 },
+  sailor:     { src: '/assets/world/outfits/sailor.png',                    previewSrc: '/assets/economy/previews/outfits/sailor.png',     sheetW: 256, sheetH: 128 },
+  sporty:     { src: '/assets/world/outfits/sporty.png',                    previewSrc: '/assets/economy/previews/outfits/sporty.png',     sheetW: 256, sheetH: 128 },
+  suit:       { src: '/assets/world/outfits/suit.png',                      previewSrc: '/assets/economy/previews/outfits/suit.png',       sheetW: 256, sheetH: 128 },
+  witch:      { src: '/assets/world/outfits/witch.png',                     previewSrc: '/assets/economy/previews/outfits/witch.png',      sheetW: 256, sheetH: 128 },
+  clown:      { src: '/assets/character-v2/outfits/clown-walk.png',         previewSrc: '/assets/economy/previews/outfits/clown.png',      sheetW: 256, sheetH: 128 },
+  dress:      { src: '/assets/character-v2/outfits/dress-walk.png',         previewSrc: '/assets/economy/previews/outfits/dress.png',      sheetW: 256, sheetH: 128 },
+  floral:     { src: '/assets/character-v2/outfits/floral-walk.png',        previewSrc: '/assets/economy/previews/outfits/floral.png',     sheetW: 256, sheetH: 128 },
+  pants:      { src: '/assets/character-v2/outfits/pants-walk.png',         previewSrc: '/assets/economy/previews/outfits/pants.png',      sheetW: 256, sheetH: 128 },
+  pants_suit: { src: '/assets/character-v2/outfits/pants-suit-walk.png',    previewSrc: '/assets/economy/previews/outfits/pants_suit.png', sheetW: 256, sheetH: 128 },
+  pumpkin:    { src: '/assets/character-v2/outfits/pumpkin-walk.png',       previewSrc: '/assets/economy/previews/outfits/pumpkin.png',    sheetW: 256, sheetH: 128 },
+  sailor_bow: { src: '/assets/character-v2/outfits/sailor-bow-walk.png',    previewSrc: '/assets/economy/previews/outfits/sailor_bow.png', sheetW: 256, sheetH: 128 },
+  shoes:      { src: '/assets/character-v2/outfits/shoes-walk.png',         previewSrc: '/assets/economy/previews/outfits/shoes.png',      sheetW: 256, sheetH: 128 },
+  skirt:      { src: '/assets/character-v2/outfits/skirt-walk.png',         previewSrc: '/assets/economy/previews/outfits/skirt.png',      sheetW: 256, sheetH: 128 },
+  skull:      { src: '/assets/character-v2/outfits/skull-walk.png',         previewSrc: '/assets/economy/previews/outfits/skull.png',      sheetW: 256, sheetH: 128 },
+  spaghetti:  { src: '/assets/character-v2/outfits/spaghetti-walk.png',     previewSrc: '/assets/economy/previews/outfits/spaghetti.png',  sheetW: 256, sheetH: 128 },
+  spooky:     { src: '/assets/character-v2/outfits/spooky-walk.png',        previewSrc: '/assets/economy/previews/outfits/spooky.png',     sheetW: 256, sheetH: 128 },
+  stripe:     { src: '/assets/character-v2/outfits/stripe-walk.png',        previewSrc: '/assets/economy/previews/outfits/stripe.png',     sheetW: 256, sheetH: 128 },
+}
+
+// Accessories share the exact walk grid and are composited after hair. They
+// are registered here for the next UI phase, but no ownership/equip state is
+// read in 3A.
+export const ACCESSORY_SHEETS = {
+  acc_beard:            { src: '/assets/character-v2/accessories/beard-walk.png',            previewSrc: '/assets/economy/previews/accessories/acc_beard.png',            sheetW: 256, sheetH: 128 },
+  acc_earring_emerald:  { src: '/assets/character-v2/accessories/earring_emerald-walk.png',  previewSrc: '/assets/economy/previews/accessories/acc_earring_emerald.png',  sheetW: 256, sheetH: 128 },
+  acc_earring_red:      { src: '/assets/character-v2/accessories/earring_red-walk.png',      previewSrc: '/assets/economy/previews/accessories/acc_earring_red.png',      sheetW: 256, sheetH: 128 },
+  acc_glasses:          { src: '/assets/character-v2/accessories/glasses-walk.png',          previewSrc: '/assets/economy/previews/accessories/acc_glasses.png',          sheetW: 256, sheetH: 128 },
+  acc_sunglasses:       { src: '/assets/character-v2/accessories/sunglasses-walk.png',       previewSrc: '/assets/economy/previews/accessories/acc_sunglasses.png',       sheetW: 256, sheetH: 128 },
+  acc_hat_cowboy:       { src: '/assets/character-v2/accessories/hat_cowboy-walk.png',       previewSrc: '/assets/economy/previews/accessories/acc_hat_cowboy.png',       sheetW: 256, sheetH: 128 },
+  acc_hat_lucky:        { src: '/assets/character-v2/accessories/hat_lucky-walk.png',        previewSrc: '/assets/economy/previews/accessories/acc_hat_lucky.png',        sheetW: 256, sheetH: 128 },
+  acc_mask_spooky:      { src: '/assets/character-v2/accessories/mask_spooky-walk.png',      previewSrc: '/assets/economy/previews/accessories/acc_mask_spooky.png',      sheetW: 256, sheetH: 128 },
+}
+
+// Stage 3A review assets only. Wallet and shop UI adoption is deferred to 3B.
+export const VILLAGE_CURRENCY_ICONS = {
+  Animal: { src: '/assets/economy/village-currencies/animal.png', size: 32 },
+  Human:  { src: '/assets/economy/village-currencies/human.png',  size: 32 },
+  Nature: { src: '/assets/economy/village-currencies/nature.png', size: 32 },
+  Urban:  { src: '/assets/economy/village-currencies/urban.png',  size: 32 },
+  Music:  { src: '/assets/economy/village-currencies/music.png',  size: 32 },
+  Lab:    { src: '/assets/economy/village-currencies/lab.png',    size: 32 },
+}
+
+export function resolveWorldCharacterLayers({ outfitSrc, accessorySrc } = {}) {
+  const layers = outfitSrc
+    ? WORLD_CHARACTER.layers.map((layer, index) => index === 1 ? { ...layer, src:outfitSrc } : layer)
+    : WORLD_CHARACTER.layers
+  if (!accessorySrc) return layers
+  return [...layers, { src: accessorySrc, sheetW: 256, sheetH: 128 }]
 }
 
 /* ─────────────────────────────────────────────

@@ -1,4 +1,5 @@
 import './globals.css'
+import { EconomyRuntimeProvider } from '@/components/economy-v1/EconomyRuntimeProvider'
 
 export const metadata = {
   title: 'SoundMimic Village',
@@ -15,7 +16,7 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ko">
-      <body>{children}</body>
+      <body><EconomyRuntimeProvider>{children}</EconomyRuntimeProvider></body>
     </html>
   )
 }

@@ -20,6 +20,8 @@ import { getOrCreateRoomShare, getRoom, getSharedRoom } from '@/lib/interiorDeco
 import { probeHost } from '@/lib/duoSession'
 import { claimParticipantSession, restoreParticipantSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
+import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
+import EconomyRuntimeNotice from '@/components/economy-v1/EconomyRuntimeNotice'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
 import { completeStudySession, flushEvents, setUserEventContext, startStudySession, trackEvent } from '@/lib/userEvents'
 import { canonicalAudioId, uniqueSoundsByCanonicalAudio } from '@/lib/soundIdentity.mjs'
@@ -101,6 +103,10 @@ function getOtherGroupSounds(groupId, bypassAll = false) {
    'house'    → HouseDecorRoom 풀스크린 (우리 집 집꾸미기)
 ───────────────────────────────────────────── */
 export default function HomePage() {
+  const economy = useEconomyRuntime()
+  const loadEconomy = economy.load
+  const resetEconomy = economy.reset
+  const applyEconomyActivityResult = economy.applyActivityResult
   const [screen,        setScreen]        = useState('start')
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
@@ -195,6 +201,7 @@ export default function HomePage() {
           const progress = await getMyExperimentProgress()
           trackedParticipantRef.current = participant.participantId
           previousScreenRef.current = 'world'
+          resetEconomy()
           setParticipantId(participant.participantId)
           setGroupId(participant.groupId)
           setExperimentProgress(progress)
@@ -205,7 +212,7 @@ export default function HomePage() {
         .finally(() => setAuthRestoring(false))
     }, 0)
     return () => window.clearTimeout(id)
-  }, [])
+  }, [resetEconomy])
 
   // 집꾸미기 초대 링크(?house=<호스트>)로 들어온 경우 — app/interior-test/page.js가
   // 검증용으로 먼저 갖고 있던 로직을 실제 앱(루트 경로)에도 그대로 옮긴 것.
@@ -332,6 +339,13 @@ export default function HomePage() {
   // 화폐 시스템 — WorldMap HUD 잔액 + 장착 중인 outfit(캐릭터 렌더링용)
   const [balance,          setBalance]          = useState(0)
   const [equippedOutfitId, setEquippedOutfitId] = useState(null)
+  const runtimeItemMap = new Map((economy.runtimeItems || []).map((item) => [item.id, item]))
+  const economyOutfit = runtimeItemMap.get(economy.loadout.outfitId)
+  const economyAccessory = runtimeItemMap.get(economy.loadout.accessoryId)
+  const runtimeOutfitSrc = economy.mode === 'cutover'
+    ? (economyOutfit?.runtimeAsset || '/assets/world/player_clothes.png')
+    : (equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined)
+  const runtimeAccessorySrc = economy.mode === 'cutover' ? economyAccessory?.runtimeAsset : undefined
   const studyAccessEnabled = isStudyAccessParticipantId(participantId)
   // ALLAUDIO_A/ALLAUDIO_B처럼 그룹이 ID에 고정된 접근이면 그 그룹으로, 아니면
   // 입력받은 groupId를 그대로 쓴다. RESEARCHER 등 그룹 무관 접근만 완전히 우회한다.
@@ -365,6 +379,7 @@ export default function HomePage() {
       setProgressError('experiment_progress_load_failed')
     }
 
+    if (economy.effectiveMainMode !== 'legacy') return
     try {
       const [bal, outfitId] = await Promise.all([
         getCurrencyBalance(participantId),
@@ -373,7 +388,13 @@ export default function HomePage() {
       setBalance(bal)
       setEquippedOutfitId(outfitId)
     } catch {}
-  }, [participantId])
+  }, [economy.effectiveMainMode, participantId])
+
+  useEffect(() => {
+    if (!participantId || localQaRef.current || experimentProgress?.isComplete) return
+    const id = window.setTimeout(() => { void loadEconomy() }, 0)
+    return () => window.clearTimeout(id)
+  }, [participantId, experimentProgress?.isComplete, loadEconomy])
 
   useEffect(() => {
     if (!participantId || experimentProgress?.isComplete) return
@@ -385,7 +406,7 @@ export default function HomePage() {
   // lib/attendance.js가 "이미 오늘 체크인했음"을 자체적으로 판별하므로
   // 여기서는 그냥 참여자가 정해질 때마다 호출하기만 하면 됨(멱등).
   useEffect(() => {
-    if (!participantId || localQaRef.current || experimentProgress?.isComplete) return
+    if (!participantId || localQaRef.current || experimentProgress?.isComplete || economy.effectiveMainMode !== 'legacy') return
     trackEvent('attendance_check_attempted', {
       target_type: 'attendance', target_id: 'daily-check-in', operation_type: 'attendance_claim',
     }, { critical: true })
@@ -410,7 +431,7 @@ export default function HomePage() {
         refreshCounts()
       }
     }).catch(error => console.error('[attendance] 인증된 체크인 처리 실패:', error))
-  }, [participantId, experimentProgress?.isComplete, refreshCounts])
+  }, [participantId, experimentProgress?.isComplete, refreshCounts, economy.effectiveMainMode])
 
   // Museum 관람 완료 토스트 자동 닫힘
   useEffect(() => {
@@ -434,6 +455,7 @@ export default function HomePage() {
     trackedParticipantRef.current = participant.participantId
     previousScreenRef.current = 'world'
     const enabled = isStudyAccessParticipantId(participant.participantId)
+    resetEconomy()
     setParticipantId(participant.participantId)
     setGroupId(participant.groupId)
     setExperimentProgress(progress)
@@ -640,6 +662,7 @@ export default function HomePage() {
 
   /* ── AnnotationPanel Stage1 완료 → Zone 복귀 + 블록 완료 체크 ── */
   const handleAnnotateComplete = useCallback(({ persistence } = {}) => {
+    applyEconomyActivityResult(persistence)
     const newCollected = new Set([...collectedIds, ...(activeSound ? [activeSound.sound_id] : [])])
     setCollectedIds(newCollected)
 
@@ -678,7 +701,7 @@ export default function HomePage() {
       setScreen('zone')
     }
     refreshCounts()
-  }, [activeSound, activeZone, collectedIds, effectiveGroupId, bypassGroupFilter, unlockedBlock, villagesUnlocked, refreshCounts, setUnlockedBlock])
+  }, [activeSound, activeZone, collectedIds, effectiveGroupId, bypassGroupFilter, unlockedBlock, villagesUnlocked, refreshCounts, setUnlockedBlock, applyEconomyActivityResult])
 
   /* ── SoundMuseum 완료 → WorldMap 복귀 (+ "오늘은 여기까지" 토스트) ── */
   const handleMuseumDone = useCallback(() => {
@@ -729,6 +752,10 @@ export default function HomePage() {
   /* ─────────────────────────────────────────────
      렌더
   ───────────────────────────────────────────── */
+
+  const economyGuard = participantId && !natureQaEnabled && !humanQaOptions
+    ? <EconomyRuntimeNotice runtimeState={economy.runtimeState} error={economy.error} onRetry={loadEconomy}/>
+    : null
 
   // 0. 집꾸미기 초대 링크(?house=)로 들어온 경우 — 방문객도 다른 진입 경로와
   // 똑같이 참여자ID/그룹을 먼저 선택해야 한다(익명 구경 아님). participantId가
@@ -786,6 +813,7 @@ export default function HomePage() {
           }}
           onPartnerLeftScreen={handlePartnerLeftScreen}
         />
+        {economyGuard}
       </main>
     )
   }
@@ -810,7 +838,12 @@ export default function HomePage() {
           totalCount={totalCount}
           zoneProgress={zoneProgress}
           balance={balance}
-          outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
+          economyMode={economy.effectiveMainMode}
+          economyBalances={economy.balances}
+          economyAttendance={economy.attendance}
+          onEconomyAttendanceClaim={economy.claimAttendance}
+          outfitSrc={runtimeOutfitSrc}
+          accessorySrc={runtimeAccessorySrc}
           lockedZones={allZonesUnlocked ? [] : ZONES_LOCKED_AT_START}
           participantId={participantId}
           roomShareToken={roomShareToken}
@@ -818,6 +851,7 @@ export default function HomePage() {
           realtimeSelfId={realtimeSelfId}
           duoHostId={followHostId || duoUrlToken}
         />
+        {economyGuard}
         {!worldOverviewQa && !worldLockQaEnabled && (natureQaEnabled || humanQaOptions?.mode === 'world') && (
           <button type="button" onClick={() => handleEnterZone(natureQaEnabled ? 'Nature' : 'Human')} style={{
             position:'fixed', right:16, bottom:16, zIndex:199,
@@ -931,6 +965,7 @@ export default function HomePage() {
       }}>
         <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare} realtimeSelfId={realtimeSelfId}
           dryRun={natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
+        {economyGuard}
       </main>
     )
   }
@@ -949,11 +984,16 @@ export default function HomePage() {
           participantId={participantId}
           sessionId={groupId}
           zoneCounts={zoneCounts}
-          outfitSrc={equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined}
+          outfitSrc={runtimeOutfitSrc}
+          accessorySrc={runtimeAccessorySrc}
+          economyMode={economy.effectiveMainMode}
+          economyViewMode={economy.mode}
+          onEconomyActivity={economy.applyActivityResult}
           onCurrencyChange={refreshCounts}
           onDone={handleMuseumDone}
           onExit={handleMuseumExit}
         />
+        {economyGuard}
       </>
     )
   }
@@ -985,6 +1025,8 @@ export default function HomePage() {
             isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : activeZone === 'Human' ? (
           <HumanZoneMap
@@ -1000,6 +1042,8 @@ export default function HomePage() {
             debugSpawns={humanQaOptions?.spawns}
             debugStart={humanQaOptions?.start}
             staticArt={humanQaOptions?.mode === 'static'}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : activeZone === 'Nature' ? (
           <NatureZoneMap
@@ -1011,6 +1055,8 @@ export default function HomePage() {
             blockNum={currentBlock}
             blockTotal={maxBlock}
             debugFirstItem={natureQaEnabled}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : activeZone === 'Urban' ? (
           <UrbanZoneMap
@@ -1021,6 +1067,8 @@ export default function HomePage() {
             isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : activeZone === 'Animal' ? (
           <AnimalZoneMap
@@ -1031,6 +1079,8 @@ export default function HomePage() {
             isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : activeZone === 'Lab' ? (
           <LabZoneMap
@@ -1041,6 +1091,8 @@ export default function HomePage() {
             isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         ) : (
           <ZoneMap
@@ -1052,6 +1104,8 @@ export default function HomePage() {
             isAnnotating={zoneInputBlocked}
             blockNum={currentBlock}
             blockTotal={maxBlock}
+            outfitSrc={runtimeOutfitSrc}
+            accessorySrc={runtimeAccessorySrc}
           />
         )}
 
@@ -1062,6 +1116,7 @@ export default function HomePage() {
             zone={activeZone}
             participantId={participantId}
             sessionId={groupId}
+            economyMode={economy.effectiveMainMode}
             dryRun={natureQaEnabled || Boolean(humanQaOptions)}
             onClose={handleAnnotateClose}
             onComplete={handleAnnotateComplete}
@@ -1103,6 +1158,7 @@ export default function HomePage() {
             </div>
           </div>
         )}
+        {economyGuard}
 
         {/* 완료 피드백 토스트 */}
         {showFeedback && (

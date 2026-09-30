@@ -100,10 +100,30 @@ test('unknown event names are rejected', async () => {
   assert.throws(() => q.create('click'), /unknown_user_event/)
 })
 
+test('Character preview load records panel viewing but no attendance claim outcome', async () => {
+  const source = await readFile(new URL('../../app/economy-v1-character-preview/EconomyV1CharacterPreview.js', import.meta.url), 'utf8')
+  const loadStart = source.indexOf('const load = useCallback')
+  const loadEnd = source.indexOf('\n  useEffect(', loadStart)
+  const load = source.slice(loadStart, loadEnd)
+  assert.match(load, /trackEvent\('attendance_panel_opened'/)
+  assert.doesNotMatch(load, /attendance_check_(?:attempted|succeeded|failed)/)
+
+  const claimStart = source.indexOf('const claimAttendance = async')
+  const claimEnd = source.indexOf("\n  if (status === 'loading')", claimStart)
+  const claim = source.slice(claimStart, claimEnd)
+  for (const eventName of ['attendance_check_attempted', 'attendance_check_succeeded', 'attendance_check_failed']) {
+    assert.match(claim, new RegExp(`trackEvent\\('${eventName}'`))
+  }
+})
+
 test('client catalog matches migration and migration keeps writes RPC-only', async () => {
   const { USER_EVENT_NAMES } = await loadQueueModule()
-  const sql = await readFile(new URL('./004_user_event_logging.sql', import.meta.url), 'utf8')
-  for (const name of USER_EVENT_NAMES) assert.match(sql, new RegExp(`\\('${name}'\\)`), `migration missing ${name}`)
+  const sql = [
+    await readFile(new URL('./004_user_event_logging.sql', import.meta.url), 'utf8'),
+    await readFile(new URL('./009_multi_village_character_loadout.sql', import.meta.url), 'utf8'),
+    await readFile(new URL('./010_multi_village_runtime_cutover.sql', import.meta.url), 'utf8'),
+  ].join('\n')
+  for (const name of USER_EVENT_NAMES) assert.match(sql, new RegExp(`\\('${name}'`), `migration missing ${name}`)
   assert.match(sql, /alter table public\.user_events enable row level security/i)
   assert.match(sql, /revoke all on public\.study_sessions, public\.user_events/i)
   assert.doesNotMatch(sql, /create policy [^\n]+ on public\.user_events for (insert|update|delete)/i)

@@ -28,6 +28,8 @@ export default function UrbanZoneMap({
   isAnnotating = false,
   blockNum = 1,
   blockTotal = 1,
+  outfitSrc,
+  accessorySrc,
   debugStart = null,
 }) {
   const village = useMemo(() => buildUrbanVillage(), [])
@@ -384,7 +386,7 @@ export default function UrbanZoneMap({
           position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
           transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
         }}>
-          <PixelChar dir={dir} moving={moving} />
+          <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} />
         </div>
         <canvas ref={foregroundCanvasRef} aria-label="Urban foreground layer" style={{
           position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 3,

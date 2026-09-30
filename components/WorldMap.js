@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SPEED, TILE, ZONE_META, useKeys } from '@/components/GameEngine'
 import WorldMapScene, { WORLD_MAP_V4_OBJECT_COUNT } from '@/components/world-map/WorldMapScene'
 import { WorldCharacter, WorldLandmarkHotspot, WorldPortalHotspot } from '@/components/world-map/WorldMapActors'
-import { WorldAttendancePanel, WorldDPad, WorldDirection, WorldEnterPrompt, WorldHomeWelcome, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
+import { WorldAttendancePanel, WorldEconomyAttendancePanel, WorldDPad, WorldDirection, WorldEnterPrompt, WorldHomeWelcome, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
 import WorldMinimap from '@/components/world-map/WorldMinimap'
 import WorldMapOverlay from '@/components/world-map/WorldMapOverlay'
 import { useDuoSession } from '@/lib/duoSession'
@@ -60,7 +60,7 @@ function getWorldQaOptions() {
   }
 }
 
-export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, outfitSrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duoHostId: duoHostIdProp = null, realtimeSelfId = null, lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, outfitSrc, accessorySrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duoHostId: duoHostIdProp = null, realtimeSelfId = null, lockedZones = [] }) {
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
   const [worldQa] = useState(getWorldQaOptions)
   const [viewport, setViewport] = useState(() => ({ width:typeof window === 'undefined' ? 1280 : window.innerWidth, height:typeof window === 'undefined' ? 720 : window.innerHeight }))
@@ -282,14 +282,16 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   const minimapPlayer = worldToMinimap(playerFoot, WORLD_MINIMAP_SIZE, minimapDisplaySize)
   const characters = []
   if (!worldQa.clean && partnerOnMap) characters.push({ key:'duo-partner', sortY:worldPlayerFootCenter(partnerPos.x, partnerPos.y).y, node:<foreignObject key="duo-partner" x={partnerPos.x} y={partnerPos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}><div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H, position:'relative' }}><div style={{ position:'absolute', top:-20, left:0, right:0, textAlign:'center', fontSize:12, fontWeight:700, color:'#fff', textShadow:'0 0 3px #000' }}>방문객</div><WorldCharacter dir={partnerPos.facing || 'down'} moving={partnerPos.moving} animationTick={animationTick}/></div></foreignObject> })
-  if (!worldQa.clean) characters.push({ key:'local-player', sortY:playerFoot.y, node:<foreignObject key="local-player" data-testid="world-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}><div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}><WorldCharacter dir={dir} moving={moving} outfitSrc={outfitSrc} animationTick={animationTick}/></div></foreignObject> })
+  if (!worldQa.clean) characters.push({ key:'local-player', sortY:playerFoot.y, node:<foreignObject key="local-player" data-testid="world-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}><div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}><WorldCharacter dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} animationTick={animationTick}/></div></foreignObject> })
 
   return <div data-testid="world-map" data-current-screen="world" data-map-ready={mapReady ? 'true' : 'false'} data-auto-walk={worldQa.autoWalk || ''} data-auto-walk-arrived={autoWalkArrived ? 'true' : 'false'} data-near-destination={nearZone || (nearMuseum ? 'Sound Library' : nearHome ? 'Home' : '')} data-map-ready-ms={qaPerformance.mapReadyMs.toFixed(1)} data-asset-transfer-bytes={qaPerformance.assetTransferBytes} data-asset-decoded-bytes={qaPerformance.assetDecodedBytes} data-asset-resource-count={qaPerformance.assetResourceCount} data-average-fps={qaPerformance.averageFps.toFixed(1)} data-slow-frames={qaPerformance.slowFrames} data-max-frame-ms={qaPerformance.maxFrameMs.toFixed(1)} data-heap-delta={qaPerformance.heapDelta} data-camera-view-w={camera.width.toFixed(2)} data-camera-view-h={camera.height.toFixed(2)} data-failed-asset-count={failedAssetCount} style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
-    {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>} 
-    {questOpen && <WorldQuestPanel participantId={participantId} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
-    {attendanceOpen && <WorldAttendancePanel participantId={participantId} onClose={closeAttendancePanel}/>}
-    {!worldQa.overview && <WorldMinimap playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onOpen={openFullMap}/>} 
-    {fullMapOpen && <WorldMapOverlay playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onClose={closeFullMap}/>} 
+    {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance} economyMode={economyMode} economyBalances={economyBalances} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>}
+    {questOpen && <WorldQuestPanel participantId={participantId} economyMode={economyMode} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
+    {attendanceOpen && (economyMode === 'cutover'
+      ? <WorldEconomyAttendancePanel attendance={economyAttendance} onClaim={onEconomyAttendanceClaim} onClose={closeAttendancePanel}/>
+      : <WorldAttendancePanel participantId={participantId} onClose={closeAttendancePanel}/>)}
+    {!worldQa.overview && <WorldMinimap playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onOpen={openFullMap}/>}
+    {fullMapOpen && <WorldMapOverlay playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onClose={closeFullMap}/>}
     <div style={{ position:'absolute', top:worldQa.overview ? 0 : HUD_H, left:0, right:0, bottom:0, background:mapReady ? '#567342' : '#465b32', overflow:'hidden' }}>
       <svg width="100%" height="100%" viewBox={`${camera.x} ${camera.y} ${camera.width} ${camera.height}`} preserveAspectRatio="xMidYMid meet" style={{ display:'block', position:'absolute', inset:0 }}>
         <WorldMapScene camera={camera} characters={characters} qa={worldQa} foot={playerFoot} collisionInfo={collisionInfo} onAssetLoad={handleAssetLoad} onAssetError={handleAssetError} interactionLayer={!worldQa.clean && <g data-layer="interaction">{WORLD_PORTALS.map(portal => <WorldPortalHotspot key={portal.zone} portal={portal} hovered={nearZone === portal.zone} progress={zoneProgress[portal.zone] || 0} locked={lockedSet.has(portal.zone)}/>)}<WorldLandmarkHotspot kind="museum" hovered={nearMuseum}/><WorldLandmarkHotspot kind="home" hovered={nearHome} state={homeState}/></g>}/>

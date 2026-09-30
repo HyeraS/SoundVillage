@@ -1,6 +1,6 @@
 'use client'
 
-import { ASSET_READY, CHARACTERS, WORLD_CHARACTER } from '@/components/AssetRegistry'
+import { ASSET_READY, CHARACTERS, WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { TILE, ZONE_META } from '@/components/GameEngine'
 import { WORLD_HOME, WORLD_MUSEUM, WORLD_PLAYER, worldDestinationInteractionPoint } from '@/lib/worldMapGeometry.mjs'
 
@@ -60,9 +60,10 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default' }) {
   )
 }
 
-export function WorldCharacter({ dir, moving, outfitSrc, animationTick = 0 }) {
+export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, animationTick = 0 }) {
   if (ASSET_READY.world) {
-    const { frame: frameSize, rows, cols, layers } = WORLD_CHARACTER
+    const { frame: frameSize, rows, cols } = WORLD_CHARACTER
+    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
     const row = rows[dir] ?? rows.down
     const frame = cols[moving ? animationTick % cols.length : 0]
     const sourceX = frame * frameSize
@@ -72,7 +73,7 @@ export function WorldCharacter({ dir, moving, outfitSrc, animationTick = 0 }) {
         style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs><clipPath id="worldPlayerClip"><rect width={frameSize} height={frameSize}/></clipPath></defs>
         {layers.map((layer, index) => (
-          <image key={layer.src} href={index === 1 && outfitSrc ? outfitSrc : layer.src}
+          <image key={`${layer.src}-${index}`} href={layer.src}
             x={-sourceX} y={-sourceY} width={layer.sheetW} height={layer.sheetH}
             clipPath="url(#worldPlayerClip)" style={{ imageRendering:'pixelated' }}/>
         ))}

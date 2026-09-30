@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ASSET_READY, WORLD_CHARACTER } from '@/components/AssetRegistry'
+import { ASSET_READY, WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { useKeys, overlaps } from '@/components/GameEngine'
 import { WorldDPad } from '@/components/world-map/WorldMapUI'
 import SoundMuseumScene from '@/components/sound-museum/SoundMuseumScene'
@@ -20,18 +20,18 @@ import {
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
 
 /* eslint-disable @next/next/no-img-element -- layered sprite sheets require exact native clipping */
-function MuseumCharacter({ dir, moving, animationTick, outfitSrc }) {
+function MuseumCharacter({ dir, moving, animationTick, outfitSrc, accessorySrc }) {
   if (!ASSET_READY.world) return null
-  const { frame, rows, cols, layers } = WORLD_CHARACTER
+  const { frame, rows, cols } = WORLD_CHARACTER
+  const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
   const row = rows[dir] ?? rows.down
   const sourceColumn = cols[moving ? animationTick % cols.length : 0]
   const scaleX = PLAYER_SPRITE.width / frame
   const scaleY = PLAYER_SPRITE.height / frame
   return <div style={{ position:'relative', width:PLAYER_SPRITE.width, height:PLAYER_SPRITE.height, overflow:'hidden' }}>
-    {layers.map((layer, index) => {
-      const sprite = index === 1 && outfitSrc ? { ...layer, src:outfitSrc } : layer
-      return <img key={`${sprite.src}-${index}`} src={sprite.src} alt="" draggable={false} style={{ position:'absolute', left:-sourceColumn * frame * scaleX, top:-row * frame * scaleY, width:sprite.sheetW * scaleX, height:sprite.sheetH * scaleY, imageRendering:'pixelated', pointerEvents:'none' }}/>
-    })}
+    {layers.map((sprite, index) => (
+      <img key={`${sprite.src}-${index}`} src={sprite.src} alt="" draggable={false} style={{ position:'absolute', left:-sourceColumn * frame * scaleX, top:-row * frame * scaleY, width:sprite.sheetW * scaleX, height:sprite.sheetH * scaleY, imageRendering:'pixelated', pointerEvents:'none' }}/>
+    ))}
   </div>
 }
 /* eslint-enable @next/next/no-img-element */
@@ -109,6 +109,7 @@ export default function LibraryRoom({
   zoneCounts = {},
   activeStations = 0,
   outfitSrc,
+  accessorySrc,
   npcDialogue = null,
 }) {
   const viewportRef = useRef(null)
@@ -245,7 +246,7 @@ export default function LibraryRoom({
   }, [autoWalk, dir, keys])
 
   const snapped = { x:snapWorld(pos.x, stageScale, viewport.dpr), y:snapWorld(pos.y, stageScale, viewport.dpr) }
-  const playerNode = <div key="player" data-testid="museum-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} style={{ position:'absolute', left:snapped.x + PLAYER_BODY.width / 2 - PLAYER_SPRITE.width / 2, top:snapped.y + PLAYER_BODY.height - PLAYER_SPRITE.height, width:PLAYER_SPRITE.width, height:PLAYER_SPRITE.height, zIndex:1 }}><MuseumCharacter dir={dir} moving={moving} animationTick={animationTick} outfitSrc={outfitSrc}/></div>
+  const playerNode = <div key="player" data-testid="museum-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} style={{ position:'absolute', left:snapped.x + PLAYER_BODY.width / 2 - PLAYER_SPRITE.width / 2, top:snapped.y + PLAYER_BODY.height - PLAYER_SPRITE.height, width:PLAYER_SPRITE.width, height:PLAYER_SPRITE.height, zIndex:1 }}><MuseumCharacter dir={dir} moving={moving} animationTick={animationTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc}/></div>
   const cardLayout = openCard ? CARD_LAYOUTS[openCard] : null
   const promptLeft = stageOffset.x + (pos.x + PLAYER_BODY.width / 2) * stageScale
   const promptTop = stageOffset.y + (pos.y - 14) * stageScale

@@ -20,6 +20,7 @@ export const config = {
     '/animal-test/:path*',
     '/attendance-test/:path*',
     '/daily-quest-test/:path*',
+    '/economy-v1-character-preview/:path*',
     '/fence-test/:path*',
     '/house-decor-test/:path*',
     '/human-village-test/:path*',

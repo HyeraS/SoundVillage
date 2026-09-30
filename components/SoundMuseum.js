@@ -4,9 +4,11 @@ import { playSound, pauseSound, resumeSound, isSoundPaused, getCurrentTime, getL
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
 import { getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
 import { newOperationKey } from '@/lib/persistenceResult'
+import { rewardEventFields } from '@/lib/economyRuntimeState.mjs'
 import { SHOP_PRODUCTS, getDailyDeal, getEffectivePrice, getShopGrowthTier, DEFAULT_OUTFIT_ID } from '@/lib/shopCatalog'
 import { ZONE_META } from '@/components/GameEngine'
 import LibraryRoom from '@/components/LibraryRoom'
+import CharacterShopPanel from '@/components/economy-v1/CharacterShopPanel'
 import { trackEvent } from '@/lib/userEvents'
 
 /* ─────────────────────────────────────────────
@@ -469,7 +471,12 @@ function Shop({ participantId, accent, onCurrencyChange }) {
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, onCurrencyChange, onDone, onExit }) {
+export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, accessorySrc, economyMode, economyViewMode = economyMode, onCurrencyChange, onEconomyActivity, onDone, onExit }) {
+  const [qaInitialCard] = useState(() => {
+    if (typeof window === 'undefined' || process.env.NODE_ENV !== 'development') return null
+    const value = new URLSearchParams(window.location.search).get('libraryQaCard')
+    return ['vote', 'exhibits', 'shop'].includes(value) ? value : null
+  })
   const npc   = ZONE_NPC[zone]  || ZONE_NPC.Lab
   const meta  = ZONE_META[zone] || { color: '#9B6DD4', emoji: '?', label: zone }
   const accent = meta.color
@@ -579,6 +586,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
             listening_time_sec: getListeningTime(),
             stage:              2,
             version:            'v0.4-web',
+            economyMode,
           })
           if (!result.ok) {
             trackEvent('museum_vote_submit_failed', {
@@ -589,11 +597,12 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
           }
           if (!result.ok) throw new Error(result.error.message)
           trackEvent('museum_vote_submit_succeeded', {
-            zone, sound_id: sound.sound_id, target_type: 'button', target_id: 'museum-vote-submit', outcome: 'succeeded',
+            sound_id: sound.sound_id, target_type: 'button', target_id: 'museum-vote-submit', outcome: 'succeeded',
             operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
             result_entity_type: 'vote', result_entity_id: result.data?.voteId,
-            metadata: { transaction_id: result.data?.reward?.transactionId, reward_amount: result.data?.reward?.awarded },
+            ...rewardEventFields(result.data),
           }, { critical: true, flush: true })
+          onEconomyActivity?.(result.data)
           resetListeningTime()
           voteKeyRef.current = newOperationKey()
         }
@@ -903,14 +912,18 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   return (
     <LibraryRoom
       onExit={onExit}
+      initialOpen={qaInitialCard}
       zoneCounts={zoneCounts}
       activeStations={candidates.length}
       outfitSrc={outfitSrc}
+      accessorySrc={accessorySrc}
       npcDialogue={{ name: npc.name, line: npc.lines[npcIdx] }}
       cards={{
         vote:     { render: () => voteCardBody },
         exhibits: { render: () => <ExhibitDisplay zoneCounts={zoneCounts} accent={accent}/> },
-        shop:     { render: () => <Shop participantId={participantId} accent={accent} onCurrencyChange={onCurrencyChange}/> },
+        shop:     { render: () => economyViewMode === 'cutover'
+          ? <CharacterShopPanel compact/>
+          : <Shop participantId={participantId} accent={accent} onCurrencyChange={onCurrencyChange}/> },
       }}
     />
   )
