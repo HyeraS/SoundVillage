@@ -16,7 +16,8 @@ import InteriorDecorRoom from '@/components/InteriorDecorRoom'
 import { getMyExperimentProgress, getMuseumAnnotationCounts, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
 import { ensureTodayCheckIn } from '@/lib/attendance'
-import { getOrCreateRoomShare, getRoom, getSharedRoom } from '@/lib/interiorDecor'
+import { getOrCreateRoomShare, getOwnedInteriorItems, getRoom, getSharedRoom } from '@/lib/interiorDecor'
+import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } from '@/lib/economyV1.client'
 import { probeHost } from '@/lib/duoSession'
 import { claimParticipantSession, restoreParticipantSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
@@ -26,6 +27,8 @@ import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAcce
 import { completeStudySession, flushEvents, setUserEventContext, startStudySession, trackEvent } from '@/lib/userEvents'
 import { canonicalAudioId, uniqueSoundsByCanonicalAudio } from '@/lib/soundIdentity.mjs'
 import { FRIEND_ROOM } from '@/lib/interiorFixtures'
+import { INTERIOR_CATALOG, INTERIOR_STARTER_IDS } from '@/lib/interiorCatalog'
+import { getUniquePlacedInteriorIds } from '@/lib/homeHub.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -236,6 +239,7 @@ export default function HomePage() {
 
   const prepareRoomShare = useCallback(async () => {
     if (authRestoring || !participantId || experimentProgress?.isComplete) return
+    if (new URLSearchParams(window.location.search).has('house')) return
     if (localQaRef.current) {
       setRoomShareToken(null)
       setRoomShareState(worldRoomShareQa === 'error'
@@ -243,9 +247,18 @@ export default function HomePage() {
         : { status:'qa', message:'QA 모드에서는 실제 공유 링크를 만들지 않아요.' })
       return
     }
+    if (economy.runtimeState === 'unknown') return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) {
+      setRoomShareToken(null)
+      setRoomShareState({ status:'idle', message:'현재 모드에서는 초대 링크를 만들 수 없어요.' })
+      return
+    }
     setRoomShareState({ status:'loading', message:'' })
     try {
-      const share = await getOrCreateRoomShare()
+      const share = economy.runtimeState === 'cutover'
+        ? await getOrCreateEconomyRoomShare()
+        : await getOrCreateRoomShare()
+      if (economy.runtimeState === 'cutover' && !share?.ok) throw new Error(share?.code || 'economy_room_share_failed')
       const token = share?.shareToken?.trim()
       if (!token) throw new Error('empty_share_token')
       setRoomShareToken(token)
@@ -255,7 +268,7 @@ export default function HomePage() {
       setRoomShareToken(null)
       setRoomShareState({ status:'error', message:'초대 링크를 만들지 못했어요. 연결을 확인한 뒤 다시 시도해주세요.' })
     }
-  }, [authRestoring, experimentProgress?.isComplete, participantId, worldRoomShareQa])
+  }, [authRestoring, experimentProgress?.isComplete, participantId, worldRoomShareQa, economy.runtimeState])
 
   useEffect(() => {
     if (authRestoring || !participantId || experimentProgress?.isComplete) return
@@ -265,13 +278,23 @@ export default function HomePage() {
 
   const refreshHomeHub = useCallback(async () => {
     if (!participantId || localQaRef.current) return
+    if (economy.runtimeState === 'unknown') return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) { setHomePlacedCount(0); return }
     try {
-      const room = await getRoom(participantId)
-      setHomePlacedCount(Array.isArray(room?.items) ? room.items.length : 0)
+      if (economy.runtimeState === 'cutover') {
+        const result = await getEconomyRoom()
+        if (!result.ok) throw new Error(result.code || 'economy_room_load_failed')
+        const runtimeItems = [...economy.interiorStarters, ...economy.interiorItems]
+        const ownedItemIds = [...INTERIOR_STARTER_IDS, ...economy.ownedItemIds]
+        setHomePlacedCount(getUniquePlacedInteriorIds({ room:result.room, ownedItemIds, runtimeItems }).length)
+      } else {
+        const [room, ownedItemIds] = await Promise.all([getRoom(participantId), getOwnedInteriorItems(participantId)])
+        setHomePlacedCount(getUniquePlacedInteriorIds({ room, ownedItemIds, runtimeItems:INTERIOR_CATALOG }).length)
+      }
     } catch (error) {
       console.error('[home-hub] 방 준비 상태 조회 실패:', error)
     }
-  }, [participantId])
+  }, [participantId, economy.runtimeState, economy.interiorStarters, economy.interiorItems, economy.ownedItemIds])
 
   useEffect(() => {
     if (!participantId || experimentProgress?.isComplete) return
@@ -281,10 +304,15 @@ export default function HomePage() {
 
   useEffect(() => {
     const shareToken = new URLSearchParams(window.location.search).get('house')?.trim()
-    if (!shareToken || authRestoring || !participantId || experimentProgress?.isComplete) return
+    if (!shareToken || authRestoring || !participantId || experimentProgress?.isComplete || economy.runtimeState === 'unknown') return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) return
     let cancelled = false
     trackEvent('friend_room_open_attempted', { target_type: 'friend_room', target_id: 'shared-room' })
-    getSharedRoom(shareToken).then((shared) => {
+    const sharedRequest = economy.runtimeState === 'cutover'
+      ? getEconomySharedRoom(shareToken)
+      : getSharedRoom(shareToken)
+    Promise.resolve(sharedRequest).then((shared) => {
+      if (economy.runtimeState === 'cutover' && !shared?.ok) throw new Error(shared?.code || 'shared_room_load_failed')
       if (cancelled || !shared?.room) return
       return probeHost(shareToken).then(({ screen }) => {
         if (cancelled) return
@@ -302,7 +330,7 @@ export default function HomePage() {
       trackEvent('friend_room_open_failed', { target_type: 'friend_room', target_id: 'shared-room', outcome: 'failed', error_code: 'shared_room_load_failed' })
     })
     return () => { cancelled = true }
-  }, [authRestoring, experimentProgress?.isComplete, participantId])
+  }, [authRestoring, experimentProgress?.isComplete, participantId, economy.runtimeState])
 
   useEffect(() => {
     if (!participantId || localQaRef.current || trackedParticipantRef.current === participantId) return

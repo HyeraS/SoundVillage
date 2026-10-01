@@ -1436,6 +1436,58 @@
       "officialStoreStatus": "free_customization"
     },
     {
+      "id": "starter_wall_neutral",
+      "name": "기본 중성 벽지",
+      "type": "wallpaper",
+      "sourceAsset": "assets/interior full/basics/wallpapers.png",
+      "runtimeAsset": "/assets/interior/starter_wall_neutral.png",
+      "plannedRuntimeAsset": null,
+      "animation": false,
+      "rarity": "free",
+      "cost": {
+        "Animal": 0,
+        "Human": 0,
+        "Nature": 0,
+        "Urban": 0,
+        "Music": 0,
+        "Lab": 0
+      },
+      "requiredVillageCount": 0,
+      "estimatedAnnotationCount": 0,
+      "minimumFreshAnnotationCount": 0,
+      "starterFree": true,
+      "existingGameConnected": true,
+      "currentCatalog": "interior",
+      "productGroup": "interior_starter",
+      "officialStoreStatus": "free_customization"
+    },
+    {
+      "id": "starter_floor_beige",
+      "name": "기본 베이지 바닥",
+      "type": "floor",
+      "sourceAsset": "assets/interior full/basics/rugs.png",
+      "runtimeAsset": "/assets/interior/starter_floor_beige.png",
+      "plannedRuntimeAsset": null,
+      "animation": false,
+      "rarity": "free",
+      "cost": {
+        "Animal": 0,
+        "Human": 0,
+        "Nature": 0,
+        "Urban": 0,
+        "Music": 0,
+        "Lab": 0
+      },
+      "requiredVillageCount": 0,
+      "estimatedAnnotationCount": 0,
+      "minimumFreshAnnotationCount": 0,
+      "starterFree": true,
+      "existingGameConnected": true,
+      "currentCatalog": "interior",
+      "productGroup": "interior_starter",
+      "officialStoreStatus": "free_customization"
+    },
+    {
       "id": "plant_tall",
       "name": "키 큰 화분",
       "type": "small_prop",

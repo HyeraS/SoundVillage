@@ -129,6 +129,9 @@ test('cutover bootstrap requires the full profile payload and never falls back t
     catalogVersion:ECONOMY_CATALOG_VERSION,
     items:[],
     runtimeItems:[],
+    interiorItems:[],
+    interiorSets:[],
+    interiorStarters:[],
     profile:{ balances:{}, ownedItemIds:[], loadout:{ outfitId:'basic', accessoryId:null } },
     attendance:{ ok:true },
   })

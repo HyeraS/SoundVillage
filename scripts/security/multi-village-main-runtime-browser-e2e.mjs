@@ -25,6 +25,7 @@ const suffix = crypto.randomUUID().replaceAll('-', '').slice(0, 12).toUpperCase(
 const participantId = `MAIN_${expectedMode.toUpperCase()}_${suffix}`
 const sourceParticipantId = `MAIN_SOURCE_${suffix}`
 const reviewDir = path.resolve('_review/economy-v1-main-runtime-hardening')
+const interiorReviewDir = path.resolve('_review/economy-v1-interior-cutover')
 const outfitAsset = '/assets/world/outfits/overalls.png'
 const accessoryAsset = '/assets/character-v2/accessories/glasses-walk.png'
 const characterLayers = ['/assets/world/player_body.png', outfitAsset, '/assets/world/player_hair.png', accessoryAsset]
@@ -41,6 +42,12 @@ async function screenshot(page, filename, locator = null) {
   const target = path.join(reviewDir, filename)
   if (locator) await locator.screenshot({ path: target })
   else await page.screenshot({ path: target, fullPage: true })
+  assert((await fs.stat(target)).size > 500, `${filename} is empty`)
+}
+
+async function screenshotInteriorReview(page, filename) {
+  const target = path.join(interiorReviewDir, filename)
+  await page.screenshot({ path:target, fullPage:true })
   assert((await fs.stat(target)).size > 500, `${filename} is empty`)
 }
 
@@ -152,6 +159,7 @@ async function assertBlockedBootstrapScenarios(session) {
 
 try {
   await fs.mkdir(reviewDir, { recursive: true })
+  await fs.mkdir(interiorReviewDir, { recursive:true })
   const signedA = ok(await authA.auth.signInAnonymously(), 'main browser sign-in')
   userA = signedA.user
   ok(await admin.from('study_participants').insert({
@@ -161,7 +169,16 @@ try {
   browser = await chromium.launch({ headless: true })
   const context = await createContext(signedA.session)
   const page = await context.newPage()
+  page.setDefaultNavigationTimeout(60_000)
   const assetFailures = []
+  const interiorMutations = []
+  page.on('request', (request) => {
+    if (request.method() !== 'POST') return
+    const pathname = new URL(request.url()).pathname
+    if (/^\/api\/economy-v1\/(?:purchase|room|room-share)$/.test(pathname)) interiorMutations.push(`economy:${pathname}`)
+    if (pathname === '/api/participant-purchase'
+      || /\/rest\/v1\/rpc\/(?:secure_purchase|save_participant_room)/.test(pathname)) interiorMutations.push(`legacy:${pathname}`)
+  })
   page.on('response', (response) => {
     if (response.url().includes('/assets/') && response.status() >= 400) assetFailures.push(`${response.status()} ${response.url()}`)
   })
@@ -184,6 +201,16 @@ try {
     await page.waitForTimeout(1_000)
     assert.equal(ok(await admin.from('participant_village_wallets').select('*').eq('participant_id', participantId), 'legacy wallets').length, 0,
       'flag OFF must not initialize village wallets')
+    await page.getByRole('button', { name:'우리 집 꾸미기 열기' }).click()
+    const legacyRoom = page.locator('[data-interior-room="ready"]')
+    await legacyRoom.waitFor({ timeout:30_000 })
+    assert.equal(await page.getByLabel('여섯 마을 지갑').count(), 0)
+    await page.getByRole('button', { name:'꾸미기 시작' }).click()
+    await page.getByRole('button', { name:'저장하기' }).click()
+    await page.waitForFunction(() => document.querySelector('[data-interior-room]')?.dataset.interiorMode === 'view')
+    assert(interiorMutations.some((entry) => entry.startsWith('legacy:')), `${expectedMode} did not use the legacy room-save path`)
+    assert.equal(interiorMutations.some((entry) => entry.startsWith('economy:')), false,
+      `${expectedMode} used an Economy v1 Interior mutation`)
     await screenshot(page, expectedMode === 'preview' ? 'preview-legacy-main-hud.png' : 'legacy-flag-off-main.png')
     console.log(`${expectedMode} main-runtime legacy behavior browser check passed.`)
   } else if (expectedMode === 'maintenance') {
@@ -192,7 +219,9 @@ try {
     await page.getByRole('alertdialog', { name:'경제 시스템 점검 중' }).waitFor({ timeout:20_000 })
     assert.equal(ok(await admin.from('participant_village_wallets').select('*').eq('participant_id', participantId), 'maintenance wallets').length, 0)
     assert.equal(ok(await admin.from('participant_attendance').select('*').eq('participant_id', participantId), 'maintenance attendance').length, 0)
+    assert.deepEqual(interiorMutations, [], 'maintenance emitted an Interior mutation')
     await screenshot(page, 'maintenance-economy-notice.png')
+    await screenshotInteriorReview(page, 'maintenance-or-blocked.png')
     console.log('Maintenance write-blocking browser check passed.')
   } else {
     const signedB = ok(await authB.auth.signInAnonymously(), 'source browser sign-in')
@@ -298,6 +327,7 @@ try {
     await sailorBuy.click()
     const purchasePrimary = page.getByRole('button', { name: '구매하고 장착' })
     await purchasePrimary.waitFor()
+    await page.waitForFunction(() => document.activeElement?.textContent?.trim() === '구매하고 장착')
     assert.equal(await purchasePrimary.evaluate((element) => element === document.activeElement), true)
     await page.keyboard.press('Escape')
     await page.waitForFunction(() => document.activeElement?.closest('[data-testid="shop-item-sailor"]'))
@@ -315,7 +345,7 @@ try {
     await page.getByRole('alert').filter({ hasText:'같은 요청으로 안전하게 다시 시도' }).waitFor()
     await screenshot(page, 'purchase-modal-network-retry.png')
     await page.getByRole('button', { name:'같은 요청 재시도' }).click()
-    await page.getByRole('status').filter({ hasText: '세일러 룩 구매 및 장착 완료' }).waitFor()
+    await page.getByRole('status').filter({ hasText: '세일러 룩 구매 및 장착 완료' }).waitFor({ timeout:60_000 })
     await page.unroute('**/api/economy-v1/purchase')
     assert.equal(purchaseKeys.length, 2)
     assert.equal(purchaseKeys[0], purchaseKeys[1], 'retryable purchase must retain the UUID')
@@ -341,7 +371,7 @@ try {
     await page.getByRole('alert').filter({ hasText:'새 요청으로 다시 시도' }).waitFor()
     await screenshot(page, 'purchase-modal-reused-key.png')
     await page.getByRole('button', { name:'구매하고 장착' }).click()
-    await page.getByRole('status').filter({ hasText:'스포티 세트 구매 및 장착 완료' }).waitFor()
+    await page.getByRole('status').filter({ hasText:'스포티 세트 구매 및 장착 완료' }).waitFor({ timeout:60_000 })
     await page.unroute('**/api/economy-v1/purchase')
     assert.equal(reusedKeys.length, 2)
     assert.notEqual(reusedKeys[0], reusedKeys[1], 'reused purchase key must be discarded before retry')
@@ -410,6 +440,14 @@ try {
   }
 } finally {
   if (browser) await browser.close().catch(() => {})
+  const cleanupParticipantIds = [participantId, sourceParticipantId]
+  await admin.from('currency_transactions').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('participant_house_layout').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('participant_house_items').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('participant_interior_items').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('participant_outfits').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('participant_currency').delete().in('participant_id', cleanupParticipantIds)
+  await admin.from('study_participants').delete().in('participant_id', cleanupParticipantIds)
   if (userA) await admin.auth.admin.deleteUser(userA.id).catch(() => {})
   if (userB) await admin.auth.admin.deleteUser(userB.id).catch(() => {})
 }

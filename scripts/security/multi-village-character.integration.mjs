@@ -110,6 +110,7 @@ try {
   assert.deepEqual(scalarAfter, scalarBefore)
   console.log('Multi-village Character loadout integration checks passed.')
 } finally {
+  await admin.from('study_participants').delete().in('participant_id', [participantA, participantB])
   if (userA) await admin.auth.admin.deleteUser(userA.id).catch(() => {})
   if (userB) await admin.auth.admin.deleteUser(userB.id).catch(() => {})
 }

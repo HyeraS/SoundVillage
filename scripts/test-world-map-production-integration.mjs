@@ -85,7 +85,7 @@ assert.match(await read('components/world-map/WorldMapUI.js'), /ariaLabel="ìš°ë¦
 assert.match(engineSource, /ArrowUp: 'up'[\s\S]*w: 'up'/)
 assert.match(interiorSource, /\.catch\(\(error\) => \{[\s\S]{0,900}?setLoadError\(true\)[\s\S]{0,120}?setLoaded\(true\)/)
 assert.match(interiorSource, /data-room-load-state=\{loadError \? 'fallback' : 'loaded'\}/)
-assert.match(interiorSource, /disabled=\{loadError\} onClick=\{startEdit\}/)
+assert.match(interiorSource, /disabled=\{loadError \|\| !mutationsAllowed\} onClick=\{startEdit\}/)
 
 const runtimeAssets = [
   ...WORLD_MAP_V4_ASSET_IDS.map(assetId => `public${WORLD_MAP_V4_ASSETS[assetId].src}`),

@@ -59,9 +59,21 @@ test('museum, shared rooms, and Realtime use constrained interfaces', async () =
 
 test('room save events link by operation key without participant-backed room IDs', async () => {
   const interior = await read('components/InteriorDecorRoom.js')
-  const successEvent = interior.match(/trackEvent\('room_save_succeeded',[\s\S]*?\}, \{ critical: true, flush: true \}\)/)?.[0] || ''
-  assert.match(successEvent, /operation_idempotency_key/)
-  assert.match(successEvent, /result_entity_type: 'participant_room'/)
-  assert.doesNotMatch(successEvent, /result_entity_id/)
-  assert.doesNotMatch(successEvent, /shareToken|auth_user_id|participant_id|p_room/)
+  const attemptEvent = interior.match(/trackEvent\('room_save_attempted',[\s\S]*?\}, \{ critical: true \}\)/)?.[0] || ''
+  const successEvent = interior.match(/trackEvent\('room_save_succeeded',[\s\S]*?dedupeKey:`room-save-succeeded:\$\{operationKey\}` \}\)/)?.[0] || ''
+  const failureEvents = [...interior.matchAll(/trackEvent\('room_save_failed',[\s\S]*?\}, \{ critical:[\s\S]*?\}\)/g)].map((match) => match[0])
+  assert.match(attemptEvent, /operation_type: economyV1 \? 'economy_v1_room_save' : 'room_save'/)
+  assert.match(attemptEvent, /operation_idempotency_key: operationKey/)
+  assert.match(successEvent, /operation_type:economyV1 \? 'economy_v1_room_save' : result\.operationType/)
+  assert.match(successEvent, /operation_idempotency_key:economyV1 \? operationKey : result\.idempotencyKey/)
+  assert.match(successEvent, /result_entity_type:economyV1 \? 'economy_v1_room' : 'participant_room'/)
+  assert.equal(failureEvents.length, 2)
+  assert.ok(failureEvents.every((event) => /operation_idempotency_key/.test(event)))
+  assert.ok(failureEvents.every((event) => /economyV1 \? 'economy_v1_room_save' :/.test(event)))
+  for (const event of [attemptEvent, successEvent, ...failureEvents]) {
+    assert.doesNotMatch(event, /result_entity_id/)
+    assert.doesNotMatch(event, /shareToken|inviteUrl|auth_user_id|participant_id|p_room|room_json/)
+  }
+  assert.match(interior, /const economyV1 = !visitorMode && !dryRun && economy\.runtimeState === 'cutover'/)
+  assert.doesNotMatch(interior, /(?:body|searchParams|query)\??\.economyV1/)
 })

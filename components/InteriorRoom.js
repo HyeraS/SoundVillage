@@ -298,10 +298,12 @@ export default function InteriorRoom({
             }}>
               {Array.from({ length: WALL_ROWS }).flatMap((_, r) =>
                 Array.from({ length: COLS }).map((__, c) => (
-                  <div
+                  <button
+                    type="button"
+                    aria-label={`벽 ${r + 1}행 ${c + 1}열에 배치`}
                     key={`w${r}${c}`}
                     className="interior-grid-cell"
-                    style={{ zIndex: 2 }}
+                    style={{ zIndex: 2, padding:0, border:0, background:'transparent' }}
                     onClick={() => onClickCell?.('wall', c, r)}
                     onMouseEnter={() => onHoverCell?.('wall', c, r)}
                   />
@@ -314,10 +316,12 @@ export default function InteriorRoom({
             }}>
               {Array.from({ length: ROWS }).flatMap((_, r) =>
                 Array.from({ length: COLS }).map((__, c) => (
-                  <div
+                  <button
+                    type="button"
+                    aria-label={`바닥 ${r + 1}행 ${c + 1}열에 배치`}
                     key={`f${r}${c}`}
                     className="interior-grid-cell"
-                    style={{ zIndex: 2 }}
+                    style={{ zIndex: 2, padding:0, border:0, background:'transparent' }}
                     onClick={() => onClickCell?.('floor', c, r)}
                     onMouseEnter={() => onHoverCell?.('floor', c, r)}
                   />

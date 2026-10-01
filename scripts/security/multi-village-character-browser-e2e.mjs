@@ -244,5 +244,6 @@ try {
   console.log('Multi-village Character browser E2E and review captures passed.')
 } finally {
   if (browser) await browser.close().catch(() => {})
+  await admin.from('study_participants').delete().eq('participant_id', participantId)
   if (user) await admin.auth.admin.deleteUser(user.id).catch(() => {})
 }

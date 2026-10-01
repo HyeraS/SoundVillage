@@ -89,13 +89,21 @@ test('preview remains internal and contains no deal, discount, or balance mutati
 
 test('protected legacy persistence files retain the Stage 3B baseline hashes while Stage 3C uses explicit branches', async () => {
   const snapshot = JSON.parse(await read('scripts/security/economy-v1-character-regression.snapshot.json'))
-  const stage3cIntegrationFiles = new Set(['app/page.js', 'components/SoundMuseum.js', 'components/AssetRegistry.js'])
+  const stage3cIntegrationFiles = new Set([
+    'app/page.js', 'components/SoundMuseum.js', 'components/AssetRegistry.js',
+    'components/InteriorDecorRoom.js',
+  ])
   for (const [path, expected] of Object.entries(snapshot).filter(([path]) => !stage3cIntegrationFiles.has(path))) {
     const bytes = await readFile(new URL(path, root))
     assert.equal(createHash('sha256').update(bytes).digest('hex'), expected, `${path} changed`)
   }
-  const [page, museum] = await Promise.all([read('app/page.js'), read('components/SoundMuseum.js')])
+  const [page, museum, interior] = await Promise.all([
+    read('app/page.js'), read('components/SoundMuseum.js'), read('components/InteriorDecorRoom.js'),
+  ])
   assert.match(page, /economy\.effectiveMainMode !== 'legacy'/)
   assert.match(page, /ensureTodayCheckIn\(participantId\)/)
   assert.match(museum, /economyViewMode === 'cutover'[\s\S]*CharacterShopPanel[\s\S]*<Shop /)
+  assert.match(interior, /economy\.runtimeState === 'cutover'/)
+  assert.match(interior, /economyV1[\s\S]*saveEconomyRoom[\s\S]*saveRoom/)
+  assert.match(interior, /economyV1 \? await economy\.purchase\(item\) : await purchaseInteriorItem/)
 })

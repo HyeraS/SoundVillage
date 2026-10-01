@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { economyResultResponse, economyStorageFailure, readIdempotencyKey, requireEnabledEconomyUser } from '@/lib/economyApi.server'
+import { economyPurchaseResultResponse, economyStorageFailure, readIdempotencyKey, requireEnabledEconomyUser } from '@/lib/economyApi.server'
 import { resolveEconomyPurchase } from '@/lib/economyCatalogV1.server'
 import { purchaseMultiVillageItem } from '@/lib/multiVillageEconomy.server'
 
@@ -23,5 +23,5 @@ export async function POST(request) {
 
   const { data, error } = await purchaseMultiVillageItem(auth.user.id, resolved.product, parsed.idempotencyKey)
   if (error) return economyStorageFailure('purchase', error)
-  return economyResultResponse(data)
+  return economyPurchaseResultResponse(data)
 }

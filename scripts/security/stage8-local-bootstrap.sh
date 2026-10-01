@@ -33,7 +33,15 @@ trap cleanup_on_failure EXIT HUP INT TERM
 
 cd "$STAGE8_WORK_DIR"
 supabase init >/dev/null
-perl -0pi -e "s/^project_id = .*$/project_id = \"$STAGE8_PROJECT_ID\"/m; s/^enable_anonymous_sign_ins = false$/enable_anonymous_sign_ins = true/m" supabase/config.toml
+STAGE8_PORT_BASE=$(node -e "const net=require('node:net');(async()=>{for(let base=20000+Math.floor(Math.random()*15000);base<50000;base+=11){const servers=[];try{for(let offset=0;offset<8;offset+=1)await new Promise((resolve,reject)=>{const server=net.createServer();servers.push(server);server.once('error',reject);server.listen(base+offset,'127.0.0.1',resolve)});process.stdout.write(String(base));for(const server of servers)server.close();return}catch{for(const server of servers)server.close()}}process.exit(1)})()")
+STAGE8_DB_PORT=$((STAGE8_PORT_BASE + 1))
+STAGE8_SHADOW_PORT=$((STAGE8_PORT_BASE + 2))
+STAGE8_POOLER_PORT=$((STAGE8_PORT_BASE + 3))
+STAGE8_STUDIO_PORT=$((STAGE8_PORT_BASE + 4))
+STAGE8_SMTP_PORT=$((STAGE8_PORT_BASE + 5))
+STAGE8_INSPECTOR_PORT=$((STAGE8_PORT_BASE + 6))
+STAGE8_ANALYTICS_PORT=$((STAGE8_PORT_BASE + 7))
+perl -0pi -e "s/^project_id = .*$/project_id = \"$STAGE8_PROJECT_ID\"/m; s/^enable_anonymous_sign_ins = false$/enable_anonymous_sign_ins = true/m; s/port = 54321/port = $STAGE8_PORT_BASE/; s/port = 54322/port = $STAGE8_DB_PORT/; s/shadow_port = 54320/shadow_port = $STAGE8_SHADOW_PORT/; s/port = 54329/port = $STAGE8_POOLER_PORT/; s/port = 54323/port = $STAGE8_STUDIO_PORT/; s/port = 54324/port = $STAGE8_SMTP_PORT/; s/inspector_port = 8083/inspector_port = $STAGE8_INSPECTOR_PORT/; s/port = 54327/port = $STAGE8_ANALYTICS_PORT/" supabase/config.toml
 mkdir -p supabase/migrations
 
 wrap_historical() {

@@ -44,7 +44,7 @@ function assertNoRemovedCatalogFields(value, trail = 'catalog') {
 const currentIds = {
   shop: idsFromJavaScript('lib/shopCatalog.js'),
   interior: idsFromJavaScript('lib/interiorCatalog.js'),
-  interiorSet: idsFromJavaScript('lib/interiorCatalog.js'),
+  interiorSet: idsFromJavaScript('lib/interiorLegacyCatalog.js'),
   house: new Set([
     ...idsFromJavaScript('lib/houseCatalog.js'),
     ...JSON.parse(fs.readFileSync(path.join(repositoryRoot, 'lib/generatedHouseAssets.json'), 'utf8')).items.map((item) => item.id),

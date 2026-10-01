@@ -45,8 +45,10 @@
     "test:stage-10b-room-browser": "node scripts/security/stage10b-room-browser-e2e.mjs",
     "test:stage-10b-zonemap-browser": "node scripts/security/stage10b-zonemap-browser-e2e.mjs",
     "stage8:local-bootstrap": "sh scripts/security/stage8-local-bootstrap.sh",
-    "test:multi-village-economy": "node --test lib/multiVillageEconomy.test.mjs scripts/security/multi-village-economy.test.mjs scripts/security/multi-village-character.test.mjs scripts/security/multi-village-runtime.test.mjs",
+    "test:multi-village-economy": "node --test lib/multiVillageEconomy.test.mjs lib/economyInteriorRoom.test.mjs scripts/security/multi-village-economy.test.mjs scripts/security/multi-village-character.test.mjs scripts/security/multi-village-runtime.test.mjs scripts/security/multi-village-interior.test.mjs",
     "test:multi-village-economy-local": "sh scripts/security/multi-village-economy-local-rehearsal.sh",
+    "test:multi-village-interior-local": "node scripts/security/multi-village-interior.integration.mjs",
+    "test:multi-village-interior-browser": "node scripts/security/multi-village-interior-browser-e2e.mjs",
     "test:functional-fixes": "node --test scripts/security/functional-fixes.test.mjs",
     "test:user-events-local": "node scripts/security/user-event-logging.integration.mjs"
   },

@@ -1,5 +1,12 @@
 import { NextResponse } from 'next/server'
-import { ECONOMY_CATALOG_VERSION, getCharacterRuntimeItems, getCharacterShopItems } from '@/lib/economyCatalogV1.server'
+import {
+  ECONOMY_CATALOG_VERSION,
+  getCharacterRuntimeItems,
+  getCharacterShopItems,
+  getInteriorShopItems,
+  getInteriorStarterItems,
+  getInteriorThemeSets,
+} from '@/lib/economyCatalogV1.server'
 import { economyStorageFailure, requireEconomyUser } from '@/lib/economyApi.server'
 import { getEconomyRuntimeMode } from '@/lib/economyRuntime.server'
 import { getMultiVillageRuntimeState } from '@/lib/multiVillageEconomy.server'
@@ -44,6 +51,9 @@ export async function GET(request) {
 
   const items = getCharacterShopItems()
   const runtimeItems = getCharacterRuntimeItems()
+  const interiorItems = getInteriorShopItems()
+  const interiorSets = getInteriorThemeSets()
+  const interiorStarters = getInteriorStarterItems()
   return NextResponse.json({
     ok: true,
     code: 'success',
@@ -51,6 +61,9 @@ export async function GET(request) {
     catalogVersion: ECONOMY_CATALOG_VERSION,
     items,
     runtimeItems,
+    interiorItems,
+    interiorSets,
+    interiorStarters,
     profile: {
       ...state.profile.data,
       // Keep discontinued and unknown ownership visible for audit. Rendering

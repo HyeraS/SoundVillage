@@ -6,6 +6,7 @@ import {
   equipCharacterItem,
   getEconomyBootstrap,
   newEconomyOperationKey,
+  purchaseEconomyItem,
   purchaseCharacterItem,
 } from '@/lib/economyV1.client'
 import {
@@ -114,6 +115,29 @@ export function EconomyRuntimeProvider({ children }) {
     return { ...purchase, equip, purchaseKey, equipKey }
   }, [load, setProfile])
 
+  const purchase = useCallback(async (item) => {
+    if (stateRef.current.runtimeState !== 'cutover') {
+      return { ok:false, code:'economy_runtime_blocked', retryable:false }
+    }
+    const purchaseKey = purchaseKeys.current.get(item.id) || newEconomyOperationKey()
+    purchaseKeys.current.set(item.id, purchaseKey)
+    const result = await purchaseEconomyItem(item.id, purchaseKey)
+    if (!result.ok) {
+      const action = purchaseFailureAction(result)
+      if (action !== 'keep-key') purchaseKeys.current.delete(item.id)
+      if (result.balances) setProfile((profile) => profile ? { ...profile, balances:result.balances } : profile)
+      if (action === 'discard-key-and-resync') await load()
+      return { ...result, purchaseKey, retrySameRequest:action === 'keep-key', resynced:action === 'discard-key-and-resync' }
+    }
+    purchaseKeys.current.delete(item.id)
+    setProfile((profile) => profile ? {
+      ...profile,
+      balances:result.balances,
+      ownedItemIds:[...new Set([...(profile.ownedItemIds || []), ...(result.grantedItemIds || [item.id])])],
+    } : profile)
+    return { ...result, purchaseKey }
+  }, [load, setProfile])
+
   const equip = useCallback(async (slot, itemId) => {
     if (stateRef.current.runtimeState !== 'cutover') {
       return { ok: false, code: 'economy_runtime_blocked', retryable: false }
@@ -169,9 +193,10 @@ export function EconomyRuntimeProvider({ children }) {
     previewItem,
     clearPreview,
     purchaseAndEquip,
+    purchase,
     equip,
     claimAttendance,
-  }), [applyActivityResult, claimAttendance, clearPreview, effectiveLoadout, equip, load, previewItem, previewLoadout, purchaseAndEquip, reset, savedLoadout, setProfile, state])
+  }), [applyActivityResult, claimAttendance, clearPreview, effectiveLoadout, equip, load, previewItem, previewLoadout, purchase, purchaseAndEquip, reset, savedLoadout, setProfile, state])
 
   return <EconomyRuntimeContext.Provider value={value}>{children}</EconomyRuntimeContext.Provider>
 }
