@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { economyPurchaseResultResponse, economyStorageFailure, readIdempotencyKey, requireEnabledEconomyUser } from '@/lib/economyApi.server'
 import { resolveEconomyPurchase } from '@/lib/economyCatalogV1.server'
 import { purchaseMultiVillageItem } from '@/lib/multiVillageEconomy.server'
+import { isDuoVisitorMutationBlocked } from '@/lib/duoSession.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +11,11 @@ export async function POST(request) {
   if (auth.response) return auth.response
   const parsed = await readIdempotencyKey(request)
   if (parsed.response) return parsed.response
+  const visitorGuard = await isDuoVisitorMutationBlocked(auth.user.id)
+  if (visitorGuard.error) return economyStorageFailure('duo-visitor-guard', visitorGuard.error)
+  if (visitorGuard.data === true) {
+    return NextResponse.json({ ok:false, code:'visitor_readonly' }, { status:403 })
+  }
   if (!parsed.body || Object.keys(parsed.body).some((key) => !['itemId', 'idempotencyKey'].includes(key))) {
     return NextResponse.json({ ok: false, code: 'invalid_request' }, { status: 400 })
   }

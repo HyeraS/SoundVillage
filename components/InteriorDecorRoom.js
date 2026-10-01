@@ -10,7 +10,6 @@ import { LEGACY_INTERIOR_PRICES, LEGACY_INTERIOR_SETS } from '@/lib/interiorLega
 import { getCurrencyBalance } from '@/lib/currency'
 import { getRoom, saveRoom, getOwnedInteriorItems, purchaseInteriorItem, purchaseInteriorSet } from '@/lib/interiorDecor'
 import { getEconomyRoom, newEconomyOperationKey, saveEconomyRoom } from '@/lib/economyV1.client'
-import { useDuoSession } from '@/lib/duoSession'
 import { newOperationKey } from '@/lib/persistenceResult'
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
 import { HOME_INVITE_REQUIRED_COUNT, getHomeInviteState, getUniquePlacedInteriorIds } from '@/lib/homeHub.mjs'
@@ -291,7 +290,7 @@ function RewardPopup({ reward, onClose, onPlace }) {
 /* 초대(공유 링크) 모달 — 예전 house-decor(HouseDecorRoom.js)의 ?house= 링크
    방식을 그대로 재사용. 진짜 실시간 동시 접속이 아니라, 상대가 이 링크로
    들어오면 내가 저장해 둔 방을 읽기전용으로 보는 방식(async 방문). */
-function InviteModal({ inviteUrl, inviteState, onRetry, onClose }) {
+function InviteModal({ inviteUrl, inviteState, liveInviteState, onCreateLive, onCloseLive, onRetry, onClose }) {
   const [copied, setCopied] = useState(false)
   const [copyError, setCopyError] = useState('')
   const copyInFlightRef = useRef(false)
@@ -307,14 +306,14 @@ function InviteModal({ inviteUrl, inviteState, onRetry, onClose }) {
       clearTimeout(copiedTimerRef.current)
     }
   }, [])
-  const copy = async (event) => {
-    if (copyInFlightRef.current || !inviteState.copyEnabled || !inviteUrl) return
+  const copy = async (event, url = inviteUrl, targetId = 'interior-invite-copy') => {
+    if (copyInFlightRef.current || !url) return
     copyInFlightRef.current = true
     setCopyError('')
     try {
-      await navigator.clipboard.writeText(inviteUrl)
+      await navigator.clipboard.writeText(url)
       trackEvent('invite_link_copy_succeeded', {
-        target_type: 'button', target_id: 'interior-invite-copy', outcome: 'succeeded',
+        target_type: 'button', target_id: targetId, outcome: 'succeeded',
         interaction_method: inferInteractionMethod(event.nativeEvent),
       })
       if (!mountedRef.current) return
@@ -323,7 +322,7 @@ function InviteModal({ inviteUrl, inviteState, onRetry, onClose }) {
       copiedTimerRef.current = setTimeout(() => setCopied(false), 1800)
     } catch {
       trackEvent('invite_link_copy_failed', {
-        target_type: 'button', target_id: 'interior-invite-copy', outcome: 'failed',
+        target_type: 'button', target_id: targetId, outcome: 'failed',
         interaction_method: inferInteractionMethod(event.nativeEvent), error_code: 'clipboard_write_failed',
       })
       if (mountedRef.current) setCopyError('링크를 복사하지 못했어요. 브라우저 권한을 확인해주세요.')
@@ -347,11 +346,26 @@ function InviteModal({ inviteUrl, inviteState, onRetry, onClose }) {
         <div style={{ fontSize: 13, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', letterSpacing: 2 }}>HOUSE INVITATION</div>
         <div id="interior-invite-title" style={{ fontSize: 20, fontFamily: "'Gothic A1', sans-serif", fontWeight: 800, margin: '8px 0' }}>우리 집에 놀러 올래?</div>
         <div style={{ fontSize: 12.5, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', lineHeight: 1.6, marginBottom: 16 }}>
-          지금 접속해 있으면 친구가 월드맵에서 나와 실시간으로 같이 돌아다닐 수 있어요. 자리를 비웠을 땐 꾸며진 방을 읽기 전용으로 구경만 할 수 있어요(가구는 못 옮겨요).
+          실시간 링크는 인증된 친구 한 명만 2시간 동안 입장할 수 있어요. 저장된 방 링크는 내가 자리를 비워도 읽기 전용으로 구경할 수 있어요.
         </div>
+        <div style={{ padding:12, background:'var(--panel-bright)', border:'3px solid var(--border-warm)', marginBottom:14, textAlign:'left' }}>
+          <strong style={{ display:'block', fontSize:13, marginBottom:8 }}>실시간 1:1 초대</strong>
+          {liveInviteState?.status === 'ready' ? <>
+            <div data-testid="duo-invite-ready" style={{ display:'flex', gap:8, alignItems:'center' }}>
+              <span style={{ flex:1, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', fontSize:11 }}>보안 링크 준비됨 · {liveInviteState.expiresAt ? new Date(liveInviteState.expiresAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '2시간 유효'}</span>
+              <PixelButton tone={copied ? 'confirm' : 'default'} onClick={(event) => copy(event, liveInviteState.inviteUrl, 'duo-invite-copy')} style={{ fontSize:12, padding:'9px 12px' }}>{copied ? '복사됨' : '복사'}</PixelButton>
+            </div>
+            <PixelButton tone="danger" onClick={onCloseLive} style={{ width:'100%', marginTop:8, fontSize:12, padding:9 }}>실시간 세션 종료</PixelButton>
+          </> : <PixelButton tone="confirm" disabled={liveInviteState?.status === 'loading'} onClick={onCreateLive} style={{ width:'100%', fontSize:12, padding:9 }}>
+            {liveInviteState?.status === 'loading' ? '보안 링크 만드는 중…' : '실시간 초대 링크 만들기'}
+          </PixelButton>}
+          {liveInviteState?.status === 'error' && <div role="alert" style={{ marginTop:8, color:'var(--interior-danger)', fontSize:12 }}>실시간 링크를 만들지 못했어요 ({liveInviteState.code || 'storage_retryable'}).</div>}
+          {liveInviteState?.status === 'revoked' && <div role="status" style={{ marginTop:8, fontSize:12 }}>실시간 세션을 종료했어요.</div>}
+        </div>
+        <div style={{ fontSize:12, fontWeight:800, textAlign:'left', marginBottom:6 }}>저장된 방 읽기 전용 링크</div>
         {inviteState.copyEnabled ? <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 8px 8px 14px', background: 'var(--panel-bright)', border: '3px solid var(--border-warm)', marginBottom: 14 }}>
-          <span data-testid="invite-url" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', textAlign: 'left' }}>{inviteUrl}</span>
-          <PixelButton tone={copied ? 'confirm' : 'default'} onClick={copy} style={{ fontSize: 12, padding: '9px 12px', flexShrink: 0 }}>{copied ? '복사됨' : '링크 복사'}</PixelButton>
+          <span data-testid="invite-url" style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 11, fontFamily: "'Gothic A1', sans-serif", color: 'var(--text-mid)', textAlign: 'left' }}>저장된 방 링크 준비됨</span>
+          <PixelButton tone={copied ? 'confirm' : 'default'} onClick={(event) => copy(event)} style={{ fontSize: 12, padding: '9px 12px', flexShrink: 0 }}>{copied ? '복사됨' : '링크 복사'}</PixelButton>
         </div> : <div role={inviteState.id === 'share-error' ? 'alert' : 'status'} data-testid="invite-unavailable" style={{ padding: 14, background: 'var(--panel-bright)', border: '3px solid var(--border-warm)', marginBottom: 14, textAlign:'left' }}>
           <strong style={{ display:'block', fontSize:13, marginBottom:5 }}>{inviteState.title}</strong>
           <span style={{ display:'block', color:'var(--text-mid)', fontSize:12, lineHeight:1.5 }}>{inviteState.detail}</span>
@@ -398,7 +412,9 @@ function footprintsOverlap(a, b) {
 ───────────────────────────────────────────── */
 export default function InteriorDecorRoom({
   initialRoom, initialOwned = [], initialBalance = 1240, participantId = 'AUDIOTEST',
-  visitorMode = false, visitorName = '친구', roomShareToken, roomShareState = { status:'idle', message:'' }, onRetryRoomShare, realtimeSelfId, onLeaveVisit, onCurrencyChange, onExit,
+  visitorMode = false, visitorName = '친구', roomShareToken, roomShareState = { status:'idle', message:'' }, onRetryRoomShare,
+  duo = null, duoInviteState = { status:'idle' }, onCreateDuoInvite, onCloseDuoSession, duoConnectionState,
+  onLeaveVisit, onCurrencyChange, onExit,
   onPartnerLeftScreen, onRoomStatusChange, dryRun = false,
 }) {
   const economy = useEconomyRuntime()
@@ -416,16 +432,8 @@ export default function InteriorDecorRoom({
   const [loaded, setLoaded] = useState(visitorMode || dryRun)
   const [loadError, setLoadError] = useState(false)
 
-  // 4단계(집 안 실시간 동기화) — WorldMap과 같은 lib/duoSession.js를 그대로
-  // 쓴다. 채널은 항상 "이 방의 주인" 기준(duo:<호스트 참여자ID>)이라, 방
-  // 주인과 방문객은 participant ID가 아닌 불투명 공유 토큰의 private 채널에서
-  // 만난다. presence key 역시 연구 ID가 아니라 세션 한정 무작위 값이다.
-  const [ephemeralVisitorId] = useState(() => `peer-${crypto.randomUUID()}`)
   const duoScreen = 'interior'
-  const { partnerPos, sendPosition } = useDuoSession(
-    roomShareToken,
-    realtimeSelfId || ephemeralVisitorId,
-  )
+  const { partnerPos = null, sendPosition = null, status:duoStatus = 'idle' } = duo || {}
   const partnerLabel = visitorMode ? visitorName : '방문객'
 
   // 방문객 전용 — 호스트가 이 방을 나가서 다른 화면(주로 월드맵)으로
@@ -1068,6 +1076,11 @@ export default function InteriorDecorRoom({
           경제 시스템 상태를 확인하는 동안 구매와 방 저장이 잠겨 있어요. 현재 방은 읽기 전용으로 볼 수 있습니다.
         </div>
       )}
+      {(duoStatus !== 'idle' || ['error','closed'].includes(duoConnectionState?.status)) && (
+        <div role="status" data-testid="duo-connection-state" style={{ padding:'8px 12px', background:'#EAF4DF', border:'3px solid var(--text-dark)', fontSize:12, fontWeight:700 }}>
+          {duoConnectionState?.status === 'closed' ? '실시간 세션 종료됨 · 저장된 방을 읽기 전용으로 보고 있어요.' : duoStatus === 'joined' ? '실시간 동행 연결됨' : duoStatus === 'disconnected' ? '연결이 끊겨 다시 연결하는 중…' : duoStatus === 'stale' ? '이 탭의 연결 시간이 만료됐어요.' : duoStatus === 'closed' ? '실시간 세션이 종료됐어요.' : '실시간 동행 연결 중…'}
+        </div>
+      )}
       {/* HUD 바 — README 헤더 스펙 중 상점/초대 진입에 필요한 요소만(잔액 pill +
           상점/초대 버튼). 방문 아바타/방 이름/도움말 버튼은 해당 기능이 구현되는
           단계에서 추가한다. visitorMode일 땐 전부 숨기고 구경 중 배지만 보여준다. */}
@@ -1282,7 +1295,8 @@ export default function InteriorDecorRoom({
       )}
 
       {modal === 'invite' && (
-        <InviteModal inviteUrl={inviteUrl} inviteState={inviteState} onRetry={onRetryRoomShare} onClose={closeModal} />
+        <InviteModal inviteUrl={inviteUrl} inviteState={inviteState} liveInviteState={duoInviteState}
+          onCreateLive={onCreateDuoInvite} onCloseLive={onCloseDuoSession} onRetry={onRetryRoomShare} onClose={closeModal} />
       )}
 
       {reward && (

@@ -367,7 +367,7 @@ try {
   const copyInviteButton = inviteDialog.getByRole('button', { name:'링크 복사' })
   await copyInviteButton.waitFor()
   const displayedInviteUrl = await inviteDialog.getByTestId('invite-url').textContent()
-  assert.match(displayedInviteUrl, /\?house=/)
+  assert.equal(displayedInviteUrl, '저장된 방 링크 준비됨')
   await pageA.evaluate(() => {
     window.__capturedInviteUrl = null
     Object.defineProperty(navigator, 'clipboard', {
@@ -377,7 +377,7 @@ try {
   })
   await copyInviteButton.click()
   await pageA.waitForFunction(() => window.__capturedInviteUrl?.includes('?house='))
-  assert.equal(await pageA.evaluate(() => window.__capturedInviteUrl), displayedInviteUrl)
+  assert.match(await pageA.evaluate(() => window.__capturedInviteUrl), /^http:\/\/127\.0\.0\.1:\d+\/\?house=[0-9a-f-]{36}$/)
   await inviteDialog.getByRole('button', { name:'복사됨' }).waitFor()
   await inviteDialog.getByRole('button', { name:'닫기' }).click()
   await inviteDialog.waitFor({ state:'hidden' })

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { economyResultResponse, economyStorageFailure, readIdempotencyKey, requireEnabledEconomyUser } from '@/lib/economyApi.server'
 import { getEconomyInteriorRoom, saveEconomyInteriorRoom } from '@/lib/economyInteriorRoom.server'
+import { isDuoVisitorMutationBlocked } from '@/lib/duoSession.server'
 
 export const dynamic = 'force-dynamic'
 
@@ -24,6 +25,11 @@ export async function POST(request) {
   if (blocked) return blocked
   const parsed = await readIdempotencyKey(request)
   if (parsed.response) return parsed.response
+  const visitorGuard = await isDuoVisitorMutationBlocked(auth.user.id)
+  if (visitorGuard.error) return economyStorageFailure('duo-visitor-guard', visitorGuard.error)
+  if (visitorGuard.data === true) {
+    return NextResponse.json({ ok:false, code:'visitor_readonly' }, { status:403 })
+  }
   if (!parsed.body || Object.keys(parsed.body).some((key) => !['room','expectedRevision','idempotencyKey'].includes(key))
     || !Number.isSafeInteger(parsed.body.expectedRevision) || parsed.body.expectedRevision < 0) {
     return NextResponse.json({ ok:false, code:'invalid_request' }, { status:400 })

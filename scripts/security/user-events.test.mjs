@@ -123,6 +123,7 @@ test('client catalog matches migration and migration keeps writes RPC-only', asy
     await readFile(new URL('./009_multi_village_character_loadout.sql', import.meta.url), 'utf8'),
     await readFile(new URL('./010_multi_village_runtime_cutover.sql', import.meta.url), 'utf8'),
     await readFile(new URL('./011_multi_village_interior_cutover.sql', import.meta.url), 'utf8'),
+    await readFile(new URL('./012_duo_session_v2.sql', import.meta.url), 'utf8'),
   ].join('\n')
   for (const name of USER_EVENT_NAMES) assert.match(sql, new RegExp(`\\('${name}'`), `migration missing ${name}`)
   assert.match(sql, /alter table public\.user_events enable row level security/i)

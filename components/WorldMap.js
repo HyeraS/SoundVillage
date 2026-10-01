@@ -7,7 +7,6 @@ import { WorldCharacter, WorldLandmarkHotspot, WorldPortalHotspot } from '@/comp
 import { WorldAttendancePanel, WorldEconomyAttendancePanel, WorldDPad, WorldDirection, WorldEnterPrompt, WorldHomeWelcome, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
 import WorldMinimap from '@/components/world-map/WorldMinimap'
 import WorldMapOverlay from '@/components/world-map/WorldMapOverlay'
-import { useDuoSession } from '@/lib/duoSession'
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
 import {
   WORLD_HOME, WORLD_MAP_HEIGHT_TILES, WORLD_MAP_WIDTH_TILES, WORLD_MUSEUM, WORLD_PLAYER, WORLD_PORTALS, WORLD_SPAWN,
@@ -60,7 +59,7 @@ function getWorldQaOptions() {
   }
 }
 
-export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, outfitSrc, accessorySrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duoHostId: duoHostIdProp = null, realtimeSelfId = null, lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, outfitSrc, accessorySrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duo = null, duoConnectionState = null, lockedZones = [] }) {
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
   const [worldQa] = useState(getWorldQaOptions)
   const [viewport, setViewport] = useState(() => ({ width:typeof window === 'undefined' ? 1280 : window.innerWidth, height:typeof window === 'undefined' ? 720 : window.innerHeight }))
@@ -94,8 +93,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   const attendanceOpenRef = useRef(false)
   const fullMapOpenRef = useRef(false)
   const fullMapTriggerRef = useRef(null)
-  const partnerConnectedRef = useRef(false)
-  const partnerEverConnectedRef = useRef(false)
   const loadedAssetIdsRef = useRef(new Set())
   const mapLoadStartedRef = useRef(0)
   const initialHeapRef = useRef(0)
@@ -181,7 +178,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
     if (attendanceOpenRef.current) trackEvent('attendance_panel_closed', { target_type:'panel', target_id:'world-attendance-panel', close_reason:'component_unmounted' })
   }, [])
 
-  const { partnerId, partnerPos, sendPosition } = useDuoSession(duoHostIdProp || roomShareToken, realtimeSelfId)
+  const { partnerId = null, partnerPos = null, sendPosition = null } = duo || {}
   const partnerOnMap = Boolean(partnerId && partnerPos && partnerPos.screen === 'worldmap')
   useEffect(() => { if (!moving && !partnerOnMap) return; const timer = setInterval(() => setAnimationTick(value => value + 1), 100); return () => clearInterval(timer) }, [moving, partnerOnMap])
   useEffect(() => {
@@ -190,14 +187,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
     proximityRef.current = key
     if (nearZone) trackEvent('collectible_prompt_shown', { zone:nearZone, target_type:'zone_portal', target_id:`zone-${nearZone.toLowerCase()}`, metadata:{ locked:lockedSet.has(nearZone) } })
   }, [nearZone, nearMuseum, nearHome, lockedSet])
-  useEffect(() => {
-    const connected = Boolean(partnerId)
-    if (connected === partnerConnectedRef.current) return
-    trackEvent(connected ? (partnerEverConnectedRef.current ? 'duo_reconnected' : 'duo_connected') : 'duo_disconnected', { target_type:'duo_session', target_id:'duo-peer', outcome:connected ? 'succeeded' : 'disconnected' })
-    if (connected) partnerEverConnectedRef.current = true
-    partnerConnectedRef.current = connected
-  }, [partnerId])
-
   useEffect(() => {
     let lastTime = performance.now()
     const loop = now => {
@@ -285,6 +274,9 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   if (!worldQa.clean) characters.push({ key:'local-player', sortY:playerFoot.y, node:<foreignObject key="local-player" data-testid="world-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} x={pos.x} y={pos.y} width={CHAR_W} height={CHAR_H} style={{ overflow:'visible' }}><div xmlns="http://www.w3.org/1999/xhtml" style={{ width:CHAR_W, height:CHAR_H }}><WorldCharacter dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} animationTick={animationTick}/></div></foreignObject> })
 
   return <div data-testid="world-map" data-current-screen="world" data-map-ready={mapReady ? 'true' : 'false'} data-auto-walk={worldQa.autoWalk || ''} data-auto-walk-arrived={autoWalkArrived ? 'true' : 'false'} data-near-destination={nearZone || (nearMuseum ? 'Sound Library' : nearHome ? 'Home' : '')} data-map-ready-ms={qaPerformance.mapReadyMs.toFixed(1)} data-asset-transfer-bytes={qaPerformance.assetTransferBytes} data-asset-decoded-bytes={qaPerformance.assetDecodedBytes} data-asset-resource-count={qaPerformance.assetResourceCount} data-average-fps={qaPerformance.averageFps.toFixed(1)} data-slow-frames={qaPerformance.slowFrames} data-max-frame-ms={qaPerformance.maxFrameMs.toFixed(1)} data-heap-delta={qaPerformance.heapDelta} data-camera-view-w={camera.width.toFixed(2)} data-camera-view-h={camera.height.toFixed(2)} data-failed-asset-count={failedAssetCount} style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
+    {(duo?.status && duo.status !== 'idle' || duoConnectionState?.status === 'error') && <div data-testid="duo-world-status" role={duoConnectionState?.status === 'error' ? 'alert' : 'status'} style={{ position:'fixed', zIndex:250, top:12, left:'50%', transform:'translateX(-50%)', padding:'8px 14px', border:'2px solid #3A2A14', borderRadius:12, background:'#FFF8E8', color:'#3A2A14', fontWeight:800, fontSize:12 }}>
+      {duoConnectionState?.status === 'error' ? `실시간 입장 실패: ${duoConnectionState.code}` : duo.status === 'joined' ? '실시간 동행 연결됨' : duo.status === 'disconnected' ? '연결이 끊겨 다시 연결하는 중…' : duo.status === 'stale' ? '이 탭의 연결 시간이 만료됐어요.' : duo.status === 'closed' ? '실시간 세션이 종료됐어요.' : '실시간 동행 연결 중…'}
+    </div>}
     {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance} economyMode={economyMode} economyBalances={economyBalances} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>}
     {questOpen && <WorldQuestPanel participantId={participantId} economyMode={economyMode} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
     {attendanceOpen && (economyMode === 'cutover'

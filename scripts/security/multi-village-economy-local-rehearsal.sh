@@ -1,13 +1,13 @@
 #!/bin/sh
 set -eu
 
-# Migrations 008-011 have a narrower lifecycle than the reusable Stage 8 browser
+# Migrations 008-012 have a narrower lifecycle than the reusable Stage 8 browser
 # bootstrap: they must compare legacy fingerprints, run concurrent DB checks and
 # HTTP/browser boundaries, then destroy the stack. Keeping this wrapper separate
 # avoids weakening or changing any 001-007 checks in stage8-local-bootstrap.sh.
 
 REPO_ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
-for command_name in supabase docker node npm curl cmp diff sed; do
+for command_name in supabase docker node npm curl cmp diff sed rsync; do
   command -v "$command_name" >/dev/null 2>&1 || {
     echo "Missing required local tool: $command_name" >&2
     exit 1
@@ -81,7 +81,7 @@ docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt \
   < scripts/security/multi-village-economy-legacy-snapshot.sql > "$BEFORE_SNAPSHOT"
 
 run_sql scripts/security/multi-village-economy-preflight.sql
-REHEARSAL_STAGE='008-011 migration apply'
+REHEARSAL_STAGE='008-012 migration apply'
 cp scripts/security/008_multi_village_economy.sql \
   "$STAGE8_WORK_DIR/supabase/migrations/20260929020000_multi_village_economy.sql"
 cp scripts/security/009_multi_village_character_loadout.sql \
@@ -90,18 +90,21 @@ cp scripts/security/010_multi_village_runtime_cutover.sql \
   "$STAGE8_WORK_DIR/supabase/migrations/20260930010000_multi_village_runtime_cutover.sql"
 cp scripts/security/011_multi_village_interior_cutover.sql \
   "$STAGE8_WORK_DIR/supabase/migrations/20261001010000_multi_village_interior_cutover.sql"
+cp scripts/security/012_duo_session_v2.sql \
+  "$STAGE8_WORK_DIR/supabase/migrations/20261001020000_duo_session_v2.sql"
 supabase migration up --local --workdir "$STAGE8_WORK_DIR"
-REHEARSAL_STAGE='008-011 SQL verification'
+REHEARSAL_STAGE='008-012 SQL verification'
 run_sql scripts/security/multi-village-economy-verify.sql
 run_sql scripts/security/multi-village-character-verify.sql
 run_sql scripts/security/multi-village-runtime-verify.sql
 run_sql scripts/security/multi-village-interior-verify.sql
+run_sql scripts/security/duo-session-v2-verify.sql
 run_sql scripts/security/multi-village-economy.integration.sql
 
 docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt \
   < scripts/security/multi-village-economy-legacy-snapshot.sql > "$AFTER_SNAPSHOT"
 cmp -s "$BEFORE_SNAPSHOT" "$AFTER_SNAPSHOT" || {
-  echo "Migration 008-011 changed a legacy table, ACL, policy, or function fingerprint" >&2
+  echo "Migration 008-012 changed a legacy table, ACL, policy, or function fingerprint" >&2
   exit 1
 }
 
@@ -117,12 +120,19 @@ export SECURITY_TEST_SUPABASE_ANON_KEY="$ANON_KEY"
 export SECURITY_TEST_SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
 export SECURITY_TEST_DB_CONTAINER="$STAGE8_DB_CONTAINER"
 export MULTI_VILLAGE_ECONOMY_HMAC_SECRET
+SUPABASE_JWT_SECRET=${JWT_SECRET:?Disposable Supabase JWT secret is missing}
+export SUPABASE_JWT_SECRET
+DUO_SESSION_HMAC_SECRET=$(node -e "process.stdout.write(require('node:crypto').randomBytes(48).toString('base64url'))")
+export DUO_SESSION_HMAC_SECRET
 
 REHEARSAL_STAGE='Economy and Interior DB integration'
 node scripts/security/multi-village-economy.integration.mjs
 node scripts/security/multi-village-character.integration.mjs
 node scripts/security/multi-village-runtime.integration.mjs
 npm run test:multi-village-interior-local
+REHEARSAL_STAGE='Duo V2 DB concurrency and WebSocket authorization'
+npm run test:duo-v2-local
+npm run test:duo-v2-realtime-local
 REHEARSAL_STAGE='legacy RLS, transactions, events, and experiment regression'
 npm run test:rls-local
 npm run test:transactional-integrity-local
@@ -134,14 +144,29 @@ export NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
 export ENABLE_INTERNAL_TEST_ROUTES=true
 
+# Keep browser verification independent from an already-running user dev server
+# and its .next/dev lock. Webpack is intentional because node_modules remains an
+# external symlink in this disposable copy.
+APP_WORK_DIR="$REHEARSAL_CONTROL_DIR/app"
+mkdir -p "$APP_WORK_DIR"
+rsync -a --delete \
+  --exclude='.git' --exclude='.next' --exclude='node_modules' --exclude='_review' --exclude='tmp' \
+  "$REPO_ROOT/" "$APP_WORK_DIR/"
+ln -s "$REPO_ROOT/node_modules" "$APP_WORK_DIR/node_modules"
+
 start_app() {
   SOUNDVILLAGE_ECONOMY_MODE=$1
+  SERVER_KIND=${2:-development}
   export SOUNDVILLAGE_ECONOMY_MODE
   APP_PORT=$(node -e "const s=require('node:net').createServer();s.listen(0,'127.0.0.1',()=>{process.stdout.write(String(s.address().port));s.close()})")
   ECONOMY_TEST_APP_URL="http://127.0.0.1:$APP_PORT"
   export ECONOMY_TEST_APP_URL
   NEXT_LOG="$REHEARSAL_CONTROL_DIR/next-$1.log"
-  ./node_modules/.bin/next dev --hostname 127.0.0.1 --port "$APP_PORT" > "$NEXT_LOG" 2>&1 &
+  if [ "$SERVER_KIND" = production ]; then
+    (cd "$APP_WORK_DIR" && exec "$REPO_ROOT/node_modules/.bin/next" start --hostname 127.0.0.1 --port "$APP_PORT") > "$NEXT_LOG" 2>&1 &
+  else
+    (cd "$APP_WORK_DIR" && exec "$REPO_ROOT/node_modules/.bin/next" dev --webpack --hostname 127.0.0.1 --port "$APP_PORT") > "$NEXT_LOG" 2>&1 &
+  fi
   NEXT_PID=$!
   APP_READY=false
   attempt=0
@@ -203,6 +228,27 @@ REHEARSAL_STAGE='Economy Interior product-path browser E2E'
 npm run test:multi-village-interior-browser
 stop_app
 
+# The internal Character/Interior QA routes are intentionally development-only,
+# but a development server may refresh a long-lived Duo tab during compilation.
+# Run only the real-root Duo flow on a separately built production copy.
+APP_WORK_DIR="$REHEARSAL_CONTROL_DIR/app-duo-production"
+mkdir -p "$APP_WORK_DIR"
+rsync -a --delete \
+  --exclude='.git' --exclude='.next' --exclude='node_modules' --exclude='_review' --exclude='tmp' \
+  "$REPO_ROOT/" "$APP_WORK_DIR/"
+ln -s "$REPO_ROOT/node_modules" "$APP_WORK_DIR/node_modules"
+REHEARSAL_STAGE='isolated Duo production build'
+NEXT_BUILD_LOG="$REHEARSAL_CONTROL_DIR/next-build.log"
+if ! (cd "$APP_WORK_DIR" && "$REPO_ROOT/node_modules/.bin/next" build --webpack) > "$NEXT_BUILD_LOG" 2>&1; then
+  echo "Isolated Next production build failed" >&2
+  sed -n '1,240p' "$NEXT_BUILD_LOG" >&2
+  exit 1
+fi
+start_app cutover production
+REHEARSAL_STAGE='Duo V2 A/B/C product-path browser E2E'
+npm run test:duo-v2-browser
+stop_app
+
 REHEARSAL_STAGE='final legacy fingerprint comparison'
 docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt \
   < scripts/security/multi-village-economy-legacy-snapshot.sql > "$FINAL_SNAPSHOT"
@@ -215,5 +261,5 @@ cmp -s "$BEFORE_SNAPSHOT" "$FINAL_SNAPSHOT" || {
 REHEARSAL_STAGE='complete'
 REHEARSAL_OK=true
 echo "Multi-village economy local rehearsal passed."
-echo "Disposable migrations 001-011, Interior verify/integration/browser checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
+echo "Disposable migrations 001-012, Interior and Duo verify/integration/browser/WebSocket checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
 echo "The disposable Supabase stack and protected temporary secret will now be removed."

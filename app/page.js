@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useLayoutEffect, useRef } from 'react'
 import StartPanel      from '@/components/StartPanel'
 import WorldMap        from '@/components/WorldMap'
 import ZoneMap         from '@/components/ZoneMap'
@@ -18,7 +18,8 @@ import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
 import { ensureTodayCheckIn } from '@/lib/attendance'
 import { getOrCreateRoomShare, getOwnedInteriorItems, getRoom, getSharedRoom } from '@/lib/interiorDecor'
 import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } from '@/lib/economyV1.client'
-import { probeHost } from '@/lib/duoSession'
+import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
+import { useDuoSession } from '@/lib/duoSession'
 import { claimParticipantSession, restoreParticipantSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
@@ -43,6 +44,44 @@ const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
 const TEMPORARILY_UNLOCK_ALL_ZONES = true
 const NATURE_QA_PARTICIPANT_ID = 'NATURE_QA_LOCAL'
 const HUMAN_QA_PARTICIPANT_ID = 'HUMAN_QA_LOCAL'
+const DUO_RECOVERY_KEY = 'soundvillage-duo-v2-recovery'
+
+function readDuoRecovery() {
+  if (typeof window === 'undefined') return null
+  try {
+    const value = JSON.parse(window.sessionStorage.getItem(DUO_RECOVERY_KEY) || 'null')
+    return value && ['host','visitor'].includes(value.role)
+      && typeof value.sessionId === 'string' && typeof value.clientId === 'string' ? value : null
+  } catch {
+    return null
+  }
+}
+
+function readAndScrubDuoInvite() {
+  if (typeof window === 'undefined') return null
+  const url = new URL(window.location.href)
+  const token = url.searchParams.get('duo')?.trim()
+    || window.sessionStorage.getItem('soundvillage-duo-v2-invite')
+    || null
+  window.sessionStorage.removeItem('soundvillage-duo-v2-invite')
+  if (url.searchParams.has('duo')) {
+    url.searchParams.delete('duo')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }
+  return token
+}
+
+function duoSessionState(result) {
+  return {
+    sessionId:result.sessionId,
+    role:result.role,
+    expiresAt:result.expiresAt,
+    leaseExpiresAt:result.leaseExpiresAt,
+    realtimeToken:result.realtimeToken,
+    realtimeTokenExpiresAt:result.realtimeTokenExpiresAt,
+    reconnectKey:crypto.randomUUID(),
+  }
+}
 
 // Sound Museum에 올라가려면 오디오 하나당 이 인원수만큼 전사가 완료돼야 한다.
 // 원래는 그룹당 5명 기준이었는데, P/Q 그룹에 결원이 생겨 4명으로 낮춤(2026-07-31).
@@ -144,12 +183,31 @@ export default function HomePage() {
   const [roomShareToken, setRoomShareToken] = useState(null)
   const [roomShareState, setRoomShareState] = useState({ status:'idle', message:'' })
   const [homePlacedCount, setHomePlacedCount] = useState(0)
-  const [realtimeSelfId] = useState(() => `peer-${crypto.randomUUID()}`)
-  const [duoUrlToken] = useState(() => (
-    typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('duo')?.trim() || null
+  const [duoRecovery, setDuoRecovery] = useState(readDuoRecovery)
+  const [realtimeClientId] = useState(() => duoRecovery?.clientId || crypto.randomUUID())
+  const [duoInviteToken, setDuoInviteToken] = useState(readAndScrubDuoInvite)
+  const [duoSession, setDuoSession] = useState(null)
+  const [duoInviteState, setDuoInviteState] = useState({ status:'idle', inviteUrl:'', expiresAt:null, code:null })
+  const [duoJoinState, setDuoJoinState] = useState({ status:'idle', code:null })
+  const [duoVisitRoom, setDuoVisitRoom] = useState(null)
+  const [hostResumeSessionId, setHostResumeSessionId] = useState(() => (
+    duoRecovery?.role === 'host' ? duoRecovery.sessionId
+      : typeof window === 'undefined' ? null : window.sessionStorage.getItem('soundvillage-duo-v2-host-session')
   ))
+  const [visitorResumeSessionId, setVisitorResumeSessionId] = useState(() => (
+    duoRecovery?.role === 'visitor' ? duoRecovery.sessionId : null
+  ))
+  const duoJoinKeyRef = useRef(null)
   const trackedParticipantRef = useRef(null)
   const previousScreenRef = useRef(null)
+
+  useLayoutEffect(() => {
+    const url = new URL(window.location.href)
+    window.sessionStorage.removeItem('soundvillage-duo-v2-invite')
+    if (!url.searchParams.has('duo')) return
+    url.searchParams.delete('duo')
+    window.history.replaceState(null, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [])
 
   useEffect(() => {
     const id = window.setTimeout(() => {
@@ -230,12 +288,103 @@ export default function HomePage() {
   // 저장된 방을 읽기 전용으로 보여준다(기존과 동일) — 이땐 duo 채널에 아무도
   // 없으니 그냥 조용히 비어 있을 뿐이다.
   const [visiting,      setVisiting]      = useState(null) // null | { token, room }
-  const [visitRedirecting, setVisitRedirecting] = useState(false)
-  // 방문 중이던 방(집 안)에서 호스트가 다른 화면(주로 월드맵)으로 나가버리면
-  // 방문객이 방 안에만 혼자 남는 문제가 있었다 — 호스트를 따라 그 화면으로
-  // 같이 옮겨가기 위한 상태. WorldMap이 이 값을 duoHostId prop으로 받아서
-  // URL을 새로고침하지 않고(=재로그인 없이) 바로 그 호스트와 짝지어진다.
-  const [followHostId, setFollowHostId] = useState(null)
+  const duoScreen = visiting || screen === 'house' ? 'interior' : screen === 'world' ? 'worldmap' : 'waiting'
+  const duo = useDuoSession(duoSession, realtimeClientId, duoScreen)
+
+  const createLiveDuoInvite = useCallback(async () => {
+    if (!participantId || homePlacedCount < 4 || !['legacy','preview','cutover'].includes(economy.runtimeState)) return
+    setDuoInviteState({ status:'loading', inviteUrl:'', expiresAt:null, code:null })
+    const result = await createDuoInvite(realtimeClientId)
+    if (!result.ok) {
+      setDuoInviteState({ status:'error', inviteUrl:'', expiresAt:null, code:result.code })
+      return
+    }
+    const activated = await heartbeatDuo(result.sessionId, realtimeClientId, 'interior')
+    if (!activated.ok) {
+      setDuoInviteState({ status:'error', inviteUrl:'', expiresAt:null, code:activated.code })
+      return
+    }
+    const inviteUrl = `${window.location.origin}${window.location.pathname}?duo=${encodeURIComponent(result.inviteToken)}`
+    const recovery = { sessionId:result.sessionId, clientId:realtimeClientId, role:'host' }
+    window.sessionStorage.setItem(DUO_RECOVERY_KEY, JSON.stringify(recovery))
+    window.sessionStorage.setItem('soundvillage-duo-v2-host-session', result.sessionId)
+    setDuoRecovery(recovery)
+    setHostResumeSessionId(result.sessionId)
+    setDuoSession(duoSessionState({ ...result, ...activated }))
+    setDuoInviteState({ status:'ready', inviteUrl, expiresAt:result.expiresAt, code:null })
+    trackEvent('duo_invite_created', {
+      target_type:'duo_session', target_id:'host', outcome:'succeeded',
+    }, { critical:true })
+  }, [economy.runtimeState, homePlacedCount, participantId, realtimeClientId])
+
+  const closeLiveDuoSession = useCallback(async () => {
+    if (!duoSession?.sessionId || duoSession.role !== 'host') return
+    const result = await revokeDuo(duoSession.sessionId)
+    if (!result.ok) {
+      setDuoInviteState((current) => ({ ...current, status:'error', code:result.code }))
+      return
+    }
+    trackEvent('duo_invite_revoked', { target_type:'duo_session', target_id:'host', outcome:'succeeded' }, { critical:true })
+    trackEvent('duo_session_closed', { target_type:'duo_session', target_id:'host', outcome:'succeeded' }, { critical:true })
+    setDuoSession(null)
+    window.sessionStorage.removeItem(DUO_RECOVERY_KEY)
+    window.sessionStorage.removeItem('soundvillage-duo-v2-host-session')
+    setDuoRecovery(null)
+    setHostResumeSessionId(null)
+    setDuoInviteState({ status:'revoked', inviteUrl:'', expiresAt:null, code:null })
+  }, [duoSession])
+
+  useEffect(() => {
+    if (!hostResumeSessionId || duoSession || duoInviteToken || authRestoring || !participantId) return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) return
+    let cancelled = false
+    recoverDuo(hostResumeSessionId, realtimeClientId).then((result) => {
+      if (cancelled) return
+      if (result.ok) {
+        setDuoSession(duoSessionState(result))
+        setDuoInviteState({ status:'active', inviteUrl:'', expiresAt:result.expiresAt, code:null })
+      } else {
+        setDuoInviteState({ status:'error', inviteUrl:'', expiresAt:null, code:result.code })
+        if (result.code === 'session_closed') {
+          window.sessionStorage.removeItem('soundvillage-duo-v2-host-session')
+          setHostResumeSessionId(null)
+        }
+      }
+    })
+    return () => { cancelled = true }
+  }, [authRestoring, duoInviteToken, duoSession, economy.runtimeState, hostResumeSessionId, participantId, realtimeClientId])
+
+  useEffect(() => {
+    if (!visitorResumeSessionId || duoSession || duoInviteToken || authRestoring || !participantId) return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) return
+    let cancelled = false
+    recoverDuo(visitorResumeSessionId, realtimeClientId).then(async (result) => {
+      if (cancelled) return
+      if (!result.ok) {
+        setDuoJoinState({ status:'error', code:result.code })
+        if (['session_closed','already_open_elsewhere'].includes(result.code)) {
+          window.sessionStorage.removeItem(DUO_RECOVERY_KEY)
+          setDuoRecovery(null)
+          setVisitorResumeSessionId(null)
+        }
+        return
+      }
+      const roomResult = await getDuoRoom(result.sessionId, realtimeClientId)
+      if (cancelled) return
+      setDuoSession(duoSessionState(result))
+      setDuoJoinState({ status:'joined', code:null })
+      if (roomResult.ok && roomResult.room) {
+        setDuoVisitRoom(roomResult.room)
+        setVisiting({ sessionId:result.sessionId, room:roomResult.room, fallback:false })
+      } else {
+        setVisiting(null)
+        setScreen('world')
+      }
+    }).catch(() => {
+      if (!cancelled) setDuoJoinState({ status:'error', code:'storage_retryable' })
+    })
+    return () => { cancelled = true }
+  }, [authRestoring, duoInviteToken, duoSession, economy.runtimeState, participantId, realtimeClientId, visitorResumeSessionId])
 
   const prepareRoomShare = useCallback(async () => {
     if (authRestoring || !participantId || experimentProgress?.isComplete) return
@@ -314,16 +463,8 @@ export default function HomePage() {
     Promise.resolve(sharedRequest).then((shared) => {
       if (economy.runtimeState === 'cutover' && !shared?.ok) throw new Error(shared?.code || 'shared_room_load_failed')
       if (cancelled || !shared?.room) return
-      return probeHost(shareToken).then(({ screen }) => {
-        if (cancelled) return
-        if (screen === 'worldmap') {
-          setVisitRedirecting(true)
-          window.location.assign(`/?duo=${encodeURIComponent(shareToken)}`)
-          return
-        }
-        trackEvent('friend_room_open_succeeded', { target_type: 'friend_room', target_id: 'shared-room', outcome: 'succeeded' })
-        setVisiting({ token: shareToken, room: shared.room })
-      })
+      trackEvent('friend_room_open_succeeded', { target_type: 'friend_room', target_id: 'shared-room', outcome: 'succeeded' })
+      setVisiting({ token: shareToken, room: shared.room, fallback:true })
     }).catch((error) => {
       if (cancelled) return
       console.error('[room-share] 공유 방 조회 실패:', error)
@@ -331,6 +472,87 @@ export default function HomePage() {
     })
     return () => { cancelled = true }
   }, [authRestoring, experimentProgress?.isComplete, participantId, economy.runtimeState])
+
+  useEffect(() => {
+    if (!duoInviteToken || authRestoring || !participantId || experimentProgress?.isComplete) return
+    if (!['legacy','preview','cutover'].includes(economy.runtimeState)) return
+    let cancelled = false
+    if (!duoJoinKeyRef.current) duoJoinKeyRef.current = crypto.randomUUID()
+    trackEvent('duo_join_attempted', { target_type:'duo_session', target_id:'visitor' }, {
+      critical:true, dedupeKey:`duo-join-attempted:${duoJoinKeyRef.current}`,
+    })
+    joinDuoInvite(duoInviteToken, realtimeClientId, duoJoinKeyRef.current).then(async (result) => {
+      if (cancelled) return
+      if (!result.ok) {
+        setDuoJoinState({ status:'error', code:result.code })
+        trackEvent('duo_join_failed', {
+          target_type:'duo_session', target_id:'visitor', outcome:'failed', error_code:result.code,
+          metadata:{ retryable:Boolean(result.retryable) },
+        }, { critical:true, dedupeKey:`duo-join-failed:${duoJoinKeyRef.current}:${result.code}` })
+        if (['invalid_invite','invite_expired','invite_revoked','session_full','already_open_elsewhere','session_closed'].includes(result.code)) {
+          setDuoInviteToken(null)
+        }
+        return
+      }
+      const recovery = { sessionId:result.sessionId, clientId:realtimeClientId, role:'visitor' }
+      window.sessionStorage.setItem(DUO_RECOVERY_KEY, JSON.stringify(recovery))
+      setDuoRecovery(recovery)
+      setVisitorResumeSessionId(result.sessionId)
+      setDuoSession(duoSessionState(result))
+      setDuoJoinState({ status:'joined', code:null })
+      trackEvent('duo_join_succeeded', {
+        target_type:'duo_session', target_id:'visitor', outcome:'succeeded',
+      }, { critical:true, dedupeKey:`duo-join-succeeded:${duoJoinKeyRef.current}` })
+      const roomResult = await getDuoRoom(result.sessionId, realtimeClientId)
+      if (cancelled) return
+      if (roomResult.ok && roomResult.room) {
+        setDuoVisitRoom(roomResult.room)
+        setVisiting({ sessionId:result.sessionId, room:roomResult.room, fallback:false })
+      } else {
+        setVisiting(null)
+        setScreen('world')
+      }
+      setDuoInviteToken(null)
+    }).catch(() => {
+      if (!cancelled) setDuoJoinState({ status:'error', code:'storage_retryable' })
+    })
+    return () => { cancelled = true }
+  }, [authRestoring, duoInviteToken, economy.runtimeState, experimentProgress?.isComplete, participantId, realtimeClientId])
+
+  useEffect(() => {
+    if (duoSession?.role !== 'visitor' || !duo.partnerPos?.screen) return
+    const id = window.setTimeout(() => {
+      if (duo.partnerPos.screen === 'worldmap') {
+        setVisiting(null)
+        setScreen('world')
+      } else if (duo.partnerPos.screen === 'interior' && duoVisitRoom) {
+        setVisiting({ sessionId:duoSession.sessionId, room:duoVisitRoom, fallback:false })
+      }
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [duo.partnerPos?.screen, duoSession, duoVisitRoom])
+
+  useEffect(() => {
+    if (!duoSession || !['closed', 'stale'].includes(duo.status)) return
+    if (duo.status === 'stale') {
+      recoverDuo(duoSession.sessionId, realtimeClientId).then((result) => {
+        if (result.ok) setDuoSession(duoSessionState(result))
+        else setDuoJoinState({ status:'error', code:result.code })
+      })
+      return
+    }
+    const id = window.setTimeout(() => {
+      window.sessionStorage.removeItem(DUO_RECOVERY_KEY)
+      setDuoRecovery(null)
+      setVisitorResumeSessionId(null)
+      setDuoSession(null)
+      setDuoJoinState({ status:'closed', code:duo.errorCode || 'session_closed' })
+      if (duoSession.role === 'visitor' && duoVisitRoom) {
+        setVisiting({ sessionId:null, room:duoVisitRoom, fallback:true })
+      }
+    }, 0)
+    return () => window.clearTimeout(id)
+  }, [duo.errorCode, duo.status, duoInviteToken, duoSession, duoVisitRoom, realtimeClientId])
 
   useEffect(() => {
     if (!participantId || localQaRef.current || trackedParticipantRef.current === participantId) return
@@ -499,7 +721,6 @@ export default function HomePage() {
      참여자ID/그룹을 다시 물어보지 않는다. */
   const handlePartnerLeftScreen = useCallback(hostScreen => {
     if (hostScreen !== 'worldmap' || !visiting) return
-    setFollowHostId(visiting.token)
     window.history.replaceState(null, '', window.location.pathname)
     setVisiting(null)
     setScreen('world')
@@ -790,13 +1011,6 @@ export default function HomePage() {
   // 아직 없으면 평소 StartPanel을 그대로 재사용해서 받고, handleStart가
   // 끝나면(participantId가 생기면) 그제서야 방으로 들어간다 — 그래야 연구
   // 참여자 집계·출석 등 다른 진입 경로와 동일하게 처리된다.
-  if (visitRedirecting) {
-    return (
-      <main style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#EDE2C6', fontFamily: "'Gothic A1', sans-serif", background: '#3A2A14' }}>
-        지금 접속해 있어요 — 같이 놀 수 있는 곳으로 이동할게요…
-      </main>
-    )
-  }
   if (participantId && progressError) {
     return <main style={{minHeight:'100vh',display:'grid',placeItems:'center',background:'#3A2A14',color:'#F5EDD8',fontFamily:'Nunito, sans-serif',textAlign:'center',padding:24}}>
       <div><h1 style={{fontSize:24}}>진행 상태를 불러오지 못했어요</h1><p>완료한 과제가 다시 표시되지 않도록 진행을 멈췄습니다.</p><button onClick={() => window.location.reload()} style={{padding:'10px 18px'}}>다시 불러오기</button></div>
@@ -829,8 +1043,9 @@ export default function HomePage() {
         <InteriorDecorRoom
           visitorMode
           visitorName="친구"
-          roomShareToken={visiting.token}
-          realtimeSelfId={realtimeSelfId}
+          roomShareToken={visiting.token || null}
+          duo={duo}
+          duoConnectionState={duoJoinState}
           initialRoom={visiting.room}
           onLeaveVisit={() => {
             // 이미 참여자ID/그룹을 받았으니(handleStart가 screen도 'world'로
@@ -848,7 +1063,7 @@ export default function HomePage() {
   // checkedVisit 자체로 화면을 막지는 않는다 — ?house= 없는 압도적 다수의
   // 정상 진입에서 그 확인 한 번 때문에 시작 화면이 매번 잠깐 깜빡이면 안 되므로,
   // 판정이 끝나기 전엔 그냥 평소 화면(아래)을 그대로 보여주다가 결과가 나오면
-  // (visiting/visitRedirecting) 그때 위 분기로 바뀐다.
+  // (visiting) 그때 위 분기로 바뀐다.
 
   // 1. 시작 화면
   if (screen === 'start') {
@@ -876,8 +1091,8 @@ export default function HomePage() {
           participantId={participantId}
           roomShareToken={roomShareToken}
           homeHubStatus={{ placedCount:homePlacedCount, shareStatus:roomShareState.status }}
-          realtimeSelfId={realtimeSelfId}
-          duoHostId={followHostId || duoUrlToken}
+          duo={duo}
+          duoConnectionState={duoJoinState}
         />
         {economyGuard}
         {!worldOverviewQa && !worldLockQaEnabled && (natureQaEnabled || humanQaOptions?.mode === 'world') && (
@@ -991,7 +1206,8 @@ export default function HomePage() {
         backgroundSize: '8px 8px',
         padding: '24px',
       }}>
-        <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare} realtimeSelfId={realtimeSelfId}
+        <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare}
+          duo={duo} duoInviteState={duoInviteState} onCreateDuoInvite={createLiveDuoInvite} onCloseDuoSession={closeLiveDuoSession}
           dryRun={natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
         {economyGuard}
       </main>
