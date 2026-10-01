@@ -2,9 +2,11 @@
 
 ## 판정
 
-**COMPLETE** — Economy V1 인테리어 전환은 Duo Session V2 착수 전에 요구된 로컬 검증 범위를 모두 통과했다. 원격·linked Supabase에는 접근하지 않았고, Duo Session V2 구현은 시작하지 않았다.
+**COMPLETE** — Economy V1 인테리어 전환 체크포인트(`4aa2b836`)는 Duo Session V2 착수 전에 요구된 로컬 검증 범위를 모두 통과했다. 원격·linked Supabase에는 접근하지 않았고, 이 체크포인트에는 Duo Session V2 구현이 포함되지 않는다.
 
 검증일은 2026-10-01(KST)이며, 데이터베이스 검증은 `scripts/security/stage8-local-bootstrap.sh`가 생성한 loopback disposable Supabase에서만 수행했다.
+
+현재 기본 작업 트리에는 이 체크포인트 이후의 별도 Duo V2·world-map 사용자 변경이 존재한다. 해당 변경을 삭제·복원·수정하지 않고, Economy 체크포인트를 clean 격리 worktree에서 다시 검증했다.
 
 ## 구현 범위
 
@@ -65,10 +67,10 @@ Migration·검증 파일:
 
 | 파일 | 시작 체크섬 | 최종 체크섬 | 처리 이유 |
 |---|---|---|---|
-| `components/InteriorDecorRoom.js` | `73e2a274…` | `0897571b…` | Economy 구매·방 저장·공유 UI, 접근성, Strict Mode 복사 상태, 반응형 처리를 완결했다. |
-| `package.json` | `0d290bcf…` | `ba70706c…` | Interior DB/browser 전용 명령을 추가했다. |
-| `scripts/security/011_multi_village_interior_cutover.sql` | `bcff7808…` | `062945d9…` | preflight, starter 고정 예외, ACL/RLS/event 계약을 최소 범위로 강화했다. |
-| `app/api/participant-purchase/route.js` | `3ccfaa1d…` | `ad18b789…` | Stage 3B 보호 baseline으로 복원했다. snapshot 기대값을 바꾸지 않았다. |
+| `components/InteriorDecorRoom.js` | `73e2a274…` | `ac431bae9cc28dd88913c5f8ac107b13a42f1609ccdb8c3c1e8a429cb73106de` | Economy 구매·방 저장·공유 UI, 접근성, Strict Mode 복사 상태, 반응형 처리를 완결했다. |
+| `package.json` | `0d290bcf…` | `c36b9c708cfd4f4adc2ad8b7c29409f68a0e4016203c781c1e2bef68bb6a05f4` | Interior DB/browser 전용 명령을 추가했다. |
+| `scripts/security/011_multi_village_interior_cutover.sql` | `bcff7808…` | `062945d93116ea5d5ebd67b8cabc8b9359e9480fdf68150808efb80faaa3ad1c` | preflight, starter 고정 예외, ACL/RLS/event 계약을 최소 범위로 강화했다. |
+| `app/api/participant-purchase/route.js` | `3ccfaa1d…` | `ad18b7893806eb5caa050df54802649468165b5f1df031a3d212ab610771376e` | Stage 3B 보호 baseline으로 복원했다. snapshot 기대값을 바꾸지 않았다. |
 
 legacy 구매는 기존 `/api/participant-purchase`, scalar currency, legacy room 경로를 그대로 사용한다. Economy V1은 `/api/economy-v1/*`, 6-wallet, 승인 catalog projection, 전용 room RPC만 사용한다. `lib/interiorCatalog.js`의 legacy 호환 export는 원래 40개 legacy 상품만 대상으로 하며 Economy 서버 코드는 이를 가격·deal 출처로 import하지 않는다.
 
@@ -120,6 +122,8 @@ legacy 구매는 기존 `/api/participant-purchase`, scalar currency, legacy roo
 | `npm run test:multi-village-economy-local` | PASS — disposable 001–011 DB/HTTP/browser rehearsal |
 
 초기 32/33 실패는 legacy route를 Stage 3B baseline으로 복원하고 명시적인 legacy compatibility export를 제공해 해결했다. snapshot/hash를 현재 변경값으로 교체하지 않았다.
+
+최종 재검증은 clean 격리 worktree에서 실행했다. 공유 `node_modules` 심볼릭 링크를 Turbopack이 거부한 첫 브라우저 서버 시도는 cleanup trap으로 완전히 정리됐고, 제품 코드 변경 없이 로컬 dev 서버만 `--webpack`으로 다시 시작해 동일한 전체 리허설을 처음부터 통과했다.
 
 ## Disposable 001–011 리허설
 
