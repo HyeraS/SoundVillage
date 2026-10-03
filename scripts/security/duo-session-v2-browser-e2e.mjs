@@ -65,6 +65,56 @@ async function enterHome(page) {
   await page.locator('[data-interior-room="ready"]').waitFor({ timeout:30_000 })
 }
 
+async function duoEventRows(participantId) {
+  return ok(await admin.from('user_events')
+    .select('event_name,target_type,target_id,error_code,metadata')
+    .eq('participant_id', participantId)
+    .in('event_name', ['duo_connected','duo_disconnected','duo_reconnected']),
+  `read Duo presence events for ${participantId}`)
+}
+
+async function eventCount(participantId, eventName) {
+  const result = await admin.from('user_events').select('*', { count:'exact', head:true })
+    .eq('participant_id', participantId).eq('event_name', eventName)
+  ok(result, `count ${eventName} for ${participantId}`)
+  return result.count || 0
+}
+
+async function flushAndWaitForDuoCounts(page, participantId, expected) {
+  const flushMarkersBefore = await eventCount(participantId, 'network_online')
+  await page.evaluate(() => window.dispatchEvent(new Event('online')))
+  const deadline = Date.now() + 15_000
+  let rows = []
+  let flushCompleted = false
+  while (Date.now() < deadline) {
+    rows = await duoEventRows(participantId)
+    const counts = Object.fromEntries(Object.keys(expected).map((name) => [
+      name, rows.filter((row) => row.event_name === name).length,
+    ]))
+    flushCompleted = await eventCount(participantId, 'network_online') > flushMarkersBefore
+    if (flushCompleted && Object.entries(expected).every(([name, count]) => counts[name] === count)) return rows
+    await new Promise((resolve) => setTimeout(resolve, 250))
+  }
+  assert.equal(flushCompleted, true, `${participantId}: explicit user-event flush did not complete`)
+  assert.deepEqual(
+    Object.fromEntries(Object.keys(expected).map((name) => [
+      name, rows.filter((row) => row.event_name === name).length,
+    ])),
+    expected,
+    `${participantId}: Duo presence event cardinality did not settle`,
+  )
+  return rows
+}
+
+function assertDuoEventPayloads(rows) {
+  for (const row of rows) {
+    assert.equal(row.target_type, 'duo_session')
+    assert.equal(row.target_id, 'duo-peer')
+  }
+  const serializedMetadata = JSON.stringify(rows.map((row) => row.metadata))
+  assert.doesNotMatch(serializedMetadata, /(?:token|session(?:_id)?|participant(?:_id)?|auth(?:_user)?(?:_id)?|"(?:x|y)"\s*:)/i)
+}
+
 try {
   await fs.mkdir(reviewDir, { recursive:true })
   const signed = []
@@ -103,6 +153,16 @@ try {
   await inviteDialog.getByTestId('duo-invite-ready').waitFor({ timeout:30_000 })
   await pageA.getByTestId('duo-connection-state').filter({ hasText:'연결됨' }).waitFor({ timeout:30_000 })
   await screenshot(pageA, 'host-invite-ready.png')
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageA, participantIds[0], {
+    duo_connected:0, duo_disconnected:0, duo_reconnected:0,
+  }))
+  await contextA.setOffline(true)
+  await pageA.getByTestId('duo-connection-state').filter({ hasText:'다시 연결하는 중' }).waitFor({ timeout:20_000 })
+  await contextA.setOffline(false)
+  await pageA.getByTestId('duo-connection-state').filter({ hasText:'연결됨' }).waitFor({ timeout:30_000 })
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageA, participantIds[0], {
+    duo_connected:0, duo_disconnected:0, duo_reconnected:0,
+  }))
   await inviteDialog.getByRole('button', { name:'복사', exact:true }).click()
   const inviteUrl = await pageA.evaluate(() => navigator.clipboard.readText())
   assert.match(inviteUrl, /\?duo=[A-Za-z0-9_-]{43}$/)
@@ -149,6 +209,12 @@ try {
   assert.equal(joinRequestObserved, true, 'join request was not observed')
   assert.equal(await pageB.evaluate(() => sessionStorage.getItem('soundvillage-duo-v2-invite')), null)
   assert.equal((await pageB.locator('body').innerText()).includes(inviteUrl.split('duo=')[1]), false, 'raw invite token is in the DOM')
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageA, participantIds[0], {
+    duo_connected:1, duo_disconnected:0, duo_reconnected:0,
+  }))
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageB, participantIds[1], {
+    duo_connected:1, duo_disconnected:0, duo_reconnected:0,
+  }))
   await screenshot(pageB, 'visitor-join.png')
   assert.equal(await pageB.getByRole('button', { name:'상점', exact:true }).count(), 0)
   assert.equal(await pageB.getByRole('button', { name:'꾸미기 시작' }).count(), 0)
@@ -212,11 +278,24 @@ try {
   await screenshot(pageB, 'mobile-landscape.png')
   await pageB.setViewportSize({ width:1280, height:720 })
 
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageA, participantIds[0], {
+    duo_connected:1, duo_disconnected:0, duo_reconnected:0,
+  }))
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageB, participantIds[1], {
+    duo_connected:1, duo_disconnected:0, duo_reconnected:0,
+  }))
+
   await contextB.setOffline(true)
   await pageB.getByTestId('duo-world-status').filter({ hasText:'다시 연결하는 중' }).waitFor({ timeout:20_000 })
   await screenshot(pageB, 'reconnect-notice.png')
   await contextB.setOffline(false)
   await pageB.getByTestId('duo-world-status').filter({ hasText:'연결됨' }).waitFor({ timeout:30_000 })
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageA, participantIds[0], {
+    duo_connected:1, duo_disconnected:1, duo_reconnected:1,
+  }))
+  assertDuoEventPayloads(await flushAndWaitForDuoCounts(pageB, participantIds[1], {
+    duo_connected:1, duo_disconnected:1, duo_reconnected:1,
+  }))
 
   await enterHome(pageA)
   await pageA.getByRole('button', { name:'초대', exact:true }).click()

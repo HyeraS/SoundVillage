@@ -129,7 +129,9 @@ function TestInner() {
       }
 
       const after = await getCurrencyBalance(claimedPid)
-      const finalQuests = await getTodayQuestSummary(claimedPid)
+      const finalQuestResult = await getTodayQuestSummary(claimedPid)
+      if (!finalQuestResult.ok) throw new Error(finalQuestResult.code)
+      const finalQuests = finalQuestResult.data
       const { data: txs } = await client.from('currency_transactions').select('*').eq('participant_id', claimedPid)
 
       setResult({

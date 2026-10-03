@@ -15,7 +15,7 @@ import FeedbackPanel   from '@/components/FeedbackPanel'
 import InteriorDecorRoom from '@/components/InteriorDecorRoom'
 import { getMyExperimentProgress, getMuseumAnnotationCounts, getAnnotatedByParticipantZone, getVotedSoundIdsByParticipant } from '@/lib/supabase'
 import { getCurrencyBalance, getEquippedOutfit } from '@/lib/currency'
-import { ensureTodayCheckIn } from '@/lib/attendance'
+import { ensureTodayCheckInSafe as ensureTodayCheckIn } from '@/lib/rewardRuntime.client'
 import { getOrCreateRoomShare, getOwnedInteriorItems, getRoom, getSharedRoom } from '@/lib/interiorDecor'
 import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } from '@/lib/economyV1.client'
 import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
@@ -154,6 +154,7 @@ export default function HomePage() {
   const [groupId,       setGroupId]       = useState('')
   const [natureQaEnabled, setNatureQaEnabled] = useState(false)
   const [humanQaOptions, setHumanQaOptions] = useState(null)
+  const [qaAttendanceClaimed, setQaAttendanceClaimed] = useState(false)
   const [worldOverviewQa, setWorldOverviewQa] = useState(false)
   const [worldLockQaEnabled, setWorldLockQaEnabled] = useState(false)
   const [worldHomeQaState] = useState(() => (
@@ -657,17 +658,19 @@ export default function HomePage() {
   // 여기서는 그냥 참여자가 정해질 때마다 호출하기만 하면 됨(멱등).
   useEffect(() => {
     if (!participantId || localQaRef.current || experimentProgress?.isComplete || economy.effectiveMainMode !== 'legacy') return
+    let active = true
     trackEvent('attendance_check_attempted', {
       target_type: 'attendance', target_id: 'daily-check-in', operation_type: 'attendance_claim',
     }, { critical: true })
     ensureTodayCheckIn(participantId).then((result) => {
+      if (!active) return
       if (!result.ok) {
         trackEvent('attendance_check_failed', {
           target_type: 'attendance', target_id: 'daily-check-in', outcome: 'failed',
           operation_type: result.operationType, operation_idempotency_key: result.idempotencyKey,
           error_code: result.error.code, metadata: { retryable: result.error.retryable },
         }, { critical: true, flush: true })
-        throw new Error(result.error.code)
+        return
       }
       const { row, isNew } = result.data
       trackEvent('attendance_check_succeeded', {
@@ -680,7 +683,14 @@ export default function HomePage() {
         setAttendanceToast({ streakDay: row.streak_day, reward: row.reward_currency })
         refreshCounts()
       }
-    }).catch(error => console.error('[attendance] 인증된 체크인 처리 실패:', error))
+    }).catch(() => {
+      if (!active) return
+      trackEvent('attendance_check_failed', {
+        target_type:'attendance', target_id:'daily-check-in', outcome:'failed',
+        operation_type:'attendance_claim', error_code:'unexpected_error',
+      }, { critical:true, flush:true })
+    })
+    return () => { active = false }
   }, [participantId, experimentProgress?.isComplete, refreshCounts, economy.effectiveMainMode])
 
   // Museum 관람 완료 토스트 자동 닫힘
@@ -1082,9 +1092,14 @@ export default function HomePage() {
           zoneProgress={zoneProgress}
           balance={balance}
           economyMode={economy.effectiveMainMode}
+          economyRuntimeState={economy.runtimeState}
           economyBalances={economy.balances}
           economyAttendance={economy.attendance}
           onEconomyAttendanceClaim={economy.claimAttendance}
+          onEconomyRetry={economy.load}
+          dryRun={natureQaEnabled || Boolean(humanQaOptions)}
+          dryRunAttendanceClaimed={qaAttendanceClaimed}
+          onDryRunAttendanceClaim={() => setQaAttendanceClaimed(true)}
           outfitSrc={runtimeOutfitSrc}
           accessorySrc={runtimeAccessorySrc}
           lockedZones={allZonesUnlocked ? [] : ZONES_LOCKED_AT_START}

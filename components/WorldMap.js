@@ -59,7 +59,7 @@ function getWorldQaOptions() {
   }
 }
 
-export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, outfitSrc, accessorySrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duo = null, duoConnectionState = null, lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyRuntimeState = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, onEconomyRetry, dryRun = false, dryRunAttendanceClaimed = false, onDryRunAttendanceClaim, outfitSrc, accessorySrc, participantId = '', roomShareToken = null, homeHubStatus = {}, duo = null, duoConnectionState = null, lockedZones = [] }) {
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
   const [worldQa] = useState(getWorldQaOptions)
   const [viewport, setViewport] = useState(() => ({ width:typeof window === 'undefined' ? 1280 : window.innerWidth, height:typeof window === 'undefined' ? 720 : window.innerHeight }))
@@ -278,10 +278,12 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
       {duoConnectionState?.status === 'error' ? `실시간 입장 실패: ${duoConnectionState.code}` : duo.status === 'joined' ? '실시간 동행 연결됨' : duo.status === 'disconnected' ? '연결이 끊겨 다시 연결하는 중…' : duo.status === 'stale' ? '이 탭의 연결 시간이 만료됐어요.' : duo.status === 'closed' ? '실시간 세션이 종료됐어요.' : '실시간 동행 연결 중…'}
     </div>}
     {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance} economyMode={economyMode} economyBalances={economyBalances} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>}
-    {questOpen && <WorldQuestPanel participantId={participantId} economyMode={economyMode} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
-    {attendanceOpen && (economyMode === 'cutover'
-      ? <WorldEconomyAttendancePanel attendance={economyAttendance} onClaim={onEconomyAttendanceClaim} onClose={closeAttendancePanel}/>
-      : <WorldAttendancePanel participantId={participantId} onClose={closeAttendancePanel}/>)}
+    {questOpen && <WorldQuestPanel participantId={participantId} economyMode={economyMode} runtimeState={economyRuntimeState} dryRun={dryRun} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
+    {attendanceOpen && (dryRun
+      ? <WorldAttendancePanel participantId={participantId} runtimeState={economyRuntimeState} dryRun qaClaimed={dryRunAttendanceClaimed} onQaClaim={onDryRunAttendanceClaim} onClose={closeAttendancePanel}/>
+      : economyMode === 'cutover'
+        ? <WorldEconomyAttendancePanel attendance={economyAttendance} runtimeState={economyRuntimeState} onClaim={onEconomyAttendanceClaim} onRetry={onEconomyRetry} onClose={closeAttendancePanel}/>
+        : <WorldAttendancePanel participantId={participantId} runtimeState={economyRuntimeState} onClose={closeAttendancePanel}/>)}
     {!worldQa.overview && <WorldMinimap playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onOpen={openFullMap}/>}
     {fullMapOpen && <WorldMapOverlay playerFoot={playerFoot} lockedZones={lockedZones} objective={objective} nearDestinationId={nearDestinationId} homeState={homeState} onClose={closeFullMap}/>}
     <div style={{ position:'absolute', top:worldQa.overview ? 0 : HUD_H, left:0, right:0, bottom:0, background:mapReady ? '#567342' : '#465b32', overflow:'hidden' }}>

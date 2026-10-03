@@ -24,7 +24,29 @@ const sources = Object.fromEntries(await Promise.all([
   'components/LabZoneMap.js',
   'components/ZoneMap.js',
   'lib/userEvents.js',
+  'lib/duoSession.js',
 ].map(async path => [path, await read(path)])))
+
+function functionBody(source, signature) {
+  const start = source.indexOf(signature)
+  assert.notEqual(start, -1, `missing function signature: ${signature}`)
+  const open = source.indexOf('{', start)
+  let depth = 0
+  for (let index = open; index < source.length; index += 1) {
+    if (source[index] === '{') depth += 1
+    if (source[index] === '}') depth -= 1
+    if (depth === 0) return source.slice(start, index + 1)
+  }
+  assert.fail(`unterminated function body: ${signature}`)
+}
+
+function eventPayload(source, eventName) {
+  const start = source.indexOf(`trackEvent('${eventName}', {`)
+  assert.notEqual(start, -1, `missing event: ${eventName}`)
+  const end = source.indexOf('\n      })', start)
+  assert.notEqual(end, -1, `unterminated event payload: ${eventName}`)
+  return source.slice(start, end)
+}
 
 test('movement input clears and stops while overlays are active', () => {
   const engine = sources['components/GameEngine.js']
@@ -110,13 +132,30 @@ test('new semantic events are accepted by both client and unapplied migration 00
     assert.match(sql, new RegExp(`\\('${name}'\\)`))
   }
   const interior = sources['components/InteriorDecorRoom.js']
-  assert.match(interior, /navigator\.clipboard\.writeText\(inviteUrl\)/)
-  assert.match(interior, /error_code: 'clipboard_write_failed'/)
-  assert.doesNotMatch(interior, /metadata:\s*\{[^}]*inviteUrl/)
+  const copy = functionBody(interior, 'const copy = async')
+  assert.match(copy, /\(event, url = inviteUrl, targetId = 'interior-invite-copy'\)/)
+  assert.match(copy, /if \(copyInFlightRef\.current \|\| !url\) return/)
+  assert.match(copy, /copyInFlightRef\.current = true/)
+  assert.match(copy, /await navigator\.clipboard\.writeText\(url\)/)
+  assert.ok(copy.indexOf('await navigator.clipboard.writeText(url)') < copy.indexOf("trackEvent('invite_link_copy_succeeded'"))
+  assert.ok(copy.indexOf('await navigator.clipboard.writeText(url)') < copy.indexOf("trackEvent('invite_link_copy_failed'"))
+  assert.match(copy, /finally \{\s*copyInFlightRef\.current = false\s*\}/)
+  assert.match(interior, /copy\(event, liveInviteState\.inviteUrl, 'duo-invite-copy'\)/)
+  assert.match(interior, /onClick=\{\(event\) => copy\(event\)\}/)
+  assert.match(eventPayload(copy, 'invite_link_copy_succeeded'), /target_id: targetId/)
+  assert.match(eventPayload(copy, 'invite_link_copy_failed'), /target_id: targetId/)
+  assert.match(eventPayload(copy, 'invite_link_copy_failed'), /error_code: 'clipboard_write_failed'/)
+  for (const eventName of ['invite_link_copy_succeeded', 'invite_link_copy_failed']) {
+    assert.doesNotMatch(eventPayload(copy, eventName), /inviteUrl|liveInviteState|\burl\b|token/i)
+  }
 })
 
 test('duo reconnect requires a prior observed partner connection', () => {
-  const world = sources['components/WorldMap.js']
-  assert.match(world, /partnerEverConnectedRef\.current \? 'duo_reconnected' : 'duo_connected'/)
-  assert.match(world, /if \(connected\) partnerEverConnectedRef\.current = true/)
+  const duo = sources['lib/duoSession.js']
+  assert.match(duo, /reduceDuoPeerPresence\(peerLifecycleRef\.current, peerPresent\)/)
+  assert.match(duo, /channel\.on\('presence', \{ event:'sync' \}/)
+  assert.match(duo, /Object\.hasOwn\(state, peerRole\)/)
+  assert.match(duo, /target_type:'duo_session', target_id:'duo-peer'/)
+  const subscribed = functionBody(duo, 'channel.subscribe')
+  assert.doesNotMatch(subscribed, /duo_connected|duo_reconnected/)
 })

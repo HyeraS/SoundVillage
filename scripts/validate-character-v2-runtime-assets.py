@@ -35,7 +35,7 @@ EXPECTED_EXISTING_HASHES = {
     "suit": "e5d05a05fbd4350ef8646377af87d73755b8441e96a8ea05f82faf2822db3f71",
     "witch": "a748c8743a7e8427b9eb62969225fd0d81698bd8fac4d97d7676b44af9f31d9b",
 }
-EXPECTED_CATALOG_PROJECTION_HASH = "94aea628eb1fb4dee4e9ca16b5baf07e54e7ac73509d912eb6f7e6de0e1ee486"
+EXPECTED_PAID_CATALOG_PROJECTION_HASH = "fdec227b3db65988822ed675cdd46d8b682549b63d118932bb7c77a00cb04f5c"
 EXPECTED_DEMAND = {"Animal": 427, "Human": 429, "Nature": 429, "Urban": 429, "Music": 429, "Lab": 427}
 EXPECTED_REVIEW_FILES = (
     "currency-icons-light-dark.png",
@@ -68,7 +68,11 @@ def catalog_projection(catalog: dict) -> dict:
         "currentCatalog", "bundleItemIds",
     )
     projection = {key: catalog[key] for key in ("currencyOrder", "currencyCombinations", "priceRules", "balancePolicy", "themeSetPolicy")}
-    projection["items"] = [{key: item[key] for key in fields if key in item} for item in catalog["items"]]
+    projection["items"] = [
+        {key: item[key] for key in fields if key in item}
+        for item in catalog["items"]
+        if not item["starterFree"]
+    ]
     return projection
 
 
@@ -95,10 +99,37 @@ def main() -> None:
     items = catalog["items"]
     by_id = {item["id"]: item for item in items}
     assert len(by_id) == len(items), "duplicate catalog product ID"
-    assert len(items) == 111, "catalog product count changed"
-    assert sum(not item["starterFree"] for item in items) == 75, "paid product count changed"
-    assert projection_digest(catalog) == EXPECTED_CATALOG_PROJECTION_HASH, "catalog prices, demand contract, statuses, sets, or products changed"
-    demand = {village: sum(item["cost"][village] for item in items if not item["starterFree"]) for village in catalog["currencyOrder"]}
+    paid_items = [item for item in items if not item["starterFree"]]
+    free_items = [item for item in items if item["starterFree"]]
+    character_free = [
+        item for item in free_items
+        if item["productGroup"] in ("identity", "outfit", "accessory")
+    ]
+    identity_free = [item for item in character_free if item["productGroup"] == "identity"]
+    interior_starters = [item for item in free_items if item["productGroup"] == "interior_starter"]
+    approved_paid = [item for item in paid_items if item["officialStoreStatus"] == "approved"]
+    pending_interior = [
+        item for item in paid_items
+        if item["officialStoreStatus"] == "pending_interior_review"
+    ]
+
+    assert len(items) == 113, "catalog product count changed"
+    assert len(paid_items) == 75, "paid product count changed"
+    assert len(free_items) == 38, "free product count changed"
+    assert len(character_free) == 36, "free Character customization count changed"
+    assert len(identity_free) == 35, "free Character identity count changed"
+    assert {item["id"] for item in character_free if item["productGroup"] == "outfit"} == {"basic"}, "basic free outfit changed"
+    assert {item["id"] for item in interior_starters} == {
+        "starter_wall_neutral", "starter_floor_beige",
+    }, "official Interior starter products changed"
+    assert all(item["officialStoreStatus"] == "free_customization" for item in free_items), "free product status changed"
+    assert len(approved_paid) == 69, "approved paid product count changed"
+    assert len(pending_interior) == 6, "pending Interior product count changed"
+    assert all(item["productGroup"] == "interior" for item in pending_interior), "pending product is not Interior"
+    assert len([item for item in paid_items if item["productGroup"] == "outfit"]) == 18, "paid outfit count changed"
+    assert len([item for item in paid_items if item["productGroup"] == "accessory"]) == 8, "accessory count changed"
+    assert projection_digest(catalog) == EXPECTED_PAID_CATALOG_PROJECTION_HASH, "paid catalog prices, demand contract, statuses, sets, or products changed"
+    demand = {village: sum(item["cost"][village] for item in paid_items) for village in catalog["currencyOrder"]}
     assert demand == EXPECTED_DEMAND, f"village demand changed: {demand}"
 
     for item_id in (*PAID_OUTFIT_IDS, *ACCESSORY_IDS):

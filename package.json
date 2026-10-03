@@ -53,6 +53,9 @@
     "test:duo-v2-local": "node scripts/security/duo-session-v2.integration.mjs",
     "test:duo-v2-realtime-local": "node scripts/security/duo-session-v2-realtime.integration.mjs",
     "test:duo-v2-browser": "node scripts/security/duo-session-v2-browser-e2e.mjs",
+    "test:quest-attendance": "node --test scripts/security/quest-attendance-reliability.test.mjs",
+    "test:quest-attendance-local": "node scripts/security/quest-attendance.integration.mjs",
+    "test:quest-attendance-browser": "node scripts/security/quest-attendance-browser-e2e.mjs",
     "test:functional-fixes": "node --test scripts/security/functional-fixes.test.mjs",
     "test:user-events-local": "node scripts/security/user-event-logging.integration.mjs"
   },

@@ -125,6 +125,10 @@ export SUPABASE_JWT_SECRET
 DUO_SESSION_HMAC_SECRET=$(node -e "process.stdout.write(require('node:crypto').randomBytes(48).toString('base64url'))")
 export DUO_SESSION_HMAC_SECRET
 
+REHEARSAL_STAGE='Quest and attendance reliability unit contract'
+npm run test:quest-attendance
+REHEARSAL_STAGE='Quest and attendance DB integrity'
+npm run test:quest-attendance-local
 REHEARSAL_STAGE='Economy and Interior DB integration'
 node scripts/security/multi-village-economy.integration.mjs
 node scripts/security/multi-village-character.integration.mjs
@@ -206,22 +210,26 @@ stop_app() {
 
 start_app legacy
 REHEARSAL_STAGE='legacy browser regression'
+EXPECTED_ECONOMY_MODE=legacy npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=legacy node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
 start_app preview
 REHEARSAL_STAGE='preview browser regression'
+EXPECTED_ECONOMY_MODE=preview npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=preview node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
 start_app maintenance
 REHEARSAL_STAGE='maintenance browser regression'
+EXPECTED_ECONOMY_MODE=maintenance npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=maintenance node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
 start_app cutover
 REHEARSAL_STAGE='cutover HTTP and browser regression'
 node scripts/security/multi-village-economy-http.integration.mjs
+EXPECTED_ECONOMY_MODE=cutover npm run test:quest-attendance-browser
 node scripts/security/multi-village-character-browser-e2e.mjs
 EXPECTED_ECONOMY_MODE=cutover node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 REHEARSAL_STAGE='Economy Interior product-path browser E2E'
