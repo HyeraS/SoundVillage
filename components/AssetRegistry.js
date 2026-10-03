@@ -12,6 +12,8 @@
  * 📁 파일 배치 위치: public/assets/ 하위
  */
 
+import { resolveWorldCharacterLayersWithBase } from '@/lib/worldCharacterLayers.mjs'
+
 /* ─────────────────────────────────────────────
    바닥 타일 (TILE × TILE px 크기 PNG)
    · Kenney Tiny Town: "TX Tileset Ground.png" 에서 개별 추출
@@ -755,11 +757,12 @@ export const WORLD_SLIMES = [
 ]
 
 /* ─────────────────────────────────────────────
-   플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(몸/옷/머리)를 같은 32×32
+   플레이어 캐릭터 — "Character v.2" 팩(shubibubi). 파츠(피부/눈/옷/머리/액세서리)를 같은 32×32
    격자에 겹쳐 그리는 레이어 시스템 — 각 시트가 "walk" 블록만 잘라낸 256×128(8열×4행).
    실제 픽셀 방향은 행 0:Down, 1:Up, 2:Right, 3:Left이며 열은 걷기 프레임(0~7).
    기존 런타임 방향 매핑과 8프레임 재생 순서를 그대로 유지한다.
-   옷/머리 원본 파일은 색상 10~14종이 가로로 이어붙어 있는데, 첫 번째(x:0~256)만 사용.
+   기본 3개 레이어는 기존 호출을 위한 픽셀 동일 계약이며, 확장 외형은 중앙 resolver가
+   Character V2 런타임 시트를 선택한다.
 ───────────────────────────────────────────── */
 export const WORLD_CHARACTER = {
   frame: 32,
@@ -853,12 +856,8 @@ export const VILLAGE_CURRENCY_ICONS = {
   Lab:    { src: '/assets/economy/village-currencies/lab.png',    size: 32 },
 }
 
-export function resolveWorldCharacterLayers({ outfitSrc, accessorySrc } = {}) {
-  const layers = outfitSrc
-    ? WORLD_CHARACTER.layers.map((layer, index) => index === 1 ? { ...layer, src:outfitSrc } : layer)
-    : WORLD_CHARACTER.layers
-  if (!accessorySrc) return layers
-  return [...layers, { src: accessorySrc, sheetW: 256, sheetH: 128 }]
+export function resolveWorldCharacterLayers(options) {
+  return resolveWorldCharacterLayersWithBase(WORLD_CHARACTER, options)
 }
 
 /* ─────────────────────────────────────────────

@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "frameSize": 32,
+  "walkSize": [256, 128],
+  "defaultLoadout": {
+    "skinId": "skin_01",
+    "eyesId": "eyes_green_light",
+    "hairStyleId": "hair_buzzcut",
+    "hairColorId": "black",
+    "outfitId": "basic",
+    "accessoryId": null
+  },
+  "defaultEyesRendering": "embedded_skin_pixels",
+  "hairColors": [
+    { "id": "black", "name": "Black" },
+    { "id": "blonde", "name": "Blonde" },
+    { "id": "brown", "name": "Brown" },
+    { "id": "brown_light", "name": "Brown Light" },
+    { "id": "copper", "name": "Copper" },
+    { "id": "emerald", "name": "Emerald" },
+    { "id": "green", "name": "Green" },
+    { "id": "grey", "name": "Grey" },
+    { "id": "lilac", "name": "Lilac" },
+    { "id": "navy", "name": "Navy" },
+    { "id": "pink", "name": "Pink" },
+    { "id": "purple", "name": "Purple" },
+    { "id": "red", "name": "Red" },
+    { "id": "turquoise", "name": "Turquoise" }
+  ],
+  "eyeColors": [
+    { "id": "eyes_black", "colorId": "black", "name": "Black" },
+    { "id": "eyes_blue", "colorId": "blue", "name": "Blue" },
+    { "id": "eyes_blue_light", "colorId": "blue_light", "name": "Blue Light" },
+    { "id": "eyes_brown", "colorId": "brown", "name": "Brown" },
+    { "id": "eyes_brown_dark", "colorId": "brown_dark", "name": "Brown Dark" },
+    { "id": "eyes_brown_light", "colorId": "brown_light", "name": "Brown Light" },
+    { "id": "eyes_green", "colorId": "green", "name": "Green" },
+    { "id": "eyes_green_dark", "colorId": "green_dark", "name": "Green Dark" },
+    { "id": "eyes_green_light", "colorId": "green_light", "name": "Green Light" },
+    { "id": "eyes_grey", "colorId": "grey", "name": "Grey" },
+    { "id": "eyes_grey_light", "colorId": "grey_light", "name": "Grey Light" },
+    { "id": "eyes_pink", "colorId": "pink", "name": "Pink" },
+    { "id": "eyes_pink_light", "colorId": "pink_light", "name": "Pink Light" },
+    { "id": "eyes_red", "colorId": "red", "name": "Red" }
+  ],
+  "hairStyles": [
+    { "id": "hair_bob", "slug": "bob", "walkStem": "bob" },
+    { "id": "hair_braids", "slug": "braids", "walkStem": "braids" },
+    { "id": "hair_buzzcut", "slug": "buzzcut", "walkStem": "buzzcut" },
+    { "id": "hair_curly", "slug": "curly", "walkStem": "curly" },
+    { "id": "hair_emo", "slug": "emo", "walkStem": "emo" },
+    { "id": "hair_extra_long", "slug": "extra-long", "walkStem": "extra_long", "skirtSource": "assets/Character v.2/hair/extra_long_skirt.png" },
+    { "id": "hair_french_curl", "slug": "french-curl", "walkStem": "french_curl" },
+    { "id": "hair_gentleman", "slug": "gentleman", "walkStem": "gentleman" },
+    { "id": "hair_long_straight", "slug": "long-straight", "walkStem": "long_straight", "skirtSource": "assets/Character v.2/hair/long_straight_skirt.png" },
+    { "id": "hair_midiwave", "slug": "midiwave", "walkStem": "midiwave" },
+    { "id": "hair_ponytail", "slug": "ponytail", "walkStem": "ponytail" },
+    { "id": "hair_spacebuns", "slug": "spacebuns", "walkStem": "spacebuns" },
+    { "id": "hair_wavy", "slug": "wavy", "walkStem": "wavy" }
+  ],
+  "skirtVariantOutfitIds": ["skirt"]
+}

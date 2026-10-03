@@ -2565,12 +2565,12 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null, outfitSrc, accessorySrc }) {
+export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null, outfitSrc, accessorySrc, characterLoadout }) {
   const frame = moving ? Math.floor(animationTick / 10) % 2 : 0
 
   if (ASSET_READY.world) {
     const { frame: fs, rows, cols } = WORLD_CHARACTER
-    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
+    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
     const row = rows[dir] ?? rows.down
     const walkTick = Math.floor(animationTick / 6) % cols.length
     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
@@ -2931,7 +2931,7 @@ export function ExitConfirmModal({ zone, onConfirm, onCancel }) {
 /* ─────────────────────────────────────────────
    ZoneMap 메인
 ───────────────────────────────────────────── */
-export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, outfitSrc, accessorySrc }) {
+export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, outfitSrc, accessorySrc, characterLoadout }) {
   const meta   = ZONE_META[zone]
   const theme  = ZONE_THEME[zone]
   // 오브젝트 (한 번만 생성)
@@ -3375,7 +3375,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             y={pos.y + CHAR_H - SPRITE_H}
             width={SPRITE_W} height={SPRITE_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:SPRITE_W, height:SPRITE_H }}>
-              <PixelChar dir={dir} moving={moving} animationTick={tick} outfitSrc={outfitSrc} accessorySrc={accessorySrc}/>
+              <PixelChar dir={dir} moving={moving} animationTick={tick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/>
             </div>
           </foreignObject>
 

@@ -60,10 +60,10 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default' }) {
   )
 }
 
-export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, animationTick = 0 }) {
+export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0 }) {
   if (ASSET_READY.world) {
     const { frame: frameSize, rows, cols } = WORLD_CHARACTER
-    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
+    const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
     const row = rows[dir] ?? rows.down
     const frame = cols[moving ? animationTick % cols.length : 0]
     const sourceX = frame * frameSize

@@ -5,10 +5,13 @@ import { getCandidateExpressions, saveVote } from '@/lib/supabase'
 import { getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
 import { newOperationKey } from '@/lib/persistenceResult'
 import { rewardEventFields } from '@/lib/economyRuntimeState.mjs'
-import { SHOP_PRODUCTS, getDailyDeal, getEffectivePrice, getShopGrowthTier, DEFAULT_OUTFIT_ID } from '@/lib/shopCatalog'
+import { SHOP_PRODUCTS, getDailyDeal, getEffectivePrice, DEFAULT_OUTFIT_ID } from '@/lib/shopCatalog'
+import { loadShopSnapshot } from '@/lib/shopReliability.mjs'
 import { ZONE_META } from '@/components/GameEngine'
 import LibraryRoom from '@/components/LibraryRoom'
 import CharacterShopPanel from '@/components/economy-v1/CharacterShopPanel'
+import CharacterStudioPanel from '@/components/character-studio/CharacterStudioPanel'
+import QaCharacterStudioPanel from '@/components/character-studio/QaCharacterStudioPanel'
 import { trackEvent } from '@/lib/userEvents'
 
 /* ─────────────────────────────────────────────
@@ -228,53 +231,79 @@ function ExhibitDisplay({ zoneCounts, accent }) {
    상점: Character v.2 outfit 판매. body/head 고정, clothes
    레이어만 교체. 가격은 lib/shopCatalog.SHOP_PRODUCTS 단일 출처.
 ───────────────────────────────────────────── */
-function ShopGrowthDecor({ tierKey }) {
-  // 시각 효과만 — 구매 가능 여부와 완전 무관. 단계가 올라갈수록 장식이 늘어난다.
-  const icons = { seed: ['🪵'], sprout: ['🪵','🕯','🪴'], bloom: ['🪵','🕯','🪴','🏮','✨'] }[tierKey] || ['🪵']
-  return (
-    <div style={{ display: 'flex', gap: '6px', position: 'absolute', top: '10px', right: '16px', fontSize: '14px', opacity: 0.7 }}>
-      {icons.map((e, i) => <span key={i}>{e}</span>)}
-    </div>
-  )
-}
-
-function Shop({ participantId, accent, onCurrencyChange }) {
-  const [balance,       setBalance]       = useState(0)
-  const [ownedOutfits,  setOwnedOutfits]  = useState([])
-  const [equipped,      setEquipped]      = useState(null)
-  const [totalEarned,   setTotalEarned]   = useState(0)
+function Shop({ participantId, onCurrencyChange }) {
+  const initialSnapshot = { balance:0, ownedOutfits:[], equipped:null, totalEarned:0 }
+  const [balance,       setBalance]       = useState(initialSnapshot.balance)
+  const [ownedOutfits,  setOwnedOutfits]  = useState(() => [...initialSnapshot.ownedOutfits])
+  const [equipped,      setEquipped]      = useState(initialSnapshot.equipped)
+  const [, setTotalEarned] = useState(initialSnapshot.totalEarned)
   const [loading,       setLoading]       = useState(true)
-  const [purchasingId,  setPurchasingId]  = useState(null)
-  const [equippingId,   setEquippingId]   = useState(null)
-  const [notice,        setNotice]        = useState('')
+  const [accountReady,  setAccountReady]  = useState(false)
+  const [loadError,     setLoadError]     = useState('')
+  const [, setPurchasingId] = useState(null)
+  const [, setEquippingId] = useState(null)
+  const [, setNotice] = useState('')
   const purchaseKeys = useRef(new Map())
   const equipKey = useRef(null)
   const purchaseInFlightRef = useRef(false)
   const equipInFlightRef = useRef(false)
+  const activeRef = useRef(false)
+  const loadVersionRef = useRef(0)
 
   const dailyDeal = getDailyDeal()
-  const tier = getShopGrowthTier(totalEarned)
+  const studioItems = SHOP_PRODUCTS.map((product) => ({
+    ...product,
+    name:product.label,
+    type:'outfit',
+    productGroup:'outfit',
+    runtimeAsset:product.sheet.src,
+    previewAsset:product.sheet.previewSrc,
+    legacyPrice:getEffectivePrice(product, dailyDeal),
+  }))
 
   const refresh = useCallback(async () => {
-    const [bal, owned, eq, earned] = await Promise.all([
-      getCurrencyBalance(participantId),
-      getOwnedOutfits(participantId),
-      getEquippedOutfit(participantId),
-      getTotalEarned(participantId),
-    ])
-    setBalance(bal)
-    setOwnedOutfits(owned)
-    setEquipped(eq)
-    setTotalEarned(earned)
-    setLoading(false)
+    const version = ++loadVersionRef.current
+    setLoading(true)
+    setAccountReady(false)
+    setLoadError('')
+    try {
+      const result = await loadShopSnapshot({
+        getCurrencyBalance:() => getCurrencyBalance(participantId),
+        getOwnedOutfits:() => getOwnedOutfits(participantId),
+        getEquippedOutfit:() => getEquippedOutfit(participantId),
+        getTotalEarned:() => getTotalEarned(participantId),
+      })
+      if (!activeRef.current || version !== loadVersionRef.current) return false
+      if ('balance' in result.data) setBalance(result.data.balance)
+      if ('ownedOutfits' in result.data) setOwnedOutfits(result.data.ownedOutfits)
+      if ('equipped' in result.data) setEquipped(result.data.equipped)
+      if ('totalEarned' in result.data) setTotalEarned(result.data.totalEarned)
+      setAccountReady(result.ok)
+      if (!result.ok) setLoadError('보유 화폐와 옷 정보를 모두 불러오지 못했어요. 구매와 장착은 잠시 잠겨 있어요.')
+      return result.ok
+    } catch {
+      if (activeRef.current && version === loadVersionRef.current) {
+        setOwnedOutfits([])
+        setAccountReady(false)
+        setLoadError('옷가게 정보를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.')
+      }
+      return false
+    } finally {
+      if (activeRef.current && version === loadVersionRef.current) setLoading(false)
+    }
   }, [participantId])
 
   useEffect(() => {
-    const timeoutId = setTimeout(refresh, 0)
-    return () => clearTimeout(timeoutId)
+    activeRef.current = true
+    const timeoutId = setTimeout(() => { void refresh() }, 0)
+    return () => {
+      activeRef.current = false
+      loadVersionRef.current += 1
+      clearTimeout(timeoutId)
+    }
   }, [refresh])
   const handleBuy = async (product) => {
-    if (purchaseInFlightRef.current) return
+    if (purchaseInFlightRef.current || !accountReady) return
     purchaseInFlightRef.current = true
     const price = getEffectivePrice(product, dailyDeal)
     setPurchasingId(product.id)
@@ -297,6 +326,7 @@ function Shop({ participantId, accent, onCurrencyChange }) {
         setNotice(`${product.emoji} ${product.label} 구매 완료! 바로 장착했어요.`)
         await refresh()
         onCurrencyChange?.()
+        return { ok:true, loadout:{ outfitId:product.id, accessoryId:null } }
       } else {
         trackEvent('purchase_failed', {
           target_type: 'outfit', target_id: product.id, outcome: 'failed', operation_type: result.operationType,
@@ -306,18 +336,20 @@ function Shop({ participantId, accent, onCurrencyChange }) {
         if (result.reason === 'insufficient_funds') setNotice('잔액이 부족해요 🪙')
         else if (result.reason === 'already_owned') { setNotice('이미 보유 중인 아이템이에요'); await refresh() }
         else setNotice('구매 중 오류가 발생했어요. 다시 시도해주세요.')
+        if (!result.error?.retryable) purchaseKeys.current.delete(product.id)
+        return { ok:false, code:result.error?.code || result.reason || 'purchase_failed', retryable:Boolean(result.error?.retryable), retrySameRequest:Boolean(result.error?.retryable) }
       }
-    } catch (error) {
-      console.error('[SoundMuseum] 구매 오류:', error)
+    } catch {
       setNotice('구매 중 오류가 발생했어요. 다시 시도해주세요.')
+      return { ok:false, code:'storage_retryable', retryable:true, retrySameRequest:true }
     } finally {
       purchaseInFlightRef.current = false
-      setPurchasingId(null)
+      if (activeRef.current) setPurchasingId(null)
     }
   }
 
   const handleEquip = async (outfitId) => {
-    if (equipInFlightRef.current) return
+    if (equipInFlightRef.current || !accountReady) return
     equipInFlightRef.current = true
     setEquippingId(outfitId)
     if (!equipKey.current || equipKey.current.outfitId !== outfitId) equipKey.current = { outfitId, key: newOperationKey() }
@@ -331,7 +363,8 @@ function Shop({ participantId, accent, onCurrencyChange }) {
           target_type: 'outfit', target_id: outfitId, outcome: 'failed', operation_type: result.operationType,
           operation_idempotency_key: result.idempotencyKey, error_code: result.error.code, metadata: { retryable: result.error.retryable },
         }, { critical: true, flush: true })
-        setNotice(result.error.message); return
+        if (!result.error.retryable) equipKey.current = null
+        setNotice(result.error.message); return { ok:false, code:result.error.code, retryable:Boolean(result.error.retryable), idempotencyKey:result.idempotencyKey }
       }
       trackEvent('outfit_equip_succeeded', {
         target_type: 'outfit', target_id: outfitId, outcome: 'succeeded', operation_type: result.operationType,
@@ -340,140 +373,42 @@ function Shop({ participantId, accent, onCurrencyChange }) {
       equipKey.current = null
       setEquipped(outfitId)
       onCurrencyChange?.()
-    } catch (error) {
-      console.error('[SoundMuseum] 장착 오류:', error)
+      return { ok:true, loadout:{ outfitId, accessoryId:null }, idempotencyKey:result.idempotencyKey }
+    } catch {
       trackEvent('outfit_equip_failed', {
         target_type: 'outfit', target_id: outfitId, outcome: 'failed', operation_type: 'outfit_equip',
         operation_idempotency_key: equipKey.current?.key, error_code: 'outfit_equip_failed', metadata: { retryable: true },
       }, { critical: true, flush: true })
       setNotice('장착 중 오류가 발생했어요. 다시 시도해주세요.')
+      return { ok:false, code:'storage_retryable', retryable:true, idempotencyKey:equipKey.current?.key }
     } finally {
       equipInFlightRef.current = false
-      setEquippingId(null)
+      if (activeRef.current) setEquippingId(null)
     }
   }
 
-  return (
-    <div style={{
-      position: 'relative', zIndex: 10,
-      width: '100%', height: '100%', overflowY: 'auto',
-      background: tier.bg, borderRadius: '20px',
-      boxShadow: `0 10px 60px #00000077, 0 0 0 1px ${tier.accent}55`,
-      scrollbarWidth: 'none',
-      transition: 'background 0.6s ease',
-    }}>
-      <div style={{
-        position: 'sticky', top: 0,
-        background: `linear-gradient(135deg, ${tier.accent}2A, ${tier.accent}0A)`,
-        borderBottom: `1px solid ${tier.accent}38`, padding: '16px 20px 12px',
-        borderRadius: '20px 20px 0 0',
-      }}>
-        <ShopGrowthDecor tierKey={tier.key}/>
-        <div style={{ fontSize: '9px', fontWeight: 800, color: tier.accent, letterSpacing: '2.5px', textTransform: 'uppercase', marginBottom: '4px' }}>
-          {tier.label.toUpperCase()}
-        </div>
-        <div style={{ fontSize: '17px', fontWeight: 800, color: '#FAF6EE' }}>🛍 옷가게</div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '8px' }}>
-          <span style={{ fontSize: '16px' }}>🪙</span>
-          <span style={{ fontSize: '16px', fontWeight: 800, color: '#FFD866', fontVariantNumeric: 'tabular-nums' }}>{balance}</span>
-          <span style={{ fontSize: '10px', color: '#FAF6EEaa' }}>보유 화폐</span>
-        </div>
-      </div>
-
-      <div style={{ padding: '16px 20px 24px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-        {loading ? (
-          <div style={{ textAlign: 'center', color: '#FAF6EEaa', fontSize: '13px', padding: '16px' }}>불러오는 중...</div>
-        ) : (
-          SHOP_PRODUCTS.map(product => {
-            const owned  = ownedOutfits.includes(product.id)
-            const isEquipped = equipped === product.id
-            const isDeal = dailyDeal.productId === product.id
-            const price  = getEffectivePrice(product, dailyDeal)
-            const canAfford = balance >= price
-            return (
-              <div key={product.id} style={{
-                display: 'flex', alignItems: 'center', gap: '12px',
-                background: '#FAF6EE0d', border: `1.5px solid ${tier.accent}33`,
-                borderRadius: '14px', padding: '10px 12px',
-              }}>
-                <div style={{
-                  width: '44px', height: '44px', borderRadius: '10px', flexShrink: 0,
-                  background: '#FAF6EE12', border: `1.5px solid ${tier.accent}55`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px',
-                }}>{product.emoji}</div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '13px', fontWeight: 800, color: '#FAF6EE' }}>
-                    {product.label}
-                    {isDeal && (
-                      <span style={{
-                        marginLeft: '6px', fontSize: '9px', fontWeight: 800, color: '#2A1F0E',
-                        background: '#FFD866', borderRadius: '6px', padding: '1px 6px',
-                      }}>오늘의 특가</span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: '11px', fontVariantNumeric: 'tabular-nums', marginTop: '2px' }}>
-                    {isDeal && <span style={{ color: '#FAF6EE66', textDecoration: 'line-through', marginRight: '5px' }}>🪙{product.price}</span>}
-                    <span style={{ color: isDeal ? '#FFD866' : '#FAF6EEcc', fontWeight: 700 }}>🪙{price}</span>
-                  </div>
-                </div>
-                {owned ? (
-                  <button onClick={() => handleEquip(product.id)} disabled={isEquipped || Boolean(equippingId)} style={{
-                    padding: '8px 14px', borderRadius: '10px',
-                    background: isEquipped ? `${tier.accent}33` : '#FAF6EE',
-                    border: `1.5px solid ${tier.accent}`,
-                    color: isEquipped ? '#FAF6EE' : '#2A1F0E',
-                    fontSize: '11px', fontWeight: 800, fontFamily: 'Nunito, sans-serif',
-                    cursor: isEquipped ? 'default' : 'pointer', whiteSpace: 'nowrap',
-                  }}>
-                    {isEquipped ? '장착 중' : '장착하기'}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => handleBuy(product)}
-                    disabled={!canAfford || Boolean(purchasingId)}
-                    title={!canAfford ? '잔액이 부족해요' : undefined}
-                    style={{
-                      padding: '8px 14px', borderRadius: '10px', border: 'none',
-                      background: canAfford ? tier.accent : '#FAF6EE22',
-                      color: canAfford ? '#fff' : '#FAF6EE55',
-                      fontSize: '11px', fontWeight: 800, fontFamily: 'Nunito, sans-serif',
-                      cursor: canAfford ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap',
-                      opacity: purchasingId === product.id ? 0.6 : 1,
-                    }}>
-                    {purchasingId === product.id ? '구매 중...' : canAfford ? '구매하기' : '잔액 부족'}
-                  </button>
-                )}
-              </div>
-            )
-          })
-        )}
-        {equipped && equipped !== DEFAULT_OUTFIT_ID && (
-          <button onClick={() => handleEquip(DEFAULT_OUTFIT_ID)} disabled={Boolean(equippingId)} style={{
-            marginTop: '2px', padding: '9px', borderRadius: '10px',
-            background: 'transparent', border: `1.5px solid ${tier.accent}44`,
-            color: '#FAF6EEaa', fontSize: '11px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
-            cursor: 'pointer',
-          }}>
-            기본 옷차림으로 되돌리기
-          </button>
-        )}
-        {notice && (
-          <div style={{
-            textAlign: 'center', fontSize: '11px', fontWeight: 700, color: tier.accent,
-            background: '#FAF6EE12', borderRadius: '10px', padding: '8px',
-          }}>{notice}</div>
-        )}
-      </div>
-    </div>
-  )
+  return <CharacterStudioPanel
+    environment="legacy"
+    items={studioItems}
+    legacyBalance={balance}
+    savedLoadout={{ outfitId:equipped || DEFAULT_OUTFIT_ID, accessoryId:null }}
+    ownedItemIds={ownedOutfits}
+    status={loading ? 'loading' : accountReady ? 'ready' : 'error'}
+    loadError={loadError}
+    onRetry={refresh}
+    onPurchaseAndEquip={handleBuy}
+    onEquip={(_slot, itemId) => handleEquip(itemId)}
+  />
 }
 
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, accessorySrc, economyMode, economyViewMode = economyMode, onCurrencyChange, onEconomyActivity, onDone, onExit }) {
+export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, accessorySrc, characterLoadout, economyMode, economyViewMode = economyMode, dryRun = false, onCurrencyChange, onEconomyActivity, onDone, onExit }) {
   const [qaInitialCard] = useState(() => {
-    if (typeof window === 'undefined' || process.env.NODE_ENV !== 'development') return null
+    const internalBrowserQa = process.env.NODE_ENV === 'development'
+      || process.env.NEXT_PUBLIC_ENABLE_INTERNAL_BROWSER_QA === 'true'
+    if (typeof window === 'undefined' || !internalBrowserQa) return null
     const value = new URLSearchParams(window.location.search).get('libraryQaCard')
     return ['vote', 'exhibits', 'shop'].includes(value) ? value : null
   })
@@ -917,13 +852,16 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
       activeStations={candidates.length}
       outfitSrc={outfitSrc}
       accessorySrc={accessorySrc}
+      characterLoadout={characterLoadout}
       npcDialogue={{ name: npc.name, line: npc.lines[npcIdx] }}
       cards={{
         vote:     { render: () => voteCardBody },
         exhibits: { render: () => <ExhibitDisplay zoneCounts={zoneCounts} accent={accent}/> },
-        shop:     { render: () => economyViewMode === 'cutover'
-          ? <CharacterShopPanel compact/>
-          : <Shop participantId={participantId} accent={accent} onCurrencyChange={onCurrencyChange}/> },
+        shop:     { render: () => dryRun
+          ? <QaCharacterStudioPanel sessionKey={`qa:${participantId || 'anonymous'}`}/>
+          : economyViewMode === 'cutover'
+            ? <CharacterShopPanel/>
+            : <Shop participantId={participantId} onCurrencyChange={onCurrencyChange}/> },
       }}
     />
   )

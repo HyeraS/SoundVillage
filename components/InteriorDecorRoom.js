@@ -416,6 +416,7 @@ export default function InteriorDecorRoom({
   duo = null, duoInviteState = { status:'idle' }, onCreateDuoInvite, onCloseDuoSession, duoConnectionState,
   onLeaveVisit, onCurrencyChange, onExit,
   onPartnerLeftScreen, onRoomStatusChange, dryRun = false,
+  outfitSrc, accessorySrc, characterLoadout,
 }) {
   const economy = useEconomyRuntime()
   const economyV1 = !visitorMode && !dryRun && economy.runtimeState === 'cutover'
@@ -1145,6 +1146,9 @@ export default function InteriorDecorRoom({
               sendPosition={sendPosition}
               partnerPos={partnerPos}
               partnerLabel={partnerLabel}
+              outfitSrc={outfitSrc}
+              accessorySrc={accessorySrc}
+              characterLoadout={characterLoadout}
             />
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginTop: 12 }}>

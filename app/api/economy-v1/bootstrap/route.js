@@ -10,6 +10,7 @@ import {
 import { economyStorageFailure, requireEconomyUser } from '@/lib/economyApi.server'
 import { getEconomyRuntimeMode } from '@/lib/economyRuntime.server'
 import { getMultiVillageRuntimeState } from '@/lib/multiVillageEconomy.server'
+import { CHARACTER_IDENTITY_CATALOG_VERSION, hasCompleteCharacterLoadout } from '@/lib/characterIdentityContract.mjs'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,6 +60,10 @@ export async function GET(request) {
     code: 'success',
     economyMode,
     catalogVersion: ECONOMY_CATALOG_VERSION,
+    identityCatalogVersion: CHARACTER_IDENTITY_CATALOG_VERSION,
+    capabilities: {
+      characterIdentityCustomization:hasCompleteCharacterLoadout(state.profile.data.loadout),
+    },
     items,
     runtimeItems,
     interiorItems,

@@ -17,10 +17,13 @@ from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG_PATH = ROOT / "data/economy/catalog-v1.json"
+IDENTITY_CONTRACT_PATH = ROOT / "data/character-v2-runtime-contract.json"
 FRAME = 32
 WALK_SIZE = (256, 128)
 PREVIEW_SIZE = 96
 REVIEW_DIR = ROOT / "_review/economy-v1-assets"
+STAGE2_REVIEW_DIR = ROOT / "_review/character-studio-stage2"
+IDENTITY_PROJECTION_PATH = ROOT / "lib/generated/characterIdentityCatalog.mjs"
 
 PAID_OUTFIT_IDS = (
     "overalls", "sailor", "sporty", "suit", "witch", "clown", "dress",
@@ -34,6 +37,12 @@ ACCESSORY_IDS = (
 )
 CURRENCIES = ("animal", "human", "nature", "urban", "music", "lab")
 KNOWN_MASTER_WALK_PIXEL_VARIANCES = {"clown": 20}
+KNOWN_IDENTITY_MASTER_WALK_PIXEL_VARIANCES = {
+    # The merged pack contains corrected palette RGB values for these two
+    # styles while the separated walk exports retain the same alpha anchors.
+    "hair_midiwave": (0, 112, 112, 477, 237, 112, 352, 112, 112, 112, 112, 112, 112, 112),
+    "hair_wavy": (781, 24, 781, 781, 781, 781, 781, 781, 781, 781, 781, 781, 781, 781),
+}
 
 CURRENCY_BUILD_SCRIPT = ROOT / "scripts/build-village-currency-icons.py"
 CURRENCY_BUILD_SPEC = importlib.util.spec_from_file_location("village_currency_builder", CURRENCY_BUILD_SCRIPT)
@@ -45,6 +54,10 @@ CURRENCY_BUILD_SPEC.loader.exec_module(CURRENCY_BUILDER)
 def load_catalog_items() -> dict[str, dict]:
     catalog = json.loads(CATALOG_PATH.read_text(encoding="utf-8"))
     return {item["id"]: item for item in catalog["items"]}
+
+
+def load_identity_contract() -> dict:
+    return json.loads(IDENTITY_CONTRACT_PATH.read_text(encoding="utf-8"))
 
 
 def rgba(path: Path) -> Image.Image:
@@ -334,13 +347,248 @@ def build_reviews(icons: dict[str, Image.Image], sheets: dict[str, Image.Image],
     build_scale_reviews(icons, previews)
 
 
+def checked_walk_blocks(source_path: Path, walk_path: Path, count: int, label: str) -> list[Image.Image]:
+    master = rgba(source_path)
+    separated = rgba(walk_path)
+    expected_width = WALK_SIZE[0] * count
+    if master.width != expected_width or master.height < WALK_SIZE[1]:
+        raise ValueError(f"{label}: expected {count} palettes in a {expected_width}px-wide master, got {master.size}")
+    if separated.size != (expected_width, WALK_SIZE[1]):
+        raise ValueError(f"{label}: unexpected separated walk size {separated.size}")
+    blocks = []
+    for index in range(count):
+        box = (index * WALK_SIZE[0], 0, (index + 1) * WALK_SIZE[0], WALK_SIZE[1])
+        master_block = master.crop(box)
+        walk_block = separated.crop(box)
+        differing_pixels = sum(
+            master_pixel != walk_pixel
+            for master_pixel, walk_pixel in zip(master_block.get_flattened_data(), walk_block.get_flattened_data())
+        )
+        expected_variances = KNOWN_IDENTITY_MASTER_WALK_PIXEL_VARIANCES.get(label, (0,) * count)
+        if differing_pixels != expected_variances[index]:
+            raise ValueError(
+                f"{label}: palette {index} master/separated variance is {differing_pixels}, "
+                f"expected {expected_variances[index]}"
+            )
+        if master_block.getchannel("A").tobytes() != walk_block.getchannel("A").tobytes():
+            raise ValueError(f"{label}: palette {index} master/separated alpha anchors differ")
+        blocks.append(master_block)
+    return blocks
+
+
+def identity_runtime_paths(contract: dict) -> dict:
+    hair_colors = contract["hairColors"]
+    return {
+        "skins": {f"skin_{index:02d}": f"/assets/character-v2/skin/skin-{index:02d}-walk.png" for index in range(1, 9)},
+        "eyes": {entry["id"]: f"/assets/character-v2/eyes/{entry['colorId'].replace('_', '-')}-walk.png" for entry in contract["eyeColors"]},
+        "hair": {
+            style["id"]: {
+                color["id"]: f"/assets/character-v2/hair/{style['slug']}/{color['id'].replace('_', '-')}-walk.png"
+                for color in hair_colors
+            }
+            for style in contract["hairStyles"]
+        },
+        "hairSkirt": {
+            style["id"]: {
+                color["id"]: f"/assets/character-v2/hair/{style['slug']}/{color['id'].replace('_', '-')}-skirt-walk.png"
+                for color in hair_colors
+            }
+            for style in contract["hairStyles"] if style.get("skirtSource")
+        },
+    }
+
+
+def build_identity_runtime_sheets(items: dict[str, dict], contract: dict) -> tuple[dict, dict]:
+    paths = identity_runtime_paths(contract)
+    sheets = {"skins": {}, "eyes": {}, "hair": {}, "hairSkirt": {}}
+    color_names = [color["name"] for color in contract["hairColors"]]
+    eye_ids = [eye["id"] for eye in contract["eyeColors"]]
+    catalog_eye_ids = [item["id"] for item in items.values() if item.get("productGroup") == "identity" and item.get("type") == "eyes"]
+    if catalog_eye_ids != eye_ids:
+        raise ValueError(f"eye palette order differs from the central contract: {catalog_eye_ids}")
+
+    for index in range(1, 9):
+        item_id = f"skin_{index:02d}"
+        item = items[item_id]
+        blocks = checked_walk_blocks(
+            ROOT / item["sourceAsset"],
+            ROOT / f"assets/Character v.2/separate/walk/char{index}_walk.png",
+            1,
+            item_id,
+        )
+        sheet = blocks[0]
+        write_png(sheet, public_path(paths["skins"][item_id]))
+        sheets["skins"][item_id] = sheet
+
+    eye_source = ROOT / items["eyes_black"]["sourceAsset"]
+    eye_blocks = checked_walk_blocks(
+        eye_source,
+        ROOT / "assets/Character v.2/separate/walk/eyes/eyes_walk.png",
+        len(contract["eyeColors"]),
+        "eyes",
+    )
+    for index, entry in enumerate(contract["eyeColors"]):
+        write_png(eye_blocks[index], public_path(paths["eyes"][entry["id"]]))
+        sheets["eyes"][entry["id"]] = eye_blocks[index]
+
+    for style in contract["hairStyles"]:
+        item = items[style["id"]]
+        if item.get("availableColors") != color_names or item.get("sourcePaletteCount") != len(color_names):
+            raise ValueError(f"{style['id']}: catalog palette contract differs from the central mapping")
+        blocks = checked_walk_blocks(
+            ROOT / item["sourceAsset"],
+            ROOT / "assets/Character v.2/separate/walk/hair" / f"{style['walkStem']}_walk.png",
+            len(contract["hairColors"]),
+            style["id"],
+        )
+        sheets["hair"][style["id"]] = {}
+        for index, color in enumerate(contract["hairColors"]):
+            write_png(blocks[index], public_path(paths["hair"][style["id"]][color["id"]]))
+            sheets["hair"][style["id"]][color["id"]] = blocks[index]
+
+        if style.get("skirtSource"):
+            master = rgba(ROOT / style["skirtSource"])
+            expected_width = WALK_SIZE[0] * len(contract["hairColors"])
+            if master.size != (expected_width, 1568):
+                raise ValueError(f"{style['id']}: unexpected skirt variant size {master.size}")
+            sheets["hairSkirt"][style["id"]] = {}
+            for index, color in enumerate(contract["hairColors"]):
+                block = master.crop((index * WALK_SIZE[0], 0, (index + 1) * WALK_SIZE[0], WALK_SIZE[1]))
+                write_png(block, public_path(paths["hairSkirt"][style["id"]][color["id"]]))
+                sheets["hairSkirt"][style["id"]][color["id"]] = block
+    return paths, sheets
+
+
+def identity_preview(*layers: Image.Image) -> Image.Image:
+    return nearest(composite(*(frame(layer) for layer in layers)), (PREVIEW_SIZE, PREVIEW_SIZE))
+
+
+def build_identity_previews(items: dict[str, dict], contract: dict, sheets: dict) -> dict:
+    basic = frame(rgba(ROOT / "public/assets/world/player_clothes.png"))
+    previews = {"skins": {}, "hairStyles": {}, "hairColors": {}, "eyes": {}}
+    default_skin = sheets["skins"]["skin_01"]
+    default_hair = sheets["hair"]["hair_buzzcut"]["black"]
+
+    for index in range(1, 9):
+        item_id = f"skin_{index:02d}"
+        image = nearest(composite(frame(sheets["skins"][item_id]), basic, frame(default_hair)), (PREVIEW_SIZE, PREVIEW_SIZE))
+        path = f"/assets/character-v2/previews/skin/skin-{index:02d}.png"
+        write_png(image, public_path(path))
+        previews["skins"][item_id] = (path, image)
+    for style in contract["hairStyles"]:
+        image = nearest(composite(frame(default_skin), basic, frame(sheets["hair"][style["id"]]["black"])), (PREVIEW_SIZE, PREVIEW_SIZE))
+        path = f"/assets/character-v2/previews/hair-style/{style['slug']}.png"
+        write_png(image, public_path(path))
+        previews["hairStyles"][style["id"]] = (path, image)
+    for color in contract["hairColors"]:
+        image = nearest(composite(frame(default_skin), basic, frame(sheets["hair"]["hair_buzzcut"][color["id"]])), (PREVIEW_SIZE, PREVIEW_SIZE))
+        path = f"/assets/character-v2/previews/hair-color/{color['id'].replace('_', '-')}.png"
+        write_png(image, public_path(path))
+        previews["hairColors"][color["id"]] = (path, image)
+    for eye in contract["eyeColors"]:
+        eye_layer = None if eye["id"] == contract["defaultLoadout"]["eyesId"] else frame(sheets["eyes"][eye["id"]])
+        layers = [frame(default_skin)] + ([eye_layer] if eye_layer else []) + [basic, frame(default_hair)]
+        image = nearest(composite(*layers), (PREVIEW_SIZE, PREVIEW_SIZE))
+        path = f"/assets/character-v2/previews/eyes/{eye['colorId'].replace('_', '-')}.png"
+        write_png(image, public_path(path))
+        previews["eyes"][eye["id"]] = (path, image)
+    return previews
+
+
+def simple_identity_contact(title: str, entries: list[tuple[str, Image.Image]], columns: int) -> Image.Image:
+    cell_w, cell_h = 132, 126
+    rows = (len(entries) + columns - 1) // columns
+    output = Image.new("RGBA", (columns * cell_w + 32, rows * cell_h + 58), "#F7F0E4")
+    draw = ImageDraw.Draw(output)
+    draw.text((16, 14), title, fill="#3E2918", font=font(20))
+    for index, (label, image) in enumerate(entries):
+        x = 16 + index % columns * cell_w
+        y = 48 + index // columns * cell_h
+        draw.rounded_rectangle((x, y, x + 116, y + 110), radius=8, fill="#E8DDCA", outline="#9B7A50", width=2)
+        output.alpha_composite(image, (x + 10, y + 2))
+        draw.text((x + 7, y + 96), label, fill="#3E2918", font=font(10))
+    return output
+
+
+def build_identity_projection(items: dict[str, dict], contract: dict, paths: dict, previews: dict) -> None:
+    projection = {
+        "version": contract["version"],
+        "defaultLoadout": contract["defaultLoadout"],
+        "skins": [{
+            "id": item_id,
+            "name": items[item_id]["name"],
+            "type": "skin",
+            "runtimeAsset": paths["skins"][item_id],
+            "previewAsset": previews["skins"][item_id][0],
+            "available": True,
+        } for item_id in paths["skins"]],
+        "hairStyles": [{
+            "id": style["id"],
+            "name": items[style["id"]]["name"],
+            "type": "hair",
+            "slug": style["slug"],
+            "previewAsset": previews["hairStyles"][style["id"]][0],
+            "available": True,
+            "hasSkirtVariant": style["id"] in paths["hairSkirt"],
+        } for style in contract["hairStyles"]],
+        "hairColors": [{
+            **color,
+            "previewAsset": previews["hairColors"][color["id"]][0],
+            "available": True,
+        } for color in contract["hairColors"]],
+        "eyes": [{
+            "id": eye["id"],
+            "colorId": eye["colorId"],
+            "name": eye["name"],
+            "type": "eyes",
+            "runtimeAsset": paths["eyes"][eye["id"]],
+            "previewAsset": previews["eyes"][eye["id"]][0],
+            "available": True,
+        } for eye in contract["eyeColors"]],
+        "skirtVariantOutfitIds": contract["skirtVariantOutfitIds"],
+    }
+    IDENTITY_PROJECTION_PATH.parent.mkdir(parents=True, exist_ok=True)
+    paid_projection = [{
+        key: item[key] for key in (
+            "id", "name", "type", "productGroup", "runtimeAsset", "previewAsset",
+            "rarity", "priceTier", "currencyCombination", "cost",
+        ) if key in item
+    } for item in items.values() if item.get("productGroup") in ("outfit", "accessory")
+        and item.get("officialStoreStatus") == "approved" and item.get("existingGameConnected") is True]
+    payload = json.dumps(projection, ensure_ascii=False, indent=2)
+    paid_payload = json.dumps(paid_projection, ensure_ascii=False, indent=2)
+    IDENTITY_PROJECTION_PATH.write_text(
+        "// Generated by scripts/build-character-v2-runtime-assets.py\n"
+        f"export const CHARACTER_IDENTITY_CATALOG = Object.freeze({payload})\n"
+        f"export const CHARACTER_STUDIO_ITEMS = Object.freeze({paid_payload})\n",
+        encoding="utf-8",
+    )
+
+
+def build_identity_reviews(contract: dict, previews: dict) -> None:
+    STAGE2_REVIEW_DIR.mkdir(parents=True, exist_ok=True)
+    write_png(simple_identity_contact("Character V2 skins - 8", [(key, value[1]) for key, value in previews["skins"].items()], 4), STAGE2_REVIEW_DIR / "asset-contact-sheet-skins.png")
+    hair_entries = [(style["id"], previews["hairStyles"][style["id"]][1]) for style in contract["hairStyles"]]
+    write_png(simple_identity_contact("Character V2 hair styles - 13 (black palette)", hair_entries, 5), STAGE2_REVIEW_DIR / "asset-contact-sheet-hair.png")
+    eye_entries = [(eye["name"], previews["eyes"][eye["id"]][1]) for eye in contract["eyeColors"]]
+    write_png(simple_identity_contact("Character V2 eye colors - 14", eye_entries, 5), STAGE2_REVIEW_DIR / "asset-contact-sheet-eyes.png")
+
+
 def main() -> None:
     items = load_catalog_items()
     sheets = build_runtime_sheets(items)
     icons = build_currency_icons()
     previews = build_previews(items, sheets)
     build_reviews(icons, sheets, previews)
-    print(f"built {len(PAID_OUTFIT_IDS)} outfit contracts, {len(ACCESSORY_IDS)} accessories, and {len(CURRENCIES)} currencies")
+    contract = load_identity_contract()
+    identity_paths, identity_sheets = build_identity_runtime_sheets(items, contract)
+    identity_previews = build_identity_previews(items, contract, identity_sheets)
+    build_identity_projection(items, contract, identity_paths, identity_previews)
+    build_identity_reviews(contract, identity_previews)
+    print(
+        f"built {len(PAID_OUTFIT_IDS)} outfit contracts, {len(ACCESSORY_IDS)} accessories, "
+        f"{len(CURRENCIES)} currencies, 8 skins, 13x14 hair sheets, 14 eyes, and 28 skirt hair variants"
+    )
 
 
 if __name__ == "__main__":

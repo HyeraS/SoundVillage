@@ -20,10 +20,10 @@ import {
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
 
 /* eslint-disable @next/next/no-img-element -- layered sprite sheets require exact native clipping */
-function MuseumCharacter({ dir, moving, animationTick, outfitSrc, accessorySrc }) {
+function MuseumCharacter({ dir, moving, animationTick, outfitSrc, accessorySrc, characterLoadout }) {
   if (!ASSET_READY.world) return null
   const { frame, rows, cols } = WORLD_CHARACTER
-  const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc })
+  const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
   const row = rows[dir] ?? rows.down
   const sourceColumn = cols[moving ? animationTick % cols.length : 0]
   const scaleX = PLAYER_SPRITE.width / frame
@@ -110,6 +110,7 @@ export default function LibraryRoom({
   activeStations = 0,
   outfitSrc,
   accessorySrc,
+  characterLoadout,
   npcDialogue = null,
 }) {
   const viewportRef = useRef(null)
@@ -246,7 +247,7 @@ export default function LibraryRoom({
   }, [autoWalk, dir, keys])
 
   const snapped = { x:snapWorld(pos.x, stageScale, viewport.dpr), y:snapWorld(pos.y, stageScale, viewport.dpr) }
-  const playerNode = <div key="player" data-testid="museum-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} style={{ position:'absolute', left:snapped.x + PLAYER_BODY.width / 2 - PLAYER_SPRITE.width / 2, top:snapped.y + PLAYER_BODY.height - PLAYER_SPRITE.height, width:PLAYER_SPRITE.width, height:PLAYER_SPRITE.height, zIndex:1 }}><MuseumCharacter dir={dir} moving={moving} animationTick={animationTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc}/></div>
+  const playerNode = <div key="player" data-testid="museum-player" data-player-x={Math.round(pos.x)} data-player-y={Math.round(pos.y)} style={{ position:'absolute', left:snapped.x + PLAYER_BODY.width / 2 - PLAYER_SPRITE.width / 2, top:snapped.y + PLAYER_BODY.height - PLAYER_SPRITE.height, width:PLAYER_SPRITE.width, height:PLAYER_SPRITE.height, zIndex:1 }}><MuseumCharacter dir={dir} moving={moving} animationTick={animationTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/></div>
   const cardLayout = openCard ? CARD_LAYOUTS[openCard] : null
   const promptLeft = stageOffset.x + (pos.x + PLAYER_BODY.width / 2) * stageScale
   const promptTop = stageOffset.y + (pos.y - 14) * stageScale

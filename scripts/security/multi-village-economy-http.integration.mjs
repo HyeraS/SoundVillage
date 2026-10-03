@@ -6,6 +6,9 @@ const apiBase = process.env.ECONOMY_TEST_APP_URL
 const supabaseUrl = process.env.SECURITY_TEST_SUPABASE_URL
 const anonKey = process.env.SECURITY_TEST_SUPABASE_ANON_KEY
 const serviceKey = process.env.SECURITY_TEST_SUPABASE_SERVICE_ROLE_KEY
+const DEFAULT_IDENTITY = {
+  skinId:'skin_01', eyesId:'eyes_green_light', hairStyleId:'hair_buzzcut', hairColorId:'black',
+}
 const hmacSecret = process.env.MULTI_VILLAGE_ECONOMY_HMAC_SECRET
 if (!apiBase || !supabaseUrl || !anonKey || !serviceKey || !hmacSecret) {
   throw new Error('Local economy HTTP integration environment is incomplete')
@@ -98,7 +101,7 @@ try {
 
   const profile = await request('/api/economy-v1/character-profile', { token })
   assert.equal(profile.response.status, 200)
-  assert.deepEqual(profile.json.loadout, { outfitId: 'basic', accessoryId: null })
+  assert.deepEqual(profile.json.loadout, { ...DEFAULT_IDENTITY, outfitId: 'basic', accessoryId: null })
   assert.deepEqual(profile.json.ownedItemIds, [])
   assert.equal(Object.keys(profile.json.balances).length, 6)
   assert.equal(typeof profile.json.economyVersion, 'string')
@@ -254,10 +257,10 @@ try {
   assert.equal(wrongSlot.json.code, 'invalid_item_type')
   const equippedOutfit = await equip('outfit', 'overalls')
   const equippedAccessory = await equip('accessory', 'acc_glasses')
-  assert.deepEqual(equippedOutfit.json.loadout, { outfitId: 'overalls', accessoryId: null })
-  assert.deepEqual(equippedAccessory.json.loadout, { outfitId: 'overalls', accessoryId: 'acc_glasses' })
+  assert.deepEqual(equippedOutfit.json.loadout, { ...DEFAULT_IDENTITY, outfitId: 'overalls', accessoryId: null })
+  assert.deepEqual(equippedAccessory.json.loadout, { ...DEFAULT_IDENTITY, outfitId: 'overalls', accessoryId: 'acc_glasses' })
   const unequipped = await equip('accessory', null)
-  assert.deepEqual(unequipped.json.loadout, { outfitId: 'overalls', accessoryId: null })
+  assert.deepEqual(unequipped.json.loadout, { ...DEFAULT_IDENTITY, outfitId: 'overalls', accessoryId: null })
 
   const attendanceStatus = await request('/api/economy-v1/attendance', { token })
   assert.equal(attendanceStatus.response.status, 200)

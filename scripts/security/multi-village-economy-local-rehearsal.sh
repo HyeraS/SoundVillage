@@ -1,7 +1,7 @@
 #!/bin/sh
 set -eu
 
-# Migrations 008-012 have a narrower lifecycle than the reusable Stage 8 browser
+# Migrations 008-013 have a narrower lifecycle than the reusable Stage 8 browser
 # bootstrap: they must compare legacy fingerprints, run concurrent DB checks and
 # HTTP/browser boundaries, then destroy the stack. Keeping this wrapper separate
 # avoids weakening or changing any 001-007 checks in stage8-local-bootstrap.sh.
@@ -93,12 +93,25 @@ cp scripts/security/011_multi_village_interior_cutover.sql \
 cp scripts/security/012_duo_session_v2.sql \
   "$STAGE8_WORK_DIR/supabase/migrations/20261001020000_duo_session_v2.sql"
 supabase migration up --local --workdir "$STAGE8_WORK_DIR"
-REHEARSAL_STAGE='008-012 SQL verification'
+REHEARSAL_STAGE='013 preflight and backfill fixture'
+run_sql scripts/security/character-identity-stage3-preflight.sql
+docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -v ON_ERROR_STOP=1 -c \
+  "insert into auth.users(id,aud,role,is_anonymous,created_at,updated_at) values('01300000-0000-4000-8000-000000000013','authenticated','authenticated',true,now(),now()); insert into public.study_participants(participant_id,auth_user_id,group_id,status) values('STAGE3_BACKFILL_FIXTURE','01300000-0000-4000-8000-000000000013','A','active'); insert into public.participant_multi_village_character_loadouts(participant_id,outfit_id,accessory_id) values('STAGE3_BACKFILL_FIXTURE','stage3_backfill_outfit','stage3_backfill_accessory')" >/dev/null
+cp scripts/security/013_character_identity_loadout.sql \
+  "$STAGE8_WORK_DIR/supabase/migrations/20261002010000_character_identity_loadout.sql"
+REHEARSAL_STAGE='013 migration apply'
+supabase migration up --local --workdir "$STAGE8_WORK_DIR"
+REHEARSAL_STAGE='008-013 SQL verification'
 run_sql scripts/security/multi-village-economy-verify.sql
 run_sql scripts/security/multi-village-character-verify.sql
 run_sql scripts/security/multi-village-runtime-verify.sql
 run_sql scripts/security/multi-village-interior-verify.sql
 run_sql scripts/security/duo-session-v2-verify.sql
+run_sql scripts/security/character-identity-stage3-verify.sql
+docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -v ON_ERROR_STOP=1 -c \
+  "do \$\$ begin if not exists(select 1 from public.participant_multi_village_character_loadouts where outfit_id='stage3_backfill_outfit' and accessory_id='stage3_backfill_accessory' and skin_id='skin_01' and eyes_id='eyes_green_light' and hair_style_id='hair_buzzcut' and hair_color_id='black') then raise exception 'Stage 3 backfill fixture failed'; end if; end \$\$" >/dev/null
+docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -v ON_ERROR_STOP=1 -c \
+  "delete from public.study_participants where participant_id='STAGE3_BACKFILL_FIXTURE'; delete from auth.users where id='01300000-0000-4000-8000-000000000013'" >/dev/null
 run_sql scripts/security/multi-village-economy.integration.sql
 
 docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt \
@@ -132,6 +145,7 @@ npm run test:quest-attendance-local
 REHEARSAL_STAGE='Economy and Interior DB integration'
 node scripts/security/multi-village-economy.integration.mjs
 node scripts/security/multi-village-character.integration.mjs
+npm run test:character-v2-stage3-local
 node scripts/security/multi-village-runtime.integration.mjs
 npm run test:multi-village-interior-local
 REHEARSAL_STAGE='Duo V2 DB concurrency and WebSocket authorization'
@@ -147,6 +161,7 @@ export NEXT_PUBLIC_SUPABASE_URL="$API_URL"
 export NEXT_PUBLIC_SUPABASE_ANON_KEY="$ANON_KEY"
 export SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
 export ENABLE_INTERNAL_TEST_ROUTES=true
+export NEXT_PUBLIC_ENABLE_INTERNAL_BROWSER_QA=true
 
 # Keep browser verification independent from an already-running user dev server
 # and its .next/dev lock. Webpack is intentional because node_modules remains an
@@ -229,11 +244,13 @@ stop_app
 start_app cutover
 REHEARSAL_STAGE='cutover HTTP and browser regression'
 node scripts/security/multi-village-economy-http.integration.mjs
+npm run test:character-v2-stage3-http
 EXPECTED_ECONOMY_MODE=cutover npm run test:quest-attendance-browser
 node scripts/security/multi-village-character-browser-e2e.mjs
 EXPECTED_ECONOMY_MODE=cutover node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 REHEARSAL_STAGE='Economy Interior product-path browser E2E'
 npm run test:multi-village-interior-browser
+CHARACTER_IDENTITY_BROWSER_PHASE=qa npm run test:character-v2-stage3-browser
 stop_app
 
 # The internal Character/Interior QA routes are intentionally development-only,
@@ -253,6 +270,8 @@ if ! (cd "$APP_WORK_DIR" && "$REPO_ROOT/node_modules/.bin/next" build --webpack)
   exit 1
 fi
 start_app cutover production
+REHEARSAL_STAGE='Stage 3 Character Identity production browser E2E'
+CHARACTER_IDENTITY_BROWSER_PHASE=live npm run test:character-v2-stage3-browser
 REHEARSAL_STAGE='Duo V2 A/B/C product-path browser E2E'
 npm run test:duo-v2-browser
 stop_app
@@ -269,5 +288,5 @@ cmp -s "$BEFORE_SNAPSHOT" "$FINAL_SNAPSHOT" || {
 REHEARSAL_STAGE='complete'
 REHEARSAL_OK=true
 echo "Multi-village economy local rehearsal passed."
-echo "Disposable migrations 001-012, Interior and Duo verify/integration/browser/WebSocket checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
+echo "Disposable migrations 001-013, Character Identity, Interior and Duo verify/integration/browser/WebSocket checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
 echo "The disposable Supabase stack and protected temporary secret will now be removed."

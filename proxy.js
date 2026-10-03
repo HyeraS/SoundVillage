@@ -19,6 +19,7 @@ export const config = {
   matcher: [
     '/animal-test/:path*',
     '/attendance-test/:path*',
+    '/character-studio-test/:path*',
     '/daily-quest-test/:path*',
     '/economy-v1-character-preview/:path*',
     '/fence-test/:path*',

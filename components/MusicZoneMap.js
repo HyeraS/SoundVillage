@@ -28,6 +28,7 @@ export default function MusicZoneMap({
   blockTotal = 1,
   outfitSrc,
   accessorySrc,
+  characterLoadout,
   debug = false,
 }) {
   const village = useMemo(() => buildVillage(), [])
@@ -403,6 +404,7 @@ export default function MusicZoneMap({
               sourceViewBox={MUSIC_PLAYER_SOURCE}
               outfitSrc={outfitSrc}
               accessorySrc={accessorySrc}
+              characterLoadout={characterLoadout}
             />
           </div>
         </div>
@@ -425,6 +427,7 @@ export default function MusicZoneMap({
             sourceViewBox={MUSIC_PLAYER_SOURCE}
             outfitSrc={outfitSrc}
             accessorySrc={accessorySrc}
+            characterLoadout={characterLoadout}
           />
         </div>
         {debug && (

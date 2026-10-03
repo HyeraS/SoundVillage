@@ -64,10 +64,11 @@ test('main runtime uses one shared economy state and renders the loadout across 
   assert.match(provider, /getEconomyBootstrap\(\)/)
   assert.match(provider, /purchaseAndEquip/)
   assert.match(page, /economy\.effectiveMainMode/)
-  assert.equal((page.match(/accessorySrc=\{runtimeAccessorySrc\}/g) || []).length, 9)
-  assert.match(actor, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc \}\)/)
-  assert.match(pixel, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc \}\)/)
-  assert.match(museum, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc \}\)/)
+  assert.equal((page.match(/accessorySrc=\{runtimeAccessorySrc\}/g) || []).length, 11)
+  assert.equal((page.match(/characterLoadout=\{runtimeCharacterLoadout\}/g) || []).length, 11)
+  assert.match(actor, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc, \.\.\.\(characterLoadout \|\| \{\}\) \}\)/)
+  assert.match(pixel, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc, \.\.\.\(characterLoadout \|\| \{\}\) \}\)/)
+  assert.match(museum, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc, \.\.\.\(characterLoadout \|\| \{\}\) \}\)/)
 })
 
 test('cutover submissions use gated route handlers and quest UI promises no currency', async () => {

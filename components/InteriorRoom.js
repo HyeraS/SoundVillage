@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useKeys, SPEED } from '@/components/GameEngine'
+import { WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { getInteriorItem } from '@/lib/interiorCatalog'
 
 /* ─────────────────────────────────────────────
@@ -13,6 +14,23 @@ export const COLS = 12, ROWS = 5, CELL = 64, ROWD = 48, WALL_ROWS = 2, WALL_ROWD
 export const STAGE_W = COLS * CELL       // 768
 export const STAGE_H = WALL_H + ROWS * ROWD // 464
 const AVATAR_NATIVE = 32 // avatar.png 원본 픽셀 크기(32x32)
+
+function InteriorCharacter({ direction, outfitSrc, accessorySrc, characterLoadout, scale }) {
+  if (!characterLoadout) return null
+  const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...characterLoadout })
+  const row = WORLD_CHARACTER.rows[direction] ?? WORLD_CHARACTER.rows.down
+  const column = WORLD_CHARACTER.cols[0]
+  return <span aria-hidden="true" style={{ position:'absolute', inset:0, overflow:'hidden' }}>
+    {layers.map((layer, index) => <span key={`${layer.src}-${index}`} data-interior-character-layer={layer.kind || index} data-layer-src={layer.src} style={{
+      position:'absolute', inset:0,
+      backgroundImage:`url(${layer.src})`,
+      backgroundRepeat:'no-repeat',
+      backgroundSize:`${layer.sheetW * scale}px ${layer.sheetH * scale}px`,
+      backgroundPosition:`${-column * AVATAR_NATIVE * scale}px ${-row * AVATAR_NATIVE * scale}px`,
+      imageRendering:'pixelated',
+    }}/>) }
+  </span>
+}
 
 /* 바닥/벽 아이템 공통 배치 수식.
    - 가로 중앙: 칸 폭(fw*CELL) 안에서 스프라이트 실제 폭만큼 중앙 정렬
@@ -137,6 +155,7 @@ export default function InteriorRoom({
   // 그대로 쓴다. 이 컴포넌트는 자신이 호스트 방인지 방문 중인지 모르고,
   // duoScreen 문자열과 sendPosition/partnerPos만 그대로 전달받아 쓴다.
   duoScreen = null, sendPosition = null, partnerPos = null, partnerLabel = '',
+  outfitSrc, accessorySrc, characterLoadout,
 }) {
   const S = pixelScale
   const wallpaper = getInteriorItem(room.wallpaper)
@@ -161,7 +180,7 @@ export default function InteriorRoom({
   ───────────────────────────────────────────── */
   const AVATAR_W = AVATAR_NATIVE * S, AVATAR_H = AVATAR_NATIVE * S
   const [avatarPos, setAvatarPos] = useState({ x: 2 * CELL + 8, y: 2 })
-  const [facingLeft, setFacingLeft] = useState(false)
+  const [avatarDirection, setAvatarDirection] = useState('right')
   const avatarPosRef = useRef(avatarPos)
   const { keys } = useKeys({ disabled: inputBlocked, screen: 'interior' })
 
@@ -184,8 +203,8 @@ export default function InteriorRoom({
       if (dx || dy) {
         x = Math.max(0, Math.min(maxX, x + dx))
         y = Math.max(0, Math.min(maxY, y + dy))
-        if (dx < 0) setFacingLeft(true)
-        else if (dx > 0) setFacingLeft(false)
+        if (Math.abs(dx) >= Math.abs(dy)) setAvatarDirection(dx < 0 ? 'left' : 'right')
+        else setAvatarDirection(dy < 0 ? 'down' : 'up')
         avatarPosRef.current = { x, y }
         setAvatarPos({ x, y })
         moved = true
@@ -255,15 +274,17 @@ export default function InteriorRoom({
             const style = applySelection(spriteStyle(it, p, S), p.uid)
             return <div key={p.uid} style={style} onClick={onSelectItem ? () => onSelectItem(p.uid) : undefined} />
           })}
-          <div style={{
+          <div data-testid="interior-player" style={{
             position: 'absolute', left: avatarPos.x, bottom: avatarPos.y,
             width: AVATAR_W, height: AVATAR_H,
-            backgroundImage: 'url(/assets/interior/avatar.png)', backgroundSize: '100% 100%',
+            ...(!characterLoadout ? { backgroundImage:'url(/assets/interior/avatar.png)', backgroundSize:'100% 100%' } : {}),
             imageRendering: 'pixelated', zIndex: avatarZIndex,
             animation: 'bob 2.6s ease-in-out infinite',
             filter: 'drop-shadow(0 3px 0 rgba(58,42,20,.25))',
-            transform: `scaleX(${facingLeft ? -1 : 1})`,
-          }} />
+            transform: !characterLoadout && avatarDirection === 'left' ? 'scaleX(-1)' : undefined,
+          }}>
+            <InteriorCharacter direction={avatarDirection} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} scale={S}/>
+          </div>
           {partnerPos && partnerPos.screen === duoScreen && (() => {
             const partnerRow = Math.max(0, Math.min(ROWS - 1, Math.round(ROWS - 1 - partnerPos.y / ROWD)))
             return (

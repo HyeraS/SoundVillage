@@ -23,6 +23,7 @@ export default function AnimalZoneMap({
   blockTotal = 1,
   outfitSrc,
   accessorySrc,
+  characterLoadout,
   debugOptions = null,
   baseOnly = false,
 }) {
@@ -342,7 +343,7 @@ export default function AnimalZoneMap({
               position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
               transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
             }}>
-              <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} />
+              <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
             </div>
 
             <canvas ref={foregroundCanvasRef} data-testid="animal-foreground-canvas" data-smoothing="off" style={{

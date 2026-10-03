@@ -57,6 +57,13 @@
     "test:quest-attendance-local": "node scripts/security/quest-attendance.integration.mjs",
     "test:quest-attendance-browser": "node scripts/security/quest-attendance-browser-e2e.mjs",
     "test:functional-fixes": "node --test scripts/security/functional-fixes.test.mjs",
+    "test:character-studio": "node --test scripts/security/character-studio.test.mjs",
+    "test:character-studio-browser": "node scripts/security/character-studio-browser-e2e.mjs",
+    "test:character-v2-stage2": "node --test scripts/character-v2-assets.test.mjs scripts/security/character-studio.test.mjs",
+    "test:character-v2-stage3": "node --test scripts/security/character-identity-stage3.test.mjs scripts/security/character-studio.test.mjs scripts/character-v2-assets.test.mjs",
+    "test:character-v2-stage3-local": "node scripts/security/character-identity-stage3.integration.mjs",
+    "test:character-v2-stage3-http": "node scripts/security/character-identity-stage3-http.integration.mjs",
+    "test:character-v2-stage3-browser": "node scripts/security/character-identity-stage3-browser-e2e.mjs",
     "test:user-events-local": "node scripts/security/user-event-logging.integration.mjs"
   },
   "dependencies": {

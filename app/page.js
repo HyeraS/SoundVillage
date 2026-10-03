@@ -597,6 +597,7 @@ export default function HomePage() {
     ? (economyOutfit?.runtimeAsset || '/assets/world/player_clothes.png')
     : (equippedOutfitId ? OUTFIT_SHEETS[equippedOutfitId]?.src : undefined)
   const runtimeAccessorySrc = economy.mode === 'cutover' ? economyAccessory?.runtimeAsset : undefined
+  const runtimeCharacterLoadout = economy.mode === 'cutover' ? economy.savedLoadout : undefined
   const studyAccessEnabled = isStudyAccessParticipantId(participantId)
   // ALLAUDIO_A/ALLAUDIO_B처럼 그룹이 ID에 고정된 접근이면 그 그룹으로, 아니면
   // 입력받은 groupId를 그대로 쓴다. RESEARCHER 등 그룹 무관 접근만 완전히 우회한다.
@@ -1065,6 +1066,9 @@ export default function HomePage() {
             setVisiting(null)
           }}
           onPartnerLeftScreen={handlePartnerLeftScreen}
+          outfitSrc={runtimeOutfitSrc}
+          accessorySrc={runtimeAccessorySrc}
+          characterLoadout={runtimeCharacterLoadout}
         />
         {economyGuard}
       </main>
@@ -1102,6 +1106,7 @@ export default function HomePage() {
           onDryRunAttendanceClaim={() => setQaAttendanceClaimed(true)}
           outfitSrc={runtimeOutfitSrc}
           accessorySrc={runtimeAccessorySrc}
+          characterLoadout={runtimeCharacterLoadout}
           lockedZones={allZonesUnlocked ? [] : ZONES_LOCKED_AT_START}
           participantId={participantId}
           roomShareToken={roomShareToken}
@@ -1223,6 +1228,7 @@ export default function HomePage() {
       }}>
         <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare}
           duo={duo} duoInviteState={duoInviteState} onCreateDuoInvite={createLiveDuoInvite} onCloseDuoSession={closeLiveDuoSession}
+          outfitSrc={runtimeOutfitSrc} accessorySrc={runtimeAccessorySrc} characterLoadout={runtimeCharacterLoadout}
           dryRun={natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
         {economyGuard}
       </main>
@@ -1245,8 +1251,10 @@ export default function HomePage() {
           zoneCounts={zoneCounts}
           outfitSrc={runtimeOutfitSrc}
           accessorySrc={runtimeAccessorySrc}
+          characterLoadout={runtimeCharacterLoadout}
           economyMode={economy.effectiveMainMode}
           economyViewMode={economy.mode}
+          dryRun={natureQaEnabled || Boolean(humanQaOptions)}
           onEconomyActivity={economy.applyActivityResult}
           onCurrencyChange={refreshCounts}
           onDone={handleMuseumDone}
@@ -1286,6 +1294,7 @@ export default function HomePage() {
             blockTotal={maxBlock}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : activeZone === 'Human' ? (
           <HumanZoneMap
@@ -1303,6 +1312,7 @@ export default function HomePage() {
             staticArt={humanQaOptions?.mode === 'static'}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : activeZone === 'Nature' ? (
           <NatureZoneMap
@@ -1316,6 +1326,7 @@ export default function HomePage() {
             debugFirstItem={natureQaEnabled}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : activeZone === 'Urban' ? (
           <UrbanZoneMap
@@ -1328,6 +1339,7 @@ export default function HomePage() {
             blockTotal={maxBlock}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : activeZone === 'Animal' ? (
           <AnimalZoneMap
@@ -1340,6 +1352,7 @@ export default function HomePage() {
             blockTotal={maxBlock}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : activeZone === 'Lab' ? (
           <LabZoneMap
@@ -1352,6 +1365,7 @@ export default function HomePage() {
             blockTotal={maxBlock}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         ) : (
           <ZoneMap
@@ -1365,6 +1379,7 @@ export default function HomePage() {
             blockTotal={maxBlock}
             outfitSrc={runtimeOutfitSrc}
             accessorySrc={runtimeAccessorySrc}
+            characterLoadout={runtimeCharacterLoadout}
           />
         )}
 

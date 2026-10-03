@@ -28,7 +28,9 @@ const reviewDir = path.resolve('_review/economy-v1-main-runtime-hardening')
 const interiorReviewDir = path.resolve('_review/economy-v1-interior-cutover')
 const outfitAsset = '/assets/world/outfits/overalls.png'
 const accessoryAsset = '/assets/character-v2/accessories/glasses-walk.png'
-const characterLayers = ['/assets/world/player_body.png', outfitAsset, '/assets/world/player_hair.png', accessoryAsset]
+const characterLayers = expectedMode === 'cutover'
+  ? ['/assets/character-v2/skin/skin-01-walk.png', outfitAsset, '/assets/character-v2/hair/buzzcut/black-walk.png', accessoryAsset]
+  : ['/assets/world/player_body.png', outfitAsset, '/assets/world/player_hair.png', accessoryAsset]
 let browser
 let userA
 let userB
@@ -288,22 +290,22 @@ try {
     await screenshot(page, 'sound-library-same-loadout.png')
 
     await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard: 'shop' })
-    await page.getByLabel('Character 상점').waitFor({ timeout: 30_000 })
-    assert.equal(await page.getByTestId(/^shop-item-/).count(), 19)
+    await page.getByLabel('캐릭터 스타일 스튜디오').waitFor({ timeout: 30_000 })
+    assert.equal(await page.getByTestId(/^studio-item-/).count(), 19)
     await screenshot(page, 'main-character-shop-outfits.png')
-    await page.getByTestId('shop-item-sailor').getByRole('button', { name:'세일러 룩 미리보기' }).click()
-    await page.getByTestId('museum-player').locator('img[src="/assets/world/outfits/sailor.png"]').waitFor()
+    await page.getByTestId('studio-item-sailor').getByRole('button', { name:'세일러 룩 착용 미리보기' }).click()
+    await page.getByTestId('character-studio-preview').locator('img[src="/assets/world/outfits/sailor.png"]').waitFor()
     await screenshot(page, 'shop-live-outfit-preview.png')
-    const outfitTab = page.getByRole('tab', { name:/의상 18/ })
+    const outfitTab = page.getByRole('tab', { name:/의상 19/ })
     await outfitTab.focus()
     await page.keyboard.press('ArrowRight')
     const accessoryTab = page.getByRole('tab', { name:/액세서리 8/ })
     assert.equal(await accessoryTab.getAttribute('aria-selected'), 'true')
     assert.equal(await accessoryTab.evaluate((element) => element === document.activeElement), true)
     await screenshot(page, 'shop-keyboard-focus.png')
-    assert.equal(await page.getByTestId(/^shop-item-/).count(), 8)
-    await page.getByTestId('shop-item-acc_sunglasses').getByRole('button', { name:'선글라스 미리보기' }).click()
-    await page.getByTestId('museum-player').locator('img[src="/assets/character-v2/accessories/sunglasses-walk.png"]').waitFor()
+    assert.equal(await page.getByTestId(/^studio-item-/).count(), 9)
+    await page.getByTestId('studio-item-acc_sunglasses').getByRole('button', { name:'선글라스 착용 미리보기' }).click()
+    await page.getByTestId('character-studio-preview').locator('img[src="/assets/character-v2/accessories/sunglasses-walk.png"]').waitFor()
     await screenshot(page, 'shop-live-accessory-preview.png')
     await page.setViewportSize({ width:390, height:844 })
     await screenshot(page, 'mobile-shop-preview.png')
@@ -316,21 +318,21 @@ try {
 
     ok(await admin.from('participant_village_wallets').update({ balance: 0 }).eq('participant_id', participantId), 'empty wallets')
     await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard: 'shop' })
-    const shortage = page.getByTestId('shop-item-sailor')
+    const shortage = page.getByTestId('studio-item-sailor')
     await shortage.getByRole('button', { name: /구매 불가:/ }).waitFor()
     assert.match(await shortage.getByRole('button').last().getAttribute('aria-label'), /인간.*자연.*도시.*음악/)
     await screenshot(page, 'main-character-shop-insufficient.png')
 
     ok(await admin.from('participant_village_wallets').update({ balance: 30 }).eq('participant_id', participantId), 'refill wallets')
     await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard: 'shop' })
-    const sailorBuy = page.getByTestId('shop-item-sailor').getByRole('button', { name: '구매하기' })
+    const sailorBuy = page.getByTestId('studio-item-sailor').getByRole('button', { name: '구매' })
     await sailorBuy.click()
     const purchasePrimary = page.getByRole('button', { name: '구매하고 장착' })
     await purchasePrimary.waitFor()
     await page.waitForFunction(() => document.activeElement?.textContent?.trim() === '구매하고 장착')
     assert.equal(await purchasePrimary.evaluate((element) => element === document.activeElement), true)
     await page.keyboard.press('Escape')
-    await page.waitForFunction(() => document.activeElement?.closest('[data-testid="shop-item-sailor"]'))
+    await page.waitForFunction(() => document.activeElement?.closest('[data-testid="studio-item-sailor"]'))
     await sailorBuy.click()
     const purchaseKeys = []
     let retryableFailurePending = true
@@ -342,21 +344,21 @@ try {
       } else await route.continue()
     })
     await page.getByRole('button', { name: '구매하고 장착' }).click()
-    await page.getByRole('alert').filter({ hasText:'같은 요청으로 안전하게 다시 시도' }).waitFor()
+    await page.locator('#studio-purchase-error').filter({ hasText:'같은 구매 요청으로 안전하게 다시 시도' }).waitFor()
     await screenshot(page, 'purchase-modal-network-retry.png')
-    await page.getByRole('button', { name:'같은 요청 재시도' }).click()
-    await page.getByRole('status').filter({ hasText: '세일러 룩 구매 및 장착 완료' }).waitFor({ timeout:60_000 })
+    await page.getByRole('button', { name:'같은 요청으로 재시도' }).click()
+    await page.getByRole('status').filter({ hasText: '세일러 룩 구매 및 장착을 완료' }).waitFor({ timeout:60_000 })
     await page.unroute('**/api/economy-v1/purchase')
     assert.equal(purchaseKeys.length, 2)
     assert.equal(purchaseKeys[0], purchaseKeys[1], 'retryable purchase must retain the UUID')
-    await page.waitForFunction(() => document.activeElement?.closest('[data-testid="shop-item-sailor"]'))
+    await page.waitForFunction(() => document.activeElement?.closest('[data-testid="studio-item-sailor"]'))
     const equipped = ok(await admin.from('participant_multi_village_character_loadouts').select('outfit_id,accessory_id').eq('participant_id', participantId).single(), 'purchased loadout')
     assert.deepEqual(equipped, { outfit_id: 'sailor', accessory_id: 'acc_glasses' })
     await screenshot(page, 'main-character-shop-purchase-and-equip.png')
 
     ok(await admin.from('participant_village_wallets').update({ balance:30 }).eq('participant_id', participantId), 'refill wallets for reused key')
     await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard:'shop' })
-    const sportyBuy = page.getByTestId('shop-item-sporty').getByRole('button', { name:'구매하기' })
+    const sportyBuy = page.getByTestId('studio-item-sporty').getByRole('button', { name:'구매' })
     const reusedKeys = []
     let reusedFailurePending = true
     await page.route('**/api/economy-v1/purchase', async (route) => {
@@ -368,10 +370,10 @@ try {
     })
     await sportyBuy.click()
     await page.getByRole('button', { name:'구매하고 장착' }).click()
-    await page.getByRole('alert').filter({ hasText:'새 요청으로 다시 시도' }).waitFor()
+    await page.locator('#studio-purchase-error').filter({ hasText:'새 요청으로 다시 시도' }).waitFor()
     await screenshot(page, 'purchase-modal-reused-key.png')
     await page.getByRole('button', { name:'구매하고 장착' }).click()
-    await page.getByRole('status').filter({ hasText:'스포티 세트 구매 및 장착 완료' }).waitFor({ timeout:60_000 })
+    await page.getByRole('status').filter({ hasText:'스포티 세트 구매 및 장착을 완료' }).waitFor({ timeout:60_000 })
     await page.unroute('**/api/economy-v1/purchase')
     assert.equal(reusedKeys.length, 2)
     assert.notEqual(reusedKeys[0], reusedKeys[1], 'reused purchase key must be discarded before retry')

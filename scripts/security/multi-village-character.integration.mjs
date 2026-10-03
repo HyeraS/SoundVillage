@@ -19,6 +19,9 @@ const participantA = `CHAR_A_${suffix}`
 const participantB = `CHAR_B_${suffix}`
 let userA
 let userB
+const DEFAULT_IDENTITY = {
+  skinId:'skin_01', eyesId:'eyes_green_light', hairStyleId:'hair_buzzcut', hairColorId:'black',
+}
 
 function ok(result, label) {
   assert.equal(result.error, null, `${label}: ${result.error?.message || ''}`)
@@ -52,7 +55,7 @@ try {
   const profile = ok(await admin.rpc('get_multi_village_character_profile_admin', { p_auth_user_id: userA.id }), 'default profile')
   assert.deepEqual(profile.balances, { Animal: 0, Human: 0, Nature: 0, Urban: 0, Music: 0, Lab: 0 })
   assert.deepEqual(profile.ownedItemIds, [])
-  assert.deepEqual(profile.loadout, { outfitId: 'basic', accessoryId: null })
+  assert.deepEqual(profile.loadout, { ...DEFAULT_IDENTITY, outfitId: 'basic', accessoryId: null })
   assert.equal(profile.defaultOutfitId, 'basic')
 
   const own = ok(await a.from('participant_multi_village_character_loadouts').select('*'), 'A own loadout')
@@ -70,7 +73,7 @@ try {
   ]), 'seed Character ownership')
 
   const outfit = ok(await admin.rpc('equip_multi_village_character_item_admin', equipArgs(userA.id, 'outfit', 'overalls', 'outfit')), 'equip outfit')
-  assert.deepEqual(outfit.loadout, { outfitId: 'overalls', accessoryId: null })
+  assert.deepEqual(outfit.loadout, { ...DEFAULT_IDENTITY, outfitId: 'overalls', accessoryId: null })
   const accessoryKey = crypto.randomUUID()
   const accessoryArgs = equipArgs(userA.id, 'accessory', 'acc_glasses', 'accessory', accessoryKey)
   const accessory = ok(await admin.rpc('equip_multi_village_character_item_admin', accessoryArgs), 'equip accessory')

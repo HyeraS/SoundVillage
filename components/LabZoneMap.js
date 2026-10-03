@@ -10,7 +10,7 @@ import { trackEvent } from '@/lib/userEvents'
 const clearKeys=keys=>{for(const k of Object.keys(keys.current))keys.current[k]=false}
 const LAB_PLAYER_SIZE=64
 const INTERACTION_RADIUS=48
-export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedIds=new Set(), isAnnotating=false, blockNum=1, blockTotal=1, outfitSrc, accessorySrc }) {
+export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedIds=new Set(), isAnnotating=false, blockNum=1, blockTotal=1, outfitSrc, accessorySrc, characterLoadout }) {
  const stageRef=useRef(null),backRef=useRef(null),frontRef=useRef(null),playerRef=useRef(null)
  const viewportRef=useRef({width:1,height:1,dpr:1})
  const village=useMemo(()=>buildVillage(),[])
@@ -118,7 +118,7 @@ export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedId
    <div className={styles.hud}><ZoneHUD zone="Lab" collected={collected} total={sounds.length} onExit={openExit} blockNum={blockNum} blockTotal={blockTotal}/></div>
    <div ref={stageRef} className={styles.stage} data-testid="lab-stage" role="application" aria-label="청록빛 마녀 골목. 방향키 또는 WASD로 이동, 소리에 다가가 Enter로 선택">
      <canvas ref={backRef} className={styles.canvas}/>
-     <div ref={playerRef} className={styles.player} style={{width:LAB_PLAYER_SIZE,height:LAB_PLAYER_SIZE}} data-animation-tick={animation.tick}><PixelChar dir={animation.dir} moving={animation.moving} animationTick={animation.tick} displayWidth={LAB_PLAYER_SIZE} displayHeight={LAB_PLAYER_SIZE} outfitSrc={outfitSrc} accessorySrc={accessorySrc}/></div>
+     <div ref={playerRef} className={styles.player} style={{width:LAB_PLAYER_SIZE,height:LAB_PLAYER_SIZE}} data-animation-tick={animation.tick}><PixelChar dir={animation.dir} moving={animation.moving} animationTick={animation.tick} displayWidth={LAB_PLAYER_SIZE} displayHeight={LAB_PLAYER_SIZE} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/></div>
      <canvas ref={frontRef} className={`${styles.canvas} ${styles.foreground}`}/>
      {!loaded&&!error&&<div className={styles.status} role="status">청록빛 마녀 골목 불러오는 중…</div>}
      {error&&<div className={styles.status} role="alert"><p>{error}</p><button onClick={onExit}>월드맵으로 돌아가기</button></div>}

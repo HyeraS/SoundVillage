@@ -33,6 +33,7 @@ export default function HumanZoneMap({
   staticArt = false,
   outfitSrc,
   accessorySrc,
+  characterLoadout,
 }) {
   const key = soundSetKey(sounds)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -356,7 +357,7 @@ export default function HumanZoneMap({
         {!staticArt && <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.ambience, background: 'radial-gradient(120% 100% at 50% 45%, transparent 64%, rgba(72,76,47,.2) 100%)' }} />}
         <canvas ref={markerCanvasRef} aria-label="Human sound markers and debug overlay" style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.markers }} />
         <div ref={playerWrapRef} data-human-player data-character-moving={moving ? 'true' : 'false'} data-animation-tick={animTick} style={{ position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H, transformOrigin: '0 0', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.player }}>
-          <PixelChar dir={dir} moving={moving} animationTick={animTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} />
+          <PixelChar dir={dir} moving={moving} animationTick={animTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
         </div>
         <canvas ref={foregroundCanvasRef} aria-label="Human Village foreground" style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.foreground }} />
         {!village && !loadError && <div style={statusStyle}>사람 마을을 준비하고 있어요…</div>}
