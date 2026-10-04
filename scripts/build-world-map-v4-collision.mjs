@@ -19,11 +19,11 @@ const MODULE = path.join(ROOT, 'lib/worldWalkableMaskData.mjs')
 const WALKABLE_PNG = path.join(OUTPUT, 'walkable-clearance-mask.png')
 const args = new Set(process.argv.slice(2))
 for (const argument of args) {
-  if (!['--check', '--review'].includes(argument)) throw new Error(`Unknown argument: ${argument}`)
+  if (!['--check', '--report'].includes(argument)) throw new Error(`Unknown argument: ${argument}`)
 }
 const checkOnly = args.has('--check')
-const writeReview = args.has('--review')
-if (checkOnly && writeReview) throw new Error('--check and --review cannot be combined')
+const writeReview = args.has('--report')
+if (checkOnly && writeReview) throw new Error('--check and --report cannot be combined')
 const CELL_SIZE = WORLD_COLLISION_CELL_SIZE
 const WIDTH = WORLD_MAP_V4.width / CELL_SIZE
 const HEIGHT = WORLD_MAP_V4.height / CELL_SIZE
