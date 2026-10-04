@@ -12,6 +12,7 @@ import {
   splitOcclusionObjects, getOcclusionState,
   getMusicCamera, worldToMusicScreen, getMusicPlayerPlacement,
 } from '@/lib/musicVillage'
+import { getCharacterRenderMetrics } from '@/lib/characterRenderMetrics.mjs'
 
 const soundSetKey = (sounds) => (sounds || [])
   .map((sound) => `${sound.sound_id}:${sound.block || 1}`)
@@ -322,11 +323,16 @@ export default function MusicZoneMap({
           context.restore()
         }
 
-        const placement = getMusicPlayerPlacement(camera, playerX, playerY)
+        const renderMetrics = getCharacterRenderMetrics({
+          stageWidth: metrics.cssW,
+          stageHeight: metrics.cssH,
+          sceneCameraScale: camera.scale,
+        })
+        const placement = getMusicPlayerPlacement(camera, playerX, playerY, renderMetrics)
         for (const wrapper of [playerWrapRef.current, silhouetteWrapRef.current].filter(Boolean)) {
           wrapper.style.left = `${placement.left}px`
           wrapper.style.top = `${placement.top}px`
-          wrapper.style.transform = `scale(${camera.scale})`
+          wrapper.style.transform = `scale(${renderMetrics.screenScale})`
         }
         if (playerWrapRef.current) {
           playerWrapRef.current.dataset.worldX = playerX.toFixed(2)
@@ -391,7 +397,7 @@ export default function MusicZoneMap({
           transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
         }}>
           <div aria-hidden="true" style={{
-            position: 'absolute', left: 4, bottom: -3, width: 28, height: 9,
+            position: 'absolute', left: (MUSIC_PLAYER_W - 28) / 2, bottom: -3, width: 28, height: 9,
             borderRadius: '50%', background: 'rgba(3,8,24,.38)', filter: 'blur(1px)',
           }} />
           <div style={{ position: 'absolute', inset: 0, filter: 'drop-shadow(0 0 3px rgba(135,125,255,.48))' }}>

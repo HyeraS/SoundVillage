@@ -10,6 +10,8 @@
     "test:nature": "node --test lib/natureFarmLayout.test.mjs",
     "validate:nature-assets": "node scripts/validate_nature_v2_assets.mjs",
     "test:music-production": "node scripts/test_music_production.mjs",
+    "test:character-render-size": "node scripts/test-character-render-metrics.mjs",
+    "test:character-render-browser": "node scripts/test-character-render-browser.mjs",
     "test:urban-production": "node scripts/test_urban_production.mjs",
     "test:urban-v3-playtest": "node --test lib/urbanV3WorldConfig.test.mjs && node scripts/test_urban_v3_playtest.mjs",
     "test:human-production": "node scripts/test_human_production.mjs",

@@ -7,6 +7,7 @@ import {
   loadAnimalVillage, moveWithCollision, spawnAnimalItems,
   drawItem, drawLockFog, drawAnimalVillageLayer, drawAnimalDebug, PLAYER_BOX,
 } from '@/lib/animalVillage'
+import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
 
 const FOV_W = 24 * TILE
 const FOV_H = 18 * TILE
@@ -281,11 +282,17 @@ export default function AnimalZoneMap({
 
       if (playerWrapRef.current) {
         const dpr = Math.max(1, window.devicePixelRatio || 1)
-        const screenLeft = snapDevicePixel(offsetX + (playerX - SPRITE_W / 2 - cameraX) * zoom, dpr)
-        const screenTop = snapDevicePixel(offsetY + (playerY - SPRITE_H - cameraY) * zoom, dpr)
-        playerWrapRef.current.style.left = `${screenLeft}px`
-        playerWrapRef.current.style.top = `${screenTop}px`
-        playerWrapRef.current.style.transform = `scale(${zoom})`
+        const stageWidth = canvas?.width ? canvas.width / dpr : playerWrapRef.current.parentElement.clientWidth
+        const stageHeight = canvas?.height ? canvas.height / dpr : playerWrapRef.current.parentElement.clientHeight
+        const renderMetrics = getCharacterRenderMetrics({ stageWidth, stageHeight, sceneCameraScale: zoom })
+        const footX = offsetX + (playerX - cameraX) * zoom
+        const footY = offsetY + (playerY - cameraY) * zoom
+        const placement = placeCharacterAtScreenFoot(footX, footY, renderMetrics)
+        playerWrapRef.current.style.left = `${snapDevicePixel(placement.left, dpr)}px`
+        playerWrapRef.current.style.top = `${snapDevicePixel(placement.top, dpr)}px`
+        playerWrapRef.current.style.transform = `scale(${renderMetrics.screenScale})`
+        playerWrapRef.current.dataset.footScreenX = placement.footX.toFixed(2)
+        playerWrapRef.current.dataset.footScreenY = placement.footY.toFixed(2)
       }
 
       animationFrame = requestAnimationFrame(loop)
@@ -339,7 +346,7 @@ export default function AnimalZoneMap({
               width: '100%', height: '100%', imageRendering: 'pixelated',
             }} />
 
-            <div ref={playerWrapRef} style={{
+            <div ref={playerWrapRef} data-testid="animal-player" style={{
               position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
               transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
             }}>

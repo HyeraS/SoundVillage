@@ -1,11 +1,38 @@
 'use client'
 
+import { useEffect, useMemo, useState } from 'react'
 import { ASSET_READY, CHARACTERS, WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { TILE, ZONE_META } from '@/components/GameEngine'
+import { getCharacterRenderMetrics } from '@/lib/characterRenderMetrics.mjs'
+import { calculateWorldCameraView, WORLD_CAMERA_HUD_HEIGHT } from '@/lib/worldMapCamera.mjs'
 import { WORLD_HOME, WORLD_MUSEUM, WORLD_PLAYER, worldDestinationInteractionPoint } from '@/lib/worldMapGeometry.mjs'
 
 const { width: CHAR_W, height: CHAR_H } = WORLD_PLAYER
 const FALLBACK_FRAMES = CHARACTERS.player_frames
+
+function useWorldCharacterRenderScale() {
+  const [viewport, setViewport] = useState({ width: 0, height: 0 })
+  useEffect(() => {
+    const update = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    update()
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
+  return useMemo(() => {
+    if (!viewport.width || !viewport.height) return 1
+    const camera = calculateWorldCameraView({
+      viewportWidth: viewport.width,
+      viewportHeight: viewport.height,
+      hudHeight: WORLD_CAMERA_HUD_HEIGHT,
+    })
+    const cameraScale = camera.sceneWidth / camera.viewW
+    return getCharacterRenderMetrics({
+      stageWidth: camera.sceneWidth,
+      stageHeight: camera.sceneHeight,
+      sceneCameraScale: cameraScale,
+    }).worldScale
+  }, [viewport])
+}
 
 export function WorldPortalHotspot({ portal, hovered, progress, locked }) {
   const meta = ZONE_META[portal.zone]
@@ -61,6 +88,7 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default' }) {
 }
 
 export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0 }) {
+  const renderScale = useWorldCharacterRenderScale()
   if (ASSET_READY.world) {
     const { frame: frameSize, rows, cols } = WORLD_CHARACTER
     const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
@@ -70,7 +98,8 @@ export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, character
     const sourceY = row * frameSize
     return (
       <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${frameSize} ${frameSize}`}
-        style={{ overflow:'hidden', imageRendering:'pixelated' }}>
+        data-character-render-scale={renderScale.toFixed(6)}
+        style={{ overflow:'hidden', imageRendering:'pixelated', transform:`scale(${renderScale})`, transformOrigin:'50% 100%' }}>
         <defs><clipPath id="worldPlayerClip"><rect width={frameSize} height={frameSize}/></clipPath></defs>
         {layers.map((layer, index) => (
           <image key={`${layer.src}-${index}`} href={layer.src}
@@ -85,7 +114,8 @@ export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, character
   const frame = offsets[moving ? animationTick % 2 : 0] ?? offsets[0]
   return (
     <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${FALLBACK_FRAMES.frameW} ${FALLBACK_FRAMES.frameH}`}
-      style={{ overflow:'hidden', imageRendering:'pixelated' }}>
+      data-character-render-scale={renderScale.toFixed(6)}
+      style={{ overflow:'hidden', imageRendering:'pixelated', transform:`scale(${renderScale})`, transformOrigin:'50% 100%' }}>
       <defs><clipPath id="worldFallbackPlayerClip"><rect width={FALLBACK_FRAMES.frameW} height={FALLBACK_FRAMES.frameH}/></clipPath></defs>
       <image href={CHARACTERS.player_sheet} x={-frame} y="0" width={FALLBACK_FRAMES.sheetW} height={FALLBACK_FRAMES.sheetH}
         clipPath="url(#worldFallbackPlayerClip)" style={{ imageRendering:'pixelated' }}/>

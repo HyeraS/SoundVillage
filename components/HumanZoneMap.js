@@ -9,6 +9,7 @@ import {
   drawHumanObjects, drawHumanMarker, drawHumanLockFog, drawHumanExitCue,
   drawHumanDebug, markerStateFor,
 } from '@/lib/humanVillage'
+import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
 
 const DESKTOP_FOV_W = 24 * TILE
 const FOV_H = 18 * TILE
@@ -312,10 +313,16 @@ export default function HumanZoneMap({
         markers.restore()
 
         if (playerWrapRef.current) {
-          playerWrapRef.current.style.left = `${cssOffsetX + (playerX - SPRITE_W / 2 - camX) * cssZoom}px`
-          playerWrapRef.current.style.top = `${cssOffsetY + (playerY - SPRITE_H - camY) * cssZoom}px`
-          playerWrapRef.current.style.transform = `scale(${cssZoom})`
+          const renderMetrics = getCharacterRenderMetrics({ stageWidth: metrics.cssW, stageHeight: metrics.cssH, sceneCameraScale: cssZoom })
+          const footX = cssOffsetX + (playerX - camX) * cssZoom
+          const footY = cssOffsetY + (playerY - camY) * cssZoom
+          const placement = placeCharacterAtScreenFoot(footX, footY, renderMetrics)
+          playerWrapRef.current.style.left = `${placement.left}px`
+          playerWrapRef.current.style.top = `${placement.top}px`
+          playerWrapRef.current.style.transform = `scale(${renderMetrics.screenScale})`
           playerWrapRef.current.style.visibility = fullMap ? 'hidden' : 'visible'
+          playerWrapRef.current.dataset.footScreenX = placement.footX.toFixed(2)
+          playerWrapRef.current.dataset.footScreenY = placement.footY.toFixed(2)
         }
         if (stageRef.current) {
           stageRef.current.dataset.humanReady = 'true'

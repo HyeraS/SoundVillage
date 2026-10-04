@@ -276,6 +276,8 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         playerWrapRef.current.style.left = `${screenLeft}px`
         playerWrapRef.current.style.top  = `${screenTop}px`
         playerWrapRef.current.style.transform = `scale(${zoom})`
+        playerWrapRef.current.dataset.footScreenX = (offsetX + (px - camX) * zoom).toFixed(2)
+        playerWrapRef.current.dataset.footScreenY = (offsetY + (py - camY) * zoom).toFixed(2)
       }
 
       raf = requestAnimationFrame(loop)

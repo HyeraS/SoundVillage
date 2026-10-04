@@ -6,9 +6,11 @@ import { buildVillage, spawnLabItems, moveWithCollision, SPAWN, overlapsExit, ca
 import { loadLabVillage, renderLabScene, labCamera } from '@/lib/labVillage'
 import styles from './LabZoneMap.module.css'
 import { trackEvent } from '@/lib/userEvents'
+import { CHARACTER_RENDER_SIZE, getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
 
 const clearKeys=keys=>{for(const k of Object.keys(keys.current))keys.current[k]=false}
-const LAB_PLAYER_SIZE=64
+const LAB_PLAYER_W=CHARACTER_RENDER_SIZE.width
+const LAB_PLAYER_H=CHARACTER_RENDER_SIZE.height
 const INTERACTION_RADIUS=48
 export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedIds=new Set(), isAnnotating=false, blockNum=1, blockTotal=1, outfitSrc, accessorySrc, characterLoadout }) {
  const stageRef=useRef(null),backRef=useRef(null),frontRef=useRef(null),playerRef=useRef(null)
@@ -106,7 +108,13 @@ export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedId
      if(now-lastAnim>90){setAnimation({dir:r.dir,moving:r.moving,tick:Math.floor(now/100)*6});lastAnim=now}
      const viewport=viewportRef.current,camera={...labCamera(viewport.width,viewport.height,r.pos),dpr:viewport.dpr}
      renderLabScene(back.getContext('2d'),front.getContext('2d'),loaded,r.items,r.pos,now,l.blockNum,l.collectedIds,camera,r.village.regionProgress,r.selected?.id||null)
-     if(playerRef.current){const el=playerRef.current;el.style.left=`${Math.round(camera.ox+(r.pos.x-LAB_PLAYER_SIZE/2-camera.x)*camera.zoom)}px`;el.style.top=`${Math.round((r.pos.y-LAB_PLAYER_SIZE-camera.y)*camera.zoom)}px`;el.style.transform=`scale(${camera.zoom})`}
+     if(playerRef.current){
+       const metrics=getCharacterRenderMetrics({stageWidth:viewport.width,stageHeight:viewport.height,sceneCameraScale:camera.zoom})
+       const footX=camera.ox+(r.pos.x-camera.x)*camera.zoom,footY=camera.oy+(r.pos.y-camera.y)*camera.zoom
+       const placement=placeCharacterAtScreenFoot(footX,footY,metrics),el=playerRef.current
+       el.style.left=`${placement.left}px`;el.style.top=`${placement.top}px`;el.style.transform=`scale(${metrics.screenScale})`
+       el.dataset.footScreenX=placement.footX.toFixed(2);el.dataset.footScreenY=placement.footY.toFixed(2)
+     }
      // Read-only DOM diagnostics for QA; no production teleport/unlock hooks.
      stage.dataset.playerX=r.pos.x.toFixed(2);stage.dataset.playerY=r.pos.y.toFixed(2);stage.dataset.mode=r.mode;stage.dataset.direction=r.dir
      raf=requestAnimationFrame(loop)
@@ -118,7 +126,7 @@ export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedId
    <div className={styles.hud}><ZoneHUD zone="Lab" collected={collected} total={sounds.length} onExit={openExit} blockNum={blockNum} blockTotal={blockTotal}/></div>
    <div ref={stageRef} className={styles.stage} data-testid="lab-stage" role="application" aria-label="청록빛 마녀 골목. 방향키 또는 WASD로 이동, 소리에 다가가 Enter로 선택">
      <canvas ref={backRef} className={styles.canvas}/>
-     <div ref={playerRef} className={styles.player} style={{width:LAB_PLAYER_SIZE,height:LAB_PLAYER_SIZE}} data-animation-tick={animation.tick}><PixelChar dir={animation.dir} moving={animation.moving} animationTick={animation.tick} displayWidth={LAB_PLAYER_SIZE} displayHeight={LAB_PLAYER_SIZE} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/></div>
+     <div ref={playerRef} className={styles.player} style={{width:LAB_PLAYER_W,height:LAB_PLAYER_H}} data-testid="lab-player" data-animation-tick={animation.tick}><PixelChar dir={animation.dir} moving={animation.moving} animationTick={animation.tick} displayWidth={LAB_PLAYER_W} displayHeight={LAB_PLAYER_H} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/></div>
      <canvas ref={frontRef} className={`${styles.canvas} ${styles.foreground}`}/>
      {!loaded&&!error&&<div className={styles.status} role="status">청록빛 마녀 골목 불러오는 중…</div>}
      {error&&<div className={styles.status} role="alert"><p>{error}</p><button onClick={onExit}>월드맵으로 돌아가기</button></div>}

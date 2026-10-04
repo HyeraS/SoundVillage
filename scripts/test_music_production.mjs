@@ -4,6 +4,7 @@ import path from 'node:path'
 import crypto from 'node:crypto'
 import sharp from 'sharp'
 import { fileURLToPath } from 'node:url'
+import { getCharacterRenderMetrics, getVisibleBodyCssBounds } from '../lib/characterRenderMetrics.mjs'
 import {
   T, MAP_W, MAP_H, WORLD_W, WORLD_H, PLAYER_BOX, INTERACTION_RADIUS,
   MUSIC_PLAYER_SOURCE, MUSIC_PLAYER_W, MUSIC_PLAYER_H, MUSIC_PLAYER_VISIBLE_H,
@@ -67,9 +68,16 @@ assert.equal(TREE_GROVE_FEATURES.length, SCENE_TREES.length, 'every visible tree
 
 const village = buildVillage()
 assert.deepEqual(PLAYER_BOX, { w: 12, h: 8 })
-assert.deepEqual(MUSIC_PLAYER_SOURCE, { x: 9, y: 12, w: 14, h: 20 })
-assert.deepEqual({ width: MUSIC_PLAYER_W, height: MUSIC_PLAYER_H }, { width: 36, height: 52 })
-assert.ok(MUSIC_PLAYER_VISIBLE_H >= 48 && MUSIC_PLAYER_VISIBLE_H <= 54, 'visible body height is in target range')
+assert.deepEqual(MUSIC_PLAYER_SOURCE, { x: 0, y: 0, w: 32, h: 32 })
+assert.deepEqual({ width: MUSIC_PLAYER_W, height: MUSIC_PLAYER_H }, { width: 72, height: 88 })
+assert.equal(MUSIC_PLAYER_VISIBLE_H, 45, 'default idle alpha matches Nature xMidYMid meet height')
+const logicalRenderMetrics = getCharacterRenderMetrics({ stageWidth: 768, stageHeight: 576, sceneCameraScale: 1 })
+const logicalVisibleBody = getVisibleBodyCssBounds(logicalRenderMetrics, { x: 9, y: 12, w: 14, h: 20 })
+assert.deepEqual(
+  { width: logicalVisibleBody.width, height: logicalVisibleBody.height, gap: logicalVisibleBody.visibleToWrapperFootGap },
+  { width: 31.5, height: MUSIC_PLAYER_VISIBLE_H, gap: 8 },
+  'Music diagnostics follow the full-source 72x88 xMidYMid meet layout',
+)
 assert.equal(collides(village, SPAWN.x, SPAWN.y), null, 'spawn is walkable')
 assert.equal(overlapsExitTrigger({ x: SPAWN.x, y: SPAWN.y }), false)
 assert.equal(overlapsExitTrigger({ x: EXIT_TRIGGER.x + EXIT_TRIGGER.w / 2, y: EXIT_TRIGGER.y + EXIT_TRIGGER.h }), true)
@@ -198,7 +206,15 @@ assert.ok(initialCamera.viewWidth / T >= 30 && initialCamera.viewWidth / T <= 32
 assert.ok(initialCamera.viewHeight / T >= 17 && initialCamera.viewHeight / T <= 20)
 const landscapeCamera = getMusicCamera({ cssWidth: 844, cssHeight: 334, playerX: 768, playerY: 576 })
 assert.ok(landscapeCamera.viewWidth / T <= 32, 'mobile landscape caps at 32 horizontal tiles')
-assert.ok(MUSIC_PLAYER_VISIBLE_H * landscapeCamera.scale >= 40, 'mobile landscape body remains at least 40 CSS px')
+const landscapeRenderMetrics = getCharacterRenderMetrics({
+  stageWidth: 844,
+  stageHeight: 334,
+  sceneCameraScale: landscapeCamera.scale,
+})
+const landscapeVisibleBody = getVisibleBodyCssBounds(landscapeRenderMetrics, { x: 9, y: 12, w: 14, h: 20 })
+assert.ok(landscapeVisibleBody.height >= 40, 'mobile landscape body remains at least 40 CSS px')
+assert.ok(Math.abs(landscapeVisibleBody.height - MUSIC_PLAYER_VISIBLE_H * landscapeRenderMetrics.screenScale) < 1e-9)
+assert.ok(Math.abs(landscapeVisibleBody.visibleToWrapperFootGap - 8 * landscapeRenderMetrics.screenScale) < 1e-9)
 const insideCamera = getMusicCamera({
   cssWidth: 1440, cssHeight: 788,
   playerX: 768 + initialCamera.deadZone.w * .25, playerY: 576,

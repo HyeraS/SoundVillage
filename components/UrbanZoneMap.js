@@ -9,6 +9,7 @@ import {
   drawUrbanMarker, drawUrbanLockFog,
   drawUrbanExitCue, markerStateFor,
 } from '@/lib/urbanVillage'
+import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
 import {
   loadUrbanAssetSet, drawUrbanAssetStatic, drawUrbanAssetYSort,
 } from '@/lib/urbanAssetArt'
@@ -316,9 +317,15 @@ export default function UrbanZoneMap({
         markerContext.restore()
 
         if (playerWrapRef.current) {
-          playerWrapRef.current.style.left = `${cssOffsetX + (playerX - SPRITE_W / 2 - camX) * cssZoom}px`
-          playerWrapRef.current.style.top = `${(playerY - SPRITE_H - camY) * cssZoom}px`
-          playerWrapRef.current.style.transform = `scale(${cssZoom})`
+          const renderMetrics = getCharacterRenderMetrics({ stageWidth: metrics.cssW, stageHeight: metrics.cssH, sceneCameraScale: cssZoom })
+          const footX = cssOffsetX + (playerX - camX) * cssZoom
+          const footY = (playerY - camY) * cssZoom
+          const placement = placeCharacterAtScreenFoot(footX, footY, renderMetrics)
+          playerWrapRef.current.style.left = `${placement.left}px`
+          playerWrapRef.current.style.top = `${placement.top}px`
+          playerWrapRef.current.style.transform = `scale(${renderMetrics.screenScale})`
+          playerWrapRef.current.dataset.footScreenX = placement.footX.toFixed(2)
+          playerWrapRef.current.dataset.footScreenY = placement.footY.toFixed(2)
         }
         if (stageRef.current) {
           stageRef.current.dataset.playerTile = `${Math.floor(playerX / T)},${Math.floor(playerY / T)}`
@@ -383,7 +390,7 @@ export default function UrbanZoneMap({
           position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
           background: 'radial-gradient(115% 92% at 50% 45%, transparent 55%, rgba(3,7,22,.36) 100%)',
         }} />
-        <div ref={playerWrapRef} style={{
+        <div ref={playerWrapRef} data-testid="urban-player" style={{
           position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
           transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
         }}>
