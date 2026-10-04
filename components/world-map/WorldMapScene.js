@@ -5,6 +5,7 @@ import {
   WORLD_MAP_V4,
   WORLD_MAP_V4_ASSET_MANIFEST,
   WORLD_MAP_V4_FOREGROUND,
+  WORLD_MAP_V4_LAYER_OVERRIDES,
   WORLD_MAP_V4_OBJECTS,
   WORLD_MAP_V4_TERRAIN_PANELS,
   objectBounds,
@@ -12,6 +13,7 @@ import {
   queryWorldMapTerrainPanels,
 } from '@/lib/worldMapV4Manifest.mjs'
 import { WORLD_MAP_V4_PREVIEW } from '@/lib/worldMapV4Assets.mjs'
+import { planWorldMapRenderLayers } from '@/lib/worldMapRenderLayers.mjs'
 
 const REFERENCE_SRC = '/assets/world/sound-archive-garden-v2/world-base-clean.png'
 const COLLISION_DEBUG_SRC = '/assets/world/sound-archive-garden-v4/collision-debug.png'
@@ -56,6 +58,26 @@ function WorldObject({ object, onAssetLoad, onAssetError }) {
   />
 }
 
+function WorldRenderLayer({ item, onAssetLoad, onAssetError }) {
+  const asset = WORLD_MAP_V4_ASSET_MANIFEST[item.assetId]
+  if (!asset) return null
+  return <image
+    data-object-id={item.objectId}
+    data-asset-id={item.assetId}
+    data-layer={item.layer}
+    data-layer-id={item.source === 'override' ? item.layerId : undefined}
+    data-render-band={item.source === 'override' ? item.renderBand : undefined}
+    href={asset.src}
+    x={item.x}
+    y={item.y}
+    width={item.width}
+    height={item.height}
+    preserveAspectRatio="none"
+    onLoad={() => onAssetLoad?.(item.assetId)}
+    onError={(event) => { event.currentTarget.style.display = 'none'; onAssetError?.(item.assetId) }}
+  />
+}
+
 export function WorldMapDebugOverlay({ activeChunks, foot, collisionInfo }) {
   return <g data-layer="debug" pointerEvents="none">
     <image href={COLLISION_DEBUG_SRC} x="0" y="0" width={WORLD_MAP_V4.width} height={WORLD_MAP_V4.height} opacity="0.62" preserveAspectRatio="none"/>
@@ -89,17 +111,15 @@ export default function WorldMapScene({
     return bounds.right >= camera.x - 180 && bounds.left <= camera.x + camera.width + 180 && bounds.bottom >= camera.y - 180 && bounds.top <= camera.y + camera.height + 180
   }), [camera])
   const environment = useMemo(() => query.objects.filter(object => object.layer === 'environment'), [query.objects])
-  const renderables = useMemo(() => [
-    ...query.objects.filter(object => (
-      (object.layer === 'gameplay' && (mode === 'all' || mode === 'objects'))
-      || (object.layer === 'inspection' && mode === 'objects')
-    )).map(object => ({
-      key: object.id,
-      sortY: object.sortY,
-      node: <WorldObject key={object.id} object={object} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>,
-    })),
-    ...(mode === 'all' ? characters : []),
-  ].sort((a, b) => a.sortY - b.sortY || a.key.localeCompare(b.key)), [characters, mode, query.objects, onAssetLoad, onAssetError])
+  const renderPlan = useMemo(() => planWorldMapRenderLayers({
+    objects: query.objects,
+    layerOverrides: WORLD_MAP_V4_LAYER_OVERRIDES,
+    view: camera,
+    mode,
+    clean: Boolean(qa.clean),
+    state: qa.layerState,
+    characters,
+  }), [camera, characters, mode, qa.clean, qa.layerState, query.objects])
   if (mode === 'reference') return <>
     <image data-layer="qa-reference" href={REFERENCE_SRC} x="0" y="0" width={WORLD_MAP_V4.width} height={WORLD_MAP_V4.height} preserveAspectRatio="none"/>
     <metadata data-map-version="4" data-reference-only="true"/>
@@ -108,13 +128,17 @@ export default function WorldMapScene({
   // underlay panels plus the authored environment clusters reconstruct every
   // reference pixel. Depth-only landmark copies are omitted in that mode.
   const showEnvironment = mode === 'all' || mode === 'objects'
-  const showObjects = mode === 'objects' || (mode === 'all' && !qa.clean)
   const showForeground = mode === 'foreground' || (mode === 'all' && !qa.clean)
   return <>
     <WorldMapTerrain camera={camera} mode={mode} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>
     {showEnvironment && <g data-layer="environment-clusters">{environment.map(object => <WorldObject key={object.id} object={object} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
-    {showObjects && <g data-layer="depth-sorted">{renderables.map(item => item.node)}</g>}
+    {renderPlan.ground.length > 0 && <g data-layer="object-ground">{renderPlan.ground.map(entry => <WorldRenderLayer key={entry.key} item={entry.item} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
+    {renderPlan.world.length > 0 && <g data-layer="depth-sorted">{renderPlan.world.map(entry => entry.type === 'character'
+      ? entry.node
+      : <WorldRenderLayer key={entry.key} item={entry.item} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
+    {renderPlan.foreground.length > 0 && <g data-layer="object-foreground">{renderPlan.foreground.map(entry => <WorldRenderLayer key={entry.key} item={entry.item} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
     {showForeground && <g data-layer="foreground">{foreground.map(object => <WorldObject key={object.id} object={object} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
+    {renderPlan.overlay.length > 0 && <g data-layer="object-overlay">{renderPlan.overlay.map(entry => <WorldRenderLayer key={entry.key} item={entry.item} onAssetLoad={onAssetLoad} onAssetError={onAssetError}/>)}</g>}
     {qa.referenceOverlay && <image href={REFERENCE_SRC} x="0" y="0" width={WORLD_MAP_V4.width} height={WORLD_MAP_V4.height} opacity="0.5" pointerEvents="none" preserveAspectRatio="none"/>}
     {interactionLayer}
     {(qa.collisionDebug || mode === 'collision') && <WorldMapDebugOverlay activeChunks={query.chunks} foot={foot} collisionInfo={collisionInfo}/>} 

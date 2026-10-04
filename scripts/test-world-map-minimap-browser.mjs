@@ -20,6 +20,7 @@ let browser
 try {
   browser = await chromium.launch({ headless:true })
   const context = await browser.newContext({ viewport:{ width:1440, height:900 } })
+  await context.addInitScript(() => localStorage.setItem('soundvillage-home-hub-intro-v1', 'seen'))
   const page = await context.newPage()
   const errors = []
   page.on('pageerror', error => errors.push(error.message))

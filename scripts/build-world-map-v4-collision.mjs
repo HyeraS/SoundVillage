@@ -1,57 +1,85 @@
-import { mkdir, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { WORLD_MAP_V4, WORLD_MAP_V4_BUILDING_COLLIDERS } from '../lib/worldMapV4Manifest.mjs'
+import {
+  WORLD_COLLISION_CELL_SIZE,
+  WORLD_MAP_V4_COLLISION_OBJECTS,
+  WORLD_PLAYER_FOOT_CLEARANCE,
+  buildCollisionMasks,
+  collisionShapeContainsPoint,
+  shapeBounds,
+} from '../lib/worldMapCollision.mjs'
+import { WORLD_MAP_V4 } from '../lib/worldMapV4Manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const OUTPUT = path.join(ROOT, 'public/assets/world/sound-archive-garden-v4')
-const REVIEW = path.join(ROOT, '_review/world-map-sequential-fix-2026-09-21/03-navigation-open-paths')
+const REVIEW = path.join(ROOT, '_review/world-map-object-collision-step2')
 const MODULE = path.join(ROOT, 'lib/worldWalkableMaskData.mjs')
-const CELL_SIZE = 4
+const WALKABLE_PNG = path.join(OUTPUT, 'walkable-clearance-mask.png')
+const args = new Set(process.argv.slice(2))
+for (const argument of args) {
+  if (!['--check', '--review'].includes(argument)) throw new Error(`Unknown argument: ${argument}`)
+}
+const checkOnly = args.has('--check')
+const writeReview = args.has('--review')
+if (checkOnly && writeReview) throw new Error('--check and --review cannot be combined')
+const CELL_SIZE = WORLD_COLLISION_CELL_SIZE
 const WIDTH = WORLD_MAP_V4.width / CELL_SIZE
 const HEIGHT = WORLD_MAP_V4.height / CELL_SIZE
-const PLAYER_FOOT_HALF_WIDTH = 14
-const PLAYER_FOOT_HALF_HEIGHT = 8
 
-await mkdir(OUTPUT, { recursive:true })
-await mkdir(REVIEW, { recursive:true })
+if (!checkOnly) await mkdir(OUTPUT, { recursive: true })
+if (writeReview) await mkdir(REVIEW, { recursive: true })
 
-const clearance = new Uint8Array(WIDTH * HEIGHT).fill(1)
-const expandedColliders = WORLD_MAP_V4_BUILDING_COLLIDERS.map(collider => ({
-  ...collider,
-  left: collider.left - PLAYER_FOOT_HALF_WIDTH,
-  right: collider.right + PLAYER_FOOT_HALF_WIDTH,
-  top: collider.top - PLAYER_FOOT_HALF_HEIGHT,
-  bottom: collider.bottom + PLAYER_FOOT_HALF_HEIGHT,
-}))
-
-for (const collider of expandedColliders) {
-  const minX = Math.max(0, Math.floor(collider.left / CELL_SIZE))
-  const maxX = Math.min(WIDTH - 1, Math.ceil(collider.right / CELL_SIZE))
-  const minY = Math.max(0, Math.floor(collider.top / CELL_SIZE))
-  const maxY = Math.min(HEIGHT - 1, Math.ceil(collider.bottom / CELL_SIZE))
-  for (let y = minY; y <= maxY; y += 1) {
-    for (let x = minX; x <= maxX; x += 1) clearance[y * WIDTH + x] = 0
+// Deterministically reconstruct the superseded production algorithm for the
+// review diff. It expanded rect bounds, then included ceil(right/bottom) with
+// <= loops. Keeping this comparison in-memory avoids treating a prior output
+// file as an authority and makes repeated builds stable.
+const previousWalkable = new Uint8Array(WIDTH * HEIGHT).fill(1)
+for (const object of WORLD_MAP_V4_COLLISION_OBJECTS) {
+  if (object.collisionRole === 'decorative-nonblocking') continue
+  for (const shape of object.shapes) {
+    if (shape.type !== 'rect') continue
+    const minX = Math.max(0, Math.floor((shape.left - WORLD_PLAYER_FOOT_CLEARANCE.halfWidth) / CELL_SIZE))
+    const maxX = Math.min(WIDTH - 1, Math.ceil((shape.right + WORLD_PLAYER_FOOT_CLEARANCE.halfWidth) / CELL_SIZE))
+    const minY = Math.max(0, Math.floor((shape.top - WORLD_PLAYER_FOOT_CLEARANCE.halfHeight) / CELL_SIZE))
+    const maxY = Math.min(HEIGHT - 1, Math.ceil((shape.bottom + WORLD_PLAYER_FOOT_CLEARANCE.halfHeight) / CELL_SIZE))
+    for (let y = minY; y <= maxY; y += 1) {
+      for (let x = minX; x <= maxX; x += 1) previousWalkable[y * WIDTH + x] = 0
+    }
   }
 }
 
-const obstacle = Uint8Array.from(clearance, value => value ? 0 : 255)
+// Author shapes at world-pixel resolution, apply the true 29x17 player-foot
+// footprint (±14 horizontally, ±8 vertically), then max-pool into 4px cells.
+const masks = buildCollisionMasks(
+  WORLD_MAP_V4_COLLISION_OBJECTS,
+  WORLD_MAP_V4.width,
+  WORLD_MAP_V4.height,
+  { cellSize: CELL_SIZE, ...WORLD_PLAYER_FOOT_CLEARANCE },
+)
+const clearance = Uint8Array.from(masks.obstacle, value => value ? 0 : 1)
+const obstacle = Uint8Array.from(masks.obstacle, value => value ? 255 : 0)
 const walkable = Uint8Array.from(clearance, value => value ? 255 : 0)
-const debug = Buffer.alloc(WIDTH * HEIGHT * 4)
-for (let index = 0; index < clearance.length; index += 1) {
-  const offset = index * 4
-  const color = clearance[index] ? [36, 214, 96] : [228, 58, 64]
-  debug[offset] = color[0]
-  debug[offset + 1] = color[1]
-  debug[offset + 2] = color[2]
-  debug[offset + 3] = 112
+
+const maskRgba = (walkableMask, alpha = 112) => {
+  const rgba = Buffer.alloc(walkableMask.length * 4)
+  for (let index = 0; index < walkableMask.length; index += 1) {
+    const offset = index * 4
+    const color = walkableMask[index] ? [36, 214, 96] : [228, 58, 64]
+    rgba[offset] = color[0]
+    rgba[offset + 1] = color[1]
+    rgba[offset + 2] = color[2]
+    rgba[offset + 3] = alpha
+  }
+  return rgba
 }
 
-await Promise.all([
-  sharp(Buffer.from(walkable), { raw:{ width:WIDTH, height:HEIGHT, channels:1 } }).png().toFile(path.join(OUTPUT, 'walkable-clearance-mask.png')),
-  sharp(Buffer.from(obstacle), { raw:{ width:WIDTH, height:HEIGHT, channels:1 } }).png().toFile(path.join(OUTPUT, 'obstacle-mask.png')),
-  sharp(debug, { raw:{ width:WIDTH, height:HEIGHT, channels:4 } }).png().toFile(path.join(OUTPUT, 'collision-debug.png')),
+const debug = maskRgba(clearance)
+const [walkablePng, obstaclePng, debugPng] = await Promise.all([
+  sharp(Buffer.from(walkable), { raw: { width: WIDTH, height: HEIGHT, channels: 1 } }).png().toBuffer(),
+  sharp(Buffer.from(obstacle), { raw: { width: WIDTH, height: HEIGHT, channels: 1 } }).png().toBuffer(),
+  sharp(debug, { raw: { width: WIDTH, height: HEIGHT, channels: 4 } }).png().toBuffer(),
 ])
 
 const packed = new Uint8Array(Math.ceil(clearance.length / 8))
@@ -68,31 +96,194 @@ export const WORLD_WALKABLE_MASK_META = Object.freeze({
   worldWidth: ${WORLD_MAP_V4.width},
   worldHeight: ${WORLD_MAP_V4.height},
   bitOrder: 'little',
-  source: 'semantic-building-footprints',
+  source: 'logical-object-collision-shapes',
+  clearance: Object.freeze({ halfWidth: ${WORLD_PLAYER_FOOT_CLEARANCE.halfWidth}, halfHeight: ${WORLD_PLAYER_FOOT_CLEARANCE.halfHeight} }),
 })
 
 export const WORLD_WALKABLE_MASK_BASE64 = [
 ${chunks.map(chunk => `  '${chunk}',`).join('\n')}
 ].join('')
 `
-await writeFile(MODULE, moduleSource)
-
-const walkableCells = clearance.reduce((sum, value) => sum + value, 0)
-const report = {
-  status:'PASS',
-  source:'semantic-building-footprints',
-  width:WIDTH,
-  height:HEIGHT,
-  cellSize:CELL_SIZE,
-  totalCells:clearance.length,
-  walkableCells,
-  blockedCells:clearance.length - walkableCells,
-  walkablePercent:Number((walkableCells / clearance.length * 100).toFixed(2)),
-  blockedPercent:Number(((clearance.length - walkableCells) / clearance.length * 100).toFixed(2)),
-  blockers:WORLD_MAP_V4_BUILDING_COLLIDERS,
+const count = (values, expected = 1) => values.reduce((sum, value) => sum + (value === expected ? 1 : 0), 0)
+const walkableCells = count(clearance)
+let newlyBlockedCells = 0
+let newlyWalkableCells = 0
+if (previousWalkable) {
+  for (let index = 0; index < clearance.length; index += 1) {
+    if (previousWalkable[index] && !clearance[index]) newlyBlockedCells += 1
+    if (!previousWalkable[index] && clearance[index]) newlyWalkableCells += 1
+  }
 }
-await Promise.all([
-  writeFile(path.join(OUTPUT, 'collision-build.json'), `${JSON.stringify(report, null, 2)}\n`),
-  writeFile(path.join(REVIEW, 'collision-build.json'), `${JSON.stringify(report, null, 2)}\n`),
-])
+
+const HOME_FIXTURE_ORIGIN = Object.freeze({ x: 1344, y: 1440 })
+const HOME_FIXTURE_WIDTH = 608
+const HOME_FIXTURE_HEIGHT = 448
+const homeFixture = Object.freeze([Object.freeze({
+  objectId: 'fixture-home',
+  colliderId: 'fixture-home-body',
+  collisionRole: 'building-body',
+  shapes: Object.freeze([Object.freeze({
+    type: 'rect',
+    left: 1520 - HOME_FIXTURE_ORIGIN.x,
+    top: 1472 - HOME_FIXTURE_ORIGIN.y,
+    right: 1776 - HOME_FIXTURE_ORIGIN.x,
+    bottom: 1696 - HOME_FIXTURE_ORIGIN.y,
+  })]),
+})])
+const homeMasks = buildCollisionMasks(homeFixture, HOME_FIXTURE_WIDTH, HOME_FIXTURE_HEIGHT)
+const sampleHomeY = (1552 - HOME_FIXTURE_ORIGIN.y) / CELL_SIZE
+let homeLastBlockedCellX = -1
+for (let x = 0; x < homeMasks.width; x += 1) {
+  if (homeMasks.obstacle[sampleHomeY * homeMasks.width + x]) homeLastBlockedCellX = x
+}
+const homeBlockedRightExclusive = HOME_FIXTURE_ORIGIN.x + (homeLastBlockedCellX + 1) * CELL_SIZE
+const roadCellX = (1792 - HOME_FIXTURE_ORIGIN.x) / CELL_SIZE
+const homeRoadCellBlocked = Boolean(homeMasks.obstacle[sampleHomeY * homeMasks.width + roadCellX])
+
+const report = {
+  status: 'PASS',
+  source: 'logical-object-collision-shapes',
+  productionAuthority: 'scripts/build-world-map-v4-collision.mjs',
+  rasterization: {
+    shapeResolution: '1 world pixel',
+    polygonFillRule: 'even-odd using pixel centers',
+    coordinateBounds: '[left,right) x [top,bottom)',
+    clearanceKernelPx: [29, 17],
+    clearanceHalfExtentPx: WORLD_PLAYER_FOOT_CLEARANCE,
+    cellReduction: '4px max-pool',
+  },
+  width: WIDTH,
+  height: HEIGHT,
+  cellSize: CELL_SIZE,
+  totalCells: clearance.length,
+  walkableCells,
+  blockedCells: clearance.length - walkableCells,
+  walkablePercent: Number((walkableCells / clearance.length * 100).toFixed(2)),
+  blockedPercent: Number(((clearance.length - walkableCells) / clearance.length * 100).toFixed(2)),
+  previousMaskDiff: {
+    baseline: 'reconstructed inclusive-ceil production algorithm',
+    newlyBlockedCells,
+    newlyWalkableCells,
+    changedCells: newlyBlockedCells + newlyWalkableCells,
+  },
+  homeFixture: {
+    footprintRight: 1776,
+    clearanceBlockedRightExclusive: homeBlockedRightExclusive,
+    roadCellX: 1792,
+    roadCellBlocked: homeRoadCellBlocked,
+    magicCorrectionUsed: false,
+  },
+  blockers: WORLD_MAP_V4_COLLISION_OBJECTS,
+}
+const reportSource = `${JSON.stringify(report, null, 2)}\n`
+const productionOutputs = [
+  [WALKABLE_PNG, walkablePng],
+  [path.join(OUTPUT, 'obstacle-mask.png'), obstaclePng],
+  [path.join(OUTPUT, 'collision-debug.png'), debugPng],
+  [path.join(OUTPUT, 'collision-build.json'), reportSource],
+  [MODULE, moduleSource],
+]
+if (checkOnly) {
+  for (const [filename, expected] of productionOutputs) {
+    const actual = await readFile(filename)
+    const expectedBuffer = Buffer.isBuffer(expected) ? expected : Buffer.from(expected)
+    if (!actual.equals(expectedBuffer)) throw new Error(`Generated output is stale: ${filename}`)
+  }
+} else {
+  await Promise.all(productionOutputs.map(([filename, contents]) => writeFile(filename, contents)))
+}
+if (writeReview) await writeFile(path.join(REVIEW, 'collision-build.json'), reportSource)
+
+// 01: previous and current clearance masks side by side.
+const previousForReview = previousWalkable
+if (writeReview) await sharp({
+  create: { width: WIDTH * 2, height: HEIGHT, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 1 } },
+}).composite([
+  { input: maskRgba(previousForReview, 255), raw: { width: WIDTH, height: HEIGHT, channels: 4 }, left: 0, top: 0 },
+  { input: maskRgba(clearance, 255), raw: { width: WIDTH, height: HEIGHT, channels: 4 }, left: WIDTH, top: 0 },
+]).png().toFile(path.join(REVIEW, '01-existing-vs-object-mask.png'))
+
+// 02: rect plus concave polygon; the empty notch proves polygon geometry is
+// not replaced by its bounding rectangle.
+const exampleObjects = [
+  { objectId: 'example-rect', colliderId: 'example-rect', collisionRole: 'wall', shapes: [{ type: 'rect', left: 24, top: 28, right: 126, bottom: 100 }] },
+  { objectId: 'example-concave', colliderId: 'example-concave', collisionRole: 'fence', shapes: [{ type: 'polygon', points: [[164, 24], [292, 24], [292, 176], [236, 176], [236, 84], [164, 84]] }] },
+]
+const exampleMasks = buildCollisionMasks(exampleObjects, 320, 220, { halfWidth: 0, halfHeight: 0, cellSize: 4 })
+const exampleRgba = Buffer.alloc(320 * 220 * 4)
+for (let y = 0; y < 220; y += 1) {
+  for (let x = 0; x < 320; x += 1) {
+    const blocked = exampleMasks.rawObstacle[y * 320 + x]
+    const offset = (y * 320 + x) * 4
+    const color = blocked ? [232, 83, 68] : [239, 235, 218]
+    exampleRgba.set([...color, 255], offset)
+  }
+}
+if (writeReview) await sharp(exampleRgba, { raw: { width: 320, height: 220, channels: 4 } }).png().toFile(path.join(REVIEW, '02-rect-polygon-overlay.png'))
+
+// 03: authored pixels (left) versus anisotropic player clearance (right).
+const crop = { left: 1440, top: 1420, width: 400, height: 380 }
+const rawCrop = Buffer.alloc(crop.width * crop.height)
+const clearanceCrop = Buffer.alloc(crop.width * crop.height)
+for (let y = 0; y < crop.height; y += 1) {
+  const sourceStart = (crop.top + y) * WORLD_MAP_V4.width + crop.left
+  rawCrop.set(masks.rawObstacle.subarray(sourceStart, sourceStart + crop.width), y * crop.width)
+  clearanceCrop.set(masks.clearanceObstacle.subarray(sourceStart, sourceStart + crop.width), y * crop.width)
+}
+const binaryRgba = values => {
+  const rgba = Buffer.alloc(values.length * 4)
+  for (let index = 0; index < values.length; index += 1) rgba.set(values[index] ? [228, 58, 64, 255] : [239, 235, 218, 255], index * 4)
+  return rgba
+}
+if (writeReview) await sharp({ create: { width: crop.width * 2, height: crop.height, channels: 4, background: '#ffffff' } }).composite([
+  { input: binaryRgba(rawCrop), raw: { width: crop.width, height: crop.height, channels: 4 }, left: 0, top: 0 },
+  { input: binaryRgba(clearanceCrop), raw: { width: crop.width, height: crop.height, channels: 4 }, left: crop.width, top: 0 },
+]).png().toFile(path.join(REVIEW, '03-clearance-before-after.png'))
+
+// 04: approved future-home fixture only; it does not alter production data.
+const homeRgba = Buffer.alloc(HOME_FIXTURE_WIDTH * HOME_FIXTURE_HEIGHT * 4)
+for (let y = 0; y < HOME_FIXTURE_HEIGHT; y += 1) {
+  for (let x = 0; x < HOME_FIXTURE_WIDTH; x += 1) {
+    const index = y * HOME_FIXTURE_WIDTH + x
+    const worldX = HOME_FIXTURE_ORIGIN.x + x
+    const worldY = HOME_FIXTURE_ORIGIN.y + y
+    let color = [239, 235, 218, 255]
+    if (worldX >= 1824 && worldX < 1952) color = [71, 137, 214, 255]
+    if (worldY >= 1728 && worldY < 1792) color = [116, 181, 110, 255]
+    if (homeMasks.clearanceObstacle[index]) color = [242, 151, 47, 255]
+    if (homeMasks.rawObstacle[index]) color = [213, 58, 54, 255]
+    if (worldX >= 1792 && worldX < 1794) color = [59, 51, 45, 255]
+    homeRgba.set(color, index * 4)
+  }
+}
+if (writeReview) await sharp(homeRgba, { raw: { width: HOME_FIXTURE_WIDTH, height: HOME_FIXTURE_HEIGHT, channels: 4 } }).png().toFile(path.join(REVIEW, '04-home-fixture-protected-road.png'))
+
+// 05: logical collider ownership colors without using render-asset alpha.
+const palette = [[230, 82, 78], [239, 151, 47], [222, 196, 74], [88, 177, 111], [62, 156, 181], [91, 121, 201], [151, 102, 193], [205, 92, 151]]
+const ownership = Buffer.alloc(WIDTH * HEIGHT * 4, 0)
+for (let objectIndex = 0; objectIndex < WORLD_MAP_V4_COLLISION_OBJECTS.length; objectIndex += 1) {
+  const object = WORLD_MAP_V4_COLLISION_OBJECTS[objectIndex]
+  const color = palette[objectIndex % palette.length]
+  for (const shape of object.shapes) {
+    const bounds = shapeBounds(shape)
+    for (let cellY = Math.max(0, Math.floor(bounds.top / CELL_SIZE)); cellY < Math.min(HEIGHT, Math.ceil(bounds.bottom / CELL_SIZE)); cellY += 1) {
+      for (let cellX = Math.max(0, Math.floor(bounds.left / CELL_SIZE)); cellX < Math.min(WIDTH, Math.ceil(bounds.right / CELL_SIZE)); cellX += 1) {
+        if (!collisionShapeContainsPoint(shape, (cellX + 0.5) * CELL_SIZE, (cellY + 0.5) * CELL_SIZE)) continue
+        ownership.set([...color, 255], (cellY * WIDTH + cellX) * 4)
+      }
+    }
+  }
+}
+if (writeReview) await sharp(ownership, { raw: { width: WIDTH, height: HEIGHT, channels: 4 } }).png().toFile(path.join(REVIEW, '05-collider-colors-debug.png'))
+
+// 06: cyan became walkable, magenta became blocked, dark gray is unchanged.
+const diff = Buffer.alloc(WIDTH * HEIGHT * 4)
+for (let index = 0; index < clearance.length; index += 1) {
+  let color = [48, 48, 48, 255]
+  if (previousWalkable[index] && !clearance[index]) color = [232, 53, 145, 255]
+  if (!previousWalkable[index] && clearance[index]) color = [38, 203, 218, 255]
+  diff.set(color, index * 4)
+}
+if (writeReview) await sharp(diff, { raw: { width: WIDTH, height: HEIGHT, channels: 4 } }).png().toFile(path.join(REVIEW, '06-mask-diff-heatmap.png'))
+
 console.log(JSON.stringify(report, null, 2))

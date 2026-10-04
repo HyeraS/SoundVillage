@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Regenerate v4 navigation from the registered reference artwork."""
+"""Legacy reference-registration collision generator.
+
+Production authority is scripts/build-world-map-v4-collision.mjs. This older
+color-selection/manual-polygon path must not be mixed with the JavaScript
+logical-object generator or used to refresh the production mask during normal
+builds.
+"""
 
 from __future__ import annotations
 
