@@ -8,8 +8,8 @@ const appUrl = process.env.CHARACTER_STUDIO_APP_URL || 'http://127.0.0.1:3100'
 const parsed = new URL(appUrl)
 if (!['127.0.0.1', 'localhost', '::1'].includes(parsed.hostname)) throw new Error('CHARACTER_STUDIO_APP_URL must be loopback-only')
 
-const reviewDir = path.resolve('_review/character-studio-stage1')
-const stage2ReviewDir = path.resolve('_review/character-studio-stage2')
+const reviewDir = path.resolve(process.env.CHARACTER_STUDIO_REVIEW_DIR || '_review/character-studio-stage1')
+const stage2ReviewDir = path.resolve(process.env.CHARACTER_STUDIO_STAGE2_REVIEW_DIR || '_review/character-studio-stage2')
 const baseQuery = 'natureQa=1&worldHomeState=decorating&worldAutoWalk=Sound%20Library&libraryQaCard=shop'
 const mutationRequests = []
 const consoleErrors = []
@@ -67,6 +67,28 @@ async function assertNoRuntimeFailure(page) {
   assert.equal(overlay, '', `Next.js error overlay: ${overlay}`)
 }
 
+async function assertPreviewGeometry(page, expected, label) {
+  const geometry = await page.getByTestId('character-studio-preview').evaluate((stage) => {
+    const sprite = stage.querySelector(':scope > div')
+    if (!sprite) throw new Error('large preview sprite not found')
+    const matrix = new DOMMatrixReadOnly(getComputedStyle(sprite).transform)
+    const stageRect = stage.getBoundingClientRect()
+    const thumbnail = document.querySelector('[data-testid="studio-item-basic"] button')?.getBoundingClientRect()
+    return {
+      stageWidth:stageRect.width,
+      stageHeight:stageRect.height,
+      spriteScale:Math.hypot(matrix.a, matrix.b),
+      thumbnailWidth:thumbnail?.width,
+      thumbnailHeight:thumbnail?.height,
+    }
+  })
+  assert.ok(Math.abs(geometry.spriteScale - expected.spriteScale) < .001, `${label} large preview scale changed: ${geometry.spriteScale}`)
+  assert.ok(Math.abs(geometry.stageWidth - expected.stageSize) < .01, `${label} circular stage width changed: ${geometry.stageWidth}`)
+  assert.ok(Math.abs(geometry.stageHeight - expected.stageSize) < .01, `${label} circular stage height changed: ${geometry.stageHeight}`)
+  assert.ok(Math.abs(geometry.thumbnailWidth - expected.thumbnailSize) < .01, `${label} product thumbnail width changed: ${geometry.thumbnailWidth}`)
+  assert.ok(Math.abs(geometry.thumbnailHeight - expected.thumbnailSize) < .01, `${label} product thumbnail height changed: ${geometry.thumbnailHeight}`)
+}
+
 try {
   await fs.mkdir(reviewDir, { recursive:true })
   await fs.mkdir(stage2ReviewDir, { recursive:true })
@@ -79,6 +101,7 @@ try {
   assert.equal(await page.getByTestId('studio-qa-notice').count(), 1)
   assert.equal(await page.locator('[data-testid^="studio-item-"]').count(), 19, '18 paid outfits plus basic must be visible')
   assert.equal(await page.locator('[data-character-layer]').count(), 4, 'saved outfit and accessory must use four world layers')
+  await assertPreviewGeometry(page, { spriteScale:.8, stageSize:210, thumbnailSize:84 }, 'desktop')
   await screenshot(page, 'qa-dry-run.png')
 
   const outfitTab = page.getByRole('tab', { name:/의상 19/ })
@@ -152,15 +175,17 @@ try {
   await assertNoRuntimeFailure(page)
   await desktopContext.close()
 
-  for (const [filename, viewport] of [
-    ['mobile-portrait.png', { width:390, height:844 }],
-    ['mobile-landscape.png', { width:844, height:390 }],
+  for (const [filename, viewport, expected] of [
+    ['mobile-600x800.png', { width:600, height:800 }, { spriteScale:.6, stageSize:142, thumbnailSize:70 }],
+    ['mobile-portrait.png', { width:390, height:844 }, { spriteScale:.544, stageSize:128, thumbnailSize:74 }],
+    ['mobile-landscape.png', { width:844, height:390 }, { spriteScale:.456, stageSize:108, thumbnailSize:64 }],
   ]) {
     const context = await contextFor(viewport)
     const mobile = await context.newPage()
     await enterStudio(mobile)
     assert.equal(await mobile.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true, `${filename} has horizontal page scroll`)
     await mobile.getByRole('button', { name:'저장된 상태로 원래대로' }).waitFor()
+    await assertPreviewGeometry(mobile, expected, filename)
     await mobile.getByTestId('studio-action-sailor').scrollIntoViewIfNeeded()
     await screenshot(mobile, filename)
     await assertNoRuntimeFailure(mobile)

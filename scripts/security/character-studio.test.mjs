@@ -112,6 +112,20 @@ test('catalog and adapters feed one shared studio without QA persistence imports
   assert.match(studio, /\['qa', 'cutover'\]\.includes\(environment\) && identityPreviewEnabled/)
 })
 
+test('only the large studio character preview is reduced to 80% at every responsive scale', async () => {
+  const css = await read('components/character-studio/characterStudio.module.css')
+
+  assert.match(css, /\.characterStage\{[^}]*width:210px;height:210px;/, 'desktop stage size changed')
+  assert.match(css, /\.sprite\{--character-preview-scale:\.8;[^}]*transform:scale\(var\(--character-preview-scale\)\)/, 'desktop preview is not 80%')
+  assert.match(css, /@media\(max-width:720px\)\{[\s\S]*?\.characterStage\{[^}]*width:142px;height:142px;[\s\S]*?\.sprite\{--character-preview-scale:\.6;/, 'mobile preview must be 80% of 0.75')
+  assert.match(css, /@media\(max-width:520px\)\{[\s\S]*?\.characterStage\{[^}]*width:128px;height:128px\}[\s\S]*?\.sprite\{--character-preview-scale:\.544\}/, 'small-mobile preview must be 80% of 0.68')
+  assert.match(css, /@media\(max-height:520px\) and \(orientation:landscape\)\{[\s\S]*?\.characterStage\{[^}]*width:108px;height:108px\}[\s\S]*?\.sprite\{--character-preview-scale:\.456\}/, 'landscape preview must be 80% of 0.57')
+
+  assert.match(css, /\.cardPreview\{[^}]*width:84px;height:84px;/, 'desktop product thumbnail size changed')
+  assert.doesNotMatch(css, /\.cardPreview\{[^}]*character-preview-scale/, 'preview scale leaked into product thumbnails')
+  assert.doesNotMatch(css, /\.characterStage\{[^}]*transform:/, 'preview scale must not resize the circular stage')
+})
+
 test('only capability-gated cutover and local QA can enable identity customization', async () => {
   const [qa, legacy, cutover, projection] = await Promise.all([
     read('components/character-studio/QaCharacterStudioPanel.js'),
