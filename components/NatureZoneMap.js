@@ -2,11 +2,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCollectiblePromptLogging, useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
 import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
+import { useWalkFrame } from '@/components/useWalkFrame'
 import {
-  T, MAP_W, MAP_H,
+  T,
   loadNatureVillage, moveWithCollision, spawnNatureItems,
   drawOrb, drawWaterShimmers, drawLockFog, PLAYER_BOX,
 } from '@/lib/natureVillage'
+import { getVillageRuntimeManifest } from '@/lib/villageRuntimeManifest.mjs'
 
 // 다른 Zone(ZoneMap.js/MusicZoneMap.js)과 동일한 FOV(24x18타일)를 써서 마을/캐릭터
 // 화면 비율을 맞춘다 — 자세한 이유는 MusicZoneMap.js 상단 주석 참고.
@@ -17,7 +19,7 @@ const FOV_H = 18 * TILE
 // 분리되어 있고 collision 그리드 BFS로 도달 가능함을 자동 검증한다.
 const ENTRANCE_RADIUS = 26
 
-export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, debugTarget = null, debugOverview = false, debugStaticArt = false, debugFirstItem = false, outfitSrc, accessorySrc, characterLoadout }) {
+export default function NatureZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1, debugTarget = null, debugOverview = false, debugStaticArt = false, debugFirstItem = false, debugStart = null, debugCollision = false, outfitSrc, accessorySrc, characterLoadout, currentWorldWidth = getVillageRuntimeManifest('nature').baseWorldWidth, currentWorldHeight = getVillageRuntimeManifest('nature').baseWorldHeight }) {
   const [village, setVillage] = useState(null)
   const [loadError, setLoadError] = useState('')
   const villageRef = useRef(null)
@@ -25,12 +27,17 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
 
   useEffect(() => {
     let cancelled = false
-    loadNatureVillage()
+    loadNatureVillage({ currentWorldWidth, currentWorldHeight })
       .then(v => {
         if (cancelled) return
         const items = spawnNatureItems(sounds, v)
-        if (debugFirstItem && items[0]) {
-          v.spawn = { x: items[0].tx * T + 16, y: items[0].ty * T + 16 }
+        if (debugStart && Number.isFinite(debugStart.x) && Number.isFinite(debugStart.y)) {
+          v.spawn = { x: debugStart.x * v.transform.scaleX, y: debugStart.y * v.transform.scaleY }
+        } else if (debugFirstItem && items[0]) {
+          v.spawn = {
+            x: (items[0].tx * T + 16) * v.transform.scaleX,
+            y: (items[0].ty * T + 16) * v.transform.scaleY,
+          }
         }
         villageRef.current = v
         itemsRef.current = items
@@ -42,8 +49,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         setLoadError(error instanceof Error ? error.message : String(error))
       })
     return () => { cancelled = true }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [currentWorldHeight, currentWorldWidth, debugFirstItem, debugStart, sounds])
 
   const stageRef  = useRef(null)
   const canvasRef = useRef(null)
@@ -73,7 +79,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
   const movingRef      = useRef(false)
   const [dir, setDir]     = useState('down')
   const [moving, setMoving] = useState(false)
-  const [, setAnimTick] = useState(0)
+  const frameIndex = useWalkFrame(moving)
   const [collecting, setCollecting] = useState(null)
   useCollectiblePromptLogging(collecting, 'Nature')
   const collectingRef     = useRef(false)
@@ -100,18 +106,12 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
   }, [village])
 
   useEffect(() => {
-    if (!village || !debugTarget) return
-    posRef.current = { x: debugTarget.x * T + 16, y: debugTarget.y * T + 16 }
-  }, [village, debugTarget])
-
-  // PixelChar 걷기 프레임 강제 리렌더 — MusicZoneMap.js와 동일한 이유(캔버스를
-  // ref로 직접 그려서 dir/moving만으로는 계속 걷는 동안 다리가 멈춰 보임).
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (movingRef.current) setAnimTick(t => t + 1)
-    }, 100)
-    return () => clearInterval(id)
-  }, [])
+    if (!village || !debugTarget || debugFirstItem || debugStart) return
+    posRef.current = {
+      x: (debugTarget.x * T + 16) * village.transform.scaleX,
+      y: (debugTarget.y * T + 16) * village.transform.scaleY,
+    }
+  }, [village, debugFirstItem, debugStart, debugTarget])
 
   useEffect(() => {
     const h = e => {
@@ -147,27 +147,38 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
       const k = keys.current
       let { x, y } = posRef.current
       let dx = 0, dy = 0, newDir = null
+      const scaleX = village.transform.scaleX
+      const scaleY = village.transform.scaleY
       const spd = SPEED * dt
-      if (k.up)    { dy -= spd; newDir = 'up' }
-      if (k.down)  { dy += spd; newDir = 'down' }
-      if (k.left)  { dx -= spd; newDir = 'left' }
-      if (k.right) { dx += spd; newDir = 'right' }
-      const moved = dx !== 0 || dy !== 0
+      if (k.up)    { dy -= spd * scaleY; newDir = 'up' }
+      if (k.down)  { dy += spd * scaleY; newDir = 'down' }
+      if (k.left)  { dx -= spd * scaleX; newDir = 'left' }
+      if (k.right) { dx += spd * scaleX; newDir = 'right' }
+      const hasMovementInput = dx !== 0 || dy !== 0
+      let moved = false
 
-      if (moved) {
-        posRef.current = moveWithCollision(village, { x, y }, dx, dy)
+      if (hasMovementInput) {
+        const nextPosition = moveWithCollision(village, { x, y }, dx, dy)
+        moved = Math.abs(nextPosition.x - x) > 0.01 || Math.abs(nextPosition.y - y) > 0.01
+        posRef.current = nextPosition
         if (newDir && newDir !== dirRef.current) { dirRef.current = newDir; setDir(newDir) }
       }
       if (moved !== movingRef.current) { movingRef.current = moved; setMoving(moved) }
 
       const { x: px, y: py } = posRef.current
+      if (playerWrapRef.current) {
+        playerWrapRef.current.dataset.worldX = px.toFixed(2)
+        playerWrapRef.current.dataset.worldY = py.toFixed(2)
+        playerWrapRef.current.dataset.movementBlocked = hasMovementInput && !moved ? 'true' : 'false'
+      }
 
       if (!collectingRef.current && !isAnnotatingRef.current) {
         for (const item of items) {
           if (collectedIdsRef.current.has(item.id)) continue
           if (item.block > blockNumRef.current) continue
-          const ix = item.tx * T + 16 - 12, iy = item.ty * T + 16 - 12
-          if (overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
+          const ix = (item.tx * T + 16 - 12) * scaleX, iy = (item.ty * T + 16 - 12) * scaleY
+          if (overlaps(px - PLAYER_BOX.w * scaleX / 2, py - PLAYER_BOX.h * scaleY,
+            PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY, ix, iy, 24 * scaleX, 24 * scaleY)) {
             collectingRef.current = true
             collectingItemRef.current = item
             setCollecting(item)
@@ -176,8 +187,9 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         }
       } else if (collectingRef.current && collectingItemRef.current && !isAnnotatingRef.current) {
         const fi = collectingItemRef.current
-        const ix = fi.tx * T + 16 - 12, iy = fi.ty * T + 16 - 12
-        if (!overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
+        const ix = (fi.tx * T + 16 - 12) * scaleX, iy = (fi.ty * T + 16 - 12) * scaleY
+        if (!overlaps(px - PLAYER_BOX.w * scaleX / 2, py - PLAYER_BOX.h * scaleY,
+          PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY, ix, iy, 24 * scaleX, 24 * scaleY)) {
           collectingRef.current = false
           collectingItemRef.current = null
           setCollecting(null)
@@ -186,7 +198,8 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
 
       if (!isAnnotatingRef.current) {
         const edx = px - village.exit.x, edy = py - village.exit.y
-        const nearEntrance = edx * edx + edy * edy < ENTRANCE_RADIUS * ENTRANCE_RADIUS
+        const exitRadius = ENTRANCE_RADIUS * Math.max(scaleX, scaleY)
+        const nearEntrance = edx * edx + edy * edy < exitRadius * exitRadius
         if (nearEntrance && !inExitZoneRef.current) {
           inExitZoneRef.current = true
           setExitConfirm(true)
@@ -199,8 +212,8 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
       const off    = village.staticCanvas
       let camX = 0, camY = 0, zoom = 1, offsetX = 0, offsetY = 0
       if (canvas && off && canvas.width > 0 && canvas.height > 0) {
-        let viewW = debugOverview ? MAP_W * T : FOV_W
-        let viewH = debugOverview ? MAP_H * T : FOV_H
+        let viewW = debugOverview ? village.currentWorldWidth : FOV_W * scaleX
+        let viewH = debugOverview ? village.currentWorldHeight : FOV_H * scaleY
         const portraitPlay = !debugOverview && canvas.width <= 600 && canvas.height > canvas.width
         const landscapePlay = !debugOverview && canvas.width <= 900 && canvas.height <= 600
         if (portraitPlay) {
@@ -216,8 +229,8 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         offsetX = (canvas.width - contentW) / 2
         offsetY = (canvas.height - contentH) / 2
 
-        camX = debugOverview ? 0 : Math.max(0, Math.min(px - viewW / 2, MAP_W * T - viewW))
-        camY = debugOverview ? 0 : Math.max(0, Math.min(py - viewH / 2, MAP_H * T - viewH))
+        camX = debugOverview ? 0 : Math.max(0, Math.min(px - viewW / 2, village.currentWorldWidth - viewW))
+        camY = debugOverview ? 0 : Math.max(0, Math.min(py - viewH / 2, village.currentWorldHeight - viewH))
 
         const ctx = canvas.getContext('2d')
         ctx.imageSmoothingEnabled = false
@@ -227,21 +240,38 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
         ctx.translate(offsetX, offsetY)
         ctx.scale(zoom, zoom)
         ctx.translate(-camX, -camY)
+        ctx.scale(scaleX, scaleY)
         ctx.drawImage(off, 0, 0)
+        if (debugCollision && village.assets.walkableMask) {
+          ctx.save()
+          ctx.globalAlpha = 0.28
+          ctx.drawImage(village.assets.walkableMask, 0, 0, village.baseWorldWidth, village.baseWorldHeight)
+          ctx.restore()
+          ctx.save()
+          ctx.fillStyle = 'rgba(255,60,70,.24)'
+          for (let ty = 0; ty < village.explicitCollision.length; ty += 1) for (let tx = 0; tx < village.explicitCollision[ty].length; tx += 1) {
+            if (village.explicitCollision[ty][tx]) ctx.fillRect(tx * T, ty * T, T, T)
+          }
+          ctx.strokeStyle = '#fff45c'
+          ctx.strokeRect(px / scaleX - PLAYER_BOX.w / 2, py / scaleY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h)
+          ctx.restore()
+        }
         if (!debugStaticArt) drawWaterShimmers(ctx, now)
 
         if (!debugStaticArt) {
           ctx.font = 'bold 11px "Courier New", monospace'
           const entLabel = '↓ 입구'
           const entW = ctx.measureText(entLabel).width + 20
+          const exitX = village.exit.x / scaleX
+          const exitY = village.exit.y / scaleY
           ctx.fillStyle = 'rgba(20,16,48,0.72)'
-          ctx.fillRect(village.exit.x - entW / 2, village.exit.y - 10, entW, 20)
+          ctx.fillRect(exitX - entW / 2, exitY - 10, entW, 20)
           ctx.strokeStyle = '#eafccb'
           ctx.lineWidth = 2
-          ctx.strokeRect(village.exit.x - entW / 2, village.exit.y - 10, entW, 20)
+          ctx.strokeRect(exitX - entW / 2, exitY - 10, entW, 20)
           ctx.fillStyle = '#eafccb'
           ctx.textBaseline = 'middle'
-          ctx.fillText(entLabel, village.exit.x - entW / 2 + 10, village.exit.y)
+          ctx.fillText(entLabel, exitX - entW / 2 + 10, exitY)
         }
 
         if (!debugStaticArt) {
@@ -265,19 +295,28 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
           fg.translate(offsetX, offsetY)
           fg.scale(zoom, zoom)
           fg.translate(-camX, -camY)
+          fg.scale(scaleX, scaleY)
           fg.drawImage(village.foregroundCanvas, 0, 0)
           fg.restore()
         }
       }
 
       if (playerWrapRef.current) {
-        const screenLeft = offsetX + (px - SPRITE_W / 2 - camX) * zoom
-        const screenTop  = offsetY + (py - SPRITE_H - camY) * zoom
+        const screenLeft = offsetX + (px - camX) * zoom - SPRITE_W * zoom * scaleX / 2
+        const screenTop  = offsetY + (py - camY) * zoom - SPRITE_H * zoom * scaleY
         playerWrapRef.current.style.left = `${screenLeft}px`
         playerWrapRef.current.style.top  = `${screenTop}px`
-        playerWrapRef.current.style.transform = `scale(${zoom})`
+        playerWrapRef.current.style.transform = `scale(${zoom * scaleY})`
         playerWrapRef.current.dataset.footScreenX = (offsetX + (px - camX) * zoom).toFixed(2)
         playerWrapRef.current.dataset.footScreenY = (offsetY + (py - camY) * zoom).toFixed(2)
+      }
+
+      if (stageRef.current) {
+        stageRef.current.dataset.worldWidth = String(village.currentWorldWidth)
+        stageRef.current.dataset.worldHeight = String(village.currentWorldHeight)
+        stageRef.current.dataset.worldScale = String(scaleX)
+        stageRef.current.dataset.maskSource = village.manifest.mask.src
+        stageRef.current.dataset.generatedMask = 'true'
       }
 
       raf = requestAnimationFrame(loop)
@@ -285,7 +324,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
     raf = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(raf)
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [village, debugOverview, debugStaticArt])
+  }, [village, debugCollision, debugOverview, debugStaticArt])
 
   const total     = sounds.length
   const collected = sounds.filter(s => collectedIds.has(s.sound_id)).length
@@ -294,7 +333,7 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', userSelect: 'none' }}>
       {!debugStaticArt && <ZoneHUD zone="Nature" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />}
 
-      <div ref={stageRef} style={{
+      <div ref={stageRef} data-testid="nature-stage" style={{
         position: 'absolute', top: debugStaticArt ? 0 : 56, left: 0, right: 0, bottom: 0,
         background: '#7fa84a', overflow: 'hidden',
       }}>
@@ -314,13 +353,13 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
               style={{ display: 'block', position: 'absolute', inset: 0, width: '100%', height: '100%', imageRendering: 'pixelated' }} />
 
             {!debugStaticArt && (
-              <div ref={playerWrapRef} data-testid="nature-player" style={{
+              <div ref={playerWrapRef} data-testid="nature-player" data-frame-index={frameIndex} style={{
                 position: 'absolute', left: 0, top: 0,
                 width: SPRITE_W, height: SPRITE_H,
                 transformOrigin: '0 0',
                 pointerEvents: 'none', zIndex: 2,
               }}>
-                <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
+                <PixelChar dir={dir} moving={moving} frameIndex={frameIndex} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
               </div>
             )}
 

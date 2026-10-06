@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import UrbanZoneMap from '@/components/UrbanZoneMap'
+import { useEffect, useMemo, useState } from 'react'
+import UrbanV3ZoneMap from '@/components/UrbanV3ZoneMap'
+import AnnotationPanel from '@/components/AnnotationPanel'
 import soundMetadata from '@/data/sound_metadata.json'
+import { WALK_ANIMATION_QA_CHARACTER } from '@/lib/walkAnimationQa.mjs'
 
 const allUrbanSounds = (soundMetadata.sounds || []).filter((sound) => sound.game_zone === 'Urban')
 
@@ -11,15 +13,41 @@ export default function UrbanTestPage() {
   const urbanSounds = useMemo(() => allUrbanSounds.filter((sound) => sound.group === group), [group])
   const maxBlock = urbanSounds.reduce((max, sound) => Math.max(max, sound.block || 1), 1)
   const [collectedIds, setCollectedIds] = useState(new Set())
+  const [activeSound, setActiveSound] = useState(null)
   const [blockNum, setBlockNum] = useState(maxBlock)
   const [view, setView] = useState('entrance')
   const [controlsVisible, setControlsVisible] = useState(true)
+  const [walkAnimationQa, setWalkAnimationQa] = useState(false)
+  const [worldScale, setWorldScale] = useState(1)
+  const [debugCollision, setDebugCollision] = useState(false)
+  const [debugFirstItem, setDebugFirstItem] = useState(false)
+  const [debugStart, setDebugStart] = useState(null)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      const query = new URLSearchParams(window.location.search)
+      setWalkAnimationQa(query.get('walkAnimationQa') === '1')
+      setWorldScale(Math.max(0.25, Number(query.get('worldScale')) || 1))
+      setDebugCollision(query.get('collision') === '1')
+      setDebugFirstItem(query.get('firstItem') === '1')
+      const startX = Number(query.get('startX'))
+      const startY = Number(query.get('startY'))
+      setDebugStart(query.has('startX') && query.has('startY') && Number.isFinite(startX) && Number.isFinite(startY) ? { x: startX, y: startY } : null)
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const selectGroup = (nextGroup) => {
     setGroup(nextGroup)
     setBlockNum(maxBlock)
     setCollectedIds(new Set())
+    setActiveSound(null)
     setView('entrance')
+  }
+
+  const finishAnnotation = () => {
+    if (activeSound) setCollectedIds((current) => new Set(current).add(activeSound.sound_id))
+    setActiveSound(null)
   }
 
   return (
@@ -30,22 +58,33 @@ export default function UrbanTestPage() {
           .urban-test-controls { transform: scale(.72); transform-origin: top right; }
         }
       `}</style>
-      <UrbanZoneMap
+      <UrbanV3ZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
         key={`${group}-${view}`}
         sounds={urbanSounds}
-        onCollectSound={(sound) => setCollectedIds((previous) => new Set([...previous, sound.sound_id]))}
+        onCollectSound={setActiveSound}
         onExit={() => {}}
         collectedIds={collectedIds}
+        isAnnotating={Boolean(activeSound)}
         blockNum={blockNum}
         blockTotal={maxBlock}
-        debugStart={
-          view === 'metro'
-            ? { tx: 24, ty: 11 }
-            : view === 'midcity'
-              ? { tx: 24, ty: 20 }
-              : null
-        }
+        currentWorldWidth={1448 * worldScale}
+        currentWorldHeight={1086 * worldScale}
+        debugCollision={debugCollision}
+        debugFirstItem={debugFirstItem}
+        debugStart={debugStart}
       />
+      {activeSound && (
+        <AnnotationPanel
+          sound={activeSound}
+          zone="Urban"
+          participantId="URBAN_QA_LOCAL"
+          sessionId={group}
+          dryRun
+          onClose={() => setActiveSound(null)}
+          onComplete={finishAnnotation}
+        />
+      )}
       {controlsVisible && <div className="urban-test-controls" data-urban-qa-controls style={{
         position: 'fixed', top: 62, right: 8, zIndex: 999,
         background: '#06112eea', color: '#eafcff', padding: '7px 10px',

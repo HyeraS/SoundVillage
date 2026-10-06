@@ -10,6 +10,8 @@ import {
   drawHumanDebug, markerStateFor,
 } from '@/lib/humanVillage'
 import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
+import { useWalkFrame } from '@/components/useWalkFrame'
+import { getVillageRuntimeManifest } from '@/lib/villageRuntimeManifest.mjs'
 
 const DESKTOP_FOV_W = 24 * TILE
 const FOV_H = 18 * TILE
@@ -35,7 +37,11 @@ export default function HumanZoneMap({
   outfitSrc,
   accessorySrc,
   characterLoadout,
+  debugFirstItem = false,
+  currentWorldWidth = getVillageRuntimeManifest('human').baseWorldWidth,
+  currentWorldHeight = getVillageRuntimeManifest('human').baseWorldHeight,
 }) {
+  const worldSize = useMemo(() => ({ currentWorldWidth, currentWorldHeight }), [currentWorldWidth, currentWorldHeight])
   const key = soundSetKey(sounds)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const items = useMemo(() => spawnHumanItems(sounds), [key])
@@ -56,7 +62,7 @@ export default function HumanZoneMap({
   const movingRef = useRef(false)
   const [dir, setDir] = useState('up')
   const [moving, setMoving] = useState(false)
-  const [animTick, setAnimTick] = useState(0)
+  const frameIndex = useWalkFrame(moving)
   const [collecting, setCollecting] = useState(null)
   useCollectiblePromptLogging(collecting, 'Human')
   const collectingRef = useRef(false)
@@ -87,19 +93,29 @@ export default function HumanZoneMap({
 
   useEffect(() => {
     let cancelled = false
-    loadHumanVillage().then((loaded) => {
+    loadHumanVillage(worldSize).then((loaded) => {
       if (cancelled) return
       villageRef.current = loaded
       setVillage(loaded)
-      posRef.current = debugStart
-        ? { x: debugStart.tx * T + T / 2, y: debugStart.ty * T + T / 2 + PLAYER_BOX.h / 2 }
+      posRef.current = debugStart && Number.isFinite(debugStart.x) && Number.isFinite(debugStart.y)
+        ? { x: debugStart.x * loaded.transform.scaleX, y: debugStart.y * loaded.transform.scaleY }
+        : debugFirstItem && items[0]
+        ? {
+          x: (items[0].tx * T + T / 2) * loaded.transform.scaleX,
+          y: (items[0].ty * T + T / 2) * loaded.transform.scaleY,
+        }
+        : debugStart
+        ? {
+          x: (debugStart.tx * T + T / 2) * loaded.transform.scaleX,
+          y: (debugStart.ty * T + T / 2 + PLAYER_BOX.h / 2) * loaded.transform.scaleY,
+        }
         : { ...loaded.spawn }
     }).catch((error) => {
       console.error('[HumanZone] map load failed:', error)
       if (!cancelled) setLoadError(error instanceof Error ? error.message : String(error))
     })
     return () => { cancelled = true }
-  }, [debugStart])
+  }, [debugFirstItem, debugStart, items, worldSize])
 
   useEffect(() => {
     const stage = stageRef.current
@@ -123,16 +139,6 @@ export default function HumanZoneMap({
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      // PixelChar's production sheet advances every six ticks. Human's canvas
-      // loop does not cause React renders, so advance one visible walk frame
-      // per interval instead of leaving animationTick at its default zero.
-      if (movingRef.current) setAnimTick((tick) => tick + 6)
-    }, 100)
-    return () => window.clearInterval(timer)
-  }, [])
-
   const beginCollect = useCallback((item) => {
     collectingRef.current = false
     collectingItemRef.current = null
@@ -146,7 +152,8 @@ export default function HumanZoneMap({
     if (!currentVillage || isAnnotatingRef.current || exitConfirmRef.current) return
     const delta = { up: [0, -SPEED], down: [0, SPEED], left: [-SPEED, 0], right: [SPEED, 0] }[direction]
     if (!delta) return
-    posRef.current = moveWithCollision(currentVillage, posRef.current, delta[0], delta[1], blockNumRef.current)
+    posRef.current = moveWithCollision(currentVillage, posRef.current,
+      delta[0] * currentVillage.transform.scaleX, delta[1] * currentVillage.transform.scaleY, blockNumRef.current)
   }, [])
 
   const pressDirection = useCallback((direction, interactionMethod) => {
@@ -189,39 +196,52 @@ export default function HumanZoneMap({
       let dx = 0
       let dy = 0
       let nextDir = null
+      const scaleX = village.transform.scaleX
+      const scaleY = village.transform.scaleY
       const speed = SPEED * dt
       if (!paused) {
-        if (pressed.up) { dy -= speed; nextDir = 'up' }
-        if (pressed.down) { dy += speed; nextDir = 'down' }
-        if (pressed.left) { dx -= speed; nextDir = 'left' }
-        if (pressed.right) { dx += speed; nextDir = 'right' }
+        if (pressed.up) { dy -= speed * scaleY; nextDir = 'up' }
+        if (pressed.down) { dy += speed * scaleY; nextDir = 'down' }
+        if (pressed.left) { dx -= speed * scaleX; nextDir = 'left' }
+        if (pressed.right) { dx += speed * scaleX; nextDir = 'right' }
       }
-      const moved = dx !== 0 || dy !== 0
-      if (moved) {
-        posRef.current = moveWithCollision(village, posRef.current, dx, dy, blockNumRef.current)
+      const hasMovementInput = dx !== 0 || dy !== 0
+      let moved = false
+      if (hasMovementInput) {
+        const previousPosition = posRef.current
+        const nextPosition = moveWithCollision(village, previousPosition, dx, dy, blockNumRef.current)
+        moved = Math.abs(nextPosition.x - previousPosition.x) > 0.01 || Math.abs(nextPosition.y - previousPosition.y) > 0.01
+        posRef.current = nextPosition
         if (nextDir && nextDir !== dirRef.current) { dirRef.current = nextDir; setDir(nextDir) }
       }
       if (moved !== movingRef.current) { movingRef.current = moved; setMoving(moved) }
 
       const { x: playerX, y: playerY } = posRef.current
+      if (playerWrapRef.current) {
+        playerWrapRef.current.dataset.worldX = playerX.toFixed(2)
+        playerWrapRef.current.dataset.worldY = playerY.toFixed(2)
+        playerWrapRef.current.dataset.movementBlocked = hasMovementInput && !moved ? 'true' : 'false'
+      }
       const currentItems = itemsRef.current
       if (dismissedItemIdRef.current) {
         const dismissed = currentItems.find((item) => item.id === dismissedItemIdRef.current)
         if (!dismissed || !overlaps(
-          playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h,
-          dismissed.tx * T + T / 2 - INTERACTION_BOX.w / 2,
-          dismissed.ty * T + T / 2 - INTERACTION_BOX.h / 2,
-          INTERACTION_BOX.w, INTERACTION_BOX.h,
+          playerX - PLAYER_BOX.w * scaleX / 2, playerY - PLAYER_BOX.h * scaleY,
+          PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY,
+          (dismissed.tx * T + T / 2 - INTERACTION_BOX.w / 2) * scaleX,
+          (dismissed.ty * T + T / 2 - INTERACTION_BOX.h / 2) * scaleY,
+          INTERACTION_BOX.w * scaleX, INTERACTION_BOX.h * scaleY,
         )) dismissedItemIdRef.current = null
       }
       if (!collectingRef.current && !paused) {
         for (const item of currentItems) {
           if (collectedIdsRef.current.has(item.id) || item.block > blockNumRef.current || item.id === dismissedItemIdRef.current) continue
-          const markerX = item.tx * T + T / 2 - INTERACTION_BOX.w / 2
-          const markerY = item.ty * T + T / 2 - INTERACTION_BOX.h / 2
+          const markerX = (item.tx * T + T / 2 - INTERACTION_BOX.w / 2) * scaleX
+          const markerY = (item.ty * T + T / 2 - INTERACTION_BOX.h / 2) * scaleY
           if (overlaps(
-            playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h,
-            markerX, markerY, INTERACTION_BOX.w, INTERACTION_BOX.h,
+            playerX - PLAYER_BOX.w * scaleX / 2, playerY - PLAYER_BOX.h * scaleY,
+            PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY,
+            markerX, markerY, INTERACTION_BOX.w * scaleX, INTERACTION_BOX.h * scaleY,
           )) {
             collectingRef.current = true
             collectingItemRef.current = item
@@ -231,11 +251,12 @@ export default function HumanZoneMap({
         }
       } else if (collectingRef.current && collectingItemRef.current && !paused) {
         const item = collectingItemRef.current
-        const markerX = item.tx * T + T / 2 - INTERACTION_BOX.w / 2
-        const markerY = item.ty * T + T / 2 - INTERACTION_BOX.h / 2
+        const markerX = (item.tx * T + T / 2 - INTERACTION_BOX.w / 2) * scaleX
+        const markerY = (item.ty * T + T / 2 - INTERACTION_BOX.h / 2) * scaleY
         if (!overlaps(
-          playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h,
-          markerX, markerY, INTERACTION_BOX.w, INTERACTION_BOX.h,
+          playerX - PLAYER_BOX.w * scaleX / 2, playerY - PLAYER_BOX.h * scaleY,
+          PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY,
+          markerX, markerY, INTERACTION_BOX.w * scaleX, INTERACTION_BOX.h * scaleY,
         )) {
           collectingRef.current = false
           collectingItemRef.current = null
@@ -243,7 +264,7 @@ export default function HumanZoneMap({
         }
       }
 
-      const inExitZone = overlapsExitTrigger(posRef.current)
+      const inExitZone = overlapsExitTrigger(posRef.current, worldSize)
       if (!paused && inExitZone && !inExitZoneRef.current) setExitConfirm(true)
       inExitZoneRef.current = inExitZone
 
@@ -253,9 +274,11 @@ export default function HumanZoneMap({
       const metrics = metricsRef.current
       if (canvas && foregroundCanvas && markerCanvas && metrics.pixelW > 0 && metrics.pixelH > 0) {
         const fullMap = debugOverview || staticArt
-        const viewWorldH = fullMap ? MAP_H * T : FOV_H
+        const worldWidth = village.currentWorldWidth
+        const worldHeight = village.currentWorldHeight
+        const viewWorldH = fullMap ? worldHeight : FOV_H * scaleY
         const responsiveW = viewWorldH * metrics.pixelW / metrics.pixelH
-        const viewWorldW = fullMap ? MAP_W * T : Math.min(DESKTOP_FOV_W, responsiveW)
+        const viewWorldW = fullMap ? worldWidth : Math.min(DESKTOP_FOV_W * scaleX, responsiveW)
         const zoom = Math.min(metrics.pixelW / viewWorldW, metrics.pixelH / viewWorldH)
         const cssZoom = Math.min(metrics.cssW / viewWorldW, metrics.cssH / viewWorldH)
         const renderedW = viewWorldW * zoom
@@ -266,14 +289,15 @@ export default function HumanZoneMap({
         const offsetY = Math.round((metrics.pixelH - renderedH) / 2)
         const cssOffsetX = (metrics.cssW - cssRenderedW) / 2
         const cssOffsetY = (metrics.cssH - cssRenderedH) / 2
-        const camX = fullMap ? 0 : Math.round(Math.max(0, Math.min(playerX - viewWorldW / 2, MAP_W * T - viewWorldW)))
-        const camY = fullMap ? 0 : Math.round(Math.max(0, Math.min(playerY - viewWorldH / 2, MAP_H * T - viewWorldH)))
+        const camX = fullMap ? 0 : Math.round(Math.max(0, Math.min(playerX - viewWorldW / 2, worldWidth - viewWorldW)))
+        const camY = fullMap ? 0 : Math.round(Math.max(0, Math.min(playerY - viewWorldH / 2, worldHeight - viewWorldH)))
         const setupWorld = (context) => {
           context.imageSmoothingEnabled = false
           context.save()
           context.translate(offsetX, offsetY)
           context.scale(zoom, zoom)
           context.translate(-camX, -camY)
+          context.scale(scaleX, scaleY)
         }
 
         const background = canvas.getContext('2d')
@@ -284,7 +308,7 @@ export default function HumanZoneMap({
         background.drawImage(village.staticCanvas, 0, 0)
         if (!staticArt) {
           drawHumanLockFog(background, blockNumRef.current, now)
-          drawHumanObjects(background, village.assets, playerY, 'below')
+          drawHumanObjects(background, village.assets, playerY / scaleY, 'below')
           drawHumanExitCue(background, now)
         }
         background.restore()
@@ -292,7 +316,7 @@ export default function HumanZoneMap({
         const foreground = foregroundCanvas.getContext('2d')
         foreground.clearRect(0, 0, metrics.pixelW, metrics.pixelH)
         setupWorld(foreground)
-        if (!staticArt) drawHumanObjects(foreground, village.assets, playerY, 'above')
+        if (!staticArt) drawHumanObjects(foreground, village.assets, playerY / scaleY, 'above')
         foreground.restore()
 
         const markers = markerCanvas.getContext('2d')
@@ -300,6 +324,12 @@ export default function HumanZoneMap({
         markers.clearRect(0, 0, metrics.pixelW, metrics.pixelH)
         setupWorld(markers)
         if (!staticArt) {
+          if (debugCollision && village.assets.walkableMask) {
+            markers.save()
+            markers.globalAlpha = 0.28
+            markers.drawImage(village.assets.walkableMask, 0, 0, village.baseWorldWidth, village.baseWorldHeight)
+            markers.restore()
+          }
           for (const item of currentItems) {
             const state = markerStateFor(item, {
               blockNum: blockNumRef.current, collectedIds: collectedIdsRef.current,
@@ -313,7 +343,7 @@ export default function HumanZoneMap({
         markers.restore()
 
         if (playerWrapRef.current) {
-          const renderMetrics = getCharacterRenderMetrics({ stageWidth: metrics.cssW, stageHeight: metrics.cssH, sceneCameraScale: cssZoom })
+          const renderMetrics = getCharacterRenderMetrics({ stageWidth: metrics.cssW, stageHeight: metrics.cssH, sceneCameraScale: cssZoom * scaleY })
           const footX = cssOffsetX + (playerX - camX) * cssZoom
           const footY = cssOffsetY + (playerY - camY) * cssZoom
           const placement = placeCharacterAtScreenFoot(footX, footY, renderMetrics)
@@ -327,17 +357,22 @@ export default function HumanZoneMap({
         if (stageRef.current) {
           stageRef.current.dataset.humanReady = 'true'
           stageRef.current.dataset.humanAsset = atlasManifestLabel(village.assets.manifest)
-          stageRef.current.dataset.playerTile = `${Math.floor(playerX / T)},${Math.floor(playerY / T)}`
+          stageRef.current.dataset.playerTile = `${Math.floor(playerX / scaleX / T)},${Math.floor(playerY / scaleY / T)}`
           stageRef.current.dataset.humanBlock = String(blockNumRef.current)
           stageRef.current.dataset.humanItems = String(currentItems.length)
           stageRef.current.dataset.humanStatic = staticArt ? 'true' : 'false'
+          stageRef.current.dataset.worldWidth = String(worldWidth)
+          stageRef.current.dataset.worldHeight = String(worldHeight)
+          stageRef.current.dataset.worldScale = String(scaleX)
+          stageRef.current.dataset.maskSource = village.manifest.mask.src
+          stageRef.current.dataset.generatedMask = 'true'
         }
       }
       animationFrame = requestAnimationFrame(loop)
     }
     animationFrame = requestAnimationFrame(loop)
     return () => cancelAnimationFrame(animationFrame)
-  }, [debugCollision, debugOverview, debugSpawns, keys, staticArt, village])
+  }, [debugCollision, debugOverview, debugSpawns, keys, staticArt, village, worldSize])
 
   const total = items.length
   const collected = items.filter((item) => collectedIds.has(item.id)).length
@@ -359,12 +394,12 @@ export default function HumanZoneMap({
         }
       `}</style>
       {!staticArt && <ZoneHUD zone="Human" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />}
-      <div ref={stageRef} style={{ position: 'absolute', top: staticArt ? 0 : 56, left: 0, right: 0, bottom: 0, overflow: 'hidden', background: '#758750' }}>
+      <div ref={stageRef} data-testid="human-stage" style={{ position: 'absolute', top: staticArt ? 0 : 56, left: 0, right: 0, bottom: 0, overflow: 'hidden', background: '#758750' }}>
         <canvas ref={canvasRef} aria-label="Human Community Hall Plaza map" style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', zIndex: HUMAN_LAYER_Z.background }} />
         {!staticArt && <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.ambience, background: 'radial-gradient(120% 100% at 50% 45%, transparent 64%, rgba(72,76,47,.2) 100%)' }} />}
         <canvas ref={markerCanvasRef} aria-label="Human sound markers and debug overlay" style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.markers }} />
-        <div ref={playerWrapRef} data-human-player data-character-moving={moving ? 'true' : 'false'} data-animation-tick={animTick} style={{ position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H, transformOrigin: '0 0', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.player }}>
-          <PixelChar dir={dir} moving={moving} animationTick={animTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
+        <div ref={playerWrapRef} data-human-player data-character-moving={moving ? 'true' : 'false'} data-frame-index={frameIndex} style={{ position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H, transformOrigin: '0 0', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.player }}>
+          <PixelChar dir={dir} moving={moving} frameIndex={frameIndex} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
         </div>
         <canvas ref={foregroundCanvasRef} aria-label="Human Village foreground" style={{ position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: HUMAN_LAYER_Z.foreground }} />
         {!village && !loadError && <div style={statusStyle}>사람 마을을 준비하고 있어요…</div>}

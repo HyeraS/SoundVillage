@@ -65,16 +65,17 @@ for (const [pass, sprites] of Object.entries(URBAN_RENDER_SPRITES)) {
   }
 }
 
-const urbanComponentSource = await readFile(repoFile('components/UrbanZoneMap.js'), 'utf8')
+const urbanComponentSource = await readFile(repoFile('components/UrbanV3ZoneMap.js'), 'utf8')
 const rootPageSource = await readFile(repoFile('app/page.js'), 'utf8')
 const artPreviewSource = await readFile(repoFile('app/urban-art-preview/page.js'), 'utf8')
-assert.match(urbanComponentSource, /drawUrbanAssetStatic/)
-assert.match(urbanComponentSource, /drawUrbanAssetYSort/)
-assert.match(urbanComponentSource, /urbanAssetRenderer = 'imagegen-v2'/)
-assert.doesNotMatch(urbanComponentSource, /drawUrbanStatic|drawUrbanForeground/, 'product Urban component must not call the legacy visible polygon renderer')
-assert.match(rootPageSource, /activeZone === 'Urban'[\s\S]*?<UrbanZoneMap/)
+assert.match(urbanComponentSource, /urbanV3WorldConfig/)
+assert.match(urbanComponentSource, /spawnUrbanV3SoundItems/)
+assert.match(urbanComponentSource, /VILLAGE_MANIFEST\.background\.src/)
+assert.match(urbanComponentSource, /currentWorldWidth/)
+assert.doesNotMatch(urbanComponentSource, /urbanVillageConfig|buildUrbanVillage/, 'production Urban must not use the legacy Urban model')
+assert.match(rootPageSource, /activeZone === 'Urban'[\s\S]*?<UrbanV3ZoneMap/)
 assert.match(artPreviewSource, /UrbanArtPreview/)
-assert.doesNotMatch(artPreviewSource, /UrbanZoneMap/, 'art preview must not mount the gameplay HUD/player component')
+assert.doesNotMatch(artPreviewSource, /UrbanV3ZoneMap/, 'art preview must not mount the gameplay HUD/player component')
 
 const metadata = JSON.parse(await readFile(new URL('../data/sound_metadata.json', import.meta.url), 'utf8'))
 const urbanSounds = (metadata.sounds || []).filter((sound) => sound.game_zone === 'Urban')

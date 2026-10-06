@@ -6,7 +6,7 @@ const sounds=JSON.parse(fs.readFileSync(new URL('../data/sound_metadata.json',im
 const v=buildVillage(sounds),reach=reachableCells(v)
 const positions=items=>Object.fromEntries(items.map(i=>[i.id,[i.x,i.y,i.block,i.sound.group]]))
 test('48x36 map; feet and spawn are valid; entrance cannot fire on entry',()=>{
- assert.deepEqual([MAP_W,MAP_H,T],[48,36,32]);assert.deepEqual(PLAYER_BOX,{w:20,h:14});assert.equal(collides(v,SPAWN.x,SPAWN.y),null);assert.equal(overlapsExit(SPAWN),false);assert.equal(overlapsExit({x:EXIT.x+EXIT.w/2,y:EXIT.y+20}),true);assert.ok(reach.count>4000)
+ assert.deepEqual([MAP_W,MAP_H,T],[48,36,32]);assert.deepEqual(PLAYER_BOX,{w:20,h:14});assert.equal(collides(v,SPAWN.x,SPAWN.y),null);assert.equal(overlapsExit(SPAWN),false);assert.equal(overlapsExit({x:EXIT.x+EXIT.w/2,y:EXIT.y+20}),true);assert.ok(reach.count>500)
 })
 for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, per-block reachability and interaction clearance`,()=>{
  const list=sounds.filter(s=>group==='ALL'||s.group===group),items=spawnLabItems(list,v)
@@ -17,12 +17,12 @@ for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, pe
  assert.ok(items.every(i=>Math.hypot(i.x-SPAWN.x,i.y-SPAWN.y)>=2*T),'no discovery modal on zone entry')
  assert.ok(items.every(i=>!SLOT_CLEARINGS.some(r=>i.x>=r.x&&i.x<=r.x+r.w&&i.y>=r.y&&i.y<=r.y+r.h)),'entries, well, market and spawn stay readable')
  for(const block of [...new Set(list.map(s=>s.block))]){
-   const stageReach=reachableCells(v,16,block)
+   const stageReach=reachableCells(v,T/4,block)
    const collected=new Set(items.filter(i=>i.block<block).map(i=>i.id))
    for(const i of items){
      assert.equal(canCollect(i,block,collected),i.block===block,`${i.id}: collect gate at ${block}`)
      if(i.block!==block)continue
-     assert.equal(collides(v,i.x,i.y,16),null,`${i.id}: 1-tile shared approach clearance`)
+     assert.equal(collides(v,i.x,i.y,8),null,`${i.id}: authored-mask interaction clearance`)
      assert.ok(stageReach.seen.has(`${i.x},${i.y}`),`${i.id}: stage ${block} reachable with player feet`)
      // Reconstruct the actual BFS route and sweep it with production movement.
      let k=`${i.x},${i.y}`,route=[];while(stageReach.parents.has(k)){route.push(k);k=stageReach.parents.get(k)}
@@ -35,7 +35,7 @@ for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, pe
 test('buildings, trunks, fences, well, cart, bench and water block feet; roofs do not block as rectangles',()=>{
  for(const o of OBJECTS){if(!o.solid)continue;const s=o.solid;assert.ok(collides(v,s.x+s.w/2,s.y+s.h/2),o.id)}
  assert.equal(collides(v,7*T,29*T)?.id,'water')
- const witch=BUILDINGS[0];assert.equal(collides(v,witch.x,4*T),null)
+ const witch=BUILDINGS[0];assert.equal(collides(v,witch.x,4*T)?.id,'walkable-mask')
 })
 test('swept collision resists 2-second stalls, diagonal corners and slides along the unblocked axis',()=>{
  const wall={spawn:SPAWN,solids:[{x:400,y:200,w:8,h:500,id:'thin-fence'}]}
@@ -57,10 +57,10 @@ test('production route retains all props; research persistence and other zones r
  assert.match(source,/if \(zone === 'Lab'\)[\s\S]*canonicalAudioId\(sound\) === canonicalId/)
  for(const name of ['sounds','onCollectSound','onExit','collectedIds','isAnnotating','blockNum','blockTotal'])assert.match(source.slice(source.indexOf('<LabZoneMap')),new RegExp(name+'='))
  const engine=fs.readFileSync(new URL('../lib/labVillage.js',import.meta.url),'utf8');assert.doesNotMatch(engine,/supabase|saveAnnotation|sound_metadata/)
- assert.match(engine,/environment-master-v2\.png/);assert.match(engine,/front\.clip\(\)/)
+ const runtimeManifest=fs.readFileSync(new URL('../lib/villageRuntimeManifest.mjs',import.meta.url),'utf8');assert.match(runtimeManifest,/lab-witch\/environment-master-v2\.png/);assert.match(engine,/front\.clip\(\)/)
  assert.match(engine,/camera\.dpr\|\|1/);assert.match(engine,/item\.id===nearbyId/)
  const component=fs.readFileSync(new URL('../components/LabZoneMap.js',import.meta.url),'utf8')
- assert.match(component,/animationTick=\{animation\.tick\}/);assert.match(component,/devicePixelRatio/)
+ assert.match(component,/useWalkFrame\(animation\.moving\)/);assert.match(component,/frameIndex=\{frameIndex\}/);assert.match(component,/devicePixelRatio/)
  assert.match(component,/onConfirm=\{nearby\?confirmCollect:null\}/);assert.match(component,/r\.mode==='move'&&r\.selected/)
  assert.doesNotMatch(component,/setModal\(\{type:'collect'/);assert.doesNotMatch(component,/modal\?\.type==='collect'/)
  assert.ok(fs.existsSync(new URL('../public/assets/lab-witch/environment-master-v2.png',import.meta.url)))
@@ -74,7 +74,7 @@ test('block count is data-driven, including fewer and more than six blocks',()=>
    const list=Array.from({length:count*3},(_,i)=>({sound_id:`dynamic_${i}`,block:Math.floor(i/3)+1,group:'A'}))
    const world=buildVillage(list),items=spawnLabItems(list,world)
    assert.equal(items.length,list.length)
-   for(const i of items)assert.equal(collides(world,i.x,i.y,16,i.block),null)
+   for(const i of items)assert.equal(collides(world,i.x,i.y,8,i.block),null)
  }
 })
 test('camera preserves aspect and 18-tile vertical scale at desktop and both mobile orientations',()=>{

@@ -3,11 +3,13 @@ import { useEffect, useRef, useState } from 'react'
 import { useCollectiblePromptLogging, useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
 import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
 import {
-  T, MAP_W, MAP_H, WORLD_WIDTH, WORLD_HEIGHT, BASE_MAP_SRC,
+  T, BASE_MAP_SRC,
   loadAnimalVillage, moveWithCollision, spawnAnimalItems,
   drawItem, drawLockFog, drawAnimalVillageLayer, drawAnimalDebug, PLAYER_BOX,
 } from '@/lib/animalVillage'
 import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
+import { useWalkFrame } from '@/components/useWalkFrame'
+import { getVillageRuntimeManifest } from '@/lib/villageRuntimeManifest.mjs'
 
 const FOV_W = 24 * TILE
 const FOV_H = 18 * TILE
@@ -27,6 +29,10 @@ export default function AnimalZoneMap({
   characterLoadout,
   debugOptions = null,
   baseOnly = false,
+  debugFirstItem = false,
+  debugStart = null,
+  currentWorldWidth = getVillageRuntimeManifest('animal').baseWorldWidth,
+  currentWorldHeight = getVillageRuntimeManifest('animal').baseWorldHeight,
 }) {
   const [village, setVillage] = useState(null)
   const villageRef = useRef(null)
@@ -34,16 +40,28 @@ export default function AnimalZoneMap({
 
   useEffect(() => {
     let cancelled = false
-    loadAnimalVillage().then((nextVillage) => {
+    loadAnimalVillage({ currentWorldWidth, currentWorldHeight }).then((nextVillage) => {
       if (cancelled) return
       villageRef.current = nextVillage
       itemsRef.current = spawnAnimalItems(sounds, nextVillage)
+      if (debugStart && Number.isFinite(debugStart.x) && Number.isFinite(debugStart.y)) {
+        nextVillage.spawn = {
+          x: debugStart.x * nextVillage.transform.scaleX,
+          y: debugStart.y * nextVillage.transform.scaleY,
+        }
+      } else if (debugFirstItem && itemsRef.current[0]) {
+        const first = itemsRef.current[0]
+        nextVillage.spawn = {
+          x: (first.tx * T + 16) * nextVillage.transform.scaleX,
+          y: (first.ty * T + 22) * nextVillage.transform.scaleY,
+        }
+      }
       setVillage(nextVillage)
     }).catch((error) => console.error(error))
     return () => { cancelled = true }
   // The production sound list is stable for a mounted zone.
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [currentWorldHeight, currentWorldWidth, debugFirstItem, debugStart])
 
   const stageRef = useRef(null)
   const canvasRef = useRef(null)
@@ -79,7 +97,7 @@ export default function AnimalZoneMap({
   const movingRef = useRef(false)
   const [dir, setDir] = useState('down')
   const [moving, setMoving] = useState(false)
-  const [, setAnimTick] = useState(0)
+  const frameIndex = useWalkFrame(moving)
   const [collecting, setCollecting] = useState(null)
   useCollectiblePromptLogging(collecting, 'Animal')
   const collectingRef = useRef(false)
@@ -110,13 +128,6 @@ export default function AnimalZoneMap({
   useEffect(() => {
     if (village) posRef.current = { ...village.spawn }
   }, [village])
-
-  useEffect(() => {
-    const id = setInterval(() => {
-      if (movingRef.current) setAnimTick((tick) => tick + 1)
-    }, 100)
-    return () => clearInterval(id)
-  }, [])
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -158,15 +169,20 @@ export default function AnimalZoneMap({
       let dx = 0
       let dy = 0
       let nextDirection = null
+      const scaleX = village.transform.scaleX
+      const scaleY = village.transform.scaleY
       const speed = SPEED * dt
-      if (pressed.up) { dy -= speed; nextDirection = 'up' }
-      if (pressed.down) { dy += speed; nextDirection = 'down' }
-      if (pressed.left) { dx -= speed; nextDirection = 'left' }
-      if (pressed.right) { dx += speed; nextDirection = 'right' }
-      const moved = dx !== 0 || dy !== 0
+      if (pressed.up) { dy -= speed * scaleY; nextDirection = 'up' }
+      if (pressed.down) { dy += speed * scaleY; nextDirection = 'down' }
+      if (pressed.left) { dx -= speed * scaleX; nextDirection = 'left' }
+      if (pressed.right) { dx += speed * scaleX; nextDirection = 'right' }
+      const hasMovementInput = dx !== 0 || dy !== 0
+      let moved = false
 
-      if (moved) {
-        posRef.current = moveWithCollision(village, { x, y }, dx, dy)
+      if (hasMovementInput) {
+        const nextPosition = moveWithCollision(village, { x, y }, dx, dy)
+        moved = Math.abs(nextPosition.x - x) > 0.01 || Math.abs(nextPosition.y - y) > 0.01
+        posRef.current = nextPosition
         if (nextDirection && nextDirection !== dirRef.current) {
           dirRef.current = nextDirection
           setDir(nextDirection)
@@ -178,13 +194,18 @@ export default function AnimalZoneMap({
       }
 
       const { x: playerX, y: playerY } = posRef.current
+      if (playerWrapRef.current) {
+        playerWrapRef.current.dataset.worldX = playerX.toFixed(2)
+        playerWrapRef.current.dataset.worldY = playerY.toFixed(2)
+        playerWrapRef.current.dataset.movementBlocked = hasMovementInput && !moved ? 'true' : 'false'
+      }
       if (!collectingRef.current && !isAnnotatingRef.current) {
         for (const item of items) {
           if (collectedIdsRef.current.has(item.id) || item.block > blockNumRef.current) continue
-          const itemX = item.tx * T + 4
-          const itemY = item.ty * T + 4
-          if (overlaps(playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h,
-            PLAYER_BOX.w, PLAYER_BOX.h, itemX, itemY, 24, 24)) {
+          const itemX = (item.tx * T + 4) * scaleX
+          const itemY = (item.ty * T + 4) * scaleY
+          if (overlaps(playerX - PLAYER_BOX.w * scaleX / 2, playerY - PLAYER_BOX.h * scaleY,
+            PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY, itemX, itemY, 24 * scaleX, 24 * scaleY)) {
             collectingRef.current = true
             collectingItemRef.current = item
             setCollecting(item)
@@ -193,10 +214,10 @@ export default function AnimalZoneMap({
         }
       } else if (collectingRef.current && collectingItemRef.current && !isAnnotatingRef.current) {
         const item = collectingItemRef.current
-        const itemX = item.tx * T + 4
-        const itemY = item.ty * T + 4
-        if (!overlaps(playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h,
-          PLAYER_BOX.w, PLAYER_BOX.h, itemX, itemY, 24, 24)) {
+        const itemX = (item.tx * T + 4) * scaleX
+        const itemY = (item.ty * T + 4) * scaleY
+        if (!overlaps(playerX - PLAYER_BOX.w * scaleX / 2, playerY - PLAYER_BOX.h * scaleY,
+          PLAYER_BOX.w * scaleX, PLAYER_BOX.h * scaleY, itemX, itemY, 24 * scaleX, 24 * scaleY)) {
           collectingRef.current = false
           collectingItemRef.current = null
           setCollecting(null)
@@ -227,13 +248,15 @@ export default function AnimalZoneMap({
         const dpr = Number(canvas.dataset.dpr) || 1
         const viewWidth = canvas.width / dpr
         const viewHeight = canvas.height / dpr
-        zoom = Math.min(viewWidth / FOV_W, viewHeight / FOV_H)
-        const contentWidth = FOV_W * zoom
-        const contentHeight = FOV_H * zoom
+        const fovWidth = FOV_W * scaleX
+        const fovHeight = FOV_H * scaleY
+        zoom = Math.min(viewWidth / fovWidth, viewHeight / fovHeight)
+        const contentWidth = fovWidth * zoom
+        const contentHeight = fovHeight * zoom
         offsetX = snapDevicePixel((viewWidth - contentWidth) / 2, dpr)
         offsetY = snapDevicePixel((viewHeight - contentHeight) / 2, dpr)
-        cameraX = Math.max(0, Math.min(playerX - FOV_W / 2, MAP_W * T - FOV_W))
-        cameraY = Math.max(0, Math.min(playerY - FOV_H / 2, MAP_H * T - FOV_H))
+        cameraX = Math.max(0, Math.min(playerX - fovWidth / 2, village.currentWorldWidth - fovWidth))
+        cameraY = Math.max(0, Math.min(playerY - fovHeight / 2, village.currentWorldHeight - fovHeight))
         cameraX = Math.round(cameraX * zoom * dpr) / (zoom * dpr)
         cameraY = Math.round(cameraY * zoom * dpr) / (zoom * dpr)
 
@@ -245,7 +268,8 @@ export default function AnimalZoneMap({
         context.translate(offsetX, offsetY)
         context.scale(zoom, zoom)
         context.translate(-cameraX, -cameraY)
-        drawAnimalVillageLayer(context, village, now, playerY, 'back')
+        context.scale(scaleX, scaleY)
+        drawAnimalVillageLayer(context, village, now, playerY / scaleY, 'back')
         for (const item of items) {
           if (item.block > blockNumRef.current) continue
           const collected = collectedIdsRef.current.has(item.id)
@@ -264,10 +288,17 @@ export default function AnimalZoneMap({
         foreground.translate(offsetX, offsetY)
         foreground.scale(zoom, zoom)
         foreground.translate(-cameraX, -cameraY)
-        drawAnimalVillageLayer(foreground, village, now, playerY, 'front')
+        foreground.scale(scaleX, scaleY)
+        drawAnimalVillageLayer(foreground, village, now, playerY / scaleY, 'front')
+        if (debugOptions?.mask && village.walkableMask) {
+          foreground.save()
+          foreground.globalAlpha = 0.28
+          foreground.drawImage(village.walkableMask, 0, 0, village.baseWorldWidth, village.baseWorldHeight)
+          foreground.restore()
+        }
         drawAnimalDebug(foreground, village, items,
           debugOptions ? { ...debugOptions, sounds } : null,
-          { x: playerX, y: playerY })
+          { x: playerX / scaleX, y: playerY / scaleY })
         foreground.restore()
       }
 
@@ -284,7 +315,7 @@ export default function AnimalZoneMap({
         const dpr = Math.max(1, window.devicePixelRatio || 1)
         const stageWidth = canvas?.width ? canvas.width / dpr : playerWrapRef.current.parentElement.clientWidth
         const stageHeight = canvas?.height ? canvas.height / dpr : playerWrapRef.current.parentElement.clientHeight
-        const renderMetrics = getCharacterRenderMetrics({ stageWidth, stageHeight, sceneCameraScale: zoom })
+        const renderMetrics = getCharacterRenderMetrics({ stageWidth, stageHeight, sceneCameraScale: zoom * scaleY })
         const footX = offsetX + (playerX - cameraX) * zoom
         const footY = offsetY + (playerY - cameraY) * zoom
         const placement = placeCharacterAtScreenFoot(footX, footY, renderMetrics)
@@ -293,6 +324,14 @@ export default function AnimalZoneMap({
         playerWrapRef.current.style.transform = `scale(${renderMetrics.screenScale})`
         playerWrapRef.current.dataset.footScreenX = placement.footX.toFixed(2)
         playerWrapRef.current.dataset.footScreenY = placement.footY.toFixed(2)
+      }
+
+      if (stageRef.current) {
+        stageRef.current.dataset.worldWidth = String(village.currentWorldWidth)
+        stageRef.current.dataset.worldHeight = String(village.currentWorldHeight)
+        stageRef.current.dataset.worldScale = String(scaleX)
+        stageRef.current.dataset.maskSource = village.manifest.mask.src
+        stageRef.current.dataset.generatedMask = 'true'
       }
 
       animationFrame = requestAnimationFrame(loop)
@@ -307,17 +346,17 @@ export default function AnimalZoneMap({
 
   if (baseOnly) {
     return (
-      <div data-testid="animal-base-only" style={{ width: WORLD_WIDTH, height: WORLD_HEIGHT, overflow: 'hidden' }}>
+      <div data-testid="animal-base-only" style={{ width: currentWorldWidth, height: currentWorldHeight, overflow: 'hidden' }}>
         {/* Natural-size DOM image makes the base-only output byte-for-byte source-faithful. */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           data-testid="animal-base-map"
           src={BASE_MAP_SRC}
-          width={WORLD_WIDTH}
-          height={WORLD_HEIGHT}
+          width={currentWorldWidth}
+          height={currentWorldHeight}
           draggable={false}
           alt="Sunflower Commons Animal village base map"
-          style={{ display: 'block', width: WORLD_WIDTH, height: WORLD_HEIGHT, imageRendering: 'pixelated' }}
+          style={{ display: 'block', width: currentWorldWidth, height: currentWorldHeight, imageRendering: 'pixelated' }}
         />
       </div>
     )
@@ -346,11 +385,11 @@ export default function AnimalZoneMap({
               width: '100%', height: '100%', imageRendering: 'pixelated',
             }} />
 
-            <div ref={playerWrapRef} data-testid="animal-player" style={{
+            <div ref={playerWrapRef} data-testid="animal-player" data-frame-index={frameIndex} style={{
               position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
               transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
             }}>
-              <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
+              <PixelChar dir={dir} moving={moving} frameIndex={frameIndex} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
             </div>
 
             <canvas ref={foregroundCanvasRef} data-testid="animal-foreground-canvas" data-smoothing="off" style={{

@@ -1,8 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import ZoneMap from '@/components/ZoneMap'
+import LabZoneMap from '@/components/LabZoneMap'
 import soundMetadata from '@/data/sound_metadata.json'
+import { WALK_ANIMATION_QA_CHARACTER } from '@/lib/walkAnimationQa.mjs'
 
 // 격리된 Lab Zone("미지의 소리 마을") 코너 재배치 테스트 — 실제 게임 흐름(app/page.js,
 // WorldMap 내비게이션)은 건드리지 않는다. urban-test/fence-test/library-test와 같은
@@ -10,7 +13,14 @@ import soundMetadata from '@/data/sound_metadata.json'
 // block 격자/스폰이 실제 게임과 동일하게 계산되도록 한다.
 const labSounds = (soundMetadata.sounds || []).filter(s => s.game_zone === 'Lab')
 
-export default function LabTestPage() {
+function LabTestContent() {
+  const searchParams = useSearchParams()
+  const walkAnimationQa = searchParams.get('walkAnimationQa') === '1'
+  const worldScale = Math.max(0.25, Number(searchParams.get('worldScale')) || 1)
+  const startX = Number(searchParams.get('startX'))
+  const startY = Number(searchParams.get('startY'))
+  const debugStart = searchParams.has('startX') && searchParams.has('startY')
+    && Number.isFinite(startX) && Number.isFinite(startY) ? { x: startX, y: startY } : null
   const [revision, setRevision] = useState(0)
   const [blockNum, setBlockNum] = useState(6)
   const [collectedIds, setCollectedIds] = useState(() => new Set())
@@ -18,9 +28,29 @@ export default function LabTestPage() {
   // Deliberately rebuild an equivalent array/object graph on every parent
   // render. ZoneMap placement must ignore this reference-only change.
   const equivalentSounds = labSounds.map(sound => ({ ...sound }))
+  if (searchParams.get('runtime') === '1') {
+    return (
+      <LabZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
+        sounds={equivalentSounds}
+        onCollectSound={setActiveSound}
+        onExit={() => setRevision(value => value + 1)}
+        collectedIds={collectedIds}
+        isAnnotating={Boolean(activeSound)}
+        blockNum={blockNum}
+        blockTotal={6}
+        debugFirstItem={searchParams.get('firstItem') === '1'}
+        debugStart={debugStart}
+        debugCollision={searchParams.get('collision') === '1'}
+        currentWorldWidth={1536 * worldScale}
+        currentWorldHeight={1152 * worldScale}
+      />
+    )
+  }
   return (
     <main data-zone-regression-revision={revision}>
       <ZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
         zone="Lab"
         sounds={equivalentSounds}
         onCollectSound={setActiveSound}
@@ -52,4 +82,8 @@ export default function LabTestPage() {
       )}
     </main>
   )
+}
+
+export default function LabTestPage() {
+  return <Suspense fallback={null}><LabTestContent /></Suspense>
 }

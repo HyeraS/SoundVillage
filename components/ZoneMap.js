@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, useMemo, memo } from 'react'
 import { useCollectiblePromptLogging, useKeys, TILE, SPEED, ZONE_META, overlaps } from '@/components/GameEngine'
 import { TILES, OBJECTS, CHARACTERS, ITEMS, ASSET_READY, ZONE_GROUND_TILE, WORLD_CHARACTER, WORLD_TILESET, WORLD_ANIMALS, WORLD_FARM_BUILDINGS, WORLD_PRODUCE, WORLD_PROPS, ANIMAL_ZONE_TILESET, WORLD_NATURE, NATURE_VILLAGE_TILESET, URBAN_KENNEY_GROUND, URBAN_KENNEY_BUILDING, URBAN_KENNEY_VEHICLES, URBAN_KENNEY_TREES, URBAN_KENNEY_PROPS, URBAN_KENNEY_PEDESTRIANS, URBAN_SOUND_ICONS, HUMAN_WINTER_GROUND, WINTER_TILES, WINTER_MARKET, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { SHEET_CODES, LAB_DUNGEON_SHEET_META, LAB_STATIC, LAB_TORCHES, LAB_TRAPS, LAB_PROPS, LAB_ANIM, LAB_FLOOR_CELLS } from '@/components/labDungeonData'
+import { useWalkFrame } from '@/components/useWalkFrame'
 
 /* ─────────────────────────────────────────────
    맵 크기
@@ -2565,17 +2566,23 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null, outfitSrc, accessorySrc, characterLoadout }) {
-  const frame = moving ? Math.floor(animationTick / 10) % 2 : 0
+export function PixelChar({ dir, moving, frameIndex, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null, outfitSrc, accessorySrc, characterLoadout }) {
+  // frameIndex is the production contract. animationTick remains only for
+  // non-production callers while they migrate from the old ambiguous unit.
+  const requestedFrame = Number.isInteger(frameIndex) ? frameIndex : Math.floor(animationTick / 6)
+  const resolvedFrame = moving ? ((requestedFrame % 8) + 8) % 8 : 0
+  const fallbackFrame = resolvedFrame % 2
 
   if (ASSET_READY.world) {
     const { frame: fs, rows, cols } = WORLD_CHARACTER
     const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
     const row = rows[dir] ?? rows.down
-    const walkTick = Math.floor(animationTick / 6) % cols.length
-    const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
+    const sourceColumn = cols[resolvedFrame % cols.length]
+    const srcX = sourceColumn * fs, srcY = row * fs
     return (
       <svg width={displayWidth} height={displayHeight}
+        data-pixel-character data-character-moving={moving ? 'true' : 'false'}
+        data-frame-index={resolvedFrame} data-source-column={sourceColumn}
         viewBox={sourceViewBox ? `${sourceViewBox.x} ${sourceViewBox.y} ${sourceViewBox.w} ${sourceViewBox.h}` : `0 0 ${fs} ${fs}`}
         style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs>
@@ -2583,6 +2590,7 @@ export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRIT
         </defs>
         {layers.map((L,i) => (
           <image key={i} href={L.src} x={-srcX} y={-srcY} width={L.sheetW} height={L.sheetH}
+            data-character-layer={L.kind || i} data-frame-index={resolvedFrame} data-source-column={sourceColumn}
             clipPath="url(#zonePlayerClip)" style={{ imageRendering:'pixelated' }}/>
         ))}
       </svg>
@@ -2591,10 +2599,11 @@ export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRIT
 
   if (ASSET_READY.characters && CHARACTERS.player_sheet) {
     const frameOffsets = CHAR_CFG[dir] || CHAR_CFG.down
-    const frameX = frameOffsets[frame] ?? frameOffsets[0]
+    const frameX = frameOffsets[fallbackFrame] ?? frameOffsets[0]
     const { frameW, frameH, sheetW, sheetH } = CHAR_CFG
     return (
       <svg width={displayWidth} height={displayHeight} viewBox={`0 0 ${frameW} ${frameH}`}
+        data-pixel-character data-character-moving={moving ? 'true' : 'false'} data-frame-index={resolvedFrame}
         style={{ overflow:'hidden', imageRendering:'pixelated' }}>
         <defs>
           <clipPath id="zoneCharClip"><rect width={frameW} height={frameH}/></clipPath>
@@ -2606,11 +2615,12 @@ export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRIT
     )
   }
 
-  const legLY = frame === 0 ? 18 : 21
-  const legRY = frame === 0 ? 21 : 18
+  const legLY = fallbackFrame === 0 ? 18 : 21
+  const legRY = fallbackFrame === 0 ? 21 : 18
   const flip  = dir === 'left' ? 'scale(-1,1) translate(-22,0)' : ''
   return (
     <svg width={displayWidth} height={displayHeight} viewBox="0 0 22 28"
+      data-pixel-character data-character-moving={moving ? 'true' : 'false'} data-frame-index={resolvedFrame}
       style={{ imageRendering:'pixelated', overflow:'visible' }}>
       <g transform={flip}>
         <ellipse cx="11" cy="27" rx="7" ry="2" fill="#00000033"/>
@@ -2968,6 +2978,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
   const [dir,        setDir]       = useState('up')
   const [moving,     setMoving]    = useState(false)
   const [tick,       setTick]      = useState(0)
+  const frameIndex = useWalkFrame(moving)
 
   // 뷰포트 — 컨테이너를 꽉 채운다. 세로로 보이는 월드 범위는 VIEW_H(18타일)로
   // 고정해 줌 레벨·캐릭터 크기는 그대로 두고, 가로 범위만 창 비율에 맞춰 늘려
@@ -3072,7 +3083,7 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
 
       const k = keys.current
       let { x, y } = posRef.current
-      let moved = false, newDir = dir
+      let hasMovementInput = false, newDir = dir
       const spd = SPEED * dt
       const minX = TILE, maxX = PX_W - TILE - CHAR_W
       const minY = TILE, maxY = PX_H - TILE - CHAR_H
@@ -3085,15 +3096,18 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
       const tryMoveY = (ny) => { if (!humanSolid || !marketBlocked(humanSolid, x, ny)) y = ny }
       const tryMoveX = (nx) => { if (!humanSolid || !marketBlocked(humanSolid, nx, y)) x = nx }
 
-      if (k.up)    { tryMoveY(Math.max(minY, y - spd)); newDir = 'up';    moved = true }
-      if (k.down)  { tryMoveY(Math.min(maxY, y + spd)); newDir = 'down';  moved = true }
-      if (k.left)  { tryMoveX(Math.max(minX, x - spd)); newDir = 'left';  moved = true }
-      if (k.right) { tryMoveX(Math.min(maxX, x + spd)); newDir = 'right'; moved = true }
+      if (k.up)    { tryMoveY(Math.max(minY, y - spd)); newDir = 'up';    hasMovementInput = true }
+      if (k.down)  { tryMoveY(Math.min(maxY, y + spd)); newDir = 'down';  hasMovementInput = true }
+      if (k.left)  { tryMoveX(Math.max(minX, x - spd)); newDir = 'left';  hasMovementInput = true }
+      if (k.right) { tryMoveX(Math.min(maxX, x + spd)); newDir = 'right'; hasMovementInput = true }
+
+      const moved = hasMovementInput
+        && (Math.abs(x - posRef.current.x) > 0.01 || Math.abs(y - posRef.current.y) > 0.01)
+      if (hasMovementInput && newDir !== dir) setDir(newDir)
 
       if (moved) {
         posRef.current = { x, y }
         setPos({ x, y })
-        if (newDir !== dir) setDir(newDir)
         setMoving(true)
 
         // 발견 상태인데 annotation 없이 멀어진 경우 → 발견 해제
@@ -3371,11 +3385,12 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
             data-zone-character data-character-x={Number(pos.x.toFixed(3))}
             data-character-y={Number(pos.y.toFixed(3))} data-character-dir={dir}
             data-character-moving={moving ? 'true' : 'false'}
+            data-frame-index={frameIndex}
             x={pos.x + CHAR_W/2 - SPRITE_W/2}
             y={pos.y + CHAR_H - SPRITE_H}
             width={SPRITE_W} height={SPRITE_H} style={{ overflow:'visible' }}>
             <div xmlns="http://www.w3.org/1999/xhtml" style={{ width:SPRITE_W, height:SPRITE_H }}>
-              <PixelChar dir={dir} moving={moving} animationTick={tick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/>
+              <PixelChar dir={dir} moving={moving} frameIndex={frameIndex} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout}/>
             </div>
           </foreignObject>
 
