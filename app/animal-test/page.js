@@ -2,7 +2,9 @@
 import { Suspense, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import AnimalZoneMap from '@/components/AnimalZoneMap'
+import AnnotationPanel from '@/components/AnnotationPanel'
 import soundMetadata from '@/data/sound_metadata.json'
+import { WALK_ANIMATION_QA_CHARACTER } from '@/lib/walkAnimationQa.mjs'
 
 // 격리된 Animal Zone(동물 마을, handoff 이식) 테스트 — 실제 게임 흐름(app/page.js,
 // WorldMap 내비게이션)은 건드리지 않는다. nature-test와 같은 패턴: 순수 시각 검증
@@ -15,9 +17,16 @@ const maxBlock = animalSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
 
 function AnimalTestContent() {
   const searchParams = useSearchParams()
+  const walkAnimationQa = searchParams.get('walkAnimationQa') === '1'
+  const worldScale = Math.max(0.25, Number(searchParams.get('worldScale')) || 1)
+  const startX = Number(searchParams.get('startX'))
+  const startY = Number(searchParams.get('startY'))
+  const debugStart = searchParams.has('startX') && searchParams.has('startY')
+    && Number.isFinite(startX) && Number.isFinite(startY) ? { x: startX, y: startY } : null
   const [baseOnlyOverride, setBaseOnlyOverride] = useState(false)
   const baseOnly = baseOnlyOverride || searchParams.get('baseOnly') === '1'
   const [collectedIds, setCollectedIds] = useState(new Set())
+  const [activeSound, setActiveSound] = useState(null)
   const [blockNum, setBlockNum] = useState(maxBlock)
   const [debugOptions, setDebugOptions] = useState({
     colliders: false,
@@ -26,22 +35,44 @@ function AnimalTestContent() {
     spawnSlots: false,
     blocks: false,
     coordinates: true,
+    mask: searchParams.get('collision') === '1',
   })
 
   const toggle = (key) => setDebugOptions((current) => ({ ...current, [key]: !current[key] }))
+  const finishAnnotation = () => {
+    if (activeSound) setCollectedIds((current) => new Set(current).add(activeSound.sound_id))
+    setActiveSound(null)
+  }
 
   return (
     <>
       <AnimalZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
         sounds={animalSounds}
-        onCollectSound={(sound) => setCollectedIds(prev => new Set([...prev, sound.sound_id]))}
+        onCollectSound={setActiveSound}
         onExit={() => {}}
         collectedIds={collectedIds}
+        isAnnotating={Boolean(activeSound)}
         blockNum={blockNum}
         blockTotal={maxBlock}
         debugOptions={debugOptions}
         baseOnly={baseOnly}
+        debugFirstItem={searchParams.get('firstItem') === '1'}
+        debugStart={debugStart}
+        currentWorldWidth={1536 * worldScale}
+        currentWorldHeight={1024 * worldScale}
       />
+      {activeSound && (
+        <AnnotationPanel
+          sound={activeSound}
+          zone="Animal"
+          participantId="ANIMAL_QA_LOCAL"
+          sessionId="A"
+          dryRun
+          onClose={() => setActiveSound(null)}
+          onComplete={finishAnnotation}
+        />
+      )}
       {!baseOnly && (
       <div style={{
         position: 'fixed', top: 8, right: 8, zIndex: 999,
@@ -60,6 +91,7 @@ function AnimalTestContent() {
           {[
             ['colliders', '충돌'], ['bounds', '오브젝트'], ['sortLines', 'Y-sort'],
             ['spawnSlots', 'spawn'], ['blocks', '6블록'], ['coordinates', '좌표'],
+            ['mask', 'PNG mask'],
           ].map(([key, label]) => (
             <label key={key} style={{ display: 'flex', alignItems: 'center', gap: 3 }}>
               <input type="checkbox" checked={debugOptions[key]} onChange={() => toggle(key)} /> {label}

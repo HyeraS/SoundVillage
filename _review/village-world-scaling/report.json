@@ -1,0 +1,665 @@
+{
+  "generatedAt": "2026-10-06T16:57:17.277Z",
+  "villages": {
+    "urban-v3": {
+      "villageId": "urban-v3",
+      "productionComponent": "components/UrbanV3ZoneMap.js",
+      "background": "public/assets/urban-city-v3/reference/canonical-map-art-runtime.png",
+      "foreground": null,
+      "mask": "public/assets/urban-city-v3/collision/urban-walkable-mask.png",
+      "generatedModule": "lib/generated/urbanV3WalkableMask.generated.mjs",
+      "sha256": "1438401782712ed4c315e69c6337d93dc060241ca2b77ded7eef1100b82dde02",
+      "baseWorldWidth": 1448,
+      "baseWorldHeight": 1086,
+      "playerFootBox": {
+        "w": 20,
+        "h": 14
+      },
+      "interpolation": "nearest-neighbor",
+      "testedScales": [
+        0.75,
+        1,
+        1.3,
+        2
+      ],
+      "screenshots": [
+        {
+          "scale": 1,
+          "path": "_review/village-world-scaling/urban-v3-1x.png"
+        },
+        {
+          "scale": 1.3,
+          "path": "_review/village-world-scaling/urban-v3-1_3x.png"
+        }
+      ],
+      "browserE2E": {
+        "passed": true,
+        "scales": [
+          {
+            "scale": 0.75,
+            "currentWorldWidth": 1086,
+            "currentWorldHeight": 814.5,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          },
+          {
+            "scale": 1,
+            "currentWorldWidth": 1448,
+            "currentWorldHeight": 1086,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/urban-v3-1x.png"
+          },
+          {
+            "scale": 1.3,
+            "currentWorldWidth": 1882.4,
+            "currentWorldHeight": 1411.8,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/urban-v3-1_3x.png"
+          },
+          {
+            "scale": 2,
+            "currentWorldWidth": 2896,
+            "currentWorldHeight": 2172,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          }
+        ]
+      },
+      "consoleErrorCount": 0,
+      "start": {
+        "passed": true
+      },
+      "exit": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "markerAccess": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "blackMaskCollision": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "connectedArea": {
+        "passed": true,
+        "verifiedBy": "model reachability regression"
+      }
+    },
+    "lab": {
+      "villageId": "lab",
+      "productionComponent": "components/LabZoneMap.js",
+      "background": "public/assets/lab-witch/environment-master-v2.png",
+      "foreground": null,
+      "mask": "public/assets/lab-witch/collision/lab-walkable-mask.png",
+      "generatedModule": "lib/generated/labWalkableMask.generated.mjs",
+      "sha256": "6abc7f67aceadeb6d01a711c3bd0cd430c62d9f99108ee8cefbdec5c7142759d",
+      "baseWorldWidth": 1536,
+      "baseWorldHeight": 1152,
+      "playerFootBox": {
+        "w": 20,
+        "h": 14
+      },
+      "interpolation": "nearest-neighbor",
+      "testedScales": [
+        0.75,
+        1,
+        1.3,
+        2
+      ],
+      "screenshots": [
+        {
+          "scale": 1,
+          "path": "_review/village-world-scaling/lab-1x.png"
+        },
+        {
+          "scale": 1.3,
+          "path": "_review/village-world-scaling/lab-1_3x.png"
+        }
+      ],
+      "browserE2E": {
+        "passed": true,
+        "scales": [
+          {
+            "scale": 0.75,
+            "currentWorldWidth": 1152,
+            "currentWorldHeight": 864,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          },
+          {
+            "scale": 1,
+            "currentWorldWidth": 1536,
+            "currentWorldHeight": 1152,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/lab-1x.png"
+          },
+          {
+            "scale": 1.3,
+            "currentWorldWidth": 1996.8000000000002,
+            "currentWorldHeight": 1497.6000000000001,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/lab-1_3x.png"
+          },
+          {
+            "scale": 2,
+            "currentWorldWidth": 3072,
+            "currentWorldHeight": 2304,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          }
+        ]
+      },
+      "consoleErrorCount": 0,
+      "start": {
+        "passed": true
+      },
+      "exit": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "markerAccess": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "blackMaskCollision": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "connectedArea": {
+        "passed": true,
+        "verifiedBy": "model reachability regression"
+      }
+    },
+    "human": {
+      "villageId": "human",
+      "productionComponent": "components/HumanZoneMap.js",
+      "background": "public/assets/human-village/community-map-master-1536x1152-v2.png",
+      "foreground": "public/assets/human-village/community-map-foreground-1536x1152-v2.png",
+      "mask": "public/assets/human-village/collision/human-walkable-mask.png",
+      "generatedModule": "lib/generated/humanWalkableMask.generated.mjs",
+      "sha256": "8e111e064fa25a8a2691ab1401d9f13a31370c626dbccc838bc2f727e4c71f2a",
+      "baseWorldWidth": 1536,
+      "baseWorldHeight": 1152,
+      "playerFootBox": {
+        "w": 20,
+        "h": 14
+      },
+      "interpolation": "nearest-neighbor",
+      "testedScales": [
+        0.75,
+        1,
+        1.3,
+        2
+      ],
+      "screenshots": [
+        {
+          "scale": 1,
+          "path": "_review/village-world-scaling/human-1x.png"
+        },
+        {
+          "scale": 1.3,
+          "path": "_review/village-world-scaling/human-1_3x.png"
+        }
+      ],
+      "browserE2E": {
+        "passed": true,
+        "scales": [
+          {
+            "scale": 0.75,
+            "currentWorldWidth": 1152,
+            "currentWorldHeight": 864,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          },
+          {
+            "scale": 1,
+            "currentWorldWidth": 1536,
+            "currentWorldHeight": 1152,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/human-1x.png"
+          },
+          {
+            "scale": 1.3,
+            "currentWorldWidth": 1996.8000000000002,
+            "currentWorldHeight": 1497.6000000000001,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/human-1_3x.png"
+          },
+          {
+            "scale": 2,
+            "currentWorldWidth": 3072,
+            "currentWorldHeight": 2304,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          }
+        ]
+      },
+      "consoleErrorCount": 0,
+      "start": {
+        "passed": true
+      },
+      "exit": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "markerAccess": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "blackMaskCollision": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "connectedArea": {
+        "passed": true,
+        "verifiedBy": "model reachability regression"
+      }
+    },
+    "animal": {
+      "villageId": "animal",
+      "productionComponent": "components/AnimalZoneMap.js",
+      "background": "public/assets/animal-village-sunflower/base-map.png",
+      "foreground": "public/assets/animal-village-sunflower/foreground-map.png",
+      "mask": "public/assets/animal-village-sunflower/walkable-mask.png",
+      "generatedModule": "lib/generated/animalWalkableMask.generated.mjs",
+      "sha256": "8325d5938f348b5b1b9a7cce92a9ec29f207aa3e76d10480bbd8bcb4e8b0e5ed",
+      "baseWorldWidth": 1536,
+      "baseWorldHeight": 1024,
+      "playerFootBox": {
+        "w": 20,
+        "h": 14
+      },
+      "interpolation": "nearest-neighbor",
+      "testedScales": [
+        0.75,
+        1,
+        1.3,
+        2
+      ],
+      "screenshots": [
+        {
+          "scale": 1,
+          "path": "_review/village-world-scaling/animal-1x.png"
+        },
+        {
+          "scale": 1.3,
+          "path": "_review/village-world-scaling/animal-1_3x.png"
+        }
+      ],
+      "browserE2E": {
+        "passed": true,
+        "scales": [
+          {
+            "scale": 0.75,
+            "currentWorldWidth": 1152,
+            "currentWorldHeight": 768,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          },
+          {
+            "scale": 1,
+            "currentWorldWidth": 1536,
+            "currentWorldHeight": 1024,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/animal-1x.png"
+          },
+          {
+            "scale": 1.3,
+            "currentWorldWidth": 1996.8000000000002,
+            "currentWorldHeight": 1331.2,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/animal-1_3x.png"
+          },
+          {
+            "scale": 2,
+            "currentWorldWidth": 3072,
+            "currentWorldHeight": 2048,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          }
+        ]
+      },
+      "consoleErrorCount": 0,
+      "start": {
+        "passed": true
+      },
+      "exit": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "markerAccess": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "blackMaskCollision": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "connectedArea": {
+        "passed": true,
+        "verifiedBy": "model reachability regression"
+      }
+    },
+    "nature": {
+      "villageId": "nature",
+      "productionComponent": "components/NatureZoneMap.js",
+      "background": "public/assets/world/nature-farm-v2/brookside-bloom-map-v3.png",
+      "foreground": null,
+      "mask": "public/assets/world/nature-farm-v2/collision/nature-walkable-mask.png",
+      "generatedModule": "lib/generated/natureWalkableMask.generated.mjs",
+      "sha256": "860c96f60d24009f733ecaf3fe492fa6c02fbc0a5422cc776716763752554810",
+      "baseWorldWidth": 1536,
+      "baseWorldHeight": 1152,
+      "playerFootBox": {
+        "w": 18,
+        "h": 10
+      },
+      "interpolation": "nearest-neighbor",
+      "testedScales": [
+        0.75,
+        1,
+        1.3,
+        2
+      ],
+      "screenshots": [
+        {
+          "scale": 1,
+          "path": "_review/village-world-scaling/nature-1x.png"
+        },
+        {
+          "scale": 1.3,
+          "path": "_review/village-world-scaling/nature-1_3x.png"
+        }
+      ],
+      "browserE2E": {
+        "passed": true,
+        "scales": [
+          {
+            "scale": 0.75,
+            "currentWorldWidth": 1152,
+            "currentWorldHeight": 864,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          },
+          {
+            "scale": 1,
+            "currentWorldWidth": 1536,
+            "currentWorldHeight": 1152,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/nature-1x.png"
+          },
+          {
+            "scale": 1.3,
+            "currentWorldWidth": 1996.8000000000002,
+            "currentWorldHeight": 1497.6000000000001,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": "_review/village-world-scaling/nature-1_3x.png"
+          },
+          {
+            "scale": 2,
+            "currentWorldWidth": 3072,
+            "currentWorldHeight": 2304,
+            "backgroundLoaded": true,
+            "generatedMask": true,
+            "startMovement": true,
+            "dpadMovement": true,
+            "resizeAligned": true,
+            "blackMaskCollision": true,
+            "markerInteraction": true,
+            "exitInteraction": true,
+            "consoleErrors": 0,
+            "screenshot": null
+          }
+        ]
+      },
+      "consoleErrorCount": 0,
+      "start": {
+        "passed": true
+      },
+      "exit": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "markerAccess": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "blackMaskCollision": {
+        "passed": true,
+        "browserScales": [
+          0.75,
+          1,
+          1.3,
+          2
+        ]
+      },
+      "connectedArea": {
+        "passed": true,
+        "verifiedBy": "model reachability regression"
+      }
+    }
+  }
+}

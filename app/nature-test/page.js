@@ -1,7 +1,9 @@
 'use client'
 import { useEffect, useState } from 'react'
 import NatureZoneMap from '@/components/NatureZoneMap'
+import AnnotationPanel from '@/components/AnnotationPanel'
 import soundMetadata from '@/data/sound_metadata.json'
+import { WALK_ANIMATION_QA_CHARACTER } from '@/lib/walkAnimationQa.mjs'
 
 // 격리된 Nature Zone(자연 마을, handoff 이식) 테스트 — 실제 게임 흐름(app/page.js,
 // WorldMap 내비게이션)은 건드리지 않는다. music-test와 같은 패턴: 순수 시각 검증
@@ -27,16 +29,35 @@ const REVIEW_VIEWS = {
 
 export default function NatureTestPage() {
   const [collectedIds, setCollectedIds] = useState(new Set())
+  const [activeSound, setActiveSound] = useState(null)
   const [blockNum, setBlockNum] = useState(maxBlock)
   const [reviewView, setReviewView] = useState('entrance')
   const [captureClean, setCaptureClean] = useState(false)
+  const [walkAnimationQa, setWalkAnimationQa] = useState(false)
+  const [worldScale, setWorldScale] = useState(1)
+  const [debugFirstItem, setDebugFirstItem] = useState(false)
+  const [debugStart, setDebugStart] = useState(null)
+  const [debugCollision, setDebugCollision] = useState(false)
   const review = REVIEW_VIEWS[reviewView]
+  const finishAnnotation = () => {
+    if (activeSound) setCollectedIds((current) => new Set(current).add(activeSound.sound_id))
+    setActiveSound(null)
+  }
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('capture') !== '1') return
+    const query = new URLSearchParams(window.location.search)
     const timer = window.setTimeout(() => {
-      setReviewView('staticArt')
-      setCaptureClean(true)
+      setWalkAnimationQa(query.get('walkAnimationQa') === '1')
+      setWorldScale(Math.max(0.25, Number(query.get('worldScale')) || 1))
+      setDebugFirstItem(query.get('firstItem') === '1')
+      const startX = Number(query.get('startX'))
+      const startY = Number(query.get('startY'))
+      setDebugStart(query.has('startX') && query.has('startY') && Number.isFinite(startX) && Number.isFinite(startY) ? { x: startX, y: startY } : null)
+      setDebugCollision(query.get('collision') === '1')
+      if (query.get('capture') === '1') {
+        setReviewView('staticArt')
+        setCaptureClean(true)
+      }
     }, 0)
     return () => window.clearTimeout(timer)
   }, [])
@@ -44,16 +65,34 @@ export default function NatureTestPage() {
   return (
     <>
       <NatureZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
         sounds={natureSounds}
-        onCollectSound={(sound) => setCollectedIds(prev => new Set([...prev, sound.sound_id]))}
+        onCollectSound={setActiveSound}
         onExit={() => {}}
         collectedIds={collectedIds}
+        isAnnotating={Boolean(activeSound)}
         blockNum={blockNum}
         blockTotal={maxBlock}
         debugTarget={review.target}
         debugOverview={!!review.overview}
         debugStaticArt={!!review.staticArt}
+        debugFirstItem={debugFirstItem}
+        debugStart={debugStart}
+        debugCollision={debugCollision}
+        currentWorldWidth={1536 * worldScale}
+        currentWorldHeight={1152 * worldScale}
       />
+      {activeSound && (
+        <AnnotationPanel
+          sound={activeSound}
+          zone="Nature"
+          participantId="NATURE_QA_LOCAL"
+          sessionId="A"
+          dryRun
+          onClose={() => setActiveSound(null)}
+          onComplete={finishAnnotation}
+        />
+      )}
       <div style={{
         position: 'fixed', top: 8, right: 8, zIndex: 999,
         background: '#000c', color: '#fff', padding: '6px 10px',

@@ -499,6 +499,8 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, dryRun, o
           {/* 재생/정지 버튼 */}
           <button
             onClick={toggle}
+            aria-label={playing ? '소리 정지' : '소리 재생'}
+            data-testid="annotation-audio-toggle"
             style={{
               width: '52px', height: '52px', borderRadius: '50%',
               background: playing ? `${accent}28` : accent,

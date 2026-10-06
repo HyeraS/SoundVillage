@@ -6,7 +6,7 @@ import ZoneMap         from '@/components/ZoneMap'
 import MusicZoneMap    from '@/components/MusicZoneMap'
 import NatureZoneMap   from '@/components/NatureZoneMap'
 import HumanZoneMap    from '@/components/HumanZoneMap'
-import UrbanZoneMap    from '@/components/UrbanZoneMap'
+import UrbanV3ZoneMap  from '@/components/UrbanV3ZoneMap'
 import AnimalZoneMap   from '@/components/AnimalZoneMap'
 import LabZoneMap      from '@/components/LabZoneMap'
 import AnnotationPanel from '@/components/AnnotationPanel'
@@ -1013,7 +1013,7 @@ export default function HomePage() {
             debugFirstItem={natureQaEnabled}
           />
         ) : activeZone === 'Urban' ? (
-          <UrbanZoneMap
+          <UrbanV3ZoneMap
             sounds={zoneSounds}
             onCollectSound={handleCollectSound}
             onExit={handleExitZone}

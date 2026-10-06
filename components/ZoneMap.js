@@ -2565,13 +2565,15 @@ function BlockCloud({ region, tick, seed = 1 }) {
 ───────────────────────────────────────────── */
 const CHAR_CFG = CHARACTERS.player_frames
 
-export function PixelChar({ dir, moving, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null }) {
-  const frame = moving ? Math.floor(animationTick / 10) % 2 : 0
+export function PixelChar({ dir, moving, frameIndex, animationTick = 0, displayWidth = SPRITE_W, displayHeight = SPRITE_H, sourceViewBox = null }) {
+  const requestedFrame = Number.isInteger(frameIndex) ? frameIndex : Math.floor(animationTick / 6)
+  const resolvedFrame = moving ? ((requestedFrame % 8) + 8) % 8 : 0
+  const frame = resolvedFrame % 2
 
   if (ASSET_READY.world) {
     const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
     const row = rows[dir] ?? rows.down
-    const walkTick = Math.floor(animationTick / 6) % cols.length
+    const walkTick = resolvedFrame % cols.length
     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
     return (
       <svg width={displayWidth} height={displayHeight}
