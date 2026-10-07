@@ -20,10 +20,9 @@ import { getOrCreateRoomShare, getOwnedInteriorItems, getRoom, getSharedRoom } f
 import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } from '@/lib/economyV1.client'
 import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
 import { useDuoSession } from '@/lib/duoSession'
-import { claimParticipantSession, restoreParticipantSession, signInMasterSession } from '@/lib/participantAuth'
+import { claimParticipantSession, endLocalParticipantSession, restoreParticipantSession, signInMasterSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
-import EconomyRuntimeNotice from '@/components/economy-v1/EconomyRuntimeNotice'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
 import { completeStudySession, flushEvents, setUserEventContext, startStudySession, trackEvent } from '@/lib/userEvents'
 import { canonicalAudioId, uniqueSoundsByCanonicalAudio } from '@/lib/soundIdentity.mjs'
@@ -263,6 +262,14 @@ export default function HomePage() {
       restoreParticipantSession()
         .then(async participant => {
           if (!participant) return
+          // 일반 참여자는 중간에 브라우저를 닫아도 이어서 진행해야 하지만,
+          // 여러 기기에서 쓰는 MASTER는 새 진입마다 비밀번호를 확인한다.
+          // local scope는 현재 브라우저 세션만 끝내므로 다른 기기의 MASTER
+          // 세션은 끊지 않는다.
+          if (participant.participantId === 'MASTER') {
+            await endLocalParticipantSession()
+            return
+          }
           await initializeUserLogging('world')
           const progress = await getMyExperimentProgress()
           trackedParticipantRef.current = participant.participantId
@@ -1057,10 +1064,6 @@ export default function HomePage() {
      렌더
   ───────────────────────────────────────────── */
 
-  const economyGuard = participantId && !TEMPORARILY_UNLOCK_ALL_CONTENT && !natureQaEnabled && !humanQaOptions
-    ? <EconomyRuntimeNotice runtimeState={economy.runtimeState} error={economy.error} onRetry={loadEconomy}/>
-    : null
-
   // 0. 집꾸미기 초대 링크(?house=)로 들어온 경우 — 방문객도 다른 진입 경로와
   // 똑같이 참여자ID/그룹을 먼저 선택해야 한다(익명 구경 아님). participantId가
   // 아직 없으면 평소 StartPanel을 그대로 재사용해서 받고, handleStart가
@@ -1114,7 +1117,6 @@ export default function HomePage() {
           accessorySrc={runtimeAccessorySrc}
           characterLoadout={runtimeCharacterLoadout}
         />
-        {economyGuard}
       </main>
     )
   }
@@ -1159,7 +1161,6 @@ export default function HomePage() {
           duo={duo}
           duoConnectionState={duoJoinState}
         />
-        {economyGuard}
         {stage4DuoQa && <div style={{ position:'fixed', right:16, bottom:16, zIndex:199, display:'flex', gap:8 }}>
           <button type="button" data-testid="stage4-enter-music" onClick={() => handleEnterZone('Music')} style={{
             border:'2px solid #5f8d42', borderRadius:8, background:'#eef8d6',
@@ -1289,7 +1290,6 @@ export default function HomePage() {
           duo={duo} duoInviteState={duoInviteState} onCreateDuoInvite={createLiveDuoInvite} onCloseDuoSession={closeLiveDuoSession}
           outfitSrc={runtimeOutfitSrc} accessorySrc={runtimeAccessorySrc} characterLoadout={runtimeCharacterLoadout}
           dryRun={TEMPORARILY_UNLOCK_ALL_CONTENT || natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
-        {economyGuard}
       </main>
     )
   }
@@ -1319,7 +1319,6 @@ export default function HomePage() {
           onDone={handleMuseumDone}
           onExit={handleMuseumExit}
         />
-        {economyGuard}
       </>
     )
   }
@@ -1491,8 +1490,6 @@ export default function HomePage() {
             </div>
           </div>
         )}
-        {economyGuard}
-
         {/* 완료 피드백 토스트 */}
         {showFeedback && (
           <FeedbackPanel
