@@ -68,6 +68,20 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default', labelSc
 }
 
 export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0, renderScale = 1 }) {
+  // Size the sprite viewport directly instead of enlarging it with a CSS
+  // transform. Safari can drop a transformed SVG nested in an SVG
+  // foreignObject, which made the local player disappear even though every
+  // sprite layer had loaded. Keeping the bottom-center anchor in layout also
+  // makes the rendered 32px frame reach the requested on-screen height.
+  const renderedSize = CHAR_H * renderScale
+  const spriteStyle = {
+    display:'block',
+    overflow:'hidden',
+    imageRendering:'pixelated',
+    position:'absolute',
+    left:(CHAR_W - renderedSize) / 2,
+    top:CHAR_H - renderedSize,
+  }
   if (ASSET_READY.world) {
     const { frame: frameSize, rows, cols } = WORLD_CHARACTER
     const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
@@ -76,14 +90,14 @@ export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, character
     const sourceX = frame * frameSize
     const sourceY = row * frameSize
     return (
-      <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${frameSize} ${frameSize}`}
+      <svg width={renderedSize} height={renderedSize} viewBox={`0 0 ${frameSize} ${frameSize}`}
         data-character-render-scale={renderScale.toFixed(6)}
-        style={{ overflow:'hidden', imageRendering:'pixelated', transform:`scale(${renderScale})`, transformOrigin:'50% 100%' }}>
-        <defs><clipPath id="worldPlayerClip"><rect width={frameSize} height={frameSize}/></clipPath></defs>
+        data-character-render-mode="layout-sized"
+        style={spriteStyle}>
         {layers.map((layer, index) => (
           <image key={`${layer.src}-${index}`} href={layer.src}
             x={-sourceX} y={-sourceY} width={layer.sheetW} height={layer.sheetH}
-            clipPath="url(#worldPlayerClip)" style={{ imageRendering:'pixelated' }}/>
+            style={{ imageRendering:'pixelated' }}/>
         ))}
       </svg>
     )
@@ -92,12 +106,12 @@ export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, character
   const offsets = FALLBACK_FRAMES[dir] || FALLBACK_FRAMES.down
   const frame = offsets[moving ? animationTick % 2 : 0] ?? offsets[0]
   return (
-    <svg width={CHAR_W} height={CHAR_H} viewBox={`0 0 ${FALLBACK_FRAMES.frameW} ${FALLBACK_FRAMES.frameH}`}
+    <svg width={renderedSize} height={renderedSize} viewBox={`0 0 ${FALLBACK_FRAMES.frameW} ${FALLBACK_FRAMES.frameH}`}
       data-character-render-scale={renderScale.toFixed(6)}
-      style={{ overflow:'hidden', imageRendering:'pixelated', transform:`scale(${renderScale})`, transformOrigin:'50% 100%' }}>
-      <defs><clipPath id="worldFallbackPlayerClip"><rect width={FALLBACK_FRAMES.frameW} height={FALLBACK_FRAMES.frameH}/></clipPath></defs>
+      data-character-render-mode="layout-sized"
+      style={spriteStyle}>
       <image href={CHARACTERS.player_sheet} x={-frame} y="0" width={FALLBACK_FRAMES.sheetW} height={FALLBACK_FRAMES.sheetH}
-        clipPath="url(#worldFallbackPlayerClip)" style={{ imageRendering:'pixelated' }}/>
+        style={{ imageRendering:'pixelated' }}/>
     </svg>
   )
 }
