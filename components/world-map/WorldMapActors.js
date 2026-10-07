@@ -67,21 +67,14 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default', labelSc
   )
 }
 
-export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0, renderScale = 1 }) {
-  // Size the sprite viewport directly instead of enlarging it with a CSS
-  // transform. Safari can drop a transformed SVG nested in an SVG
-  // foreignObject, which made the local player disappear even though every
-  // sprite layer had loaded. Keeping the bottom-center anchor in layout also
-  // makes the rendered 32px frame reach the requested on-screen height.
+export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0, renderScale = 1, clipId = 'worldCharacterClip' }) {
+  // Keep every character primitive in the outer world SVG. Safari can omit
+  // content behind foreignObject and has inconsistent nested-SVG viewport
+  // clipping, so each sprite sheet is scaled and positioned directly in world
+  // coordinates, then cropped with one native clipPath.
   const renderedSize = CHAR_H * renderScale
-  const spriteStyle = {
-    display:'block',
-    overflow:'hidden',
-    imageRendering:'pixelated',
-    position:'absolute',
-    left:(CHAR_W - renderedSize) / 2,
-    top:CHAR_H - renderedSize,
-  }
+  const spriteX = (CHAR_W - renderedSize) / 2
+  const spriteY = CHAR_H - renderedSize
   if (ASSET_READY.world) {
     const { frame: frameSize, rows, cols } = WORLD_CHARACTER
     const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })
@@ -89,29 +82,41 @@ export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, character
     const frame = cols[moving ? animationTick % cols.length : 0]
     const sourceX = frame * frameSize
     const sourceY = row * frameSize
+    const frameScale = renderedSize / frameSize
     return (
-      <svg width={renderedSize} height={renderedSize} viewBox={`0 0 ${frameSize} ${frameSize}`}
+      <g
         data-character-render-scale={renderScale.toFixed(6)}
-        data-character-render-mode="layout-sized"
-        style={spriteStyle}>
-        {layers.map((layer, index) => (
-          <image key={`${layer.src}-${index}`} href={layer.src}
-            x={-sourceX} y={-sourceY} width={layer.sheetW} height={layer.sheetH}
-            style={{ imageRendering:'pixelated' }}/>
-        ))}
-      </svg>
+        data-character-render-mode="native-svg"
+        data-character-frame={frame}
+        data-character-row={row}>
+        <defs><clipPath id={clipId}><rect x={spriteX} y={spriteY} width={renderedSize} height={renderedSize}/></clipPath></defs>
+        <g clipPath={`url(#${clipId})`}>
+          {layers.map((layer, index) => (
+            <image key={`${layer.src}-${index}`} href={layer.src}
+              x={spriteX - sourceX * frameScale} y={spriteY - sourceY * frameScale}
+              width={layer.sheetW * frameScale} height={layer.sheetH * frameScale}
+              style={{ imageRendering:'pixelated' }}/>
+          ))}
+        </g>
+      </g>
     )
   }
 
   const offsets = FALLBACK_FRAMES[dir] || FALLBACK_FRAMES.down
   const frame = offsets[moving ? animationTick % 2 : 0] ?? offsets[0]
+  const frameScale = renderedSize / FALLBACK_FRAMES.frameW
   return (
-    <svg width={renderedSize} height={renderedSize} viewBox={`0 0 ${FALLBACK_FRAMES.frameW} ${FALLBACK_FRAMES.frameH}`}
+    <g
       data-character-render-scale={renderScale.toFixed(6)}
-      data-character-render-mode="layout-sized"
-      style={spriteStyle}>
-      <image href={CHARACTERS.player_sheet} x={-frame} y="0" width={FALLBACK_FRAMES.sheetW} height={FALLBACK_FRAMES.sheetH}
-        style={{ imageRendering:'pixelated' }}/>
-    </svg>
+      data-character-render-mode="native-svg"
+      data-character-frame={frame}
+      data-character-row="0">
+      <defs><clipPath id={clipId}><rect x={spriteX} y={spriteY} width={renderedSize} height={renderedSize}/></clipPath></defs>
+      <g clipPath={`url(#${clipId})`}>
+        <image href={CHARACTERS.player_sheet} x={spriteX - frame * frameScale} y={spriteY}
+          width={FALLBACK_FRAMES.sheetW * frameScale} height={FALLBACK_FRAMES.sheetH * frameScale}
+          style={{ imageRendering:'pixelated' }}/>
+      </g>
+    </g>
   )
 }

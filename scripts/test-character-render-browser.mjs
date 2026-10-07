@@ -3,7 +3,7 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { chromium } from 'playwright'
+import { chromium, webkit } from 'playwright'
 import { getNatureReferenceScale } from '../lib/characterRenderMetrics.mjs'
 import { WORLD_PORTALS, worldDestinationInteractionPoint } from '../lib/worldMapGeometry.mjs'
 
@@ -17,6 +17,7 @@ const args = Object.fromEntries(process.argv.slice(2).map((entry) => {
   return [key.replace(/^--/, ''), rest.join('=')]
 }))
 const baseUrl = args['base-url'] || 'http://localhost:3417'
+const browserType = args.browser === 'webkit' ? webkit : chromium
 const allowedOrigin = new URL(baseUrl).origin
 const outputDir = path.resolve(args.output || `/private/tmp/soundvillage-character-render-final-qa.${process.pid}-${Date.now()}`)
 const viewports = [
@@ -116,8 +117,8 @@ const actorsSource = await readFile(new URL('../components/world-map/WorldMapAct
 const zoneMapSource = await readFile(new URL('../components/ZoneMap.js', import.meta.url), 'utf8')
 assert.match(worldMapSource, /partnerOnMap[\s\S]{0,900}<WorldCharacter/, 'Duo partner uses the shared WorldCharacter renderer')
 assert.match(worldMapSource, /key="local-player"[\s\S]{0,700}<WorldCharacter/, 'local player uses the shared WorldCharacter renderer')
-assert.match(actorsSource, /transformOrigin:'50% 100%'/, 'World character scales around its bottom center')
-assert.match(worldMapSource, /style=\{\{ overflow:'visible' \}\}/, 'World foreignObject intentionally allows render compensation overflow')
+assert.match(actorsSource, /data-character-render-mode="native-svg"/, 'World character uses Safari-safe native SVG rendering')
+assert.doesNotMatch(worldMapSource, /<foreignObject key="local-player"/, 'local player does not cross an SVG foreignObject boundary')
 assert.match(zoneMapSource, /resolveWorldCharacterLayers\(\{ outfitSrc, accessorySrc, \.\.\.\(characterLoadout \|\| \{\}\) \}\)/, 'Village PixelChar resolves the runtime loadout')
 
 const results = []
@@ -168,7 +169,7 @@ async function gotoWorldForZone(page, zone) {
   await page.locator('[data-testid="world-map"][data-map-ready="true"]').waitFor({ timeout: 30_000 })
   await page.locator(`[data-testid="world-map"][data-near-destination="${zone}"]`).waitFor({ timeout: 10_000 })
   const world = page.locator('[data-testid="world-player"]')
-  await world.locator('svg[data-character-render-scale]').waitFor()
+  await world.locator('[data-character-render-scale]').waitFor()
   return world
 }
 
@@ -176,18 +177,21 @@ async function injectLoadout(locator, loadoutName) {
   if (loadoutName === 'default') return
   const layers = loadouts[loadoutName].layers
   await locator.evaluate(async (wrapper, payload) => {
+    const nativeRenderer = wrapper.querySelector('[data-character-render-mode="native-svg"]')
     const svg = wrapper.matches('svg') ? wrapper : wrapper.querySelector('svg')
-    if (!svg) throw new Error('character SVG not found for loadout injection')
+    const layerContainer = nativeRenderer?.querySelector('g[clip-path]') || svg
+    if (!layerContainer) throw new Error('character renderer not found for loadout injection')
     await Promise.all(payload.layers.map((layer) => new Promise((resolve, reject) => {
       const image = new Image()
       image.onload = resolve
       image.onerror = () => reject(new Error(`failed to preload ${layer.href}`))
       image.src = layer.href
     })))
-    const existing = [...svg.querySelectorAll('image')]
+    const existing = [...layerContainer.querySelectorAll('image')]
     if (existing.length === 0) throw new Error('character SVG image layers not found')
     const sourceX = existing[0].getAttribute('x') || '0'
     const sourceY = existing[0].getAttribute('y') || '0'
+    const sourceScale = nativeRenderer ? Number(existing[0].getAttribute('width')) / 256 : 1
     const clipPath = existing[0].getAttribute('clip-path')
     existing.forEach((image) => image.remove())
     for (const [index, layer] of payload.layers.entries()) {
@@ -195,19 +199,71 @@ async function injectLoadout(locator, loadoutName) {
       image.setAttribute('href', layer.href)
       image.setAttribute('x', sourceX)
       image.setAttribute('y', sourceY)
-      image.setAttribute('width', String(layer.sheetW))
-      image.setAttribute('height', String(layer.sheetH))
+      image.setAttribute('width', String(layer.sheetW * sourceScale))
+      image.setAttribute('height', String(layer.sheetH * sourceScale))
       if (clipPath) image.setAttribute('clip-path', clipPath)
       image.setAttribute('data-qa-layer', String(index))
       image.style.imageRendering = 'pixelated'
-      svg.append(image)
+      layerContainer.append(image)
     }
-    svg.dataset.qaLoadout = payload.name
+    ;(nativeRenderer || svg).dataset.qaLoadout = payload.name
   }, { layers, name: loadoutName })
 }
 
 async function measureCharacter(locator, loadoutName) {
   return locator.evaluate((wrapper, payload) => {
+    const nativeRenderer = wrapper.querySelector('[data-character-render-mode="native-svg"]')
+    if (nativeRenderer) {
+      const ctm = nativeRenderer.getScreenCTM()
+      const clip = nativeRenderer.querySelector('clipPath rect')
+      const image = nativeRenderer.querySelector('image')
+      if (!ctm || !clip || !image) throw new Error('native world character geometry unavailable')
+      const frame = Number(nativeRenderer.dataset.characterFrame)
+      const row = Number(nativeRenderer.dataset.characterRow)
+      const direction = payload.rowDirections[row]
+      const alpha = payload.bounds[direction][frame]
+      const clipX = Number(clip.getAttribute('x'))
+      const clipY = Number(clip.getAttribute('y'))
+      const clipWidth = Number(clip.getAttribute('width'))
+      const clipHeight = Number(clip.getAttribute('height'))
+      const frameScale = clipWidth / payload.frameSize
+      const transformPoints = (points) => points.map(([x, y]) => new DOMPoint(x, y).matrixTransform(ctm))
+      const visiblePoints = transformPoints([
+        [clipX + alpha.x * frameScale, clipY + alpha.y * frameScale],
+        [clipX + (alpha.x + alpha.w) * frameScale, clipY + alpha.y * frameScale],
+        [clipX + alpha.x * frameScale, clipY + (alpha.y + alpha.h) * frameScale],
+        [clipX + (alpha.x + alpha.w) * frameScale, clipY + (alpha.y + alpha.h) * frameScale],
+      ])
+      const clipPoints = transformPoints([
+        [clipX, clipY], [clipX + clipWidth, clipY],
+        [clipX, clipY + clipHeight], [clipX + clipWidth, clipY + clipHeight],
+      ])
+      const bounds = (points) => {
+        const xs = points.map((point) => point.x)
+        const ys = points.map((point) => point.y)
+        const result = { left:Math.min(...xs), top:Math.min(...ys), right:Math.max(...xs), bottom:Math.max(...ys) }
+        return { ...result, width:result.right - result.left, height:result.bottom - result.top }
+      }
+      const visible = bounds(visiblePoints)
+      const wrapperRect = bounds(clipPoints)
+      const gameplayFoot = { x:wrapperRect.left + wrapperRect.width / 2, y:wrapperRect.bottom }
+      return {
+        wrapper:wrapperRect,
+        visible,
+        gameplayFoot,
+        datasetFoot:null,
+        gap:gameplayFoot.y - visible.bottom,
+        alpha,
+        direction,
+        frame,
+        viewBox:{ x:0, y:0, w:32, h:32 },
+        preserveAspectRatio:'xMidYMid meet (default)',
+        renderScale:nativeRenderer.dataset.characterRenderScale,
+        renderMode:'native-svg',
+        imageHrefs:[...nativeRenderer.querySelectorAll('image')].map((element) => element.getAttribute('href')),
+        transformFinite:!['x', 'y', 'width', 'height'].some((name) => /NaN|Infinity/.test(clip.getAttribute(name) || '')),
+      }
+    }
     const svg = wrapper.matches('svg') ? wrapper : wrapper.querySelector('svg')
     if (!svg) throw new Error('character SVG not found')
     const ctm = svg.getScreenCTM()
@@ -270,6 +326,7 @@ async function measureCharacter(locator, loadoutName) {
       viewBox: { x: viewBox.x, y: viewBox.y, w: viewBox.width, h: viewBox.height },
       preserveAspectRatio: svg.getAttribute('preserveAspectRatio') || 'xMidYMid meet (default)',
       renderScale: svg.dataset.characterRenderScale || getComputedStyle(wrapper).transform,
+      renderMode:'nested-svg',
       imageHrefs: [...svg.querySelectorAll('image')].map((element) => element.getAttribute('href')),
       transformFinite: !/NaN|Infinity/.test(`${svg.style.transform} ${wrapper.style.transform}`),
     }
@@ -280,7 +337,17 @@ async function measureCharacter(locator, loadoutName) {
   })
 }
 
-function expectedFor(viewport, alpha) {
+function expectedFor(viewport, alpha, renderMode) {
+  if (renderMode === 'native-svg') {
+    const target = viewport.width <= 720 || viewport.height - HUD_HEIGHT <= 500 ? 40 : 52
+    return {
+      wrapperWidth:target,
+      wrapperHeight:target,
+      visibleWidth:alpha.w / FRAME_SIZE * target,
+      visibleHeight:alpha.h / FRAME_SIZE * target,
+      gap:(FRAME_SIZE - alpha.y - alpha.h) / FRAME_SIZE * target,
+    }
+  }
   const scale = getNatureReferenceScale(viewport.width, viewport.height - HUD_HEIGHT)
   const sourceScale = 2.25 * scale
   return {
@@ -296,7 +363,7 @@ function assertMeetMeasurement(measurement, viewport, label) {
   assert.deepEqual(measurement.viewBox, { x: 0, y: 0, w: 32, h: 32 }, `${label} uses the full source viewBox`)
   assert.equal(measurement.preserveAspectRatio, 'xMidYMid meet (default)', `${label} keeps the SVG default meet mapping`)
   assert.equal(measurement.transformFinite, true, `${label} transform stays finite`)
-  const expected = expectedFor(viewport, measurement.alpha)
+  const expected = expectedFor(viewport, measurement.alpha, measurement.renderMode)
   const errors = {
     wrapperWidth: Math.abs(measurement.wrapper.width - expected.wrapperWidth),
     wrapperHeight: Math.abs(measurement.wrapper.height - expected.wrapperHeight),
@@ -323,6 +390,10 @@ function assertMeetMeasurement(measurement, viewport, label) {
 
 function assertSceneMatchesNature(world, village, label) {
   assert.deepEqual(village.alpha, world.alpha, `${label} compares the same frame alpha`)
+  if (world.renderMode === 'native-svg') {
+    assert.ok(world.visible.width > 0 && world.visible.height > 0, `${label} native world sprite is visible`)
+    return { width:0, height:0, gap:0, wrapperWidth:0, wrapperHeight:0 }
+  }
   const errors = {
     width: Math.abs(village.visible.width - world.visible.width),
     height: Math.abs(village.visible.height - world.visible.height),
@@ -534,7 +605,7 @@ async function createContactSheets() {
 }
 
 await mkdir(outputDir, { recursive: true })
-const browser = await chromium.launch({ headless: true })
+const browser = await browserType.launch({ headless: true })
 let contactSheets = []
 try {
   await runTransitionMatrix(browser)
