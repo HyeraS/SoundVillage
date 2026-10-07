@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "coordinateSystem": "half-open world pixels; top-left origin",
+  "productionIntegration": false,
+  "layers": {
+    "candidateA": {
+      "building": {
+        "file": "candidate-a/home-building.png",
+        "pixelSize": [
+          352,
+          301
+        ],
+        "worldRect": {
+          "left": 1472,
+          "top": 1395,
+          "right": 1824,
+          "bottom": 1696,
+          "width": 352,
+          "height": 301
+        },
+        "role": "home-building",
+        "expectedRenderBand": "world",
+        "sortY": 1696,
+        "sortOffsetY": 0,
+        "alphaBbox": {
+          "0": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          },
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          }
+        },
+        "declaredRectMarginsPx": {
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        "groundContact": [
+          1648,
+          1696
+        ],
+        "sha256": "197931821b40304aa20dcf8a7f1e2aed02e267a24c0469d99e0b2553283c34a8",
+        "sharedLayer": false
+      },
+      "siteGround": {
+        "file": "candidate-a/home-site-ground.png",
+        "pixelSize": [
+          512,
+          480
+        ],
+        "worldRect": {
+          "left": 1344,
+          "top": 1344,
+          "right": 1856,
+          "bottom": 1824,
+          "width": 512,
+          "height": 480
+        },
+        "role": "home-site-ground",
+        "expectedRenderBand": "ground",
+        "sortY": 1695,
+        "sortOffsetY": -1,
+        "alphaBbox": {
+          "0": {
+            "left": 0,
+            "top": 0,
+            "right": 512,
+            "bottom": 480,
+            "width": 512,
+            "height": 480
+          },
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 512,
+            "bottom": 480,
+            "width": 512,
+            "height": 480
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 512,
+            "bottom": 480,
+            "width": 512,
+            "height": 480
+          }
+        },
+        "declaredRectMarginsPx": {
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        "groundContact": [
+          1648,
+          1696
+        ],
+        "sha256": "4e242c074c88b970f9612e661f4fa7bd781f367ebe692922eadb54f53a4ef20b",
+        "sharedLayer": true
+      },
+      "foreground": null
+    },
+    "candidateB": {
+      "building": {
+        "file": "candidate-b/home-building.png",
+        "pixelSize": [
+          352,
+          301
+        ],
+        "worldRect": {
+          "left": 1472,
+          "top": 1395,
+          "right": 1824,
+          "bottom": 1696,
+          "width": 352,
+          "height": 301
+        },
+        "role": "home-building",
+        "expectedRenderBand": "world",
+        "sortY": 1696,
+        "sortOffsetY": 0,
+        "alphaBbox": {
+          "0": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          },
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 352,
+            "bottom": 301,
+            "width": 352,
+            "height": 301
+          }
+        },
+        "declaredRectMarginsPx": {
+          "8": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          },
+          "16": {
+            "left": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0
+          }
+        },
+        "groundContact": [
+          1648,
+          1696
+        ],
+        "sha256": "daafea68f1805763579fe6953a30c4eb2a8c66bcbd1256888645dc3902f46300",
+        "sharedLayer": false
+      },
+      "siteGround": {
+        "sharedFrom": "candidateA.siteGround",
+        "file": "candidate-a/home-site-ground.png",
+        "sharedLayer": true
+      },
+      "foreground": null
+    }
+  },
+  "siteMetadata": {
+    "visualBox": {
+      "left": 1472,
+      "top": 1395,
+      "right": 1824,
+      "bottom": 1696
+    },
+    "visualFootprint": {
+      "left": 1520,
+      "top": 1472,
+      "right": 1776,
+      "bottom": 1696
+    },
+    "futureCollisionReviewOnly": {
+      "left": 1520,
+      "top": 1472,
+      "right": 1776,
+      "bottom": 1696
+    },
+    "groundContact": [
+      1648,
+      1696
+    ],
+    "sortY": 1696,
+    "doorPoint": [
+      1648,
+      1760
+    ],
+    "approachPoint": [
+      1648,
+      1760
+    ],
+    "roadConnectionPoint": [
+      1824,
+      1760
+    ],
+    "siteBounds": {
+      "left": 1440,
+      "top": 1344,
+      "right": 1856,
+      "bottom": 1824
+    },
+    "southPassage": {
+      "left": 1344,
+      "top": 1728,
+      "right": 1856,
+      "bottom": 1792
+    },
+    "protectedRoad": {
+      "left": 1824,
+      "top": 1440,
+      "right": 1952,
+      "bottom": 1888
+    },
+    "apron": {
+      "left": 1616,
+      "top": 1696,
+      "right": 1680,
+      "bottom": 1792
+    },
+    "waitingArea": {
+      "left": 1616,
+      "top": 1728,
+      "right": 1680,
+      "bottom": 1792
+    }
+  }
+}

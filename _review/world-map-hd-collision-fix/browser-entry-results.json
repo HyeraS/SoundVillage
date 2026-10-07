@@ -1,0 +1,37 @@
+{
+  "currentBrowserRun": {
+    "browser": "Codex in-app browser",
+    "viewport": "844x390",
+    "devicePixelRatio": 1,
+    "worldStartUsed": false,
+    "Nature": {
+      "movement": "PASS - sustained touch direction inputs from default spawn",
+      "proximityCue": "PASS",
+      "enter": "PASS - NatureZoneMap rendered",
+      "return": "PASS - back button returned to world",
+      "screenshot": "12-nature-entered-by-walking.png"
+    },
+    "Sound Library": {
+      "movement": "PASS - default spawn is the authored library approach",
+      "proximityCue": "PASS",
+      "enter": "PASS - SoundMuseum rendered",
+      "return": "PASS - Escape returned to world",
+      "screenshot": "14-library-entered-by-walking.png"
+    }
+  },
+  "sharedProductionMovementValidation": {
+    "Lab": "PASS",
+    "Animal": "PASS",
+    "Urban": "PASS",
+    "Music": "PASS",
+    "Human": "PASS",
+    "Nature": "PASS",
+    "Sound Library": "PASS",
+    "Home": "PASS",
+    "evidence": [
+      "collision-coverage-validation.json",
+      "../world-map-production-integration/portal-route-results.json"
+    ]
+  },
+  "limitation": "A fresh from-spawn browser traversal was completed for Nature and the spawn-adjacent Library. The remaining six destinations and Home were validated with the exact shared production movement function and current mask, but were not all replayed end-to-end through physical browser key events in this pass. Prior all-destination browser transition captures remain under _review/world-map-production-integration/."
+}

@@ -13,6 +13,7 @@ import {
 } from '../lib/characterRenderMetrics.mjs'
 import { calculateWorldCameraView } from '../lib/worldMapCamera.mjs'
 import { WORLD_PLAYER, WORLD_SPAWN } from '../lib/worldMapGeometry.mjs'
+import { MUSEUM_WORLD_HEIGHT, MUSEUM_WORLD_WIDTH, PLAYER_BODY as MUSEUM_PLAYER_BODY, PLAYER_SPRITE as MUSEUM_PLAYER_SPRITE } from '../lib/soundMuseumFinalBLayout.mjs'
 import {
   getMusicCamera,
   MUSIC_PLAYER_H,
@@ -34,6 +35,7 @@ const FRAME_SIZE = 32
 const VIEWPORTS = Object.freeze([
   { width: 1440, height: 900 },
   { width: 1280, height: 720 },
+  { width: 1920, height: 1080 },
   { width: 390, height: 844 },
   { width: 844, height: 390 },
 ])
@@ -89,9 +91,22 @@ function sceneCameraScales(stageWidth, stageHeight) {
   const urban = stageHeight / (18 * 32)
   const music = getMusicCamera({ cssWidth: stageWidth, cssHeight: stageHeight, playerX: 24 * 32, playerY: 18 * 32 }).scale
   const lab = labCamera(stageWidth, stageHeight, LAB_SPAWN).zoom
-  const worldView = calculateWorldCameraView({ viewportWidth: stageWidth, viewportHeight: stageHeight + HUD_HEIGHT, hudHeight: HUD_HEIGHT })
-  const world = worldView.sceneWidth / worldView.viewW
-  return { World: world, Nature: nature, Animal: animal, Human: human, Urban: urban, Music: music, Lab: lab }
+  const worldDefaultView = calculateWorldCameraView({ viewportWidth:stageWidth, viewportHeight:stageHeight + HUD_HEIGHT, hudHeight:HUD_HEIGHT })
+  const world100View = calculateWorldCameraView({ viewportWidth:stageWidth, viewportHeight:stageHeight + HUD_HEIGHT, hudHeight:HUD_HEIGHT, visualScale:1 })
+  const world75View = calculateWorldCameraView({ viewportWidth:stageWidth, viewportHeight:stageHeight + HUD_HEIGHT, hudHeight:HUD_HEIGHT, visualScale:.75 })
+  const museum = Math.min(stageWidth / MUSEUM_WORLD_WIDTH, (stageHeight + HUD_HEIGHT) / MUSEUM_WORLD_HEIGHT)
+  return {
+    World:worldDefaultView.sceneWidth / worldDefaultView.viewW,
+    World100:world100View.sceneWidth / world100View.viewW,
+    World75:world75View.sceneWidth / world75View.viewW,
+    Museum:museum,
+    Nature:nature,
+    Animal:animal,
+    Human:human,
+    Urban:urban,
+    Music:music,
+    Lab:lab,
+  }
 }
 
 const alphaBounds = {}
@@ -202,6 +217,8 @@ for (const input of [
 // Gameplay geometry remains on its original contracts; render metrics do not
 // participate in collision, speed, interaction, spawn or auto-walk math.
 assert.deepEqual(WORLD_PLAYER, { width: 72, height: 88, footWidth: 28, footHeight: 16 })
+assert.deepEqual(MUSEUM_PLAYER_SPRITE, CHARACTER_RENDER_SIZE)
+assert.deepEqual(MUSEUM_PLAYER_BODY, { width: 30, height: 42 })
 assert.deepEqual(WORLD_SPAWN, { tx: 60, ty: 47 })
 assert.deepEqual(NATURE_PLAYER_BOX, { w: 18, h: 10 })
 assert.deepEqual(ANIMAL_PLAYER_BOX, { w: 20, h: 14 })

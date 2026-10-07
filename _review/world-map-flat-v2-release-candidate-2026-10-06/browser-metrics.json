@@ -1,0 +1,354 @@
+{
+  "baseUrl": "http://localhost:3107",
+  "generatedAt": "2026-10-05T17:14:14.641Z",
+  "records": [
+    {
+      "width": 1280,
+      "height": 720,
+      "dpr": 1,
+      "screenshot": "browser/1280x720-dpr1.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.230556
+      },
+      "targetHeight": 52,
+      "renderScale": 2.563,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 1280,
+        "bottom": 720,
+        "width": 1280,
+        "height": 664
+      },
+      "background": {
+        "left": 197.333,
+        "top": 56,
+        "right": 1082.667,
+        "bottom": 720,
+        "width": 885.333,
+        "height": 664
+      },
+      "character": {
+        "left": 618.727,
+        "top": 352.6,
+        "right": 661.273,
+        "bottom": 404.6,
+        "width": 42.545,
+        "height": 52
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2007,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 72.3,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 117.3,
+        "slowFrames": 0,
+        "maxFrameMs": 31.7,
+        "heapDelta": 0
+      },
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "dpr": 1,
+      "screenshot": "browser/1440x900-dpr1.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.293056
+      },
+      "targetHeight": 52,
+      "renderScale": 2.016,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 1440,
+        "bottom": 900,
+        "width": 1440,
+        "height": 844
+      },
+      "background": {
+        "left": 157.333,
+        "top": 56,
+        "right": 1282.667,
+        "bottom": 900,
+        "width": 1125.333,
+        "height": 844
+      },
+      "character": {
+        "left": 698.727,
+        "top": 447.1,
+        "right": 741.273,
+        "bottom": 499.1,
+        "width": 42.545,
+        "height": 52
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2007,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 64.3,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 117.9,
+        "slowFrames": 0,
+        "maxFrameMs": 41.7,
+        "heapDelta": 0
+      },
+      "errors": []
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "dpr": 2,
+      "screenshot": "browser/1440x900-dpr2.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.293056
+      },
+      "targetHeight": 52,
+      "renderScale": 2.016,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 1440,
+        "bottom": 900,
+        "width": 1440,
+        "height": 844
+      },
+      "background": {
+        "left": 157.333,
+        "top": 56,
+        "right": 1282.667,
+        "bottom": 900,
+        "width": 1125.333,
+        "height": 844
+      },
+      "character": {
+        "left": 698.727,
+        "top": 447.1,
+        "right": 741.273,
+        "bottom": 499.1,
+        "width": 42.545,
+        "height": 52
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2007,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 70.8,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 118.8,
+        "slowFrames": 0,
+        "maxFrameMs": 33.4,
+        "heapDelta": 0
+      },
+      "errors": []
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "dpr": 1,
+      "screenshot": "browser/1920x1080-dpr1.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.355556
+      },
+      "targetHeight": 52,
+      "renderScale": 1.662,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 1920,
+        "bottom": 1080,
+        "width": 1920,
+        "height": 1024
+      },
+      "background": {
+        "left": 277.333,
+        "top": 56,
+        "right": 1642.667,
+        "bottom": 1080,
+        "width": 1365.333,
+        "height": 1024
+      },
+      "character": {
+        "left": 938.727,
+        "top": 541.6,
+        "right": 981.273,
+        "bottom": 593.6,
+        "width": 42.546,
+        "height": 52
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2010,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 69.8,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 118.2,
+        "slowFrames": 0,
+        "maxFrameMs": 34.5,
+        "heapDelta": 0
+      },
+      "errors": []
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "dpr": 1,
+      "screenshot": "browser/390x844-dpr1.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.101563
+      },
+      "targetHeight": 40,
+      "renderScale": 4.476,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 390,
+        "bottom": 844,
+        "width": 390,
+        "height": 788
+      },
+      "background": {
+        "left": 0,
+        "top": 303.75,
+        "right": 390,
+        "bottom": 596.25,
+        "width": 390,
+        "height": 292.5
+      },
+      "character": {
+        "left": 178.636,
+        "top": 417.313,
+        "right": 211.364,
+        "bottom": 457.313,
+        "width": 32.727,
+        "height": 40
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2010,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 69.4,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 118.6,
+        "slowFrames": 0,
+        "maxFrameMs": 33.4,
+        "heapDelta": 0
+      },
+      "errors": []
+    },
+    {
+      "width": 844,
+      "height": 390,
+      "dpr": 1,
+      "screenshot": "browser/844x390-dpr1.png",
+      "camera": {
+        "width": 3840,
+        "height": 2880,
+        "scale": 0.115972
+      },
+      "targetHeight": 40,
+      "renderScale": 3.919,
+      "stage": {
+        "left": 0,
+        "top": 56,
+        "right": 844,
+        "bottom": 390,
+        "width": 844,
+        "height": 334
+      },
+      "background": {
+        "left": 199.333,
+        "top": 56,
+        "right": 644.667,
+        "bottom": 390,
+        "width": 445.333,
+        "height": 334
+      },
+      "character": {
+        "left": 405.636,
+        "top": 191.35,
+        "right": 438.364,
+        "bottom": 231.35,
+        "width": 32.727,
+        "height": 40
+      },
+      "playerMovement": {
+        "before": {
+          "x": 1884,
+          "y": 1424
+        },
+        "after": {
+          "x": 2007,
+          "y": 1424
+        }
+      },
+      "performance": {
+        "mapReadyMs": 69,
+        "transferBytes": 727004,
+        "decodedBytes": 6290112,
+        "assetResources": 1,
+        "averageFps": 119.2,
+        "slowFrames": 0,
+        "maxFrameMs": 25,
+        "heapDelta": 0
+      },
+      "errors": []
+    }
+  ]
+}

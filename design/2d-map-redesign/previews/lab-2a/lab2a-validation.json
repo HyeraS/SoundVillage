@@ -1,0 +1,33 @@
+{
+  "pass": true,
+  "sounds": 169,
+  "groups": {
+    "A": {
+      "total": 84,
+      "blocks": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        9
+      ]
+    },
+    "B": {
+      "total": 85,
+      "blocks": [
+        15,
+        15,
+        15,
+        15,
+        15,
+        10
+      ]
+    }
+  },
+  "slots": 108,
+  "clearanceTileChecks": 972,
+  "reachableTiles": 1047,
+  "foregroundCandidateWalkableTiles": 22,
+  "note": "Actual tall artwork clipped to original collision; candidate guide unchanged. Static geometry is not runtime gameplay validation."
+}

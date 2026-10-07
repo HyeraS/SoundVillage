@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "procedure": [
+    "Set landmark-home to legacy in a test-only authority map",
+    "Compile projections in memory",
+    "Verify legacy render/collision/destination/minimap/path",
+    "Discard test authority map; do not write production files"
+  ],
+  "restored": {
+    "assetId": "landmark-home-hub",
+    "bounds": [
+      1440,
+      1368,
+      1888,
+      1752
+    ],
+    "sortY": 1752,
+    "collision": [
+      1536,
+      1472,
+      1792,
+      1752
+    ],
+    "approach": [
+      1664,
+      1792
+    ],
+    "minimap": [
+      1664,
+      1792
+    ],
+    "guidePath": [
+      [
+        1920,
+        1504
+      ],
+      [
+        1856,
+        1568
+      ],
+      [
+        1792,
+        1696
+      ],
+      [
+        1664,
+        1792
+      ]
+    ]
+  },
+  "productionAfterRehearsal": {
+    "library": "native",
+    "home": "native",
+    "other": "legacy",
+    "nativeCount": 2,
+    "legacyCount": 16
+  },
+  "legacyAssetsRetained": true
+}

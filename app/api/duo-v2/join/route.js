@@ -1,4 +1,4 @@
-import { duoResponse, duoResponseWithRealtime, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
+import { duoResponse, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
 import { isJoinToken } from '@/lib/duoSessionContract.mjs'
 import { hashDuoJoinToken, joinDuoSession } from '@/lib/duoSession.server'
 
@@ -19,5 +19,5 @@ export async function POST(request) {
     parsed.body.idempotencyKey,
   )
   if (error) return duoStorageFailure('join', error)
-  return duoResponseWithRealtime(data, auth.user.id, parsed.body.clientId)
+  return duoResponse(data)
 }

@@ -1,0 +1,13 @@
+{
+  "pass": true,
+  "checks": [
+    "spawn free and outside exit",
+    "required route and complete loop traverse in ground model",
+    "central base blocks large step, upper arch itself does not",
+    "archive partition blocks but middle opening permits crossing",
+    "diagonal corner sliding does not leave a blocked endpoint",
+    "every actual slot has clearance, not reserved; no shared coordinate",
+    "capacity failure remains explicit, never padded with fake markers",
+    "recommended camera world/display preserve aspect and stay in world"
+  ]
+}

@@ -1,40 +1,13 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
 import { ASSET_READY, CHARACTERS, WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { TILE, ZONE_META } from '@/components/GameEngine'
-import { getCharacterRenderMetrics } from '@/lib/characterRenderMetrics.mjs'
-import { calculateWorldCameraView, WORLD_CAMERA_HUD_HEIGHT } from '@/lib/worldMapCamera.mjs'
 import { WORLD_HOME, WORLD_MUSEUM, WORLD_PLAYER, worldDestinationInteractionPoint } from '@/lib/worldMapGeometry.mjs'
 
 const { width: CHAR_W, height: CHAR_H } = WORLD_PLAYER
 const FALLBACK_FRAMES = CHARACTERS.player_frames
 
-function useWorldCharacterRenderScale() {
-  const [viewport, setViewport] = useState({ width: 0, height: 0 })
-  useEffect(() => {
-    const update = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
-    update()
-    window.addEventListener('resize', update)
-    return () => window.removeEventListener('resize', update)
-  }, [])
-  return useMemo(() => {
-    if (!viewport.width || !viewport.height) return 1
-    const camera = calculateWorldCameraView({
-      viewportWidth: viewport.width,
-      viewportHeight: viewport.height,
-      hudHeight: WORLD_CAMERA_HUD_HEIGHT,
-    })
-    const cameraScale = camera.sceneWidth / camera.viewW
-    return getCharacterRenderMetrics({
-      stageWidth: camera.sceneWidth,
-      stageHeight: camera.sceneHeight,
-      sceneCameraScale: cameraScale,
-    }).worldScale
-  }, [viewport])
-}
-
-export function WorldPortalHotspot({ portal, hovered, progress, locked }) {
+export function WorldPortalHotspot({ portal, hovered, progress, locked, labelScale = 1 }) {
   const meta = ZONE_META[portal.zone]
   const { x, y } = worldDestinationInteractionPoint(portal, TILE)
   const label = `${meta.emoji} ${meta.label}`
@@ -45,17 +18,20 @@ export function WorldPortalHotspot({ portal, hovered, progress, locked }) {
         fill={locked ? '#555' : meta.color} opacity={hovered ? 0.34 : 0.16}/>
       {hovered && !locked && <ellipse cx={x} cy={y - 5} rx="48" ry="17"
         fill="none" stroke={meta.color} strokeWidth="3" opacity="0.8"/>}
-      <rect x={x - width / 2} y={y + 5} width={width} height="24" rx="9"
-        fill="#172014dd" stroke={locked ? '#aaa' : meta.color} strokeWidth={hovered ? 2.5 : 1.5}/>
-      <text x={x} y={y + 21} textAnchor="middle" fontSize="11" fontWeight="800"
-        fontFamily="Nunito, sans-serif" fill="#fff" style={{ userSelect:'none' }}>
-        {locked ? `🔒 ${meta.label}` : `${label} ${Math.round(progress * 100)}%`}
-      </text>
+      <g data-role="world-label" data-label-scale={labelScale.toFixed(4)}
+        transform={labelScale === 1 ? undefined : `translate(${x} ${y + 17}) scale(${labelScale}) translate(${-x} ${-(y + 17)})`}>
+        <rect x={x - width / 2} y={y + 5} width={width} height="24" rx="9"
+          fill="#172014dd" stroke={locked ? '#aaa' : meta.color} strokeWidth={hovered ? 2.5 : 1.5}/>
+        <text x={x} y={y + 21} textAnchor="middle" fontSize="11" fontWeight="800"
+          fontFamily="Nunito, sans-serif" fill="#fff" style={{ userSelect:'none' }}>
+          {locked ? `🔒 ${meta.label}` : `${label} ${Math.round(progress * 100)}%`}
+        </text>
+      </g>
     </g>
   )
 }
 
-export function WorldLandmarkHotspot({ kind, hovered, state = 'default' }) {
+export function WorldLandmarkHotspot({ kind, hovered, state = 'default', labelScale = 1 }) {
   const isHome = kind === 'home'
   const target = isHome ? WORLD_HOME : WORLD_MUSEUM
   const { x, y } = worldDestinationInteractionPoint(target, TILE)
@@ -73,22 +49,25 @@ export function WorldLandmarkHotspot({ kind, hovered, state = 'default' }) {
     <g aria-label={`${label} 입구`} data-testid={isHome ? 'world-home' : 'world-museum'} data-home-state={isHome ? state : undefined}>
       <ellipse cx={x} cy={y - 4} rx={hovered ? 40 : 26} ry={hovered ? 13 : 8}
         fill={color} opacity={hovered ? 0.34 : 0.16}/>
-      {isHome && homeStatus && <g data-testid="world-home-status" pointerEvents="none">
+      {isHome && homeStatus && <g data-testid="world-home-status" pointerEvents="none"
+        transform={labelScale === 1 ? undefined : `translate(${x + 60} ${y - 37}) scale(${labelScale}) translate(${-(x + 60)} ${-(y - 37)})`}>
         <circle cx={x + 60} cy={y - 54} r={state === 'invite-ready' ? 12 : 10} fill={homeStatus.color} opacity="0.25"/>
         <circle cx={x + 60} cy={y - 54} r="5" fill={homeStatus.color} stroke="#FFF4D6" strokeWidth="2"/>
         <rect x={x + 14} y={y - 47} width="92" height="20" rx="8" fill="#172014e8" stroke={homeStatus.color}/>
         <text x={x + 60} y={y - 33} textAnchor="middle" fontSize="10" fontWeight="900" fill="#fff">{homeStatus.icon} {homeStatus.label}</text>
       </g>}
-      <rect x={x - width / 2} y={y + 5} width={width} height="24" rx="9"
-        fill="#172014dd" stroke={color} strokeWidth={hovered ? 2.5 : 1.5}/>
-      <text x={x} y={y + 21} textAnchor="middle" fontSize="11" fontWeight="800"
-        fontFamily="Nunito, sans-serif" fill="#fff" style={{ userSelect:'none' }}>{label}</text>
+      <g data-role="world-label" data-label-scale={labelScale.toFixed(4)}
+        transform={labelScale === 1 ? undefined : `translate(${x} ${y + 17}) scale(${labelScale}) translate(${-x} ${-(y + 17)})`}>
+        <rect x={x - width / 2} y={y + 5} width={width} height="24" rx="9"
+          fill="#172014dd" stroke={color} strokeWidth={hovered ? 2.5 : 1.5}/>
+        <text x={x} y={y + 21} textAnchor="middle" fontSize="11" fontWeight="800"
+          fontFamily="Nunito, sans-serif" fill="#fff" style={{ userSelect:'none' }}>{label}</text>
+      </g>
     </g>
   )
 }
 
-export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0 }) {
-  const renderScale = useWorldCharacterRenderScale()
+export function WorldCharacter({ dir, moving, outfitSrc, accessorySrc, characterLoadout, animationTick = 0, renderScale = 1 }) {
   if (ASSET_READY.world) {
     const { frame: frameSize, rows, cols } = WORLD_CHARACTER
     const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...(characterLoadout || {}) })

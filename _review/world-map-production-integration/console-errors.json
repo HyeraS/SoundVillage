@@ -1,0 +1,18 @@
+{
+  "status": "PARTIAL — backend verification required",
+  "unexpectedFrontendErrors": [],
+  "asset404s": [],
+  "expectedBackendLimitations": [
+    {
+      "area": "SoundMuseum candidate lookup",
+      "message": "Remote QA pseudo-account candidate lookup failed; SoundMuseum still mounted and remained usable for navigation."
+    },
+    {
+      "area": "InteriorDecorRoom bootstrap",
+      "message": "Remote QA pseudo-account had no usable room/currency data. The component opened a read-only fallback room and allowed a safe return to the world map."
+    }
+  ],
+  "developmentOnlyNoise": [
+    "Next.js development issue badge reflected the expected backend errors above."
+  ]
+}

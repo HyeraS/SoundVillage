@@ -1,0 +1,280 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-09-26T14:05:15+09:00",
+  "scope": "read-only current architecture survey and migration design; no production code, runtime asset, placement, or collision-mask mutation",
+  "repositoryState": {
+    "dirtyWorktreeObserved": true,
+    "policy": "preserve all existing user and collision-system changes; no reset, checkout, restore, clean, commit, push, or deploy",
+    "relevantModifiedOrUntrackedInputs": [
+      "lib/worldMapGeometry.mjs",
+      "lib/worldMapV4Manifest.mjs",
+      "lib/worldWalkableMaskData.mjs",
+      "lib/worldMapCollision.mjs",
+      "scripts/build-world-map-v4-collision.mjs",
+      "package.json",
+      "_review/world-map-object-collision-step2/",
+      "_review/world-map-home-integration-step0/",
+      "_review/world-map-home-circulation-step1/"
+    ]
+  },
+  "coordinateSystem": {
+    "origin": "top-left",
+    "unit": "world pixel",
+    "tileSize": 32,
+    "worldWidth": 3840,
+    "worldHeight": 2880,
+    "collisionRectRule": "[left,right) x [top,bottom)",
+    "collisionPolygonRule": "even-odd pixel-center fill with half-open maximum X/Y boundaries",
+    "collisionCellSize": 4,
+    "playerFoot": {
+      "runtimeWidth": 28,
+      "runtimeHeight": 16,
+      "clearanceKernelWidth": 29,
+      "clearanceKernelHeight": 17,
+      "halfWidth": 14,
+      "halfHeight": 8
+    }
+  },
+  "contentCounts": {
+    "terrainPanels": 12,
+    "renderObjects": 17,
+    "environmentClusters": 8,
+    "landmarkRenderObjects": 9,
+    "interactiveDestinationLandmarks": 8,
+    "inspectionOnlyLandmarks": 1,
+    "foregroundObjects": 1,
+    "collisionObjects": 8,
+    "runtimeAssets": 30,
+    "runtimeAssetEncodedBytes": 7439806,
+    "runtimeAssetDecodedRgbaBytes": 129521776,
+    "previewEncodedBytes": 29190,
+    "previewDecodedRgbaBytes": 691200
+  },
+  "content": {
+    "bakedGround": {
+      "logicalRecommendation": "one world-ground source with generated terrain panel layers",
+      "runtimePanels": [
+        "terrain-panel-0-0",
+        "terrain-panel-0-1",
+        "terrain-panel-0-2",
+        "terrain-panel-0-3",
+        "terrain-panel-1-0",
+        "terrain-panel-1-1",
+        "terrain-panel-1-2",
+        "terrain-panel-1-3",
+        "terrain-panel-2-0",
+        "terrain-panel-2-1",
+        "terrain-panel-2-2",
+        "terrain-panel-2-3"
+      ]
+    },
+    "staticDecorationClusters": [
+      "environment-north-forest",
+      "environment-west-stream-forest",
+      "environment-east-forest",
+      "environment-central-gardens",
+      "environment-southwest-garden",
+      "environment-southeast-garden",
+      "environment-south-center-garden",
+      "environment-south-forest"
+    ],
+    "modularGameplayObjects": [
+      "landmark-lab",
+      "landmark-animal",
+      "landmark-urban",
+      "landmark-music",
+      "landmark-human",
+      "landmark-nature",
+      "landmark-library",
+      "landmark-home"
+    ],
+    "inspectionOnlyObjects": [
+      "landmark-guesthouse"
+    ],
+    "foregroundOrOccluder": [
+      "foreground-south-gate"
+    ]
+  },
+  "runtimeBaselineAtSpawn": [
+    {
+      "viewport": [1280, 720],
+      "staticSvgImageNodes": 11,
+      "uniquePreloadAssetIdsExcludingPreview": 10,
+      "encodedBytesIncludingPreview": 3020860,
+      "decodedRgbaBytesIncludingPreview": 52609156
+    },
+    {
+      "viewport": [1440, 900],
+      "staticSvgImageNodes": 11,
+      "uniquePreloadAssetIdsExcludingPreview": 10,
+      "encodedBytesIncludingPreview": 3020860,
+      "decodedRgbaBytesIncludingPreview": 52609156
+    },
+    {
+      "viewport": [390, 844],
+      "staticSvgImageNodes": 14,
+      "uniquePreloadAssetIdsExcludingPreview": 13,
+      "encodedBytesIncludingPreview": 3336140,
+      "decodedRgbaBytesIncludingPreview": 60670536
+    },
+    {
+      "viewport": [844, 390],
+      "staticSvgImageNodes": 9,
+      "uniquePreloadAssetIdsExcludingPreview": 8,
+      "encodedBytesIncludingPreview": 2724764,
+      "decodedRgbaBytesIncludingPreview": 45236356
+    }
+  ],
+  "authorities": {
+    "renderPlacementAndDepth": "lib/worldMapV4Manifest.mjs",
+    "runtimeAssetRegistry": "lib/worldMapV4Assets.mjs (generated)",
+    "assetSourceCropAndGeneration": "scripts/build-world-map-v4-assets.py plus public/assets/world/sound-archive-garden-v4/asset-manifest.json",
+    "collisionDeclaration": "lib/worldMapCollision.mjs",
+    "collisionBuild": "scripts/build-world-map-v4-collision.mjs",
+    "runtimeMovement": "lib/worldMapGeometry.mjs plus generated lib/worldWalkableMaskData.mjs",
+    "interactionDestination": "lib/worldMapGeometry.mjs, duplicated in lib/worldMapV4Manifest.mjs",
+    "navigationRoute": "lib/worldMapNavigation.mjs generated from the walkable-clearance mask",
+    "navigationGuideRoad": "lib/worldMapV4Manifest.mjs WORLD_MAP_V4_PATHS",
+    "minimapPoint": "derived from geometry destinations by lib/worldMapMinimap.mjs",
+    "minimapPresentation": "components/GameEngine.js and components/world-map/WorldMapDiagram.js",
+    "state": "lib/homeHub.mjs and components/WorldMap.js",
+    "culling": "lib/worldMapV4Manifest.mjs spatial index and query functions"
+  },
+  "caseStudies": {
+    "Home": {
+      "objectId": "landmark-home",
+      "assetId": "landmark-home-hub",
+      "visualBounds": [1440, 1368, 1888, 1752],
+      "assetSize": [448, 384],
+      "anchor": [0, 0],
+      "groundContact": null,
+      "sortY": 1752,
+      "collision": {
+        "colliderId": "home-body",
+        "role": "building-body",
+        "rect": [1536, 1472, 1792, 1752]
+      },
+      "destinationTileBox": [48, 46, 8, 9],
+      "interactionPoint": [1664, 1792],
+      "minimapPoint": [1664, 1792],
+      "authoredGuidePath": [[1920, 1504], [1856, 1568], [1792, 1696], [1664, 1792]],
+      "generatedRoute": [[1920, 1504], [1810, 1650], [1810, 1762], [1664, 1792]],
+      "spatialChunks": ["2,2", "3,2", "2,3", "3,3"],
+      "source": "design/world-map-v4/source-assets/landmark-home-player-hub-v1.png",
+      "migration": "not first pilot; future art/site approval pending"
+    },
+    "Library": {
+      "objectId": "landmark-library",
+      "assetId": "landmark-library",
+      "visualBounds": [1146.9613259668508, 828.7292817679557, 2691.7127071823206, 1544.7513812154696],
+      "assetSize": [1545, 717],
+      "anchor": [0, 0],
+      "groundContact": null,
+      "sortY": 1339.2265193370165,
+      "collision": {
+        "colliderId": "library-body",
+        "role": "building-body",
+        "rect": [1728, 1184, 2112, 1398]
+      },
+      "destinationTileBox": [54, 37, 12, 8],
+      "interactionPoint": [1918, 1438],
+      "minimapPoint": [1918, 1438],
+      "authoredGuidePath": [[1920, 1504], [1918, 1438]],
+      "generatedRoute": [[1920, 1504], [1918, 1438]],
+      "spatialChunkCount": 12,
+      "source": "design/concepts/world-map-reskin-2026-09-18/02-sound-archive-garden-hd-master.png crop [1730,1250,4060,2330]",
+      "migration": "recommended first pilot",
+      "knownDrift": "runtime sortReferenceY 1010 vs asset-build semantic sortReferenceY 1147; preserve runtime value during migration"
+    },
+    "Music": {
+      "objectId": "landmark-music",
+      "assetId": "landmark-music",
+      "visualBounds": [2864.0883977900553, 1803.3149171270718, 3840, 2804.419889502762],
+      "assetSize": [976, 1002],
+      "anchor": [0, 0],
+      "groundContact": null,
+      "sortY": 2532.5966850828727,
+      "collision": {
+        "colliderId": "music-body",
+        "role": "building-body",
+        "rect": [3040, 2080, 3392, 2430]
+      },
+      "destinationTileBox": [95, 65, 11, 11],
+      "interactionPoint": [3166, 2470],
+      "minimapPoint": [3166, 2470],
+      "authoredGuidePath": [[1920, 1504], [2250, 1690], [2500, 1920], [2860, 2140], [3166, 2470]],
+      "generatedRoutePointCount": 10,
+      "spatialChunks": ["5,3", "6,3", "7,3", "5,4", "6,4", "7,4", "5,5", "6,5", "7,5"],
+      "source": "design/concepts/world-map-reskin-2026-09-18/02-sound-archive-garden-hd-master.png crop [4320,2720,5792,4230]",
+      "migration": "migrate after simpler landmarks",
+      "knownDrift": "runtime sortReferenceY 1910 vs asset-build semantic sortReferenceY 2097; preserve runtime value during migration"
+    }
+  },
+  "sourceHashesSha256": {
+    "lib/worldMapV4Manifest.mjs": "561a89143afd572062a6f12165da01050f8215c08952ce552dacdd27af08f880",
+    "lib/worldMapCollision.mjs": "3704aafc62f777ec433ae38a01428c5e0f0abc67e97bcf4f7b4ded601c9b830b",
+    "lib/worldMapGeometry.mjs": "c1eb303acf6dfe3c9bb5ada236592480a0d0c40ae8dc476eacd045366a0d062a",
+    "lib/worldMapCamera.mjs": "4aeb32aedf8ebecfc3e4fdecada8060b8445d3a9cdd734c09170de11dd546ba9",
+    "lib/worldMapNavigation.mjs": "3853397aca686a6a45e1fbc4d3756ba373e309e1dc8ea85ee433309e49e62e05",
+    "lib/worldMapMinimap.mjs": "001da1be997c8e279f5411aae51d4f6e85a6683c1510fda366427b85f877e0bb",
+    "lib/worldMapV4Assets.mjs": "39f0d97bae315e086df8d49fddeb82e120e7ff08696b34ec85b844e3ca2bd1f2",
+    "components/WorldMap.js": "ec41abe04d9963f40fd2df215a21c7084248c4991e7e8358d9b5d9d79ba90dbd",
+    "components/world-map/WorldMapScene.js": "3670664d7327f9c236a60950b3b85459ea8847361de691b7549367903239e5df",
+    "scripts/build-world-map-v4-assets.py": "ccea0d9bba5de24e8926ac258534a1223d1a8192ee25e5ac2979e63a373a993c",
+    "scripts/build-world-map-v4-runtime-assets.mjs": "86e3eff61df9fc4ad45d1881ed83cee365d61fd51252caf3fbe8a017c36c3729",
+    "scripts/build-world-map-v4-collision.mjs": "ec935eaccbf30c479eeb80d0236809022182589fb28fc4ca001f9fc11f0695bb",
+    "lib/worldWalkableMaskData.mjs": "01707f39a1e5219e4f73ec3738d4b107591fd2bfa12091410378555d367e8abd",
+    "public/assets/world/sound-archive-garden-v4/walkable-clearance-mask.png": "90c42850c4ca4e4fc9d019b8675405fa8e2342e8bb1a2e0c5ccc2f6a3dd7f12f",
+    "public/assets/world/sound-archive-garden-v4/obstacle-mask.png": "dfc3665c58f929d5e6ce44276df0bb280fbba9e492a35c3062dbbbcbe8c73617",
+    "public/assets/world/sound-archive-garden-v4/collision-debug.png": "03f79edc28b644cbdaa6ff1762e61efc085edde5c8512656b7c4935989a3819a"
+  },
+  "reviewedFiles": [
+    "lib/worldMapV4Manifest.mjs",
+    "lib/worldMapCollision.mjs",
+    "lib/worldMapCollision.test.mjs",
+    "lib/worldMapGeometry.mjs",
+    "lib/worldMapCamera.mjs",
+    "lib/worldMapNavigation.mjs",
+    "lib/worldMapMinimap.mjs",
+    "lib/worldMapMinimap.test.mjs",
+    "lib/worldMapV4Assets.mjs",
+    "lib/homeHub.mjs",
+    "components/WorldMap.js",
+    "components/world-map/WorldMapScene.js",
+    "components/world-map/WorldMapActors.js",
+    "components/world-map/WorldMapDiagram.js",
+    "components/world-map/WorldMinimap.js",
+    "components/world-map/WorldMapOverlay.js",
+    "scripts/build-world-map-v4-assets.py",
+    "scripts/build-world-map-v4-runtime-assets.mjs",
+    "scripts/build-world-map-v4-collision.mjs",
+    "scripts/build-world-map-v4-collision.py",
+    "scripts/build-world-map-hd-assets.py",
+    "scripts/test-world-map-v4-assets.mjs",
+    "scripts/test-world-map-hd-collision.mjs",
+    "scripts/test-world-map-authored-routes.mjs",
+    "scripts/test-world-map-camera.mjs",
+    "scripts/test-world-map-home-hub.mjs",
+    "scripts/test-world-map-minimap-browser.mjs",
+    "scripts/test-world-map-production-integration.mjs",
+    "package.json",
+    "public/assets/world/sound-archive-garden-v4/asset-manifest.json",
+    "_review/world-map-object-collision-step2/COLLISION_ARCHITECTURE.md",
+    "_review/world-map-object-collision-step2/TEST_RESULTS.md",
+    "_review/world-map-object-collision-step2/collision-build.json",
+    "_review/world-map-home-integration-step0/SPEC.md",
+    "_review/world-map-home-integration-step0/findings.json",
+    "_review/world-map-home-circulation-step1/CIRCULATION_SPEC.md",
+    "_review/world-map-home-circulation-step1/circulation-findings.json",
+    "node_modules/next/dist/docs/01-app/03-api-reference/01-directives/use-client.md",
+    "node_modules/next/dist/docs/01-app/01-getting-started/05-server-and-client-components.md"
+  ],
+  "decision": {
+    "recommendedCandidate": 3,
+    "targetAuthority": 1,
+    "firstPilot": "landmark-library",
+    "collisionConnection": "WorldObject-authored colliders projected by adapter into the existing WORLD_MAP_V4_COLLISION_OBJECTS shape; existing raster and runtime mask lookup remain unchanged",
+    "homePilot": false,
+    "individualSmallDecorationObjects": false
+  }
+}

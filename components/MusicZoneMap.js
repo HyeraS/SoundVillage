@@ -13,6 +13,7 @@ import {
   getMusicCamera, worldToMusicScreen, getMusicPlayerPlacement,
 } from '@/lib/musicVillage'
 import { getCharacterRenderMetrics } from '@/lib/characterRenderMetrics.mjs'
+import { useWalkFrame } from '@/components/useWalkFrame'
 
 const soundSetKey = (sounds) => (sounds || [])
   .map((sound) => `${sound.sound_id}:${sound.block || 1}`)
@@ -60,7 +61,7 @@ export default function MusicZoneMap({
   const movingRef = useRef(false)
   const [dir, setDir] = useState('down')
   const [moving, setMoving] = useState(false)
-  const [animTick, setAnimTick] = useState(0)
+  const frameIndex = useWalkFrame(moving)
   const [collecting, setCollecting] = useState(null)
   useCollectiblePromptLogging(collecting, 'Music')
   const collectingRef = useRef(false)
@@ -133,13 +134,6 @@ export default function MusicZoneMap({
     return () => observer.disconnect()
   }, [])
 
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (movingRef.current) setAnimTick((tick) => tick + 1)
-    }, 100)
-    return () => clearInterval(timer)
-  }, [])
-
   const beginCollect = (item) => {
     if (!item || isAnnotatingRef.current) return
     // Lock synchronously so a second key/pointer event cannot open the same
@@ -188,9 +182,13 @@ export default function MusicZoneMap({
       if (pressed.left) { dx -= speed; nextDir = 'left' }
       if (pressed.right) { dx += speed; nextDir = 'right' }
       if (dx && dy) { dx *= Math.SQRT1_2; dy *= Math.SQRT1_2 }
-      const moved = dx !== 0 || dy !== 0
-      if (moved) {
-        const movement = moveWithCollisionDetailed(village, posRef.current, dx, dy)
+      const hasMovementInput = dx !== 0 || dy !== 0
+      let moved = false
+      if (hasMovementInput) {
+        const previousPosition = posRef.current
+        const movement = moveWithCollisionDetailed(village, previousPosition, dx, dy)
+        moved = Math.abs(movement.position.x - previousPosition.x) > 0.01
+          || Math.abs(movement.position.y - previousPosition.y) > 0.01
         posRef.current = movement.position
         movementDebugRef.current = movement
         if (nextDir && nextDir !== dirRef.current) {
@@ -204,6 +202,9 @@ export default function MusicZoneMap({
       }
 
       const { x: playerX, y: playerY } = posRef.current
+      if (playerWrapRef.current) {
+        playerWrapRef.current.dataset.movementBlocked = hasMovementInput && !moved ? 'true' : 'false'
+      }
       const currentItems = itemsRef.current
       if (!collectingRef.current && !isAnnotatingRef.current) {
         const nearby = currentItems
@@ -304,7 +305,6 @@ export default function MusicZoneMap({
             collectedIds: collectedIdsRef.current,
             nearbyId: collectingItemRef.current?.id,
             interactingId: isAnnotatingRef.current ? interactingItemIdRef.current : null,
-            distance: distanceToMusicItem(posRef.current, item),
           }),
         }))
         const depth = splitOcclusionObjects(playerY)
@@ -392,7 +392,7 @@ export default function MusicZoneMap({
           position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
           imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 1,
         }} />
-        <div ref={playerWrapRef} data-testid="music-player" style={{
+        <div ref={playerWrapRef} data-testid="music-player" data-frame-index={frameIndex} style={{
           position: 'absolute', left: 0, top: 0, width: MUSIC_PLAYER_W, height: MUSIC_PLAYER_H,
           transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
         }}>
@@ -404,7 +404,7 @@ export default function MusicZoneMap({
             <PixelChar
               dir={dir}
               moving={moving}
-              animationTick={animTick}
+              frameIndex={frameIndex}
               displayWidth={MUSIC_PLAYER_W}
               displayHeight={MUSIC_PLAYER_H}
               sourceViewBox={MUSIC_PLAYER_SOURCE}
@@ -427,7 +427,7 @@ export default function MusicZoneMap({
           <PixelChar
             dir={dir}
             moving={moving}
-            animationTick={animTick}
+            frameIndex={frameIndex}
             displayWidth={MUSIC_PLAYER_W}
             displayHeight={MUSIC_PLAYER_H}
             sourceViewBox={MUSIC_PLAYER_SOURCE}

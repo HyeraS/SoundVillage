@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "normalizedSize": [
+    960,
+    720
+  ],
+  "comparison": "baseline 4:3 capture vs centered 4:3 map crop from the new browser capture",
+  "expectedChangeRegions": [
+    "former-home interaction marker",
+    "new central home landmark and interaction marker"
+  ],
+  "outsideMeanAbsoluteError255": 6.4284,
+  "outsideChangedPixelRatio": 0.006673,
+  "expectedRegionChangedPixels": 4537
+}

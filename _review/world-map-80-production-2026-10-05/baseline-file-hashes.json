@@ -1,0 +1,51 @@
+{
+  "capturedAt": "2026-10-05",
+  "algorithm": "sha256",
+  "writerCheck": {
+    "method": "lsof on owned target files",
+    "openHandles": 0,
+    "note": "Process enumeration was denied by the managed macOS sandbox; no target file had an open lsof handle. Hashes are rechecked before every owned edit and after verification."
+  },
+  "ownedTargets": {
+    "components/WorldMap.js": "2ea039afc6f3da2c37b93b044a1d024e4af7641309841885cef63689d4b1262f",
+    "components/world-map/WorldMapActors.js": "16671d792bff8ae65ee99c564a6cbdda661d021a4bebf10f30d4b89708ed467d",
+    "lib/worldMapCamera.mjs": "90c6909f3b6a46a0ccbcfde2074d07698e9d827e0de0da7943a2ba5a3d3e351b",
+    "scripts/test-world-map-camera.mjs": "7964e476679042fb178de14d35da397469916ae0f089167a99357bcb87e7924d",
+    "scripts/test-character-render-metrics.mjs": "51b26e0ebca412d46880d7394129feb75f923e5aad9390a6b37ca5adf92a09cf",
+    "scripts/test-world-map-production-integration.mjs": "a548748de0c7e6a29aaa987484025dbc129e46118203db544788abe829e75991",
+    "scripts/capture-world-map-scale-prototype.mjs": "fe840d6cee6cf893f28ef3ad42ec1edf1eefd6b5f1c48b95c362c4e075c2bafe",
+    "scripts/test-world-map-scale-prototype.mjs": "e83e9418c4b823cb6e8ebe910cfb336501e106b3c39f612ea2674b41c5eddd41",
+    "scripts/report-world-map-scale-prototype.mjs": "71916ebf7441bad86473922f8db32cbfa98fa36ed001bc7ab9fcceeccf6ea38d"
+  },
+  "protectedFiles": {
+    "components/AnimalZoneMap.js": "e55bc20ea2bfa35e661269bca77135ce41a361716e683ed095efb276c10722f3",
+    "components/NatureZoneMap.js": "a214bfe787ef50c61a4fa7cff94a9be996a055f3219666b3c3afac6ddd28934a",
+    "components/MusicZoneMap.js": "00e827c609beb7ec4693f7c5269a355dcd8b940a778e9b00ca1f73fd5142f2c1",
+    "components/HumanZoneMap.js": "50e8ff8e2194737dc08d1742ed3820568a74030173a2336ec0b6c16ebaa9266f",
+    "components/UrbanZoneMap.js": "a085227656d8f7eece1a20979ea965f30df80b1b497f22f877e50b0eaa981f54",
+    "components/LabZoneMap.js": "1bb6acd1197d71660499b9f9bb22e56db5e1a195562bc54b8bf07b21184e2c57",
+    "components/ZoneMap.js": "44fb40e8d5febf074e0b07f71f47833d523039d4e1ca3a40bd897b4bf5866fa7",
+    "components/InteriorRoom.js": "5a33e68073890346356d641b18f31798e2c10ba52463a6e307ff67e3cdc7b5f5",
+    "components/InteriorDecorRoom.js": "ca2b3347e7564e0e72b500e315aef3797612e26b13537ed23addf1ff0dcf091b",
+    "components/HouseDecorRoom.js": "9a82c68e492b495a2629487050c9a162e5f4119d6f101bf601ff7bc9d39fefd4",
+    "components/LibraryRoom.js": "6985748e398aa40db3d3be8e9850a25b07f26ae2baba8f95cbe6c911f5d6bcc7",
+    "components/SoundMuseum.js": "c9348152dbab5399afc71cf3960da30e9d5b66d3f3c5e51438583e20fddf6182",
+    "lib/animalVillageSunflowerConfig.mjs": "c66bfc0ddd279276c7b18d7bc7904224bacab01c3546bd058fe4312da9a52ebf",
+    "lib/natureFarmLayout.mjs": "2604764cc8251de54637482720e5d2a87eac1b74917dc10688af32598ab4b8fc",
+    "lib/musicVillageConfig.mjs": "134db688f190dfa84e838e2c9a292841b5ade00d4e871e5975574d0b41bc7f4e",
+    "lib/humanVillageConfig.mjs": "1a0877f07a2e4518a00ddf69164fd812b8f50d21d1a610e7844ea8ffda378554",
+    "lib/urbanVillageConfig.mjs": "2188050598d2806fa9d73186bd589de6c5d29ea882636f965dc3b647b3a9b3cc",
+    "lib/urbanV3WorldConfig.mjs": "2386a72ae0919646d6909e03dc36ec77aef4c5e2d77da011ad64b3c8f797e22e",
+    "lib/labVillageConfig.mjs": "a5a4d26a1dba4b6babd7acf5ae5f33ae7217fedfd4001d96528fe331bcb58312",
+    "lib/worldMapGeometry.mjs": "48346a15586cbad923d8d78f8babb9ce9abbdfccfb9ef93c990bd45207177470",
+    "lib/worldMapCollision.mjs": "00b2b4e9029c9acc6f42fb614f3b10c74f93523f456eb97d27cc7a59bb01b468",
+    "lib/worldMapCollisionContract.mjs": "55826fd966dca40986398d79096214f9936ec2ad1fa221b94f00ddb6bd0b3158",
+    "lib/worldMapNavigation.mjs": "3853397aca686a6a45e1fbc4d3756ba373e309e1dc8ea85ee433309e49e62e05",
+    "lib/generated/worldMapV4CollisionObjects.mjs": "4304831d801375981c079afde0966e53e315bca398a6d7229c162aa270608288",
+    "lib/generated/worldMapV4RuntimeObjects.mjs": "696883f247c92a24e3c827ebd9c79e81314172f1fba85845be06de0679d1ae72",
+    "data/world-map-v4/legacyCollisionObjects.mjs": "625c09ecb69bab9c3b587a67ef8bd200d81a53265e0c14e388d2740d813052cf",
+    "public/assets/world/sound-archive-garden-v4/collision-build.json": "8b3853a8a379775267603e2f7128b0b102bb79d4f29dddd01a335aeeac51c7e6",
+    "public/assets/world/sound-archive-garden-v4/obstacle-mask.png": "3cc4c06887846a7ae17c8521b9bc72215ad24e0fd2debcc78abe01be5a0f20b3",
+    "public/assets/world/sound-archive-garden-v4/walkable-clearance-mask.png": "c85237a143a741ffde89c766b8fd19219339981f8056f570ac0ecdb8e5b48474"
+  }
+}

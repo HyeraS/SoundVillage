@@ -846,7 +846,8 @@ export const ACCESSORY_SHEETS = {
   acc_mask_spooky:      { src: '/assets/character-v2/accessories/mask_spooky-walk.png',      previewSrc: '/assets/economy/previews/accessories/acc_mask_spooky.png',      sheetW: 256, sheetH: 128 },
 }
 
-// Stage 3A review assets only. Wallet and shop UI adoption is deferred to 3B.
+// The approved 32px village currency icons are also reused by each village's
+// collectible sound-data marker, so collection and spending share one symbol.
 export const VILLAGE_CURRENCY_ICONS = {
   Animal: { src: '/assets/economy/village-currencies/animal.png', size: 32 },
   Human:  { src: '/assets/economy/village-currencies/human.png',  size: 32 },

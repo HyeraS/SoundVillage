@@ -1,0 +1,58 @@
+[
+  {
+    "name": "records",
+    "source": [
+      59,
+      41
+    ],
+    "alphaBounds": [
+      1,
+      1,
+      56,
+      40
+    ],
+    "opaqueColors": 30
+  },
+  {
+    "name": "measurement",
+    "source": [
+      59,
+      41
+    ],
+    "alphaBounds": [
+      2,
+      2,
+      55,
+      39
+    ],
+    "opaqueColors": 10
+  },
+  {
+    "name": "workbench",
+    "source": [
+      56,
+      36
+    ],
+    "alphaBounds": [
+      0,
+      2,
+      56,
+      34
+    ],
+    "opaqueColors": 25
+  },
+  {
+    "name": "frame",
+    "source": [
+      24,
+      44
+    ],
+    "alphaBounds": [
+      1,
+      3,
+      22,
+      40
+    ],
+    "opaqueColors": 11
+  }
+]

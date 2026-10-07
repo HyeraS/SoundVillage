@@ -1,0 +1,40 @@
+{
+  "status": "PASS",
+  "mode": "additive-build",
+  "assetCount": 33,
+  "registryAssetCount": 32,
+  "existingRuntimeAssetsReencoded": 0,
+  "additiveAssets": [
+    {
+      "id": "landmark-home-player-building",
+      "src": "/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+      "width": 352,
+      "height": 301,
+      "hasAlpha": true,
+      "category": "landmark",
+      "sourceBytes": 136592,
+      "bytes": 25226,
+      "decodedRGBA": 423808
+    },
+    {
+      "id": "landmark-home-player-site-ground",
+      "src": "/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+      "width": 512,
+      "height": 480,
+      "hasAlpha": true,
+      "category": "landmark",
+      "sourceBytes": 393097,
+      "bytes": 63768,
+      "decodedRGBA": 983040
+    }
+  ],
+  "bytes": 7557990,
+  "decodedRGBA": 131619824,
+  "preview": {
+    "src": "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+    "width": 480,
+    "height": 360,
+    "bytes": 29190,
+    "decodedRGBA": 691200
+  }
+}

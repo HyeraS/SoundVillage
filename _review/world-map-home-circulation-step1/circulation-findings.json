@@ -1,0 +1,539 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "scope": "analysis-only whitebox; no production code, runtime asset, or collision-mask mutation",
+  "coordinateSystem": {
+    "origin": "top-left",
+    "unit": "world pixel",
+    "tileSize": 32,
+    "worldSize": [
+      3840,
+      2880
+    ],
+    "collisionCellSize": 4
+  },
+  "productionModel": {
+    "player": {
+      "width": 72,
+      "height": 88,
+      "footWidth": 28,
+      "footHeight": 16
+    },
+    "spawnFootPoint": {
+      "x": 1920,
+      "y": 1504
+    },
+    "moveSubstepPx": 3,
+    "movementOrder": "for each substep: X then Y; foot-center lookup against the pre-expanded 4 px mask",
+    "collisionBuildRasterization": "floor(left/top), ceil(right/bottom), both inclusive",
+    "sourceHashes": {
+      "lib/worldMapGeometry.mjs": "5694c9da8af26ffbebd55fdd2f2065e1736a88dab81c2a11a69ce0e48e4fdafb",
+      "lib/worldMapV4Manifest.mjs": "b2d6be0a927ae4fd5a756e7a74699e82f27c52324fca8b2258c9dd27d03beb0d"
+    }
+  },
+  "finalCoordinates": {
+    "visualBox": {
+      "left": 1472,
+      "top": 1395,
+      "right": 1824,
+      "bottom": 1696,
+      "width": 352,
+      "height": 301
+    },
+    "visualSize": [
+      352,
+      301
+    ],
+    "groundContact": {
+      "x": 1648,
+      "y": 1696
+    },
+    "visualFootprint": {
+      "left": 1520,
+      "top": 1472,
+      "right": 1776,
+      "bottom": 1696,
+      "width": 256,
+      "height": 224
+    },
+    "temporaryRecommendedCollision": {
+      "left": 1520,
+      "top": 1472,
+      "right": 1774,
+      "bottom": 1696,
+      "width": 254,
+      "height": 224
+    },
+    "collisionAdjustmentReason": "right edge is 2 px west of visual footprint so the inclusive ceil rasterizer does not mark the x=1792 road cell after 14 px expansion",
+    "footprintCollisionMaximumAxisDifferencePx": 2,
+    "doorPoint": {
+      "x": 1648,
+      "y": 1760
+    },
+    "approachPoint": {
+      "x": 1648,
+      "y": 1760
+    },
+    "roadConnectionPoint": {
+      "x": 1824,
+      "y": 1760
+    },
+    "sortY": 1696,
+    "siteBounds": {
+      "left": 1440,
+      "top": 1344,
+      "right": 1856,
+      "bottom": 1824,
+      "width": 416,
+      "height": 480
+    }
+  },
+  "circulation": {
+    "mainRoadProtectedZone": {
+      "left": 1824,
+      "top": 1440,
+      "right": 1952,
+      "bottom": 1888,
+      "width": 128,
+      "height": 448
+    },
+    "mainRoadValidationExtentReason": "y=1440 is the first 32 px-aligned test point below the existing Library collider's expanded/rasterized south edge (y=1412); y=1888 is the south edge of the home-adjacent plaza road",
+    "southEastWestPassage": {
+      "left": 1344,
+      "top": 1728,
+      "right": 1856,
+      "bottom": 1792,
+      "width": 512,
+      "height": 64
+    },
+    "westRingSeam": {
+      "left": 1344,
+      "top": 1728,
+      "right": 1440,
+      "bottom": 1792,
+      "width": 96,
+      "height": 64
+    },
+    "eastRoadSeam": {
+      "left": 1824,
+      "top": 1728,
+      "right": 1856,
+      "bottom": 1792,
+      "width": 32,
+      "height": 64
+    },
+    "doorApron": {
+      "left": 1616,
+      "top": 1696,
+      "right": 1680,
+      "bottom": 1792,
+      "width": 64,
+      "height": 96
+    },
+    "twoCharacterWaitingSquare": {
+      "left": 1616,
+      "top": 1728,
+      "right": 1680,
+      "bottom": 1792,
+      "width": 64,
+      "height": 64
+    },
+    "waitingFootCenters": [
+      {
+        "x": 1632,
+        "y": 1760
+      },
+      {
+        "x": 1664,
+        "y": 1760
+      }
+    ],
+    "westRingMeasuredInnerEdgeSamples": [
+      {
+        "y": 1728,
+        "innerEdgeXApprox": 1400
+      },
+      {
+        "y": 1744,
+        "innerEdgeXApprox": 1384
+      },
+      {
+        "y": 1760,
+        "innerEdgeXApprox": 1376
+      },
+      {
+        "y": 1776,
+        "innerEdgeXApprox": 1368
+      },
+      {
+        "y": 1792,
+        "innerEdgeXApprox": 1352
+      }
+    ],
+    "westConnectionDecision": "x=1344; the 64 px band remains overlapped with the curved ring edge through y=1728..1792",
+    "rawWidthsPx": {
+      "mainRoad": 128,
+      "southPassage": 64,
+      "apron": [
+        64,
+        96
+      ]
+    },
+    "footCenterClearance": {
+      "mainRoadNominalPx": 100,
+      "mainRoadMinimumCells": 26,
+      "southPassageNominalPx": 48,
+      "southPassageMinimumCells": 13
+    }
+  },
+  "collision": {
+    "home": {
+      "id": "Home",
+      "sourceBounds": {
+        "left": 1520,
+        "top": 1472,
+        "right": 1774,
+        "bottom": 1696,
+        "width": 254,
+        "height": 224
+      },
+      "analyticExpandedBounds": {
+        "left": 1506.0,
+        "top": 1464.0,
+        "right": 1788.0,
+        "bottom": 1704.0,
+        "width": 282.0,
+        "height": 240.0
+      },
+      "rasterCellBoundsInclusive": {
+        "left": 376,
+        "top": 366,
+        "right": 447,
+        "bottom": 426
+      },
+      "rasterWorldCoverageHalfOpen": {
+        "left": 1504,
+        "top": 1464,
+        "right": 1792,
+        "bottom": 1708,
+        "width": 288,
+        "height": 244
+      }
+    },
+    "analyticExpandedBounds": {
+      "left": 1506.0,
+      "top": 1464.0,
+      "right": 1788.0,
+      "bottom": 1704.0,
+      "width": 282.0,
+      "height": 240.0
+    },
+    "rasterCoverageHalfOpen": {
+      "left": 1504,
+      "top": 1464,
+      "right": 1792,
+      "bottom": 1708,
+      "width": 288,
+      "height": 244
+    },
+    "legacyPaintedRoadStartX": 1792,
+    "legacyRoadIntrusionAreaPx2": 0,
+    "protectedRoadIntrusionAreaPx2": 0
+  },
+  "connectivity": {
+    "walkableComponentCount": 1,
+    "disconnectedWalkableRegions": 0,
+    "largestComponentCells": 635356,
+    "otherComponentCells": [],
+    "oneOrTwoCellPinches": 0,
+    "pinchDefinition": "protected corridor cross-section with <=2 contiguous 4 px foot-center cells"
+  },
+  "routes": [
+    {
+      "id": "main-road-north-to-south",
+      "label": "남북 주도로 북→남",
+      "start": {
+        "x": 1888,
+        "y": 1440
+      },
+      "end": {
+        "x": 1888,
+        "y": 1888
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 113,
+        "lengthPx": 448,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 77,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1888.0,
+          "y": 1888.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    },
+    {
+      "id": "main-road-south-to-north",
+      "label": "남북 주도로 남→북",
+      "start": {
+        "x": 1888,
+        "y": 1888
+      },
+      "end": {
+        "x": 1888,
+        "y": 1440
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 113,
+        "lengthPx": 448,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 77,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1888.0,
+          "y": 1440.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    },
+    {
+      "id": "west-ring-to-east-road",
+      "label": "서측 원형길→동측 주도로",
+      "start": {
+        "x": 1328,
+        "y": 1760
+      },
+      "end": {
+        "x": 1888,
+        "y": 1760
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 141,
+        "lengthPx": 560,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 96,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1888.0,
+          "y": 1760.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    },
+    {
+      "id": "east-road-to-west-ring",
+      "label": "동측 주도로→서측 원형길",
+      "start": {
+        "x": 1888,
+        "y": 1760
+      },
+      "end": {
+        "x": 1328,
+        "y": 1760
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 141,
+        "lengthPx": 560,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 96,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1328.0,
+          "y": 1760.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    },
+    {
+      "id": "spawn-to-approach",
+      "label": "spawn→집 approachPoint",
+      "start": {
+        "x": 1920,
+        "y": 1504
+      },
+      "end": {
+        "x": 1648,
+        "y": 1760
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 133,
+        "lengthPx": 528,
+        "waypointCountAfterOrthogonalCompression": 3
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 91,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1648.0,
+          "y": 1760.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    },
+    {
+      "id": "approach-to-east-road",
+      "label": "approachPoint→동측 주도로",
+      "start": {
+        "x": 1648,
+        "y": 1760
+      },
+      "end": {
+        "x": 1888,
+        "y": 1760
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 61,
+        "lengthPx": 240,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 41,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1887.85,
+          "y": 1760.0
+        },
+        "arrivalErrorPx": 0.15
+      }
+    },
+    {
+      "id": "approach-to-west-ring",
+      "label": "approachPoint→서측 원형길",
+      "start": {
+        "x": 1648,
+        "y": 1760
+      },
+      "end": {
+        "x": 1328,
+        "y": 1760
+      },
+      "bfs": {
+        "reachable": true,
+        "cellCount": 81,
+        "lengthPx": 320,
+        "waypointCountAfterOrthogonalCompression": 2
+      },
+      "movementSimulation": {
+        "arrived": true,
+        "frames": 55,
+        "totalStalledFrames": 0,
+        "maxConsecutiveStalledFrames": 0,
+        "blockedXFrames": 0,
+        "blockedYFrames": 0,
+        "finalFoot": {
+          "x": 1328.0,
+          "y": 1760.0
+        },
+        "arrivalErrorPx": 0.0
+      }
+    }
+  ],
+  "depthAndForeground": {
+    "buildingSortY": 1696,
+    "protectedRoadVisualBoxOverlapAreaPx2": 0,
+    "legacyRoadShoulderVisualOverlap": {
+      "left": 1792,
+      "top": 1395,
+      "right": 1824,
+      "bottom": 1696,
+      "width": 32,
+      "height": 301
+    },
+    "proposedHomeForegroundInsideProtectedZones": 0,
+    "existingForegroundIntersectingProtectedZones": [],
+    "edgeLaneAvatarBodyOverlapRisk": {
+      "footCenterXRange": [
+        1838,
+        1860
+      ],
+      "whenFootYLessThan": 1696,
+      "classification": "low / boundary silhouette only; no protected-ground overlap",
+      "mitigation": "keep all home foreground and opaque decorative overhang west of x=1824; favor the road centerline x=1888 for authored travel"
+    }
+  },
+  "whiteboxAssumptions": {
+    "currentBackgroundConflictsIntersectingProtectedPassage": [
+      {
+        "element": "curved low wall, flowerbed, and shrubs",
+        "worldBounds": {
+          "left": 1432,
+          "top": 1600,
+          "right": 1792,
+          "bottom": 1816,
+          "width": 360,
+          "height": 216
+        },
+        "resolution": "remove and rebuild outside the protected passage"
+      },
+      {
+        "element": "west plaza lamp",
+        "worldBounds": {
+          "left": 1728,
+          "top": 1568,
+          "right": 1808,
+          "bottom": 1816,
+          "width": 80,
+          "height": 248
+        },
+        "resolution": "move outside the protected passage and apron"
+      }
+    ],
+    "proposedFenceFlowerbedShrubForegroundInsideProtectedZones": 0,
+    "note": "PASS evaluates the proposed cleared whitebox. The two baked-background conflicts remain visible in review plates because runtime art is intentionally unchanged."
+  },
+  "completionCriteria": {
+    "mainRoadBidirectionalReachable": true,
+    "westRingEastRoadBidirectionalReachable": true,
+    "spawnToApproachReachable": true,
+    "mainRoadMinimumRawWidthPx": 128,
+    "southPassageMinimumRawWidthPx": 64,
+    "disconnectedWalkableRegions": 0,
+    "oneOrTwoCellPinches": 0,
+    "sustainedStopFrames": 0,
+    "expandedCollisionRoadIntrusionPx": 0,
+    "protectedCorridorDecorationOrForegroundCount": 0,
+    "visualBoxProtectedRoadOverlapPx2": 0,
+    "doorApproachDistancePx": 0.0,
+    "twoCharacterWaitingSpacePass": true,
+    "status": "PASS"
+  }
+}

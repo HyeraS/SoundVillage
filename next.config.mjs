@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  allowedDevOrigins: ['172.17.37.19'],
   // Visual QA uses pixel-normalized captures; the development badge must not
   // become part of those screenshots. Compile/runtime error overlays remain.
   devIndicators: false,

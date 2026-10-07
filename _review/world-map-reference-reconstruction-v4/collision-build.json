@@ -1,0 +1,15 @@
+{
+  "status": "PASS",
+  "source": "design/world-map-v4/source-assets/world-base-clean-reference.png",
+  "width": 960,
+  "height": 720,
+  "cellSize": 4,
+  "rawWalkableCells": 149083,
+  "clearanceCells": 111304,
+  "registration": {
+    "worldWidth": 3840,
+    "worldHeight": 2880,
+    "referenceWidth": 2896,
+    "referenceHeight": 2172
+  }
+}

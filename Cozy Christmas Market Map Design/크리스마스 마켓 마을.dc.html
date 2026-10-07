@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=Nunito:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;background:#161d27;font-family:'Gowun Dodum','Nunito',sans-serif}
+  a{color:#c9885a;text-decoration:none}
+  a:hover{color:#e0a878}
+  @keyframes bobItem{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+  @keyframes glowPulse{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.85;transform:scale(1.18)}}
+  @keyframes fadeUp{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+</style>
+</helmet>
+<div style="min-height:100vh;padding:28px 24px 40px;display:flex;flex-direction:column;align-items:center;gap:18px;background:radial-gradient(120% 90% at 50% 0%,#26313f 0%,#161d27 70%)">
+
+  <div style="display:flex;align-items:baseline;gap:14px;width:1120px;max-width:100%">
+    <div style="font-family:'Jua',sans-serif;font-size:23px;color:#f3e7d6;letter-spacing:.5px">사람 마을 · 크리스마스 마켓</div>
+    <div style="font-size:13px;color:#8b98a8">Human Zone reskin · 48×36 타일 · TILE 32px</div>
+  </div>
+
+  <div style="position:relative;width:1120px;height:720px;flex:none;border:5px solid #4a3524;border-radius:6px;overflow:hidden;box-shadow:0 26px 60px rgba(0,0,0,.55),inset 0 0 0 3px #6d5138;background:#dceaf3">
+    <canvas ref="{{ canvasRef }}" width="700" height="450" style="display:block;width:100%;height:100%;image-rendering:pixelated"></canvas>
+
+    <div style="position:absolute;top:16px;left:16px;display:flex;flex-direction:column;gap:8px;pointer-events:none">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 14px;background:rgba(28,22,17,.82);border:2px solid #8a6a49;border-radius:4px">
+        <span style="width:11px;height:11px;background:#e8a04a;border-radius:2px;display:block"></span>
+        <span style="font-family:'Jua',sans-serif;font-size:16px;color:#f6ecdd">사람 마을</span>
+        <span style="font-size:12px;color:#c3a884">Human</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:9px;padding:7px 13px;background:rgba(28,22,17,.82);border:2px solid #8a6a49;border-radius:4px">
+        <span style="font-size:12px;color:#c3a884">수집한 소리</span>
+        <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:16px;color:#f6ecdd">{{ doneLabel }}</span>
+      </div>
+    </div>
+
+    <div style="position:absolute;top:16px;right:16px;padding:8px 13px;background:rgba(28,22,17,.72);border:2px solid #6d5138;border-radius:4px;font-size:12px;color:#cdb392;line-height:1.7;pointer-events:none">
+      <div>이동 · 방향키 / WASD</div>
+      <div>소리 수집 · Space</div>
+    </div>
+
+    <sc-if value="{{ showPrompt }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);animation:fadeUp .18s ease-out;display:flex;align-items:center;gap:12px;padding:11px 20px;background:rgba(28,22,17,.9);border:2px solid #c98f4e;border-radius:4px;pointer-events:none">
+        <span style="font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;color:#1c1611;background:#e8c07a;padding:4px 8px;border-radius:3px">SPACE</span>
+        <span style="font-family:'Jua',sans-serif;font-size:16px;color:#f6ecdd">소리를 전사하기</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ panelOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="position:absolute;inset:0;background:rgba(16,12,9,.55);display:flex;align-items:center;justify-content:center">
+        <div style="width:460px;background:#fdf4e6;border:4px solid #6d5138;border-radius:5px;box-shadow:0 18px 0 rgba(0,0,0,.18);overflow:hidden">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 18px;background:#8c5f3c;border-bottom:4px solid #6d5138">
+            <span style="font-family:'Jua',sans-serif;font-size:18px;color:#fdf4e6">소리 전사</span>
+            <span style="font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;color:#e6cba9">{{ activeId }}</span>
+          </div>
+          <div style="padding:20px 20px 22px;display:flex;flex-direction:column;gap:16px">
+            <div style="display:flex;align-items:center;gap:14px;padding:14px;background:#f2e3cc;border:2px solid #cdb392;border-radius:4px">
+              <div onClick="{{ togglePlay }}" style="width:44px;height:44px;flex:none;background:#c9743f;border:2px solid #6d5138;border-radius:3px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff8ee;font-size:17px" style-hover="background:#dc8a52">{{ playIcon }}</div>
+              <div style="flex:1;display:flex;align-items:flex-end;gap:3px;height:38px">
+                <sc-for list="{{ waveBars }}" as="bar" hint-placeholder-count="26">
+                  <div style="flex:1;background:#b98f63;border-radius:1px;height:{{ bar.h }}"></div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:7px">
+              <label style="font-size:13px;color:#6d5138">이 소리를 의성어로 표현해 주세요</label>
+              <input value="{{ expr }}" onChange="{{ onExpr }}" placeholder="예) 하하하 웃음소리가 겹쳐 들려요" maxLength="80" style="width:100%;padding:11px 13px;font-family:'Gowun Dodum',sans-serif;font-size:14px;color:#3d2c1d;background:#fff;border:2px solid #cdb392;border-radius:3px;outline:none" style-focus="border-color:#c9743f"></input>
+              <div style="align-self:flex-end;font-family:'Nunito',sans-serif;font-size:11px;color:#a3906f">{{ exprCount }} / 80</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <label style="font-size:13px;color:#6d5138">얼마나 확신하시나요?</label>
+              <div style="display:flex;gap:7px">
+                <sc-for list="{{ confOptions }}" as="c" hint-placeholder-count="5">
+                  <div onClick="{{ c.onClick }}" style="flex:1;padding:9px 0;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;border:2px solid #cdb392;border-radius:3px;background:{{ c.bg }};color:{{ c.fg }}">{{ c.n }}</div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:2px">
+              <div onClick="{{ closePanel }}" style="padding:12px 18px;font-family:'Jua',sans-serif;font-size:15px;color:#8c7355;background:#efe1c9;border:2px solid #cdb392;border-radius:3px;cursor:pointer" style-hover="background:#e5d3b6">닫기</div>
+              <div onClick="{{ submit }}" style="flex:1;padding:12px 0;text-align:center;font-family:'Jua',sans-serif;font-size:15px;color:#fff8ee;background:#4f7a4a;border:2px solid #355732;border-radius:3px;cursor:pointer" style-hover="background:#5d8d57">제출하고 다음 소리 찾기</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="position:absolute;bottom:20px;right:20px;display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;opacity:.9">
+      <div></div>
+      <div onPointerDown="{{ upDown }}" onPointerUp="{{ upUp }}" onPointerLeave="{{ upUp }}" style="background:rgba(28,22,17,.78);border:2px solid #8a6a49;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#f6ecdd;font-size:13px;cursor:pointer;user-select:none">▲</div>
+      <div></div>
+      <div onPointerDown="{{ leftDown }}" onPointerUp="{{ leftUp }}" onPointerLeave="{{ leftUp }}" style="background:rgba(28,22,17,.78);border:2px solid #8a6a49;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#f6ecdd;font-size:13px;cursor:pointer;user-select:none">◀</div>
+      <div onPointerDown="{{ actDown }}" style="background:rgba(201,143,78,.85);border:2px solid #6d5138;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#1c1611;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer;user-select:none">A</div>
+      <div onPointerDown="{{ rightDown }}" onPointerUp="{{ rightUp }}" onPointerLeave="{{ rightUp }}" style="background:rgba(28,22,17,.78);border:2px solid #8a6a49;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#f6ecdd;font-size:13px;cursor:pointer;user-select:none">▶</div>
+      <div></div>
+      <div onPointerDown="{{ downDown }}" onPointerUp="{{ downUp }}" onPointerLeave="{{ downUp }}" style="background:rgba(28,22,17,.78);border:2px solid #8a6a49;border-radius:4px;display:flex;align-items:center;justify-content:center;color:#f6ecdd;font-size:13px;cursor:pointer;user-select:none">▼</div>
+      <div></div>
+    </div>
+
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;inset:0;background:#dceaf3;display:flex;align-items:center;justify-content:center;font-family:'Jua',sans-serif;font-size:17px;color:#6d8ba3">마을을 짓고 있어요…</div>
+    </sc-if>
+  </div>
+
+  <div style="width:1120px;max-width:100%;display:flex;gap:10px;flex-wrap:wrap">
+    <div style="flex:1;min-width:250px;padding:14px 16px;background:#1f2733;border:1px solid #33404f;border-radius:5px">
+      <div style="font-family:'Jua',sans-serif;font-size:14px;color:#e8c07a;margin-bottom:7px">레이아웃</div>
+      <div style="font-size:12.5px;color:#9aa7b6;line-height:1.75">중앙 광장을 원형 길이 감싸고, 스톨 6개가 길 바깥쪽에서 광장을 바라봅니다. 남쪽 캔디케인 게이트가 입구, 북서쪽은 이글루·눈사람 정원, 북동쪽은 진저브레드 하우스.</div>
+    </div>
+    <div style="flex:1;min-width:250px;padding:14px 16px;background:#1f2733;border:1px solid #33404f;border-radius:5px">
+      <div style="font-family:'Jua',sans-serif;font-size:14px;color:#e8c07a;margin-bottom:7px">충돌</div>
+      <div style="font-size:12.5px;color:#9aa7b6;line-height:1.75">모든 스톨·건물·나무·가로등·울타리는 타일 단위 footprint를 가지며 통과할 수 없습니다. Tweaks에서 충돌 격자를 켜서 확인할 수 있습니다.</div>
+    </div>
+    <div style="flex:1;min-width:250px;padding:14px 16px;background:#1f2733;border:1px solid #33404f;border-radius:5px">
+      <div style="font-family:'Jua',sans-serif;font-size:14px;color:#e8c07a;margin-bottom:7px">소리 아이템</div>
+      <div style="font-size:12.5px;color:#9aa7b6;line-height:1.75">걷기 가능한 타일 위에 둥둥 떠 있고, 가까워지면 프롬프트가 뜹니다. 잠금 연출 없이 전체 오픈 상태입니다.</div>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:940},&quot;timeOfDay&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;day&quot;,&quot;dusk&quot;,&quot;night&quot;],&quot;default&quot;:&quot;day&quot;,&quot;tsType&quot;:&quot;'day'|'dusk'|'night'&quot;,&quot;section&quot;:&quot;분위기&quot;},&quot;snowfall&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;분위기&quot;},&quot;itemCount&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:4,&quot;max&quot;:14,&quot;step&quot;:1,&quot;default&quot;:10,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;게임&quot;},&quot;showCollision&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;게임&quot;}}">
+const TILE = 32, MAP_W = 48, MAP_H = 36;
+const CX = 24, CY = 18;
+const SHEET = "assets/winter_global.png";
+const TSHEET = "assets/global.png";
+const WSHEET = "assets/global2.png";
+// 지형 타일 — 16px 그리드. T=global.png, TW=global2.png(겨울 타일셋)
+const T = {
+  dirt: [[112, 48], [96, 48], [128, 48]],
+  cobble: [608, 192],           // 3×3 눈-보도블록 블롭 그룹 좌상단
+  base: [96, 208]
+};
+const TW = {
+  snow: [[672, 160], [688, 160], [672, 176]],
+  packed: [[672, 352], [688, 352], [704, 352]],
+  drift: [656, 144]             // 3×3 눈 더미 블롭 그룹
+};
+
+const S = {
+  stall_menu:[192,80,48,64], stall_pretzel:[160,193,48,63], cart_cotton:[357,196,40,60],
+  shop_candy:[2,195,75,61], shop_flores:[405,187,54,69], stall_bakery:[480,94,48,50],
+  stall_hearts:[0,93,48,51], stall_jam:[97,93,46,51],
+  tree_big:[11,386,64,126], ginger_house:[305,435,62,77], igloo:[306,385,29,30],
+  snow_blob:[340,386,24,29], sled:[372,403,24,13], drift:[240,388,30,13], pile:[273,384,13,32],
+  lamp:[1,36,14,44], lamp_wreath:[17,36,14,44], candycane:[3,305,9,15],
+  snowman1:[3,14,25,18], snowman2:[34,7,27,25], snowman3:[64,5,31,42], snowman4:[96,9,31,39],
+  snowman5:[182,4,23,22], snowman6:[226,40,26,23],
+  bunny1:[128,16,16,16], bunny2:[150,17,18,15], bunny3:[211,17,25,15], reindeer:[162,49,14,15],
+  pine_snow:[96,324,32,44], tree_snow1:[193,336,31,32], tree_snow2:[256,336,32,32], tree_snow3:[288,337,32,31],
+  tree_bare1:[2,342,26,26], tree_bare2:[35,339,29,45], tree_bare3:[132,342,23,26],
+  tree_bare4:[165,342,20,26], tree_bare5:[232,342,23,26], bush:[70,340,19,28],
+  gift1:[2,326,12,10], gift2:[17,326,14,10], gift3:[35,324,11,12], gift4:[50,322,11,14],
+  gift5:[65,322,14,14], gift6:[81,323,14,13], gift7:[97,324,14,12], gift8:[130,321,12,15],
+  fence_h:[412,392,32,22], fence_v:[412,412,16,32], counter:[243,483,48,22],
+  ice_rink:[400,391,160,89],
+  npc0:[292,290,11,14], npc1:[307,289,11,15], npc2:[339,289,13,15],
+  npc3:[355,290,11,14], npc4:[371,290,11,14], npc5:[386,290,11,14]
+};
+const PLAYER = S.npc1;
+
+const TREES = ["pine_snow","pine_snow","pine_snow","tree_snow1","tree_snow2","tree_snow3","tree_snow1","tree_snow2","tree_bare2"];
+const GIFTS = ["gift1","gift2","gift3","gift4","gift5","gift6","gift7","gift8"];
+
+// (key, tileX, tileY, footprintW, footprintH, scale)
+const SHOP = 2.25;
+const PLACED = [
+  ["tree_big", 23, 15, 3, 3, 1.5],
+  // 프롬나드 양쪽 스톨 열 — 실제 크리스마스 마켓처럼 통로를 마주 보게 두 줄
+  ["stall_pretzel", 17, 26, 4, 3, SHOP],
+  ["stall_bakery", 17, 31, 4, 3, SHOP],
+  ["shop_flores", 27, 26, 4, 3, SHOP],
+  ["cart_cotton", 28, 31, 3, 3, SHOP],
+  // 광장 북쪽 — 뜨거운 음료·과자 코너
+  ["stall_menu", 16, 7, 4, 3, SHOP],
+  ["shop_candy", 28, 7, 5, 3, SHOP],
+  // 랜드마크
+  ["ginger_house", 5, 4, 4, 3, SHOP],
+  ["igloo", 11, 9, 2, 2, 1.5],
+  ["snowman3", 8, 8, 1, 1, 1.2], ["snowman4", 13, 7, 1, 1, 1.2],
+  ["snowman2", 14, 11, 1, 1, 1.2], ["snowman1", 9, 12, 1, 1, 1.2],
+  ["snowman5", 11, 6, 1, 1, 1.2], ["snowman6", 6, 10, 1, 1, 1.2],
+  ["bunny1", 12, 13, 1, 1, 1.2], ["bunny3", 8, 14, 1, 1, 1.2],
+  ["sled", 15, 13, 1, 1, 1.5], ["pile", 17, 5, 1, 1, 1.2],
+  ["snow_blob", 45, 15, 1, 1, 1.2], ["reindeer", 44, 20, 1, 1, 1.5],
+  // 남쪽 게이트 + 프롬나드 가로등
+  ["candycane", 21, 33, 1, 2, 3], ["candycane", 27, 33, 1, 2, 3],
+  ["lamp", 21, 25, 1, 1, 1.5], ["lamp_wreath", 26, 25, 1, 1, 1.5],
+  ["lamp_wreath", 21, 30, 1, 1, 1.5], ["lamp", 26, 30, 1, 1, 1.5],
+  ["lamp", 21, 34, 1, 1, 1.5], ["lamp_wreath", 26, 34, 1, 1, 1.5],
+  // 광장 둘레 가로등
+  ["lamp", 19, 13, 1, 1, 1.5], ["lamp_wreath", 29, 13, 1, 1, 1.5],
+  ["lamp_wreath", 19, 23, 1, 1, 1.5], ["lamp", 29, 23, 1, 1, 1.5],
+  // 광장 안 — 트리 앞 선물더미 · 스탠딩 테이블 · 눈사람
+  ["counter", 21, 20, 2, 1, 1.5], ["counter", 26, 20, 2, 1, 1.5],
+  ["counter", 23, 13, 2, 1, 1.5],
+  ["gift4", 22, 19, 1, 1, 1.4], ["gift5", 25, 19, 1, 1, 1.4],
+  ["gift1", 20, 16, 1, 1, 1.4], ["gift6", 27, 16, 1, 1, 1.4],
+  ["snowman1", 20, 14, 1, 1, 1.2], ["snowman5", 28, 14, 1, 1, 1.2],
+  ["candycane", 19, 17, 1, 2, 2], ["candycane", 29, 17, 1, 2, 2],
+  ["bunny2", 27, 15, 1, 1, 1.2]
+];
+
+// 아이스링크 — 테두리만 충돌, 내부는 스케이트 가능
+const RINK = { key: "rink", tx: 34, ty: 5, w: 10, h: 6, scale: 2, gate: [38, 39] };
+
+const NPCS = [
+  ["npc0", 22, 25], ["npc2", 25, 28], ["npc4", 22, 31],
+  ["npc5", 25, 33], ["npc3", 21, 12], ["npc0", 27, 11],
+  ["npc4", 21, 19], ["npc3", 26, 18], ["npc5", 24, 12],
+  ["npc2", 37, 7], ["npc4", 40, 8], ["npc0", 36, 9]
+];
+
+const SOUND_SPOTS = [
+  [24, 22, "Human_236044"], [21, 16, "Human_112907"], [27, 20, "Human_309551"],
+  [24, 10, "Human_441028"], [31, 18, "Human_178322"], [17, 18, "Human_205617"],
+  [24, 29, "Human_367410"], [12, 12, "Human_290844"], [39, 8, "Human_154032"],
+  [23, 34, "Human_318765"], [36, 26, "Human_402193"], [11, 26, "Human_221580"],
+  [43, 13, "Human_133907"], [6, 13, "Human_099412"]
+];
+
+function hash(x, y, s) {
+  let h = x * 374761393 + y * 668265263 + s * 2246822519;
+  h = (h ^ (h >> 13)) * 1274126177;
+  return ((h ^ (h >> 16)) >>> 0) / 4294967295;
+}
+function dist(x, y) { return Math.hypot(x - CX, y - CY); }
+// 눈길 가지 [x0,x1,y0,y1]
+const BRANCH = [
+  [5, 17, 12, 13],   // 북서 눈사람 정원 · 진저브레드 하우스
+  [8, 9, 13, 17],    // 북서 연결
+  [33, 44, 12, 13],  // 북동 아이스링크 앞
+  [33, 34, 13, 17],  // 북동 연결
+  [11, 12, 22, 30],  // 남서 숲 산책로
+  [36, 37, 22, 30]   // 남동 숲 산책로
+];
+function ground(tx, ty) {
+  const d = dist(tx + 0.5, ty + 0.5);
+  if (d < 6.2) return 2;                                  // 중앙 광장(보도블록)
+  if (d < 7.6) return 0;
+  if (d < 9.8) return 3;                                  // 광장 둘레 흙길
+  if (Math.abs(tx - 24) <= 2 && ty >= CY) return 3;       // 남쪽 메인 프롬나드
+  if (Math.abs(tx - 24) <= 1.5 && ty < CY) return 1;      // 북쪽 눈길
+  if (Math.abs(ty - 17.5) <= 1.5) return 1;               // 동서 눈길
+  for (const b of BRANCH) if (tx >= b[0] && tx <= b[1] && ty >= b[2] && ty <= b[3]) return 1;
+  return 0;
+}
+
+class Component extends DCLogic {
+  state = { loading: true, near: null, panel: false, expr: "", conf: 3,
+            done: 0, playing: false, tick: 0 };
+
+  constructor(props) {
+    super(props);
+    this.canvasRef = React.createRef();
+    this.keys = {};
+    this.t = 0;
+    this.player = { x: 24 * TILE + 16, y: 32 * TILE + 16, dir: 1, step: 0, moving: false };
+    this.cam = { x: 0, y: 0 };
+    this.collected = {};
+    this.build();
+  }
+
+  build() {
+    const solid = new Uint8Array(MAP_W * MAP_H);
+    const mark = (tx, ty) => { if (tx >= 0 && ty >= 0 && tx < MAP_W && ty < MAP_H) solid[ty * MAP_W + tx] = 1; };
+    for (let x = 0; x < MAP_W; x++) { mark(x, 0); mark(x, MAP_H - 1); }
+    for (let y = 0; y < MAP_H; y++) { mark(0, y); mark(MAP_W - 1, y); }
+    for (let x = 21; x <= 27; x++) solid[(MAP_H - 1) * MAP_W + x] = 0;
+
+    const objs = [];
+    const add = (key, tx, ty, fw, fh, scale) => {
+      const r = S[key]; if (!r) return;
+      const sc = scale || 1;
+      const w = r[2] * sc, h = r[3] * sc;
+      const cx = (tx + fw / 2) * TILE, base = (ty + fh) * TILE;
+      objs.push({ r, x: Math.round(cx - w / 2), y: Math.round(base - h), w, h, sort: base });
+      for (let a = 0; a < fw; a++) for (let b = 0; b < fh; b++) mark(tx + a, ty + b);
+    };
+
+    PLACED.forEach(p => add(p[0], p[1], p[2], p[3], p[4], p[5]));
+
+    // 아이스링크: 스프라이트는 바닥 레이어, 충돌은 테두리 한 줄만(아래쪽 입구는 열림)
+    const rk = S.ice_rink;
+    this.rink = { x: RINK.tx * TILE, y: RINK.ty * TILE, w: rk[2] * RINK.scale, h: rk[3] * RINK.scale, r: rk };
+    for (let a = 0; a < RINK.w; a++) for (let b = 0; b < RINK.h; b++) {
+      const edge = a === 0 || a === RINK.w - 1 || b === 0 || b === RINK.h - 1;
+      const gate = b === RINK.h - 1 && RINK.tx + a >= RINK.gate[0] && RINK.tx + a <= RINK.gate[1];
+      if (edge && !gate) mark(RINK.tx + a, RINK.ty + b);
+    }
+
+    // 울타리 — 지도 테두리 (남쪽 게이트만 열림)
+    for (let x = 1; x < MAP_W - 1; x++) {
+      const px = x * TILE;
+      objs.push({ r: S.fence_h, x: px, y: 1 * TILE + 6, w: 32, h: 22, sort: 1 * TILE + 28 });
+      if (x < 21 || x > 26) objs.push({ r: S.fence_h, x: px, y: (MAP_H - 2) * TILE + 8, w: 32, h: 22, sort: (MAP_H - 2) * TILE + 30 });
+    }
+    for (let y = 2; y < MAP_H - 2; y++) {
+      objs.push({ r: S.fence_v, x: 1 * TILE + 8, y: y * TILE, w: 16, h: 32, sort: y * TILE + 30 });
+      objs.push({ r: S.fence_v, x: (MAP_W - 2) * TILE + 8, y: y * TILE, w: 16, h: 32, sort: y * TILE + 30 });
+    }
+
+    // 나무·덤불·선물 스캐터
+    for (let ty = 2; ty < MAP_H - 2; ty++) {
+      for (let tx = 2; tx < MAP_W - 2; tx++) {
+        if (ground(tx, ty) !== 0) continue;
+        if (solid[ty * MAP_W + tx]) continue;
+        if (tx >= RINK.tx - 1 && tx <= RINK.tx + RINK.w && ty >= RINK.ty - 1 && ty <= RINK.ty + RINK.h) continue;
+        let free = true;
+        for (let a = -1; a <= 1 && free; a++) for (let b = -1; b <= 1; b++) {
+          if (ground(tx + a, ty + b) !== 0) { free = false; break; }
+        }
+        if (!free) continue;
+        const r1 = hash(tx, ty, 7);
+        const clearing = hash(Math.floor(tx / 6), Math.floor(ty / 6), 21);
+        const nearGarden = tx < 17 && ty < 16;
+        const density = (nearGarden ? 0.035 : 0.085) * (0.35 + clearing * 1.5);
+        if (r1 < density) {
+          const key = TREES[Math.floor(hash(tx, ty, 11) * TREES.length)];
+          add(key, tx, ty, 1, 1, 2);
+        } else if (r1 < density + 0.02) {
+          add("bush", tx, ty, 1, 1, 1.5);
+        } else if (r1 < density + 0.032) {
+          const g = GIFTS[Math.floor(hash(tx, ty, 13) * GIFTS.length)];
+          const r = S[g];
+          objs.push({ r, x: tx * TILE + 8, y: ty * TILE + 20 - r[3], w: r[2], h: r[3], sort: ty * TILE + 20 });
+        }
+      }
+    }
+
+    this.solid = solid;
+    this.objs = objs.sort((a, b) => a.sort - b.sort);
+
+    this.npcs = NPCS.map((n, i) => {
+      mark(n[1], n[2]);
+      return { r: S[n[0]], tx: n[1], ty: n[2], phase: i * 0.7 };
+    });
+
+    const count = Math.max(4, Math.min(14, this.props.itemCount ?? 10));
+    this.items = SOUND_SPOTS.slice(0, count).map((s, i) => {
+      let tx = s[0], ty = s[1];
+      if (solid[ty * MAP_W + tx]) { ty += 1; if (solid[ty * MAP_W + tx]) tx += 1; }
+      return { id: s[2], tx, ty, x: tx * TILE + 16, y: ty * TILE + 16, phase: i * 1.1 };
+    });
+
+    this.flakes = [];
+    for (let i = 0; i < 90; i++) {
+      this.flakes.push({ x: Math.random() * 700, y: Math.random() * 450,
+        s: 0.25 + Math.random() * 0.55, r: Math.random() < 0.25 ? 2 : 1,
+        d: Math.random() * 6.28 });
+    }
+  }
+
+  componentDidMount() {
+    this.img = new Image();
+    this.img.onload = () => { this.setState({ loading: false }); };
+    this.img.onerror = () => { this.setState({ loading: false }); };
+    this.img.src = SHEET;
+    this.timg = new Image();
+    this.timg.src = TSHEET;
+    this.wimg = new Image();
+    this.wimg.src = WSHEET;
+    this.onKeyDown = e => {
+      const k = e.key.toLowerCase();
+      if ([" ", "arrowup", "arrowdown", "arrowleft", "arrowright"].includes(k)) e.preventDefault();
+      if (k === " " || k === "enter") { this.tryCollect(); return; }
+      if (k === "escape") { this.setState({ panel: false }); return; }
+      this.keys[k] = true;
+    };
+    this.onKeyUp = e => { this.keys[e.key.toLowerCase()] = false; };
+    window.addEventListener("keydown", this.onKeyDown);
+    window.addEventListener("keyup", this.onKeyUp);
+    this.raf = requestAnimationFrame(this.loop);
+  }
+  componentWillUnmount() {
+    window.removeEventListener("keydown", this.onKeyDown);
+    window.removeEventListener("keyup", this.onKeyUp);
+    cancelAnimationFrame(this.raf);
+  }
+  componentDidUpdate(prev) {
+    if (prev.itemCount !== this.props.itemCount) {
+      const count = Math.max(4, Math.min(14, this.props.itemCount ?? 10));
+      this.items = SOUND_SPOTS.slice(0, count).map((s, i) => ({
+        id: s[2], tx: s[0], ty: s[1], x: s[0] * TILE + 16, y: s[1] * TILE + 16, phase: i * 1.1
+      })).filter(it => !this.collected[it.id] || true);
+    }
+  }
+
+  blocked(px, py) {
+    const pts = [[px - 7, py - 3], [px + 7, py - 3], [px - 7, py + 7], [px + 7, py + 7]];
+    for (const p of pts) {
+      const tx = Math.floor(p[0] / TILE), ty = Math.floor(p[1] / TILE);
+      if (tx < 0 || ty < 0 || tx >= MAP_W || ty >= MAP_H) return true;
+      if (this.solid[ty * MAP_W + tx]) return true;
+    }
+    return false;
+  }
+
+  nearest() {
+    let best = null, bd = 999;
+    for (const it of this.items) {
+      if (this.collected[it.id]) continue;
+      const d = Math.hypot(it.x - this.player.x, it.y - this.player.y);
+      if (d < 34 && d < bd) { bd = d; best = it; }
+    }
+    return best;
+  }
+
+  tryCollect() {
+    if (this.state.panel) return;
+    const it = this.nearest();
+    if (it) this.setState({ panel: true, expr: "", conf: 3, near: it.id, playing: false });
+  }
+
+  loop = () => {
+    this.raf = requestAnimationFrame(this.loop);
+    this.t = (this.t || 0) + 1;
+    const p = this.player, k = this.keys;
+    if (!this.state.panel) {
+      let dx = 0, dy = 0;
+      if (k["arrowleft"] || k["a"]) dx -= 1;
+      if (k["arrowright"] || k["d"]) dx += 1;
+      if (k["arrowup"] || k["w"]) dy -= 1;
+      if (k["arrowdown"] || k["s"]) dy += 1;
+      const sp = 2.5;
+      if (dx || dy) {
+        const n = Math.hypot(dx, dy);
+        const nx = p.x + (dx / n) * sp, ny = p.y + (dy / n) * sp;
+        if (!this.blocked(nx, p.y)) p.x = nx;
+        if (!this.blocked(p.x, ny)) p.y = ny;
+        if (dx) p.dir = dx > 0 ? 1 : -1;
+        p.moving = true; p.step += 0.22;
+      } else { p.moving = false; p.step = 0; }
+    }
+    const near = this.nearest();
+    const nid = near ? near.id : null;
+    if (nid !== this.state.near && !this.state.panel) this.setState({ near: nid });
+    this.draw();
+  };
+
+  draw() {
+    const cv = this.canvasRef.current; if (!cv) return;
+    const ctx = cv.getContext("2d");
+    const VW = cv.width, VH = cv.height;
+    ctx.imageSmoothingEnabled = false;
+    const p = this.player;
+    let camX = Math.round(p.x - VW / 2), camY = Math.round(p.y - VH / 2);
+    camX = Math.max(0, Math.min(MAP_W * TILE - VW, camX));
+    camY = Math.max(0, Math.min(MAP_H * TILE - VH, camY));
+
+    const t0x = Math.floor(camX / TILE), t0y = Math.floor(camY / TILE);
+    const t1x = Math.ceil((camX + VW) / TILE), t1y = Math.ceil((camY + VH) / TILE);
+
+    ctx.fillStyle = "#e7f1f8";
+    ctx.fillRect(0, 0, VW, VH);
+
+    const tim = this.timg, tready = tim && tim.complete && tim.naturalWidth;
+    const cell = (cx, cy) => ground(cx >> 1, cy >> 1);
+    const c0x = t0x * 2, c0y = t0y * 2, c1x = (t1x + 1) * 2, c1y = (t1y + 1) * 2;
+    for (let cy = c0y; cy <= c1y; cy++) {
+      for (let cx = c0x; cx <= c1x; cx++) {
+        const g = cell(cx, cy);
+        const n = hash(cx, cy, 3);
+        const X = cx * 16 - camX, Y = cy * 16 - camY;
+        if (!tready) {
+          ctx.fillStyle = g === 2 ? "#8b8378" : g === 1 ? "#c6a878" : "#eaf3fa";
+          ctx.fillRect(X, Y, 16, 16);
+          continue;
+        }
+        const wim = this.wimg, wready = wim && wim.complete && wim.naturalWidth;
+        const snowTile = () => {
+          if (!wready) { ctx.fillStyle = "#e9f3f7"; ctx.fillRect(X, Y, 16, 16); return; }
+          const v = TW.snow[n < 0.6 ? 0 : n < 0.85 ? 1 : 2];
+          ctx.drawImage(wim, v[0], v[1], 16, 16, X, Y, 16, 16);
+        };
+        if (g === 2) {
+          const l = cell(cx - 1, cy) === 2, r = cell(cx + 1, cy) === 2;
+          const u = cell(cx, cy - 1) === 2, d = cell(cx, cy + 1) === 2;
+          const col = l ? (r ? 1 : 2) : 0, row = u ? (d ? 1 : 2) : 0;
+          snowTile();
+          ctx.drawImage(tim, T.cobble[0] + col * 16, T.cobble[1] + row * 16, 16, 16, X, Y, 16, 16);
+        } else if (g === 3) {
+          const v = T.dirt[n < 0.6 ? 0 : n < 0.8 ? 1 : 2];
+          ctx.drawImage(tim, v[0], v[1], 16, 16, X, Y, 16, 16);
+          ctx.fillStyle = "rgba(252,250,244,.18)"; ctx.fillRect(X, Y, 16, 16);
+        } else if (g === 1) {
+          if (wready) {
+            const v = TW.packed[n < 0.5 ? 0 : n < 0.8 ? 1 : 2];
+            ctx.drawImage(wim, v[0], v[1], 16, 16, X, Y, 16, 16);
+          } else { ctx.fillStyle = "#c9d6d8"; ctx.fillRect(X, Y, 16, 16); }
+        } else {
+          snowTile();
+          // 눈 더미 블롭 — 3×3 오토타일 그룹을 저주파 노이즈 영역에 9-slice
+          if (wready) {
+            const dr = (a, b) => hash(a >> 1, b >> 1, 31) > 0.66 && cell(a, b) === 0;
+            if (dr(cx, cy)) {
+              const col = dr(cx - 1, cy) ? (dr(cx + 1, cy) ? 1 : 2) : 0;
+              const row = dr(cx, cy - 1) ? (dr(cx, cy + 1) ? 1 : 2) : 0;
+              ctx.drawImage(wim, TW.drift[0] + col * 16, TW.drift[1] + row * 16, 16, 16, X, Y, 16, 16);
+            }
+          }
+        }
+        // 길 가장자리에 쌓인 눈
+        if (g === 3) {
+          ctx.fillStyle = "rgba(242,251,255,.92)";
+          const sc = 2 + Math.round(n * 3);
+          if (cell(cx, cy - 1) !== 3) ctx.fillRect(X, Y, 16, sc);
+          if (cell(cx, cy + 1) !== 3) ctx.fillRect(X, Y + 16 - sc, 16, sc);
+          if (cell(cx - 1, cy) !== 3) ctx.fillRect(X, Y, sc, 16);
+          if (cell(cx + 1, cy) !== 3) ctx.fillRect(X + 16 - sc, Y, sc, 16);
+          if (n > 0.9) { ctx.fillStyle = "rgba(242,251,255,.5)"; ctx.fillRect(X + 4, Y + 5, 7, 4); }
+        }
+      }
+    }
+
+    if (this.props.showCollision) {
+      ctx.fillStyle = "rgba(230,70,70,.32)";
+      for (let ty = t0y; ty <= t1y; ty++) for (let tx = t0x; tx <= t1x; tx++) {
+        if (tx >= 0 && ty >= 0 && tx < MAP_W && ty < MAP_H && this.solid[ty * MAP_W + tx])
+          ctx.fillRect(tx * TILE - camX, ty * TILE - camY, TILE, TILE);
+      }
+    }
+
+    const img = this.img;
+    const drawSp = (r, x, y, w, h, flip) => {
+      if (!img || !img.complete || !img.naturalWidth) return;
+      if (flip) {
+        ctx.save(); ctx.translate(x + w, y); ctx.scale(-1, 1);
+        ctx.drawImage(img, r[0], r[1], r[2], r[3], 0, 0, w, h); ctx.restore();
+      } else ctx.drawImage(img, r[0], r[1], r[2], r[3], x, y, w, h);
+    };
+    const shadow = (cx, by, w) => {
+      ctx.fillStyle = "rgba(90,110,130,.16)";
+      ctx.beginPath(); ctx.ellipse(cx, by - 2, w / 2, w / 5, 0, 0, 6.284); ctx.fill();
+    };
+
+    // 아이스링크 — 바닥 위, 오브젝트 밑
+    if (this.rink && img && img.complete) {
+      const rr = this.rink;
+      ctx.drawImage(img, rr.r[0], rr.r[1], rr.r[2], rr.r[3], rr.x - camX, rr.y - camY, rr.w, rr.h);
+    }
+
+    const drawList = [];
+    for (const o of this.objs) {
+      if (o.x + o.w < camX - 40 || o.x > camX + VW + 40 || o.y + o.h < camY - 40 || o.y > camY + VH + 60) continue;
+      drawList.push({ sort: o.sort, fn: () => {
+        if (o.h > 26) shadow(o.x + o.w / 2 - camX, o.y + o.h - camY, o.w * 0.62);
+        drawSp(o.r, o.x - camX, o.y - camY, o.w, o.h);
+      } });
+    }
+    for (const n of this.npcs) {
+      const bob = Math.sin(this.t / 26 + n.phase) > 0.6 ? 1 : 0;
+      const w = n.r[2] * 2, h = n.r[3] * 2;
+      const x = n.tx * TILE + 16 - w / 2, by = (n.ty + 1) * TILE - 4;
+      drawList.push({ sort: by, fn: () => {
+        shadow(x + w / 2 - camX, by - camY, w * 0.7);
+        drawSp(n.r, x - camX, by - h - bob - camY, w, h);
+      } });
+    }
+    for (const it of this.items) {
+      if (this.collected[it.id]) continue;
+      const bob = Math.sin(this.t / 22 + it.phase) * 5;
+      const x = it.x - camX, y = it.y - camY - 16 + bob;
+      const isNear = this.state.near === it.id;
+      drawList.push({ sort: it.y + 40, fn: () => {
+        ctx.fillStyle = "rgba(90,110,130,.14)";
+        ctx.beginPath(); ctx.ellipse(x, it.y - camY + 12, 9, 3.5, 0, 0, 6.284); ctx.fill();
+        const g = ctx.createRadialGradient(x, y, 1, x, y, isNear ? 22 : 16);
+        g.addColorStop(0, isNear ? "rgba(255,238,190,.95)" : "rgba(214,238,255,.85)");
+        g.addColorStop(1, "rgba(214,238,255,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, isNear ? 22 : 16, 0, 6.284); ctx.fill();
+        ctx.fillStyle = isNear ? "#fff4d6" : "#eaf7ff";
+        ctx.fillRect(x - 6, y - 7, 12, 14);
+        ctx.fillStyle = isNear ? "#c9873c" : "#5b8fb8";
+        ctx.fillRect(x - 6, y - 7, 12, 2); ctx.fillRect(x - 6, y + 5, 12, 2);
+        ctx.fillRect(x - 6, y - 7, 2, 14); ctx.fillRect(x + 4, y - 7, 2, 14);
+        ctx.fillRect(x - 1, y - 4, 2, 6); ctx.fillRect(x + 1, y - 4, 3, 2);
+        ctx.fillRect(x - 3, y + 1, 3, 3);
+      } });
+    }
+    const pw = Math.round(PLAYER[2] * 2.4), ph = Math.round(PLAYER[3] * 2.4);
+    const pbob = p.moving ? (Math.floor(p.step) % 2 ? 2 : 0) : 0;
+    drawList.push({ sort: p.y + 8, fn: () => {
+      shadow(p.x - camX, p.y + 8 - camY, pw * 0.8);
+      drawSp(PLAYER, Math.round(p.x - pw / 2 - camX), Math.round(p.y + 8 - ph - pbob - camY), pw, ph, p.dir < 0);
+    } });
+    drawList.sort((a, b) => a.sort - b.sort).forEach(d => d.fn());
+
+    const tod = this.props.timeOfDay || "day";
+    if (tod !== "day") {
+      ctx.fillStyle = tod === "night" ? "rgba(24,32,62,.46)" : "rgba(72,54,92,.24)";
+      ctx.fillRect(0, 0, VW, VH);
+      ctx.globalCompositeOperation = "lighter";
+      for (const o of PLACED) {
+        if (o[0].indexOf("lamp") !== 0 && o[0] !== "candycane") continue;
+        const gx = (o[1] + 0.5) * TILE - camX, gy = (o[2] + 0.5) * TILE - 26 - camY;
+        const g = ctx.createRadialGradient(gx, gy, 2, gx, gy, 62);
+        g.addColorStop(0, "rgba(255,214,140,.5)"); g.addColorStop(1, "rgba(255,214,140,0)");
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(gx, gy, 62, 0, 6.284); ctx.fill();
+      }
+      const tx = 24 * TILE - camX, ty2 = 17 * TILE - camY;
+      const tg = ctx.createRadialGradient(tx, ty2, 4, tx, ty2, 110);
+      tg.addColorStop(0, "rgba(255,226,170,.4)"); tg.addColorStop(1, "rgba(255,226,170,0)");
+      ctx.fillStyle = tg; ctx.beginPath(); ctx.arc(tx, ty2, 110, 0, 6.284); ctx.fill();
+      ctx.globalCompositeOperation = "source-over";
+    }
+
+    if (this.props.snowfall !== false) {
+      ctx.fillStyle = "rgba(255,255,255,.85)";
+      for (const f of this.flakes) {
+        f.y += f.s; f.x += Math.sin(f.d + this.t / 90) * 0.25;
+        if (f.y > VH) { f.y = -3; f.x = Math.random() * VW; }
+        ctx.fillRect(Math.round(f.x), Math.round(f.y), f.r, f.r);
+      }
+    }
+    ctx.fillStyle = "rgba(20,28,40,.10)";
+    ctx.fillRect(0, 0, VW, 6); ctx.fillRect(0, VH - 6, VW, 6);
+  }
+
+  press(k, v) { this.keys[k] = v; }
+
+  renderVals() {
+    const bars = [];
+    for (let i = 0; i < 26; i++) {
+      const v = 8 + Math.round(Math.abs(Math.sin(i * 1.7)) * 26 + (i % 3) * 3);
+      bars.push({ h: v + "px" });
+    }
+    const conf = this.state.conf;
+    return {
+      canvasRef: this.canvasRef,
+      loading: this.state.loading,
+      showPrompt: !!this.state.near && !this.state.panel,
+      panelOpen: this.state.panel,
+      activeId: this.state.near || "",
+      doneLabel: this.state.done + " / " + this.items.length,
+      waveBars: bars,
+      expr: this.state.expr,
+      exprCount: this.state.expr.length,
+      playIcon: this.state.playing ? "■" : "▶",
+      togglePlay: () => this.setState(s => ({ playing: !s.playing })),
+      onExpr: e => this.setState({ expr: e.target.value.slice(0, 80) }),
+      confOptions: [1, 2, 3, 4, 5].map(n => ({
+        n, bg: conf === n ? "#c9743f" : "#fff", fg: conf === n ? "#fff8ee" : "#8c7355",
+        onClick: () => this.setState({ conf: n })
+      })),
+      closePanel: () => this.setState({ panel: false }),
+      submit: () => {
+        if (this.state.near) this.collected[this.state.near] = true;
+        this.setState(s => ({ panel: false, done: s.done + 1, near: null, expr: "" }));
+      },
+      upDown: () => this.press("arrowup", true), upUp: () => this.press("arrowup", false),
+      downDown: () => this.press("arrowdown", true), downUp: () => this.press("arrowdown", false),
+      leftDown: () => this.press("arrowleft", true), leftUp: () => this.press("arrowleft", false),
+      rightDown: () => this.press("arrowright", true), rightUp: () => this.press("arrowright", false),
+      actDown: () => this.tryCollect()
+    };
+  }
+}
+</script>
+</body>
+</html>

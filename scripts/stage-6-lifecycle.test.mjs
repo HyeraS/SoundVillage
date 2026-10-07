@@ -6,6 +6,7 @@ const read = path => readFile(new URL(`../${path}`, import.meta.url), 'utf8')
 
 const sources = Object.fromEntries(await Promise.all([
   'app/page.js',
+  'app/library-test/page.js',
   'components/GameEngine.js',
   'components/LibraryRoom.js',
   'components/WorldMap.js',
@@ -19,7 +20,7 @@ const sources = Object.fromEntries(await Promise.all([
   'components/MusicZoneMap.js',
   'components/NatureZoneMap.js',
   'components/HumanZoneMap.js',
-  'components/UrbanZoneMap.js',
+  'components/UrbanV3ZoneMap.js',
   'components/AnimalZoneMap.js',
   'components/LabZoneMap.js',
   'components/ZoneMap.js',
@@ -53,13 +54,14 @@ test('movement input clears and stops while overlays are active', () => {
   assert.match(engine, /if \(disabled\) clearMovementKeys\(keys\.current\)/)
   assert.match(engine, /if \(!direction \|\| isTyping\(\) \|\| disabledRef\.current\) return/)
   assert.match(sources['components/LibraryRoom.js'], /useKeys\(\{ disabled: Boolean\(openCard\)/)
-  assert.match(sources['components/LibraryRoom.js'], /keysDown: openCardRef\.current \? \{\} : keys\.current/)
+  assert.match(sources['components/LibraryRoom.js'], /inputBlocked = Boolean\(openCardRef\.current \|\| exitConfirmRef\.current\)/)
+  assert.match(sources['components/LibraryRoom.js'], /keysDown: inputBlocked \? \{\} : keys\.current/)
   assert.match(sources['components/WorldMap.js'], /disabled\s*:\s*questOpen \|\| attendanceOpen/)
   assert.match(sources['components/InteriorRoom.js'], /disabled: inputBlocked/)
   assert.match(sources['app/page.js'], /zoneInputBlocked = screen === 'annotate' \|\| showFeedback \|\| Boolean\(blockUnlockInfo\)/)
   for (const path of [
     'components/MusicZoneMap.js', 'components/NatureZoneMap.js', 'components/HumanZoneMap.js',
-    'components/UrbanZoneMap.js', 'components/AnimalZoneMap.js', 'components/ZoneMap.js',
+    'components/UrbanV3ZoneMap.js', 'components/AnimalZoneMap.js', 'components/ZoneMap.js',
   ]) assert.match(sources[path], /useKeys\(\{[\s\S]{0,80}?disabled: (?:baseOnly \|\| )?isAnnotating \|\| exitConfirm/)
   assert.match(sources['components/LabZoneMap.js'], /disabled:isAnnotating\|\|!!modal\|\|complete/)
 })
@@ -69,24 +71,32 @@ test('meaningful controls log once per activation and Enter repeat is ignored', 
   assert.match(engine, /!e\.repeat && !keys\.current\[direction\]/)
   assert.match(engine, /target_id: `map-control-\$\{direction\}`/)
   assert.match(engine, /metadata: \{ source: 'dpad' \}/)
-  for (const path of ['components/HumanZoneMap.js', 'components/UrbanZoneMap.js']) {
+  for (const path of ['components/HumanZoneMap.js']) {
     assert.match(sources[path], /press\(direction, interactionMethod\)/, `${path} must preserve mouse versus touch input`)
   }
+  assert.match(sources['components/UrbanV3ZoneMap.js'], /<DPad press=\{press\}/)
   assert.match(sources['components/LabZoneMap.js'], /press\(direction,interactionMethod\)/)
   for (const path of [
     'components/LibraryRoom.js', 'components/WorldMap.js', 'components/MusicZoneMap.js',
-    'components/NatureZoneMap.js', 'components/HumanZoneMap.js', 'components/UrbanZoneMap.js',
+    'components/NatureZoneMap.js', 'components/HumanZoneMap.js', 'components/UrbanV3ZoneMap.js',
     'components/AnimalZoneMap.js', 'components/LabZoneMap.js', 'components/ZoneMap.js',
   ]) assert.match(sources[path], /repeat/, `${path} must reject repeated keyboard activation`)
 })
 
 test('library and world panels preserve precise close reasons', () => {
   const library = sources['components/LibraryRoom.js']
+  const libraryHarness = sources['app/library-test/page.js']
   for (const reason of ['close_button', 'escape', 'backdrop', 'navigation', 'component_unmounted']) {
     assert.match(library, new RegExp(`['"]${reason}['"]`))
   }
   assert.match(library, /library_card_opened/)
   assert.match(library, /library_card_closed/)
+  assert.match(library, /data-testid="museum-floor-exit"/)
+  assert.match(library, /data-testid="museum-exit-button"/)
+  assert.match(library, /overlapsMuseumExitTrigger\(result\)/)
+  assert.match(library, /role="dialog" aria-modal="true" aria-labelledby="museum-exit-title"/)
+  assert.match(libraryHarness, /import QaCharacterStudioPanel/)
+  assert.match(libraryHarness, /shop:\{ render:\(\) => <QaCharacterStudioPanel sessionKey="library-test-shop"\/> \}/)
   const world = sources['components/WorldMap.js'] + sources['components/world-map/WorldMapUI.js']
   assert.match(world, /quest_panel_closed/)
   assert.match(world, /attendance_panel_opened/)

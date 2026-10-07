@@ -1,0 +1,13 @@
+{
+  "PROJECT_SUMMARY.md": true,
+  "app/music-test/page.js": true,
+  "components/GameEngine.js": true,
+  "components/LibraryRoom.js": true,
+  "components/MusicZoneMap.js": true,
+  "components/WorldMap.js": true,
+  "components/ZoneMap.js": true,
+  "lib/animalVillage.js": true,
+  "lib/musicVillage.js": true,
+  "lib/natureVillage.js": true,
+  "package.json": true
+}

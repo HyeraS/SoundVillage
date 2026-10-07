@@ -1,0 +1,21 @@
+{"groups":{"A":84,"B":85,"ALL":169},"safeSlots":403,"reachableFootCells":4335,"objects":247,"collisionRects":1719}
+✔ 48x36 map; feet and spawn are valid; entrance cannot fire on entry (0.9015ms)
+✔ all real A IDs, stable order, per-block reachability and interaction clearance (2674.820625ms)
+✔ all real B IDs, stable order, per-block reachability and interaction clearance (1735.3295ms)
+✔ all real ALL IDs, stable order, per-block reachability and interaction clearance (1560.190458ms)
+✔ buildings, trunks, fences, well, cart, bench and water block feet; roofs do not block as rectangles (0.234041ms)
+✔ swept collision resists 2-second stalls, diagonal corners and slides along the unblocked axis (345.475ms)
+✔ capacity and bad identities fail explicitly, never truncate or use obstacle fallback (2.191709ms)
+✔ production route retains all props; research persistence and other zones remain independent (3.350834ms)
+✔ block count is data-driven, including fewer and more than six blocks (1932.07ms)
+✔ camera preserves aspect and 18-tile vertical scale at desktop and both mobile orientations (0.254292ms)
+✔ approved blueprint controls landmarks, organic lane coverage and place density (106.123333ms)
+✔ pond water and dock rails block feet while authored dock planks remain walkable (0.210542ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 12
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9045.770875

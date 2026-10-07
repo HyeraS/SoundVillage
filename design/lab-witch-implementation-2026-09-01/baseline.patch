@@ -1,0 +1,2573 @@
+diff --git a/PROJECT_SUMMARY.md b/PROJECT_SUMMARY.md
+index bc5a40e..649d04b 100644
+--- a/PROJECT_SUMMARY.md
++++ b/PROJECT_SUMMARY.md
+@@ -2,13 +2,14 @@
+ 
+ > 소리를 탐험하고, 의성어로 표현하고, 다른 참여자의 표현에 공감 투표하는 웹 기반 사운드 어노테이션 연구용 게임.
+ > 요약 작성 기준: 2026-08-05 (`main` 커밋 `79adf70` / `asset-swap` 커밋 `ca5d129` + 미커밋 WIP, 두 브랜치 상태를 함께 정리)
++> 최근 갱신: 2026-08-30 — 13장(house-decor-2d 집꾸미기·실시간 동행)에 이어 **14장(Zone 내부 맵 리스킨: Music/Nature/Human/Animal)** 추가. 9장 `house-decor-2d` 커밋 로그 갱신.
+ 
+ `docs/notion/` 아래 2026-06-05 기준 상세 문서 7편이 있으나, 이후 커밋(Sound Museum, 블록 퀘스트, 그룹 A/B, 마을 잠금, 연구용 접근 ID, 실 접속자 장애 대응, WorldMap 비주얼 전면 개편 등)으로 Zone 체계·흐름·비주얼이 크게 바뀌었다. 이 문서는 **현재 코드 기준**으로 다시 정리한 것이다.
+ 
+ **브랜치 상태가 세 갈래로 갈라져 있음 — 중요:**
+ - `main`: 실제 실험 참여자들이 접속하는 배포 브랜치. 게임플레이/백엔드 로직(1~11장 내용)은 이 브랜치 기준.
+ - `asset-swap`: `main`의 `fabc721`에서 분기, 아직 push/merge 전인 **로컬 전용 WIP 브랜치**. WorldMap·Lab 존을 구매한 itch.io 픽셀 에셋으로 전면 리스킨하는 작업에 더해, 현재는 **동물 마을(Animal) 길 버그 수정**과 **자연 마을(Nature) 존 전면 교체**까지 진행 중이다(12장 참고). 이 두 항목은 아직 커밋되지 않은 워킹 트리 변경사항(`app/page.js`, `components/AssetRegistry.js`, `components/WorldMap.js`, `components/ZoneMap.js`)이다. **`main`에만 있는 커밋 2개(`fb2fb1c`, `79adf70` — 접속 장애 수정, Museum 로딩 인디케이터)가 `asset-swap`에는 없으므로**, 이후 `main`에 merge하거나 `main`을 다시 베이스로 rebase할 때 반드시 반영 확인 필요.
+-- `house-decor-2d`: `asset-swap`의 `50ce34a`에서 분기, **별도 git worktree**(`SoundVillage-house-decor-2d/`)에서 작업 중인 브랜치. 3D 리서치 프로토타입(`codex/3d-research-prototype`)과 완전히 분리하기 위해 만들어졌으며, 집꾸미기(Cozy Room)와 실시간 동행("초대") 기능을 담고 있다(13장 참고). **이미 별도 Vercel 프로젝트(`new-soundvillage.vercel.app`, GitHub `HyeraS/new_soundvillage`)의 `main`에 push되어 배포 중** — `main`/`asset-swap`이 배포되는 원래 Vercel 프로젝트(Supabase 프로젝트 ref `nzzesrjneqsbkgtbaoxy`)와는 완전히 다른 배포·다른 Supabase 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)를 쓴다 — 실제 실험 데이터와 물리적으로 분리하기 위한 의도적 선택.
++- `house-decor-2d`: `asset-swap`의 `50ce34a`에서 분기, **별도 git worktree**(`SoundVillage-house-decor-2d/`)에서 작업 중인 브랜치. 3D 리서치 프로토타입(`codex/3d-research-prototype`)과 완전히 분리하기 위해 만들어졌으며, 집꾸미기(Cozy Room)와 실시간 동행("초대") 기능(13장) + **Zone 내부 맵 리스킨(Music/Nature/Human/Animal, 14장)** + WorldMap 지면 디테일 폴리시를 담고 있다. **이미 별도 Vercel 프로젝트(`new-soundvillage.vercel.app`, GitHub `HyeraS/new_soundvillage`)의 `main`에 push되어 배포 중** — `main`/`asset-swap`이 배포되는 원래 Vercel 프로젝트(Supabase 프로젝트 ref `nzzesrjneqsbkgtbaoxy`)와는 완전히 다른 배포·다른 Supabase 프로젝트(ref `ogjcqtfoabuxkgkpqsil`)를 쓴다 — 실제 실험 데이터와 물리적으로 분리하기 위한 의도적 선택.
+ 
+ ---
+ 
+@@ -161,7 +162,10 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
+ | `app/globals.css` | Nunito 폰트, 전역 리셋, 애니메이션 |
+ | `components/StartPanel.js` | 참여자/그룹 입력, 연구용 접근 미리보기 |
+ | `components/WorldMap.js` | 월드맵, Zone 포털 + Museum 입구, HUD (`asset-swap`: 1310줄로 대폭 확장 — 오토타일 지형·카메라·건물 스프라이트 렌더링 + 역할 기반 마을 오브젝트 배치 포함, 12장 참고) |
+-| `components/ZoneMap.js` (`main` 1291줄 / `asset-swap` 2305줄, 최대 파일) | 블록 격자 계산, 소리 아이템 스폰, 충돌, 잠금 연출 (`asset-swap`: Lab 존 전용 가구/포스터 오브젝트 타입, Animal 존 길 렌더링, Nature 존 전면 재구현(`buildNatureZone`) 추가, 12.5·12.6절 참고) |
++| `components/ZoneMap.js` (최대 파일) | Human/Urban/Lab 존 렌더 + 공용 블록 격자 계산·소리 아이템 스폰·충돌·잠금 연출. (`house-decor-2d`: Human 존을 크리스마스 마켓으로 리스킨 → 14.4, 풀스크린 렌더 방식 14.7절로 조정) |
++| `components/MusicZoneMap.js` + `lib/musicVillage.js` (`house-decor-2d`) | Music 존 전용 캔버스 엔진 — 절차적 밤 네온 마을 handoff 이식 (14.2). ※ 미커밋 재작업 진행 중(14.8) |
++| `components/NatureZoneMap.js` + `lib/natureVillage.js` (`house-decor-2d`) | Nature 존 전용 캔버스 엔진 — 구매 에셋 타일맵 handoff 이식, 비동기 이미지 로딩 게이트 (14.3) |
++| `components/AnimalZoneMap.js` + `lib/animalVillage.js` (`house-decor-2d`) | Animal 존 전용 캔버스 엔진 — 절차적 농장맵 handoff 이식(레이아웃 B), 6블록 격자 스폰/안개 재구현 (14.5) |
+ | `components/AnnotationPanel.js` | Stage 1 표현/자신감 제출 |
+ | `components/SoundMuseum.js` (614줄, 신규) | Stage 2 성격의 투표 룸, Zone별 테마/NPC |
+ | `components/FeedbackPanel.js` | 완료 토스트 |
+@@ -228,6 +232,26 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
+ | `f63d17d` | 맵 2배 확장 + 플레이어 추적 카메라, 잔디 색상 얼룩으로 자연스러운 초원 질감 |
+ | `07c8b3e` | WorldMap에 실제 오토타일 지형·존별 테마 장식·포털 건물·레이어드 캐릭터 적용(구매 에셋 첫 도입) |
+ 
++### `house-decor-2d` (배포 브랜치 = `new-soundvillage.vercel.app`, 최신)
++
++| 커밋 | 날짜 | 내용 |
++|---|---|---|
++| *(미커밋 WIP)* | | Music 마을 재작업(`musicVillageConfig.mjs` 등), Lab observatory 리디자인 프리뷰 — 14.8절 |
++| `a8b8091` | 08-30 | WorldMap Nature 연못을 타일 오토타일 대신 `<NaturePond/>` 레이어 스택으로 (14.6) |
++| `e733ba9` | 08-30 | 포털 근접 `<EnterCue>`를 모든 지면색에서 읽히게 — 접촉 그림자 + 링 핑 (14.6) |
++| `f451471` | 08-30 | 다져진 길·판석 질감·경계 페더링 (WorldMap + Animal 마을) (14.6) |
++| `592d656` | 08-30 | 포털 호버 박스 → 발밑 글로우 + 까딱이는 진입 쐐기 (14.6) |
++| `f957bc5` | 08-30 | 톤 잔디 얼룩 + 클러스터 지면 디테일 (WorldMap + Animal 마을) (14.6) |
++| `bad3cb9` | 08-27 | Human 존을 크리스마스 마켓으로 리스킨 + 픽셀아트 정수배 스케일링 (14.4) |
++| `67904b0` | 08-25 | Nature 존 길/잔디 경계 타일 flip 비트 반전 수정 (14.3) |
++| `c756db4` | 08-25 | Music/Nature 존 맵을 전용 캔버스 엔진으로 리스킨 + Museum "데이터 부족" 상태 (14.2·14.3) |
++| `3434726` | 08-24 | 새 Supabase 프로젝트 env var 반영 재배포 트리거 |
++| `cc3244c` | 08-24 | Cozy Room 인테리어 시스템 + 실시간 동행 (13장) |
++| `ab94d3a` | 08-23 | 집꾸미기를 별도 테스트 라우트 대신 WorldMap에서 진입 (13.4) |
++| `6a2dfa6` | 08-23 | 집꾸미기 프로토타입을 배포된 2D(asset-swap) 빌드로 이식 (13장) |
++
++> 이 세션에서 추가로 `ZoneMap.js` 풀스크린 렌더 조정(14.7, 미커밋)을 함.
++
+ ---
+ 
+ ## 10. 알려진 리스크 / 미해결 사항 (구 문서 대비 최신화)
+@@ -245,6 +269,8 @@ Zone/블록 진입 로직은 Supabase에서 참여자가 실제로 완료한 `so
+ | `asset-swap`이 `main`에 없는 프로덕션 수정 2건을 못 받고 있음 | **신규** — `main`은 `fabc721` 이후 `fb2fb1c`(커넥션 풀 고갈 수정)·`79adf70`(Museum 로딩 인디케이터)가 추가됐지만 `asset-swap`은 `fabc721`에서 분기한 뒤 그대로라 이 두 수정이 없음. `asset-swap`을 `main`에 합칠 계획이면 rebase나 merge로 반드시 반영해야 함 |
+ | anon 키만으로 `participant_currency.balance`를 임의 조작 가능(화폐 시스템, 신규) | **신규, 기존 패턴 계승** — 브라우저에 노출되는 건 `NEXT_PUBLIC_SUPABASE_ANON_KEY` 하나뿐이고 서버 측 검증 계층이 없어서, 이 키로 `increment_currency_balance` RPC나 `currency_transactions` insert를 직접 호출하면 서버 로직(`calculateReward` 고정값 5/2)을 거치지 않고 임의 금액을 자기 잔액에 얹을 수 있다. 새로 만든 문제가 아니라 **`annotations`/`votes`가 이미 처음부터 이 구조**였다는 걸 실측으로 확인함(anon 키 SELECT count가 service_role과 완전히 동일, `increment_vote_count`도 anon이 별도 GRANT 없이 EXECUTE 가능 — `scripts/currency_schema.sql` 상단 주석 참고) — 즉 참여자가 마음만 먹으면 지금도 자기 annotation을 무한정 위조 제출하거나 `vote_count`를 직접 올릴 수 있는 것과 동일한 신뢰 모델. `currency_transactions`에 `UNIQUE(participant_id, related_id, type)` 제약을 걸어 "같은 소리/투표에 대한 중복 지급"만은 DB 레벨에서 막아뒀지만, 애초에 존재하지 않는 `related_id`로 여러 번 호출하는 것 자체는 못 막는다. 근본 해결은 지급 판단을 서버(Edge Function 등)로 옮기고 클라이언트는 결과만 받는 구조가 필요하지만, 지금 화폐 시스템은 UI 이전 데이터 계층 단계라 범위 밖 — 참여자 실험 데이터 자체의 신뢰도가 이미 같은 전제 위에 있다는 점만 명시해둠 |
+ | `asset-swap`이 로컬에만 있고 원격에 push되지 않음 | **신규** — 사용자 확인 없이 push하지 않는 게 지금까지의 작업 방침. 머지 전 원본 구매 에셋 폴더(`full version/`, `town full/`, `interior full/`, `nature full/`, `fishing_full/`, `winter full/`)가 `.gitignore`에 걸려있는지, `public/assets/`에 복사된 파일만 커밋됐는지 재확인 필요 |
++| `house-decor-2d` 워킹 트리에 미커밋 병렬 WIP 다수 (2026-08-30) | **신규** — Music 마을 재작업(`musicVillage.js` −1409/+541, `musicVillageConfig.mjs` 신설, 실 에셋), Lab observatory 리디자인 프리뷰 5종, `GameEngine.js`/`LibraryRoom.js`/`natureVillage.js` 소규모 변경이 커밋 안 된 채로 있음. 다른 세션 작업이라 이 요약(14.8)엔 파일 목록만, 동작·검증 상태 미확인 |
++| `house-decor-2d`에 12.5·12.6절과 실제 코드가 불일치 | 12.5(asset-swap Animal 길 수정)·12.6(`buildNatureZone`)은 이후 14장 방식으로 대체됨 — 12장은 asset-swap 히스토리로만 읽고, 현재 Zone 맵 구현은 14장 기준 |
+ 
+ ---
+ 
+@@ -388,3 +414,62 @@ Lab 존 작업 이후, Animal 존의 길(path) 렌더링에서 두 가지 버그
+ | 상점 구매 확인 단계 없음(가격 버튼 즉시 결제) | 미해결 |
+ | 다중 방문객(3인 이상) 동시 접속 | 미검증 — 설계 자체가 1:1 전제(presence에서 "나 아닌 첫 번째 키"만 상대로 취급) |
+ | `nzzesrjneqsbkgtbaoxy` 쪽 예전 house-decor 코드/테이블 | 정리 안 됨 — 코드는 안 쓰이지만 파일/테이블 그대로 존재 |
++
++---
++
++## 14. Zone 내부 맵 리스킨 — Music / Nature / Human / Animal (2026-08-25 ~ 08-30, `house-decor-2d`)
++
++> 12장이 다룬 건 `asset-swap` 시절 `ZoneMap.js` 안에서 `buildNatureZone()` 식으로 손그린 SVG를 재배치한 접근이었다. 이후 `house-decor-2d`에서 각 Zone 내부 맵을 **HANDOFF 디자인 이식** 방식으로 다시 갈아엎었다 — 12.5·12.6절(asset-swap의 Animal 길 수정 / Nature `buildNatureZone`)은 이 장으로 대체된다.
++> **불변 제약(계속 지켜짐)**: 소리 수집/블록 잠금/어노테이션/투표/집계 등 게임·데이터 로직은 한 줄도 안 건드림. `app/page.js`는 Zone별 렌더 분기만 늘어나고, `spawnSoundItems`/`computeBlockGrid`(`ZoneMap.js`) 같은 공용 함수는 import/수정하지 않고 공식만 각 엔진에서 독립 재구현한다.
++
++### 14.1 공통 패턴
++
++- Zone별 두 파일 쌍: `lib/{zone}Village.js`(맵 생성·충돌·Canvas 드로잉, 프레임워크 의존성 없는 순수 모듈) + `components/{Zone}ZoneMap.js`(입력 루프·추적 카메라·HUD — 다른 Zone과 동일한 `ZoneHUD`/`DPad`/`PixelChar`/`CompleteModal`/`ExitConfirmModal` 재사용). 캐릭터는 캔버스 y-정렬 합성 대신 다른 Zone처럼 DOM `PixelChar` 오버레이.
++- `app/page.js`의 `screen==='zone'` 블록에 `activeZone==='Music' | 'Nature' | 'Animal'` 분기 추가(그 외 Human/Urban/Lab은 기존 `ZoneMap.js`). 소리 데이터(`getGroupSounds`)·수집 콜백(`handleCollectSound`)·`AnnotationPanel` 흐름은 전부 공유.
++- 격리 검증 라우트(실 데이터, 영구 보존): `app/music-test`, `app/nature-test`, `app/animal-test`.
++- 블록(구역) 격자: 각 엔진이 `ZoneMap.js`의 `computeBlockGrid` 공식(cols≈√(n·W/H) → 6블록이면 3열×2행, 여백 2타일)을 **독립 재구현**. 아이템은 `spawn{Zone}Items(sounds, village)`가 실제 `SOUND_ITEMS.{Zone}`(그룹 필터 통과분)를 격자 셀에 **입구(스폰)-거리순**으로 배정하고(안개가 입구에서부터 걷힘), 시드는 `zone + 정렬된 sound_id 목록`으로 고정해 재입장 시 배치가 동일.
++
++### 14.2 Music Zone — 밤 네온 마을 (`c756db4`, 2026-08-25)
++
++`design_handoff_music_zone_map`(Claude Design 산출물, **절차적 Canvas 드로잉** — 외부 이미지 0개)을 `components/MusicZoneMap.js` + `lib/musicVillage.js`로 이식. 절차적이라 비동기 로딩 게이트 없이 동기 빌드로 충분한 게 Nature와의 유일한 구조적 차이.
++
++### 14.3 Nature Zone — 구매 에셋 타일맵 (`c756db4` + `67904b0`)
++
++- **이식**(`c756db4`): handoff 패키지(48×36 타일, `terrain.png`/`nature.png` 스프라이트시트 + 사전계산된 tiles/objects/collision JSON)를 `components/NatureZoneMap.js` + `lib/natureVillage.js`로. Music과 달리 **비동기 이미지 로딩 게이트**(`loadNatureVillage`) + 정적 레이어 오프스크린 프리렌더가 필요.
++- **flip 버그 수정**(`67904b0`): handoff JSON의 흙↔잔디 경계 타일(가로 분할/세로 분할 + 꽃 프린지 변형)의 `flipX/flipY`가 실제 이웃 채움 타일 대비 전부 반대였음(약 200개 인스턴스 100% — 알파 스캔으로 이웃 대조해 확인, 육안 아님). 잘못된 flip 때문에 울타리 경계가 길 입구를 봉쇄하고 있었음. `data/nature_village_map.json`에서 비트만 반전(물 경계 타일은 영향 없었음).
++
++### 14.4 Human Zone — 크리스마스 마켓 (`bad3cb9`, 2026-08-27)
++
++- HANDOFF 겨울 마켓 디자인(`Cozy Christmas Market Map Design/` — winter 팩 지형 + 마켓 소품)을 **`ZoneMap.js` 안에서 직접** 리스킨(Music/Nature처럼 전용 컴포넌트를 분리하지 않고, `ZoneMap.js`의 Human 분기 렌더를 교체). 이전 Lynch풍 스텁 팔레트를 대체. `public/assets/winter/global.png` 추가, `AssetRegistry.js` +94줄, `ZoneMap.js` 대폭 개편.
++- **픽셀아트 스케일링(정수배 레터박스)**: 같은 커밋에서, 게임 캔버스 SVG가 `width/height:100%`로 창을 채우며 비정수 배율일 때 스프라이트가 흐려지던 문제를 → 컨테이너 크기를 재서 **정수배(1x/2x/3x)로만** 렌더하고 남는 공간은 레터박스로 두는 방식으로 변경. → 14.7에서 다시 조정됨.
++
++### 14.5 Animal Zone — 절차적 농장 맵 (2026-08-28~, 이후 `f957bc5`/`f451471`에 편입)
++
++- `cozy animal village map design/` handoff(`animal-village.js` — 의존성 없는 **절차적** 농장맵 엔진: 중앙 폴리곤 연못을 도는 고리 도로 + 세로 목교 + 우리 6곳(가축 100% 울타리 안) + 밭·과수원 + 가장자리 편향 숲 스캐터)를 `lib/animalVillage.js` + `components/AnimalZoneMap.js`로 이식. 레이아웃 B(연못 고리길) 확정, `layoutA`는 미호출로 보존.
++- handoff의 목업 5구역 하드코딩(`v.districts` / `spawnItems` / district 기반 `drawLockFog`)은 **미사용** — 제품 Animal 존은 6블록이라 Nature와 같은 `computeBlockGrid` 방식으로 `spawnAnimalItems` + 격자 `drawLockFog`(농장 톤 크림빛 안개) 재구현.
++- 스폰을 진입로 위쪽(23,30)으로 올려 입장 즉시 나가기 팝업 방지, 남쪽 '입구' 팻말은 컴포넌트가 ENTRANCE 마커로 직접 그려 중복 제거. 에셋 26장 전부 이미 저장소에 존재(신규 복사 0).
++- **튜닝**: 가축 스프라이트 `scale` 1.5→2.25, 숲 스캐터 확률(`edgeBias`) 절반(0.78/0.4/0.12 → 0.39/0.2/0.06), 새싹 텍스처 밀도 0.34→0.24, per-tile 꽃/버섯/덤불 굴림을 WorldMap과 공유하는 클러스터 스캐터로 교체(`f957bc5`/`f451471`).
++- 검증: `app/animal-test` + 실제 앱 흐름(`ALLAUDIO_A` 로그인 → WorldMap 도보 → 동물 마을 포털 ENTER → AnimalZoneMap "구역 6/6") headless 스크린샷, 콘솔 에러 0.
++
++### 14.6 공유 WorldMap / Animal 마을 비주얼 폴리시 (`f957bc5` ~ `a8b8091`, 2026-08-30)
++
++WorldMap(SVG)과 Animal 마을(canvas)에 나란히 적용한 지면 디테일 패스. 지형 코드·`PATH_SET`/`WALKABLE_SET`/`STONE_SET`·충돌·오토타일·walkable·소리 로직은 전부 불변, 튜닝 상수는 각 파일 상단에 모여 있음.
++
++| 커밋 | 내용 |
++|---|---|
++| `f957bc5` | 톤 잔디 얼룩(밝음/중간/어두움 3톤, 크고작은 반경 혼합) + 열린 잔디에만(길·물·포털/뮤지엄 마당·테두리 나무칸 제외) 꽃/덤불/버섯 3~6개씩 뭉치는 시드 클러스터 스캐터. Animal은 `drawStatic`에 저주파 방사 그라디언트 톤 레이어를 굽고 per-tile 굴림을 같은 클러스터 헬퍼로 교체 |
++| `592d656` | 포털/뮤지엄/집 근접 표시를 "디자인 툴 선택 박스"처럼 읽히던 라운드 사각 테두리+그림자 → 공유 `<EnterCue>`: 발밑 존 강조색 방사 글로우(잠김=회색, 0.25s 페이드) + 라벨 위에 SMIL로 위아래 까딱이는 작은 강조색 쐐기(JS 틱 없음). 잠긴 포털은 기존 grayscale+🔒 유지 |
++| `f451471` | 스포크/링 중앙선에 반투명 2타일 "다져진 길" 띠, 흙 타일에 자갈·바퀴자국·마른 풀 스캐터, 잔디↔흙 경계 타일에 흙 알갱이/풀잎 상호 침투. 뮤지엄 판석 마당 바깥 링을 흙+돌조각으로(멤버십/충돌 불변), 안쪽 판석에 균열·이끼·바랜 자국 + 중앙→입구 축 그라디언트. Animal은 2×2 블록별 길 타일 색 변주(단일 타일 반복 제거) + `featherEdges` 강화(7→14개, 깊이 9→16px) |
++| `e733ba9` | Urban(`#C4B99A`)·Lab(`#D4883A`)처럼 강조색이 지면색과 비슷한 존은 글로우만으론 근접 표시가 안 보여서, `<EnterCue>`에 대비용 어두운 접촉 그림자 타원 + 존 강조색 링 "핑"(SMIL rx/ry/opacity 확장) 추가, 글로우 불투명도 0.30→0.34 |
++| `a8b8091` | WorldMap Nature 연못을 물 오토타일(수련잎/거품 장식 크롭이 대부분이라 작은 blob에선 수련잎 더미처럼 보이던 것) 대신 `animalVillage.js`의 `drawPond` 레이어 스택을 SVG `<NaturePond/>`로 포팅(흙 둔치→잔디 프린지→blob 클립 평면 물+블루 틴트+얕은 물 띠+시드 반짝임→수련잎→갈대). `WATER_TILES`/`WATER_SET`은 통행 차단 마스크로 유지. 연못 확대(rx 5→7, ry 4→6)·중심 이동 + 풍차 북쪽 물가로 이동 |
++
++### 14.7 Zone 맵 풀스크린 렌더 조정 (2026-08-29)
++
++`bad3cb9`의 정수배 레터박스가 흔한 노트북 해상도(예: 1440×844)에서 거의 항상 1x로 떨어져 화면의 절반 이상이 여백이 되는 문제. `ZoneMap.js`(Human/Urban/Lab)를 캔버스 기반 존(Music/Nature/Animal)과 같은 방식으로 변경 — 세로로 보이는 월드 범위(`VIEW_H`=18타일)만 고정하고 가로는 창 비율에 맞춰 확장(`viewWorldW = min(PX_W, round(VIEW_H·컨테이너W/컨테이너H))`), SVG는 컨테이너 픽셀 크기 그대로 + `preserveAspectRatio="xMidYMid slice"` + `imageRendering:pixelated`. 레터박스 제거, 세로 줌·캐릭터 크기는 그대로.
++
++### 14.8 진행 중 (미커밋, 다른 세션) — 상세 미정리
++
++이 요약 갱신 시점(2026-08-30)에 워킹 트리에 다음 대규모 WIP가 있으나 미검토:
++- **Music 마을 재작업**: `lib/musicVillageConfig.mjs` 신설(STAGE/GATE 등 좌표를 `Object.freeze`로 뽑은 설정 모듈), `lib/musicVillage.js` 대폭 축소(−1409/+541), `components/MusicZoneMap.js` 재작성, 실 에셋 `public/assets/music-village/`, 검증 라우트 `app/music-whitebox-preview`·`app/music-responsive-test`, `scripts/test_music_production.mjs`(+ `package.json`에 `test:music-production` 스크립트).
++- **Lab observatory 리디자인**: `app/lab-observatory-{art,cohesion,identity,pixel}-preview` + `app/lab-whitebox-preview` 프리뷰 라우트, `design/2d-map-redesign`·`design/concepts` 폴더.
++- `components/GameEngine.js`·`components/LibraryRoom.js`·`lib/natureVillage.js`(+154)에도 소규모 미커밋 변경.
+diff --git a/app/music-test/page.js b/app/music-test/page.js
+index d3356b5..3c3754f 100644
+--- a/app/music-test/page.js
++++ b/app/music-test/page.js
+@@ -1,5 +1,5 @@
+ 'use client'
+-import { useState } from 'react'
++import { useMemo, useState } from 'react'
+ import MusicZoneMap from '@/components/MusicZoneMap'
+ import soundMetadata from '@/data/sound_metadata.json'
+ 
+@@ -7,17 +7,31 @@ import soundMetadata from '@/data/sound_metadata.json'
+ // 내비게이션)은 건드리지 않는다. urban-test/library-test와 같은 패턴: 순수 시각 검증
+ // 전용 페이지. 실제 sound_metadata.json의 Music 소리(그룹 A)를 그대로 써서(mock 아님)
+ // district 배치가 실제 게임과 동일하게 계산되도록 한다.
+-const musicSounds = (soundMetadata.sounds || []).filter(
+-  s => s.game_zone === 'Music' && (!s.group || s.group === 'A')
+-)
+-const maxBlock = musicSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
++const allMusicSounds = (soundMetadata.sounds || []).filter(s => s.game_zone === 'Music')
+ 
+ export default function MusicTestPage() {
++  const [group, setGroup] = useState('A')
++  const musicSounds = useMemo(() => allMusicSounds.filter(s => s.group === group), [group])
++  const maxBlock = musicSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
+   const [collectedIds, setCollectedIds] = useState(new Set())
+-  const [blockNum, setBlockNum] = useState(maxBlock)
++  const [blockNum, setBlockNum] = useState(1)
++
++  const selectGroup = (nextGroup) => {
++    setGroup(nextGroup)
++    setBlockNum(1)
++    setCollectedIds(new Set())
++  }
+ 
+   return (
+     <>
++      <style>{`
++        @media (max-width: 600px) {
++          .music-test-controls { display: none !important; }
++        }
++        @media (min-width: 601px) and (max-width: 800px) {
++          .music-test-controls { transform: scale(.72); transform-origin: top right; }
++        }
++      `}</style>
+       <MusicZoneMap
+         sounds={musicSounds}
+         onCollectSound={(sound) => setCollectedIds(prev => new Set([...prev, sound.sound_id]))}
+@@ -26,14 +40,23 @@ export default function MusicTestPage() {
+         blockNum={blockNum}
+         blockTotal={maxBlock}
+       />
+-      <div style={{
++      <div className="music-test-controls" style={{
+         position: 'fixed', top: 8, right: 8, zIndex: 999,
+         background: '#000c', color: '#fff', padding: '6px 10px',
+         borderRadius: 6, fontSize: 11, fontFamily: 'monospace',
+       }}>
+-        blockNum: {blockNum} / {maxBlock}{' '}
++        Group {group}{' '}
++        <button onClick={() => selectGroup('A')}>A</button>{' '}
++        <button onClick={() => selectGroup('B')}>B</button>{' '}
++        · blockNum: {blockNum} / {maxBlock}{' '}
+         <button onClick={() => setBlockNum(b => Math.max(1, b - 1))}>-</button>{' '}
+         <button onClick={() => setBlockNum(b => Math.min(maxBlock, b + 1))}>+</button>
++        {' '}·{' '}
++        <button onClick={() => setCollectedIds(new Set(
++          musicSounds.filter(sound => (sound.block || 1) <= blockNum).map(sound => sound.sound_id)
++        ))}>complete unlocked</button>{' '}
++        <button onClick={() => setCollectedIds(new Set(musicSounds.map(sound => sound.sound_id)))}>complete 83</button>{' '}
++        <button onClick={() => setCollectedIds(new Set())}>reset</button>
+       </div>
+     </>
+   )
+diff --git a/app/page.js b/app/page.js
+index 91fcf67..8242f28 100644
+--- a/app/page.js
++++ b/app/page.js
+@@ -5,6 +5,7 @@ import WorldMap        from '@/components/WorldMap'
+ import ZoneMap         from '@/components/ZoneMap'
+ import MusicZoneMap    from '@/components/MusicZoneMap'
+ import NatureZoneMap   from '@/components/NatureZoneMap'
++import AnimalZoneMap   from '@/components/AnimalZoneMap'
+ import AnnotationPanel from '@/components/AnnotationPanel'
+ import SoundMuseum     from '@/components/SoundMuseum'
+ import FeedbackPanel   from '@/components/FeedbackPanel'
+@@ -665,11 +666,12 @@ export default function HomePage() {
+       <>
+         {/* ZoneMap — zone의 모든 소리를 한 화면에 유지. 잠긴/해제된 구역 표시는
+             blockNum prop으로 ZoneMap 내부에서 처리하므로 리마운트하지 않는다.
+-            Music/Nature만 예외 — 전용 캔버스 엔진을 쓴다(Music: 절차적 드로잉
+-            handoff를 이식한 MusicZoneMap/lib/musicVillage.js. Nature: 구매
+-            에셋 기반 타일맵 handoff를 이식한 NatureZoneMap/lib/natureVillage.js).
+-            소리 데이터·전사 흐름(onCollectSound/AnnotationPanel)은 다른 Zone과
+-            완전히 동일. */}
++            Music/Nature/Animal만 예외 — 전용 캔버스 엔진을 쓴다(Music: 절차적
++            드로잉 handoff를 이식한 MusicZoneMap/lib/musicVillage.js. Nature: 구매
++            에셋 기반 타일맵 handoff를 이식한 NatureZoneMap/lib/natureVillage.js.
++            Animal: 구매 에셋 기반 절차적 농장 맵 handoff를 이식한
++            AnimalZoneMap/lib/animalVillage.js). 소리 데이터·전사 흐름
++            (onCollectSound/AnnotationPanel)은 다른 Zone과 완전히 동일. */}
+         {activeZone === 'Music' ? (
+           <MusicZoneMap
+             sounds={zoneSounds}
+@@ -690,6 +692,16 @@ export default function HomePage() {
+             blockNum={currentBlock}
+             blockTotal={maxBlock}
+           />
++        ) : activeZone === 'Animal' ? (
++          <AnimalZoneMap
++            sounds={zoneSounds}
++            onCollectSound={handleCollectSound}
++            onExit={handleExitZone}
++            collectedIds={collectedIds}
++            isAnnotating={screen === 'annotate'}
++            blockNum={currentBlock}
++            blockTotal={maxBlock}
++          />
+         ) : (
+           <ZoneMap
+             zone={activeZone}
+diff --git a/components/GameEngine.js b/components/GameEngine.js
+index 804d7ab..8d97735 100644
+--- a/components/GameEngine.js
++++ b/components/GameEngine.js
+@@ -5,7 +5,7 @@ import { useEffect, useRef, useCallback } from 'react'
+    상수
+ ───────────────────────────────────────────── */
+ export const TILE  = 32   // 타일 1칸 px
+-export const SPEED = 3.9  // 픽셀/프레임 (기존 3 × 1.3)
++export const SPEED = 5.85  // 픽셀/프레임 (기존 3 × 1.3 × 1.5)
+ 
+ export const ZONE_META = {
+   Animal: { label: '동물 마을',        color: '#5B9E3A', bg: '#1C3512', emoji: '🐾' },
+diff --git a/components/LibraryRoom.js b/components/LibraryRoom.js
+index 5ea971d..29133fc 100644
+--- a/components/LibraryRoom.js
++++ b/components/LibraryRoom.js
+@@ -18,7 +18,7 @@ const CHAR_W = 22
+ const CHAR_H = 28
+ const SPRITE_W = 72
+ const SPRITE_H = 88
+-const SPEED = 3.2
++const SPEED = 4.8
+ 
+ // 캐릭터가 절대 넘어갈 수 없는 방의 바깥 경계 — wallY보다 위(벽/천장)로는
+ // 가구 충돌판정 없이도 원천적으로 못 올라간다.
+diff --git a/components/MusicZoneMap.js b/components/MusicZoneMap.js
+index f2b5a10..061d025 100644
+--- a/components/MusicZoneMap.js
++++ b/components/MusicZoneMap.js
+@@ -1,239 +1,187 @@
+ 'use client'
+-import { useEffect, useRef, useState } from 'react'
++
++import { useEffect, useMemo, useRef, useState } from 'react'
+ import { useKeys, SPEED, overlaps, TILE } from '@/components/GameEngine'
+-import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, CHAR_W, CHAR_H, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
++import { PixelChar, ZoneHUD, CompleteModal, ExitConfirmModal, DPad, SPRITE_W, SPRITE_H } from '@/components/ZoneMap'
+ import {
+-  T, MAP_W, MAP_H, mulberry32,
+-  buildVillage, moveWithCollision, PLAYER_BOX,
+-  drawStatic, drawItem, drawLockFog,
++  T, MAP_W, MAP_H, PLAYER_BOX, INTERACTION_BOX,
++  buildVillage, spawnMusicItems, moveWithCollision, overlapsExitTrigger,
++  preloadMusicAssets, drawStatic, drawMarker, drawExitCue, markerStateFor,
+ } from '@/lib/musicVillage'
+ 
+-// 화면에서 마을/캐릭터가 차지하는 비율을 다른 Zone(ZoneMap.js)과 똑같이 맞춘다 —
+-// 그쪽은 항상 24x18타일(768x576 월드px)을 한 화면에 담고(SVG viewBox), 캐릭터
+-// 스프라이트는 그 월드 좌표계 기준 72x88px다. 고정 줌(×2) 대신 "이 FOV를 실제
+-// 캔버스 크기에 맞게 얼마나 확대해야 하는가"를 매 프레임 계산해서 쓰면, 화면
+-// 크기가 달라져도 마을/캐릭터 비율이 항상 다른 Zone과 동일해진다(비율 유지
+-// letterbox — 다른 Zone의 SVG preserveAspectRatio="xMidYMid meet"과 동일 동작).
+ const FOV_W = 24 * TILE
+ const FOV_H = 18 * TILE
+ 
+-// 월드맵으로 나가는 입구 — 버스킹 광장(스폰 지점) 남쪽, 맵 최남단 걸을 수 있는
+-// 줄(ty=34)에서 스폰과 가까운 걸을 수 있는 칸을 골랐다(alpha 대신 walkable()로
+-// 실측 확인). 스폰 지점과 거리를 둬서(9타일) 입장하자마자 바로 나가기 확인
+-// 팝업이 뜨지 않게 한다 — 다른 Zone도 스폰을 입구에서 몇 칸 띄워 두는 것과 동일.
+-const ENTRANCE = { x: 21 * T + 16, y: 34 * T + 20 }
+-const ENTRANCE_RADIUS = 26
+-
+-function hashSeed(str) {
+-  let h = 5381
+-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0
+-  return Math.abs(h) || 1
+-}
+-
+-// district(구역) 영역 안의 걸을 수 있는 타일을 모두 모아 시드 고정 셔플 후,
+-// 서로 2칸 이상 떨어진 자리부터 채운다 — 자리가 모자라면(구역이 작아 간격을
+-// 다 못 지키면) 남은 아이템은 간격 제약 없이 채우되, walkable 타일 밖으로는
+-// 절대 나가지 않는다(빌딩/물 위에 아이템이 놓여 못 줍는 상황 방지).
+-function pickPositions(district, count, walkable, rnd) {
+-  const pool = []
+-  for (let ty = district.area.y; ty < district.area.y + district.area.h; ty++) {
+-    for (let tx = district.area.x; tx < district.area.x + district.area.w; tx++) {
+-      if (walkable(tx, ty)) pool.push({ tx, ty })
+-    }
+-  }
+-  for (let i = pool.length - 1; i > 0; i--) {
+-    const j = Math.floor(rnd() * (i + 1))
+-    ;[pool[i], pool[j]] = [pool[j], pool[i]]
+-  }
+-  const chosen = []
+-  for (const p of pool) {
+-    if (chosen.length >= count) break
+-    if (chosen.every(c => Math.abs(c.tx - p.tx) >= 2 || Math.abs(c.ty - p.ty) >= 2)) chosen.push(p)
+-  }
+-  if (chosen.length < count) {
+-    for (const p of pool) {
+-      if (chosen.length >= count) break
+-      if (!chosen.some(c => c.tx === p.tx && c.ty === p.ty)) chosen.push(p)
+-    }
+-  }
+-  return chosen
+-}
+-
+-// 실제 SOUND_ITEMS.Music(sounds prop)을 music-village.js가 만든 구역(district)
+-// 좌표계에 배치한다. buildVillage() 자체의 절차적 아이템 생성(village.items)은
+-// 쓰지 않고 무시 — 소리 데이터는 항상 이 함수가 만든 배열을 통해서만 온다.
+-// zone + 소리 id 목록으로 시드를 고정해 같은 참여자가 재입장해도 항상 같은
+-// 배치가 나온다(spawnSoundItems의 기존 관례와 동일).
+-function spawnMusicItems(sounds, village) {
+-  const seed = hashSeed('Music|' + sounds.map(s => s.sound_id).sort().join(','))
+-  const rnd  = mulberry32(seed)
+-  const byBlock = new Map()
+-  sounds.forEach(s => {
+-    const b = s.block || 1
+-    if (!byBlock.has(b)) byBlock.set(b, [])
+-    byBlock.get(b).push(s)
+-  })
+-  const items = []
+-  byBlock.forEach((list, block) => {
+-    const district = village.districts.find(d => d.block === block) || village.districts[0]
+-    const positions = pickPositions(district, list.length, village.walkable, rnd)
+-    list.forEach((s, i) => {
+-      const pos = positions[i] || positions[positions.length - 1] || { tx: district.area.x, ty: district.area.y }
+-      items.push({
+-        id:    s.sound_id,
+-        sound: s,
+-        tx:    pos.tx,
+-        ty:    pos.ty,
+-        neon:  district.neon,
+-        kind:  hashSeed(s.sound_id) % 2 === 0 ? 'note' : 'tape',
+-        phase: rnd() * Math.PI * 2,
+-      })
+-    })
+-  })
+-  return items
+-}
+-
+-export default function MusicZoneMap({ sounds, onCollectSound, onExit, collectedIds = new Set(), isAnnotating = false, blockNum = 1, blockTotal = 1 }) {
++const soundSetKey = (sounds) => (sounds || [])
++  .map((sound) => `${sound.sound_id}:${sound.block || 1}`)
++  .sort()
++  .join('|')
++
++export default function MusicZoneMap({
++  sounds,
++  onCollectSound,
++  onExit,
++  collectedIds = new Set(),
++  isAnnotating = false,
++  blockNum = 1,
++  blockTotal = 1,
++}) {
+   const { keys, press, release } = useKeys()
+-
+-  const villageRef = useRef(null)
+-  if (villageRef.current === null) villageRef.current = buildVillage('B')
+-  const village = villageRef.current
+-
+-  const itemsRef = useRef(null)
+-  if (itemsRef.current === null) itemsRef.current = spawnMusicItems(sounds, village)
+-  const items = itemsRef.current
+-
+-  const stageRef         = useRef(null)
+-  const canvasRef        = useRef(null)
+-  const staticCanvasRef  = useRef(null)
+-  useEffect(() => {
+-    const off = document.createElement('canvas')
+-    off.width  = MAP_W * T
+-    off.height = MAP_H * T
+-    drawStatic(off.getContext('2d'), village, { neon: true })
+-    staticCanvasRef.current = off
+-  }, [village])
+-
+-  // 캔버스를 다른 Zone과 동일하게 컨테이너 실측 크기로 꽉 채운다(고정 960x600
+-  // 프레임이 아님) — 리사이즈될 때마다 canvas의 실제 픽셀 크기를 갱신한다.
+-  useEffect(() => {
+-    const stage = stageRef.current
+-    const canvas = canvasRef.current
+-    if (!stage || !canvas) return
+-    const resize = () => {
+-      const w = Math.round(stage.clientWidth)
+-      const h = Math.round(stage.clientHeight)
+-      if (canvas.width !== w) canvas.width = w
+-      if (canvas.height !== h) canvas.height = h
+-    }
+-    resize()
+-    const ro = new ResizeObserver(resize)
+-    ro.observe(stage)
+-    return () => ro.disconnect()
+-  }, [])
+-
+-  const posRef        = useRef({ ...village.spawn })
+-  const dirRef         = useRef('down')
+-  const movingRef      = useRef(false)
+-  const [dir, setDir]     = useState('down')
++  const village = useMemo(() => buildVillage(), [])
++  const key = soundSetKey(sounds)
++  // `key`는 입력 배열 순서와 무관하므로 같은 sound set은 항상 같은 memo/배치를 쓴다.
++  // eslint-disable-next-line react-hooks/exhaustive-deps
++  const items = useMemo(() => spawnMusicItems(sounds), [key])
++  const itemsRef = useRef(items)
++
++  const stageRef = useRef(null)
++  const canvasRef = useRef(null)
++  const markerCanvasRef = useRef(null)
++  const staticCanvasRef = useRef(null)
++  const playerWrapRef = useRef(null)
++  const metricsRef = useRef({ cssW: 0, cssH: 0, pixelW: 0, pixelH: 0, dpr: 1 })
++
++  const posRef = useRef({ x: village.spawn.x, y: village.spawn.y })
++  const dirRef = useRef('down')
++  const movingRef = useRef(false)
++  const [dir, setDir] = useState('down')
+   const [moving, setMoving] = useState(false)
+   const [, setAnimTick] = useState(0)
+   const [collecting, setCollecting] = useState(null)
+-  const collectingRef     = useRef(false)
++  const collectingRef = useRef(false)
+   const collectingItemRef = useRef(null)
+-  const isAnnotatingRef   = useRef(isAnnotating)
+-  const blockNumRef       = useRef(blockNum)
+-  const collectedIdsRef   = useRef(collectedIds)
+-  const playerWrapRef     = useRef(null)
+-
+-  // 입구(월드맵으로 나가는 곳) — 캐릭터가 걸어서 들어서면 확인 팝업 표시.
+-  // ESC는 기존처럼 확인 없이 즉시 나가고, 이건 다른 Zone처럼 "걸어서 나가기"
+-  // 대안 경로다.
++  const interactingItemIdRef = useRef(null)
++  const isAnnotatingRef = useRef(isAnnotating)
++  const blockNumRef = useRef(blockNum)
++  const collectedIdsRef = useRef(collectedIds)
+   const [exitConfirm, setExitConfirm] = useState(false)
+   const inExitZoneRef = useRef(false)
++  const [assetStatus, setAssetStatus] = useState('loading')
+ 
+   useEffect(() => { isAnnotatingRef.current = isAnnotating }, [isAnnotating])
+   useEffect(() => { blockNumRef.current = blockNum }, [blockNum])
+   useEffect(() => { collectedIdsRef.current = collectedIds }, [collectedIds])
++  useEffect(() => { itemsRef.current = items }, [items])
+   useEffect(() => {
+-    if (!isAnnotating) { collectingRef.current = false; collectingItemRef.current = null }
++    if (!isAnnotating) {
++      collectingRef.current = false
++      collectingItemRef.current = null
++      interactingItemIdRef.current = null
++    }
+   }, [isAnnotating])
+ 
+-  // PixelChar의 걷기 프레임은 내부적으로 Date.now()를 읽어서 결정되는데(다른
+-  // Zone은 SVG 트리 전체가 매 프레임 다시 렌더링돼서 자연스럽게 갱신됨), 여기는
+-  // 캔버스를 ref로 직접 그리느라 dir/moving 값이 바뀔 때만 리렌더한다 — 그러면
+-  // 한 방향으로 계속 걷는 동안 PixelChar가 한 번도 다시 안 그려져서 다리가 멈춘
+-  // 채로 미끄러지는 것처럼 보인다. WORLD_CHARACTER 걷기 프레임 갱신 주기(100ms)에
+-  // 맞춰 리렌더만 강제로 트리거해서 다른 Zone과 같은 걷기 모션을 만든다.
+   useEffect(() => {
+-    const id = setInterval(() => {
+-      if (movingRef.current) setAnimTick(t => t + 1)
++    let cancelled = false
++    const offscreen = document.createElement('canvas')
++    offscreen.width = MAP_W * T
++    offscreen.height = MAP_H * T
++    const ctx = offscreen.getContext('2d')
++    drawStatic(ctx, village, null)
++    staticCanvasRef.current = offscreen
++    preloadMusicAssets().then((assets) => {
++      if (cancelled) return
++      drawStatic(ctx, village, assets)
++      staticCanvasRef.current = offscreen
++      setAssetStatus(assets.failed.length ? 'partial' : 'ready')
++    })
++    return () => { cancelled = true }
++  }, [village])
++
++  useEffect(() => {
++    const stage = stageRef.current
++    const canvases = [canvasRef.current, markerCanvasRef.current]
++    if (!stage || canvases.some((canvas) => !canvas)) return
++    const resize = () => {
++      const cssW = Math.max(1, Math.round(stage.clientWidth))
++      const cssH = Math.max(1, Math.round(stage.clientHeight))
++      const dpr = Math.min(window.devicePixelRatio || 1, 2)
++      const pixelW = Math.round(cssW * dpr)
++      const pixelH = Math.round(cssH * dpr)
++      for (const canvas of canvases) {
++        if (canvas.width !== pixelW) canvas.width = pixelW
++        if (canvas.height !== pixelH) canvas.height = pixelH
++      }
++      metricsRef.current = { cssW, cssH, pixelW, pixelH, dpr }
++    }
++    resize()
++    const observer = new ResizeObserver(resize)
++    observer.observe(stage)
++    return () => observer.disconnect()
++  }, [])
++
++  useEffect(() => {
++    const timer = setInterval(() => {
++      if (movingRef.current) setAnimTick((tick) => tick + 1)
+     }, 100)
+-    return () => clearInterval(id)
++    return () => clearInterval(timer)
+   }, [])
+ 
+-  // ESC(나가기) + Enter(전사 패널 열기) — 다른 Zone과 동일한 키 규약
++  const beginCollect = (item) => {
++    collectingRef.current = false
++    collectingItemRef.current = null
++    interactingItemIdRef.current = item.id
++    setCollecting(null)
++    onCollectSound(item.sound)
++  }
++
+   useEffect(() => {
+-    const h = e => {
+-      if (e.key === 'Escape') { if (!isAnnotatingRef.current) onExit(); return }
+-      if (e.key === 'Enter' && collectingItemRef.current && !isAnnotatingRef.current) {
+-        const item = collectingItemRef.current
+-        collectingItemRef.current = null
+-        setCollecting(null)
+-        onCollectSound(item.sound)
++    const handleKeyDown = (event) => {
++      if (event.key === 'Escape') {
++        if (!isAnnotatingRef.current) onExit()
++        return
++      }
++      if (event.key === 'Enter' && !event.repeat && collectingItemRef.current && !isAnnotatingRef.current) {
++        beginCollect(collectingItemRef.current)
+       }
+     }
+-    window.addEventListener('keydown', h)
+-    return () => window.removeEventListener('keydown', h)
++    window.addEventListener('keydown', handleKeyDown)
++    return () => window.removeEventListener('keydown', handleKeyDown)
++  // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [onExit, onCollectSound])
+ 
+   const confirmCollect = () => {
+-    const item = collectingItemRef.current
+-    if (!item) return
+-    collectingItemRef.current = null
+-    setCollecting(null)
+-    onCollectSound(item.sound)
++    if (collectingItemRef.current) beginCollect(collectingItemRef.current)
+   }
+ 
+-  // 게임 루프 — 캔버스는 매 프레임 직접 그리고(React 리렌더와 분리), 캐릭터
+-  // 스프라이트는 별도 DOM 오버레이의 style을 ref로 직접 갱신한다. 전부 ref만
+-  // 읽으므로 이펙트는 마운트 시 한 번만 걸면 된다.
+   useEffect(() => {
+-    let raf
++    let animationFrame
+     let lastTime = performance.now()
+     const loop = (now) => {
+-      // 다른 Zone(ZoneMap.js)과 동일하게 프레임 간 실제 경과 시간으로 속도를
+-      // 보정한다(60fps 기준 dt=1, 최대 3배 캡) — 이게 없으면 모니터 주사율에
+-      // 따라 이동 속도가 달라져서 다른 마을과 체감 속도가 어긋난다.
+       const dt = Math.min((now - lastTime) / 16.67, 3)
+       lastTime = now
+-
+-      const k = keys.current
+-      let { x, y } = posRef.current
+-      let dx = 0, dy = 0, newDir = null
+-      const spd = SPEED * dt
+-      if (k.up)    { dy -= spd; newDir = 'up' }
+-      if (k.down)  { dy += spd; newDir = 'down' }
+-      if (k.left)  { dx -= spd; newDir = 'left' }
+-      if (k.right) { dx += spd; newDir = 'right' }
++      const pressed = keys.current
++      let dx = 0
++      let dy = 0
++      let nextDir = null
++      const speed = SPEED * dt
++      if (pressed.up) { dy -= speed; nextDir = 'up' }
++      if (pressed.down) { dy += speed; nextDir = 'down' }
++      if (pressed.left) { dx -= speed; nextDir = 'left' }
++      if (pressed.right) { dx += speed; nextDir = 'right' }
+       const moved = dx !== 0 || dy !== 0
+-
+       if (moved) {
+-        posRef.current = moveWithCollision(village, { x, y }, dx, dy)
+-        if (newDir && newDir !== dirRef.current) { dirRef.current = newDir; setDir(newDir) }
++        posRef.current = moveWithCollision(village, posRef.current, dx, dy)
++        if (nextDir && nextDir !== dirRef.current) {
++          dirRef.current = nextDir
++          setDir(nextDir)
++        }
++      }
++      if (moved !== movingRef.current) {
++        movingRef.current = moved
++        setMoving(moved)
+       }
+-      if (moved !== movingRef.current) { movingRef.current = moved; setMoving(moved) }
+-
+-      const { x: px, y: py } = posRef.current
+ 
+-      // 근접 판정 — annotation 패널이 열려 있는 동안은 새 발견 차단
++      const { x: playerX, y: playerY } = posRef.current
++      const currentItems = itemsRef.current
+       if (!collectingRef.current && !isAnnotatingRef.current) {
+-        for (const item of items) {
+-          if (collectedIdsRef.current.has(item.id)) continue
+-          if ((item.sound.block || 1) > blockNumRef.current) continue
+-          const ix = item.tx * T + 16 - 12, iy = item.ty * T + 14 - 12
+-          if (overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
++        for (const item of currentItems) {
++          if (collectedIdsRef.current.has(item.id) || item.block > blockNumRef.current) continue
++          const markerX = item.tx * T + T / 2 - INTERACTION_BOX.w / 2
++          const markerY = item.ty * T + T / 2 - INTERACTION_BOX.h / 2
++          if (overlaps(
++            playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h,
++            markerX, markerY, INTERACTION_BOX.w, INTERACTION_BOX.h,
++          )) {
+             collectingRef.current = true
+             collectingItemRef.current = item
+             setCollecting(item)
+@@ -241,161 +189,126 @@ export default function MusicZoneMap({ sounds, onCollectSound, onExit, collected
+           }
+         }
+       } else if (collectingRef.current && collectingItemRef.current && !isAnnotatingRef.current) {
+-        const fi = collectingItemRef.current
+-        const ix = fi.tx * T + 16 - 12, iy = fi.ty * T + 14 - 12
+-        if (!overlaps(px - PLAYER_BOX.w / 2, py - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h, ix, iy, 24, 24)) {
++        const item = collectingItemRef.current
++        const markerX = item.tx * T + T / 2 - INTERACTION_BOX.w / 2
++        const markerY = item.ty * T + T / 2 - INTERACTION_BOX.h / 2
++        if (!overlaps(
++          playerX - PLAYER_BOX.w / 2, playerY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h,
++          markerX, markerY, INTERACTION_BOX.w, INTERACTION_BOX.h,
++        )) {
+           collectingRef.current = false
+           collectingItemRef.current = null
+           setCollecting(null)
+         }
+       }
+ 
+-      // 입구 근접 판정 — annotation 패널이 열려 있는 동안은 확인 팝업을 새로
+-      // 띄우지 않는다(다른 Zone과 동일 규칙).
+-      if (!isAnnotatingRef.current) {
+-        const edx = px - ENTRANCE.x, edy = py - ENTRANCE.y
+-        const nearEntrance = edx * edx + edy * edy < ENTRANCE_RADIUS * ENTRANCE_RADIUS
+-        if (nearEntrance && !inExitZoneRef.current) {
+-          inExitZoneRef.current = true
+-          setExitConfirm(true)
+-        } else if (!nearEntrance) {
+-          inExitZoneRef.current = false
+-        }
+-      }
++      const inExitZone = overlapsExitTrigger(posRef.current)
++      if (!isAnnotatingRef.current && inExitZone && !inExitZoneRef.current) setExitConfirm(true)
++      inExitZoneRef.current = inExitZone
+ 
+       const canvas = canvasRef.current
+-      const off    = staticCanvasRef.current
+-      let camX = 0, camY = 0, zoom = 1, offsetX = 0, offsetY = 0
+-      if (canvas && off && canvas.width > 0 && canvas.height > 0) {
+-        // 다른 Zone과 동일하게 항상 FOV_W x FOV_H(24x18타일) 월드 영역을 화면에
+-        // 담는다. 캔버스 실측 크기에 맞춰 얼마나 확대할지(zoom)를 계산하고,
+-        // 화면 비율이 FOV 비율(4:3)과 다르면 남는 쪽에 레터박스를 준다 — SVG의
+-        // preserveAspectRatio="xMidYMid meet"과 동일한 결과.
+-        zoom = Math.min(canvas.width / FOV_W, canvas.height / FOV_H)
+-        const contentW = FOV_W * zoom, contentH = FOV_H * zoom
+-        offsetX = (canvas.width - contentW) / 2
+-        offsetY = (canvas.height - contentH) / 2
+-
+-        // 카메라 — 플레이어 중심, 맵 경계에서 클램프. 보이는 월드 영역은 항상
+-        // FOV_W x FOV_H로 고정(다른 Zone과 동일 — 화면 크기와 무관하게 town이
+-        // 차지하는 비율이 같아진다).
+-        camX = Math.max(0, Math.min(px - FOV_W / 2, MAP_W * T - FOV_W))
+-        camY = Math.max(0, Math.min(py - FOV_H / 2, MAP_H * T - FOV_H))
+-
+-        const ctx = canvas.getContext('2d')
+-        ctx.imageSmoothingEnabled = false
+-        ctx.fillStyle = '#0f0920'
+-        ctx.fillRect(0, 0, canvas.width, canvas.height)
+-        ctx.save()
+-        ctx.translate(offsetX, offsetY)
+-        ctx.scale(zoom, zoom)
+-        ctx.translate(-camX, -camY)
+-        ctx.drawImage(off, 0, 0)
+-
+-        // 입구 표시 — 다른 Zone의 "↓ 입구" 표시와 같은 역할, 위치만 이 마을의
+-        // 실제 걸을 수 있는 남쪽 지점(ENTRANCE)에 맞춰 그린다.
+-        ctx.font = 'bold 11px "Courier New", monospace'
+-        const entLabel = '↓ 입구'
+-        const entW = ctx.measureText(entLabel).width + 20
+-        ctx.fillStyle = 'rgba(20,16,48,0.82)'
+-        ctx.fillRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
+-        ctx.strokeStyle = '#7cf2c4'
+-        ctx.lineWidth = 2
+-        ctx.strokeRect(ENTRANCE.x - entW / 2, ENTRANCE.y - 10, entW, 20)
+-        ctx.fillStyle = '#7cf2c4'
+-        ctx.textBaseline = 'middle'
+-        ctx.fillText(entLabel, ENTRANCE.x - entW / 2 + 10, ENTRANCE.y)
+-
+-        for (const item of items) {
+-          if ((item.sound.block || 1) > blockNumRef.current) continue
+-          const done = collectedIdsRef.current.has(item.id)
+-          if (done) ctx.globalAlpha = 0.35
+-          drawItem(ctx, item, now)
+-          if (done) ctx.globalAlpha = 1
++      const markerCanvas = markerCanvasRef.current
++      const staticCanvas = staticCanvasRef.current
++      const metrics = metricsRef.current
++      if (canvas && markerCanvas && staticCanvas && metrics.pixelW > 0 && metrics.pixelH > 0) {
++        const zoom = Math.min(metrics.pixelW / FOV_W, metrics.pixelH / FOV_H)
++        const cssZoom = Math.min(metrics.cssW / FOV_W, metrics.cssH / FOV_H)
++        const offsetX = (metrics.pixelW - FOV_W * zoom) / 2
++        const offsetY = (metrics.pixelH - FOV_H * zoom) / 2
++        const cssOffsetX = (metrics.cssW - FOV_W * cssZoom) / 2
++        const cssOffsetY = (metrics.cssH - FOV_H * cssZoom) / 2
++        const camX = Math.max(0, Math.min(playerX - FOV_W / 2, MAP_W * T - FOV_W))
++        const camY = Math.max(0, Math.min(playerY - FOV_H / 2, MAP_H * T - FOV_H))
++
++        const background = canvas.getContext('2d')
++        background.imageSmoothingEnabled = false
++        background.fillStyle = '#6f7865'
++        background.fillRect(0, 0, metrics.pixelW, metrics.pixelH)
++        background.save()
++        background.translate(offsetX, offsetY)
++        background.scale(zoom, zoom)
++        background.translate(-camX, -camY)
++        background.drawImage(staticCanvas, 0, 0)
++        drawExitCue(background)
++        background.restore()
++
++        const markerContext = markerCanvas.getContext('2d')
++        markerContext.imageSmoothingEnabled = false
++        markerContext.clearRect(0, 0, metrics.pixelW, metrics.pixelH)
++        markerContext.save()
++        markerContext.translate(offsetX, offsetY)
++        markerContext.scale(zoom, zoom)
++        markerContext.translate(-camX, -camY)
++        for (const item of currentItems) {
++          const state = markerStateFor(item, {
++            blockNum: blockNumRef.current,
++            collectedIds: collectedIdsRef.current,
++            nearbyId: collectingItemRef.current?.id,
++            interactingId: isAnnotatingRef.current ? interactingItemIdRef.current : null,
++          })
++          drawMarker(markerContext, item, state, now)
+         }
+-        drawLockFog(ctx, village, blockNumRef.current, now)
+-        ctx.restore()
+-      }
++        markerContext.restore()
+ 
+-      // 캐릭터 오버레이 — world → screen 좌표 변환(레터박스 오프셋 + 동적 줌).
+-      // 발치(px,py)를 스프라이트 하단 중앙에 맞춘다(음악 마을 엔진의 pos는
+-      // 발치 기준점). 스프라이트 크기(72x88)는 다른 Zone과 동일한 월드 단위라,
+-      // 같은 zoom을 곱하면 화면 상 캐릭터 비율도 다른 Zone과 항상 같아진다.
+-      if (playerWrapRef.current) {
+-        const screenLeft = offsetX + (px - SPRITE_W / 2 - camX) * zoom
+-        const screenTop  = offsetY + (py - SPRITE_H - camY) * zoom
+-        playerWrapRef.current.style.left = `${screenLeft}px`
+-        playerWrapRef.current.style.top  = `${screenTop}px`
+-        playerWrapRef.current.style.transform = `scale(${zoom})`
++        if (playerWrapRef.current) {
++          playerWrapRef.current.style.left = `${cssOffsetX + (playerX - SPRITE_W / 2 - camX) * cssZoom}px`
++          playerWrapRef.current.style.top = `${cssOffsetY + (playerY - SPRITE_H - camY) * cssZoom}px`
++          playerWrapRef.current.style.transform = `scale(${cssZoom})`
++        }
+       }
+-
+-      raf = requestAnimationFrame(loop)
++      animationFrame = requestAnimationFrame(loop)
+     }
+-    raf = requestAnimationFrame(loop)
+-    return () => cancelAnimationFrame(raf)
++    animationFrame = requestAnimationFrame(loop)
++    return () => cancelAnimationFrame(animationFrame)
+   // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [])
+ 
+-  const total     = items.length
+-  const collected = items.filter(it => collectedIds.has(it.id)).length
++  const total = items.length
++  const collected = items.filter((item) => collectedIds.has(item.id)).length
+   const remaining = total - collected
+ 
+   return (
+     <div style={{ width: '100vw', height: '100vh', overflow: 'hidden', position: 'relative', userSelect: 'none' }}>
+       <ZoneHUD zone="Music" collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal} />
+-
+-      {/* 다른 Zone(ZoneMap.js)과 동일하게 HUD 아래 전체 화면을 꽉 채운다 —
+-          960x600 고정 프레임을 중앙에 띄우지 않는다(화면 비율 불일치 수정). */}
+-      <div ref={stageRef} style={{
++      <div ref={stageRef} data-music-assets={assetStatus} style={{
+         position: 'absolute', top: 56, left: 0, right: 0, bottom: 0,
+-        background: '#0f0920', overflow: 'hidden',
++        background: '#6f7865', overflow: 'hidden',
+       }}>
+-        <canvas ref={canvasRef}
+-          style={{ display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated' }} />
+-
+-        {/* 캐릭터 — 기존 Zone들과 동일한 PixelChar(현재 게임 캐릭터 에셋) 재사용 */}
++        <canvas ref={canvasRef} aria-label="Music Village production map" style={{
++          position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
++          imageRendering: 'pixelated', zIndex: 0,
++        }} />
++        <div style={{
++          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
++          background: 'radial-gradient(120% 95% at 50% 45%, transparent 56%, rgba(63,67,88,.18) 100%)',
++        }} />
+         <div ref={playerWrapRef} style={{
+-          position: 'absolute', left: 0, top: 0,
+-          width: SPRITE_W, height: SPRITE_H,
+-          transformOrigin: '0 0',
+-          pointerEvents: 'none',
++          position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
++          transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
+         }}>
+           <PixelChar dir={dir} moving={moving} />
+         </div>
+-
+-        {/* 비네트 */}
+-        <div style={{
+-          position: 'absolute', inset: 0, pointerEvents: 'none',
+-          background: 'radial-gradient(120% 90% at 50% 45%, transparent 40%, rgba(12,6,28,.62) 100%)',
++        <canvas ref={markerCanvasRef} aria-label="Music sound markers" style={{
++          position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%',
++          imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 3,
+         }} />
+-
+-        {/* 근접 프롬프트 */}
+         {collecting && !isAnnotating && (
+           <div style={{
+-            position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)',
+-            background: '#1a1033', border: '3px solid #ff5fa2', borderRadius: 4,
+-            boxShadow: '0 0 24px rgba(255,95,162,.45)',
+-            padding: '6px 16px', display: 'flex', alignItems: 'center', gap: 8,
+-            fontFamily: 'Nunito, sans-serif', color: '#f4ecff', fontSize: 13, whiteSpace: 'nowrap',
++            position: 'absolute', left: '50%', bottom: 16, transform: 'translateX(-50%)', zIndex: 4,
++            background: '#3f4358ee', border: '2px solid #c69a45', borderRadius: 6,
++            boxShadow: '0 4px 18px rgba(63,67,88,.3)', padding: '7px 15px',
++            display: 'flex', alignItems: 'center', gap: 8, fontFamily: 'Nunito, sans-serif',
++            color: '#f7f1e7', fontSize: 13, whiteSpace: 'nowrap',
+           }}>
+-            <span style={{ color: '#ffd166', fontWeight: 800, fontSize: 11 }}>Enter ↵</span>
+-            {collecting.kind === 'note' ? '음표' : '카세트'} 소리 전사하기
++            <span style={{ color: '#ffe18a', fontWeight: 800, fontSize: 11 }}>Enter ↵</span>
++            이 소리 전사하기
+           </div>
+         )}
+       </div>
+ 
+-      <DPad press={press} release={release} onExit={onExit}
+-        onConfirm={collecting ? confirmCollect : null} />
+-
++      <DPad press={press} release={release} onExit={onExit} onConfirm={collecting ? confirmCollect : null} />
+       {remaining === 0 && total > 0 && <CompleteModal zone="Music" onExit={onExit} />}
+-
+-      {exitConfirm && (
+-        <ExitConfirmModal
+-          zone="Music"
+-          onConfirm={onExit}
+-          onCancel={() => setExitConfirm(false)}
+-        />
+-      )}
++      {exitConfirm && <ExitConfirmModal zone="Music" onConfirm={onExit} onCancel={() => setExitConfirm(false)} />}
+     </div>
+   )
+ }
+diff --git a/components/WorldMap.js b/components/WorldMap.js
+index 6a0fa3e..832320e 100644
+--- a/components/WorldMap.js
++++ b/components/WorldMap.js
+@@ -672,9 +672,8 @@ const GRASS_DETAIL = (() => {
+ 
+ /* ─────────────────────────────────────────────
+    흙길·돌광장 노면 보강 (B2) — terrain 코드/PATH_SET/STONE_SET/충돌/보행/autotileShape
+-   판정은 전부 그대로. 아래는 순수 렌더 오버레이(밟힘 띠·노면 디테일·판석 균열·경계 페더).
++   판정은 전부 그대로. 아래는 순수 렌더 오버레이(노면 디테일·판석 균열·경계 페더).
+ ───────────────────────────────────────────── */
+-const PATH_CENTER_DARKEN     = 0.1   // 중앙 밟힘 띠 어둡기(브라운 alpha)
+ const PATH_DETAIL_ODDS       = 0.09  // 흙길 내부 타일당 자갈/바큇자국/마른풀 확률
+ const STONE_CRACK_ODDS       = 0.08  // 판석 균열·이끼·변색 확률
+ const STONE_EDGE_BLEND_RINGS = 2     // 광장 가장자리에서 흙/깨진 판석으로 섞을 링 수
+@@ -689,36 +688,6 @@ const pr = (a, b = 0, c = 0) => seedRand(a * 131.71 + b * 977.3 + c * 17.13 + 3.
+ const dirtFull = (tx, ty) =>
+   [[0, -1], [0, 1], [-1, 0], [1, 0]].every(([dx, dy]) => terrainAt(tx + dx, ty + dy) === 'dirt')
+ 
+-// 스포크/링 중심선(±THICK/2 타일)을 하나의 긴 rect 몇 개로 — "자로 잰 길" 위에 밟힌 자국
+-function centerlineStrips(x0, y0, x1, y1, bend, thick = 2) {
+-  const pts = spokeCenterline(x0, y0, x1, y1, bend)
+-  const runs = []
+-  let cur = null
+-  for (const p of pts) {
+-    if (!cur || cur.dir !== p.dir) { cur = { dir: p.dir, xs: [p.tx], ys: [p.ty] }; runs.push(cur) }
+-    else { cur.xs.push(p.tx); cur.ys.push(p.ty) }
+-  }
+-  const half = thick / 2
+-  return runs.map(r => {
+-    const xmin = Math.min(...r.xs), xmax = Math.max(...r.xs)
+-    const ymin = Math.min(...r.ys), ymax = Math.max(...r.ys)
+-    return r.dir === 'h'
+-      ? { x: xmin * TILE, y: (ymin + 0.5 - half) * TILE, w: (xmax - xmin + 1) * TILE, h: thick * TILE }
+-      : { x: (xmin + 0.5 - half) * TILE, y: ymin * TILE, w: thick * TILE, h: (ymax - ymin + 1) * TILE }
+-  })
+-}
+-const WORN_STRIPS = [
+-  ...PORTALS.flatMap(p => centerlineStrips(
+-    Math.round(MUSEUM_CENTER.x), Math.round(MUSEUM_CENTER.y),
+-    Math.round(p.tx + p.w / 2), Math.round(p.ty + p.h / 2), SPOKE_BENDS[p.zone])),
+-  ...RING_ORDER.flatMap((zone, i) => {
+-    const a = portalByZone[zone], b = portalByZone[RING_ORDER[(i + 1) % RING_ORDER.length]]
+-    return centerlineStrips(
+-      Math.round(a.tx + a.w / 2), Math.round(a.ty + a.h / 2),
+-      Math.round(b.tx + b.w / 2), Math.round(b.ty + b.h / 2), RING_BEND)
+-  }),
+-]
+-
+ // 흙길 내부 타일에만, 등간격 아닌 시드 스캐터로 노면 디테일
+ const PATH_DETAIL = PATH_TILES
+   .filter(t => !inMuseumStonePlaza(t.tx, t.ty) && dirtFull(t.tx, t.ty) && pr(t.tx, t.ty, 17) < PATH_DETAIL_ODDS)
+@@ -762,17 +731,6 @@ const STONE_AXIS = {
+   w: (STONE_RECT.x1 - STONE_RECT.x0 + 1) * TILE, h: (STONE_RECT.y1 - STONE_RECT.y0 + 1) * TILE,
+ }
+ 
+-/* 밟힘 띠 — 길게 이어지는 반투명 캡슐 */
+-function WornStrips() {
+-  return (
+-    <g fill="#3a2a18" opacity={PATH_CENTER_DARKEN}>
+-      {WORN_STRIPS.map((s, i) => (
+-        <rect key={i} x={s.x} y={s.y} width={s.w} height={s.h} rx={TILE * 0.5} ry={TILE * 0.5}/>
+-      ))}
+-    </g>
+-  )
+-}
+-
+ /* 노면 디테일 — kind 0 자갈 / 1 바큇자국 / 2 마른 풀포기 */
+ function PathDetailMark({ tx, ty, kind, j }) {
+   const x = tx * TILE, y = ty * TILE
+@@ -2160,8 +2118,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
+               {/* Nature 연못 — per-tile water 오토타일 대신 SVG 블롭 하나로(연잎/기포 장식
+                   타일 반복 문제 해결). WATER_TILES/WATER_SET 은 보행 불가 판정용으로만 유지. */}
+               <NaturePond/>
+-              {/* 흙길 노면 보강 — 중앙 밟힘 띠 + 등간격 아닌 노면 디테일 */}
+-              <WornStrips/>
++              {/* 흙길 노면 보강 — 등간격 아닌 노면 디테일(중앙 밟힘 띠는 제거, 평범한 흙길로) */}
+               {PATH_DETAIL.map((d,i) => <PathDetailMark key={`pd${i}`} {...d}/>)}
+               {/* 돌 광장 — 중앙→정문 축 그라디언트 + 판석 균열/이끼/변색 */}
+               <rect x={STONE_AXIS.x} y={STONE_AXIS.y} width={STONE_AXIS.w} height={STONE_AXIS.h} fill="url(#stoneAxis)"/>
+diff --git a/components/ZoneMap.js b/components/ZoneMap.js
+index b26ef6a..bc5f6d3 100644
+--- a/components/ZoneMap.js
++++ b/components/ZoneMap.js
+@@ -2951,19 +2951,20 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
+   const [moving,     setMoving]    = useState(false)
+   const [tick,       setTick]      = useState(0)
+ 
+-  // 픽셀아트 정수배 스케일링 — SVG를 width/height:100%로 늘리면 컨테이너 크기가
+-  // VIEW_W×VIEW_H(768×576)의 정수배가 아닐 때 브라우저가 어중간한 배율로
+-  // 리샘플링해 image-rendering:pixelated를 걸어도 타일/스프라이트 가장자리가
+-  // 흐려진다. 컨테이너 크기를 관찰해 항상 정수배(1x,2x,3x...)로만 그리고,
+-  // 남는 공간은 레터박스(테마 border색 배경)로 남긴다.
++  // 뷰포트 — 컨테이너를 꽉 채운다. 세로로 보이는 월드 범위는 VIEW_H(18타일)로
++  // 고정해 줌 레벨·캐릭터 크기는 그대로 두고, 가로 범위만 창 비율에 맞춰 늘려
++  // 레터박스 여백을 없앤다(캔버스 기반 존 MusicZoneMap/NatureZoneMap과 동일
++  // 방식). 정수배 스케일링은 흔한 노트북 해상도(예: 1440×844)에서 거의 항상
++  // 1x로 떨어져 화면 대부분이 여백이 되는 문제 때문에 폐기했다. imageRendering:
++  // pixelated + 대개 DPR>=2라 비정수 배율에서도 스프라이트는 충분히 선명하다.
+   const canvasWrapRef = useRef(null)
+-  const [scale, setScale] = useState(1)
++  const [viewPx, setViewPx] = useState({ w: VIEW_W, h: VIEW_H })
+   useEffect(() => {
+     const el = canvasWrapRef.current
+     if (!el) return
+     const compute = () => {
+       const { width, height } = el.getBoundingClientRect()
+-      setScale(Math.max(1, Math.floor(Math.min(width / VIEW_W, height / VIEW_H))))
++      setViewPx({ w: Math.max(1, Math.round(width)), h: Math.max(1, Math.round(height)) })
+     }
+     compute()
+     const ro = new ResizeObserver(compute)
+@@ -3149,9 +3150,14 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
+   const total     = itemsRef.current.items.length
+   const collected = total - remaining
+ 
++  // 세로로 보이는 월드 범위는 VIEW_H로 고정, 가로는 창 비율에 맞춰 확장.
++  // (맵보다 넓어지는 초광폭 창에선 PX_W로 잘라 맵 밖이 과하게 노출되지 않게 한다.)
++  const viewWorldH = VIEW_H
++  const viewWorldW = Math.min(PX_W, Math.round(VIEW_H * viewPx.w / viewPx.h))
++
+   // 카메라: 플레이어 중심, 맵 경계에서 클램프
+-  const camX = Math.max(0, Math.min(pos.x + CHAR_W / 2 - VIEW_W / 2, PX_W - VIEW_W))
+-  const camY = Math.max(0, Math.min(pos.y + CHAR_H / 2 - VIEW_H / 2, PX_H - VIEW_H))
++  const camX = Math.max(0, Math.min(pos.x + CHAR_W / 2 - viewWorldW / 2, PX_W - viewWorldW))
++  const camY = Math.max(0, Math.min(pos.y + CHAR_H / 2 - viewWorldH / 2, PX_H - viewWorldH))
+ 
+   return (
+     <div style={{ width:'100vw', height:'100vh', overflow:'hidden', position:'relative', userSelect:'none' }}>
+@@ -3159,17 +3165,17 @@ export default function ZoneMap({ zone, sounds, onCollectSound, onExit, collecte
+       {/* Zone HUD */}
+       <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal}/>
+ 
+-      {/* 게임 캔버스 — 정수배 스케일링(위 useEffect)으로 항상 선명하게, 남는
+-          공간은 레터박스로 둔다. */}
++      {/* 게임 캔버스 — 컨테이너를 꽉 채운다(레터박스 없음). 세로 줌 고정, 가로만
++          창 비율에 맞춰 확장(위 useEffect + viewWorldW/H). */}
+       <div ref={canvasWrapRef} style={{
+         position:'absolute', top:`${HUD_H}px`, left:0, right:0, bottom:0,
+         background: theme.border, overflow:'hidden',
+-        display:'flex', alignItems:'center', justifyContent:'center',
+       }}>
+         <svg
+-          width={VIEW_W * scale} height={VIEW_H * scale}
+-          viewBox={`${camX} ${camY} ${VIEW_W} ${VIEW_H}`}
+-          style={{ display:'block', imageRendering:'pixelated' }}
++          width={viewPx.w} height={viewPx.h}
++          viewBox={`${camX} ${camY} ${viewWorldW} ${viewWorldH}`}
++          preserveAspectRatio="xMidYMid slice"
++          style={{ display:'block', position:'absolute', inset:0, imageRendering:'pixelated' }}
+         >
+           <defs>
+             <filter id="cloudBlur" x="-50%" y="-50%" width="200%" height="200%">
+diff --git a/lib/animalVillage.js b/lib/animalVillage.js
+index b2494ea..2dbfc29 100644
+--- a/lib/animalVillage.js
++++ b/lib/animalVillage.js
+@@ -85,17 +85,14 @@ const GRASS_DETAIL_CLUSTERS = 15
+ const CLUSTER_RADIUS_TILES = 2.4
+ const CLUSTER_MIN = 3
+ const CLUSTER_MAX = 6
+-/* 흙길·광장 노면 보강 (B2) — terrain 코드/충돌/보행/autotile 은 불변, drawStatic 오버레이만.
+-   PATH_VARIANT_TINTS: 단일 TILE_PATH 반복 위에 타일별 랜덤으로 얹는 반투명 틴트.
+-   PATH_CENTER_DARKEN: 사방이 길인 내부 타일(=길 중앙)에 얹는 밟힘 그늘.
+-   EDGE_FEATHER_*: featherEdges 강화(스탬프 수/침투 깊이). */
+-const PATH_VARIANT_TINTS = ['rgba(0,0,0,0.035)', 'rgba(255,240,214,0.03)', 'rgba(92,62,32,0.05)', 'rgba(0,0,0,0)', 'rgba(0,0,0,0)']
+-const PATH_CENTER_DARKEN = 'rgba(58,42,24,0.1)'
+-const PATH_DETAIL_ODDS   = 0.09
++/* 흙길·광장 노면 — 사각형 타일 스프라이트를 반복하면 타일마다 음영이 들어가
++   격자처럼 보인다는 피드백으로, 이제 평평한 단색 흙(DIRT_BASE) 한 겹으로만 채운다.
++   길↔잔디 경계만 featherEdges 로 흩뜨려 자연스럽게 만든다.
++   EDGE_FEATHER_*: featherEdges 강도(스탬프 수 / 침투 깊이 px). */
++const DIRT_BASE = '#c8a678'
+ const EDGE_FEATHER_COUNT  = 14
+ const EDGE_FEATHER_DEPTH  = 16
+ const TILE_GRASS = sp('farm', 8, 8, 32, 32)
+-const TILE_PATH  = sp('town', 80, 40, 32, 32)
+ /* 구매 시트의 열린 물 타일 — 물 픽셀 100%인 16×16 잡티 없는 구역(2색, 6×6
+    반복에서 이음매 없음 확인). waterFull(96,224,32,32)은 연잎·기포 줄이 섞여
+    있어 반복 타일링에 부적절. */
+@@ -661,24 +658,10 @@ export function drawStatic(ctx, v) {
+       ctx.fillRect(cx - rad, cy - rad, rad * 2, rad * 2)
+     }
+   }
+-  // 길 / 광장 / 밭
+-  const pcell = (tx, ty, salt) => rng((((tx * 73856093) ^ (ty * 19349663) ^ (salt * 83492791)) >>> 0))()
+-  const isRoad = (x, y) => { const cc = tr[y] && tr[y][x]; return cc === 1 || cc === 2 }
++  // 길 / 광장 / 밭 — 평평한 단색 흙 한 겹. 타일 스프라이트도, 타일별 음영도 없음.
+   for (let ty = 0; ty < MAP_H; ty++) for (let tx = 0; tx < MAP_W; tx++) {
+     const c = tr[ty][tx]
+-    if (c === 1 || c === 2 || c === 4 || c === 5) drawSp(ctx, TILE_PATH, tx * T, ty * T)
+-    if (c === 1 || c === 2) {
+-      // variant 틴트 — 2×2 블록 단위로 골라(타일마다 다 다른 격자 노이즈 방지) 단조로움만 깬다
+-      ctx.fillStyle = PATH_VARIANT_TINTS[Math.floor(pcell(tx >> 1, ty >> 1, 3) * PATH_VARIANT_TINTS.length)]
+-      ctx.fillRect(tx * T, ty * T, T, T)
+-      // 중앙 밟힘 그늘 — 사방이 길인 내부 타일(=폭 3 이상 길의 중심선)만
+-      if (isRoad(tx - 1, ty) && isRoad(tx + 1, ty) && isRoad(tx, ty - 1) && isRoad(tx, ty + 1)) {
+-        ctx.fillStyle = PATH_CENTER_DARKEN
+-        ctx.fillRect(tx * T, ty * T, T, T)
+-      }
+-      // 노면 디테일 — 자갈/바큇자국/마른 풀포기 (등간격 아님)
+-      if (pcell(tx, ty, 7) < PATH_DETAIL_ODDS) drawPathDetail(ctx, tx, ty, pcell)
+-    }
++    if (c === 1 || c === 2 || c === 4 || c === 5) { ctx.fillStyle = DIRT_BASE; ctx.fillRect(tx * T, ty * T, T, T) }
+     if (c === 2) { ctx.fillStyle = 'rgba(255,238,196,.16)'; ctx.fillRect(tx * T, ty * T, T, T) }
+     if (c === 4) { ctx.fillStyle = 'rgba(72,44,22,.30)'; ctx.fillRect(tx * T, ty * T, T, T) }
+   }
+@@ -857,38 +840,6 @@ function drawPond(ctx, pts, seedIdx) {
+   ctx.restore()
+ }
+ 
+-/* 노면 디테일 — kind 0 자갈무리 / 1 바큇자국 / 2 마른 풀포기 */
+-function drawPathDetail(ctx, tx, ty, cell) {
+-  const x = tx * T, y = ty * T
+-  const kind = Math.floor(cell(tx, ty, 11) * 3)
+-  const j = cell(tx, ty, 13)
+-  if (kind === 0) {
+-    ctx.fillStyle = 'rgba(120,100,72,0.7)'
+-    for (let i = 0; i < 3; i++) {
+-      const px = x + 6 + cell(tx, ty, 20 + i) * 20
+-      const py = y + 8 + cell(tx, ty, 30 + i) * 18
+-      ctx.fillRect(Math.round(px), Math.round(py), 2 + (i % 2), 2)
+-    }
+-  } else if (kind === 1) {
+-    ctx.strokeStyle = 'rgba(70,52,32,0.4)'
+-    ctx.lineWidth = 1.5
+-    const oy = y + 8 + j * 14
+-    ctx.beginPath()
+-    ctx.moveTo(x + 3, oy); ctx.lineTo(x + T - 3, oy + 2)
+-    ctx.moveTo(x + 3, oy + 5); ctx.lineTo(x + T - 3, oy + 7)
+-    ctx.stroke()
+-  } else {
+-    ctx.strokeStyle = 'rgba(150,146,90,0.75)'
+-    ctx.lineWidth = 1.4
+-    const bx = x + 8 + j * 14, by = y + 22
+-    ctx.beginPath()
+-    ctx.moveTo(bx, by); ctx.lineTo(bx - 3, by - 7)
+-    ctx.moveTo(bx, by); ctx.lineTo(bx + 1, by - 9)
+-    ctx.moveTo(bx, by); ctx.lineTo(bx + 4, by - 6)
+-    ctx.stroke()
+-  }
+-}
+-
+ /* 길↔잔디 경계 페더링 — 딱딱한 직선 대신 흙/풀이 서로 반칸까지 물리게.
+    시그니처 유지, 강도는 상단 EDGE_FEATHER_* 상수로. */
+ function featherEdges(ctx, tr) {
+diff --git a/lib/musicVillage.js b/lib/musicVillage.js
+index 8226e3a..12fceef 100644
+--- a/lib/musicVillage.js
++++ b/lib/musicVillage.js
+@@ -1,1100 +1,141 @@
+-// 음악 마을(Music Zone) 맵 생성 + 렌더 엔진 — 순수 로직/드로잉. UI는 DC가 담당.
+-// 좌표 단위: 타일(32px). 맵 48x36 = 1536x1152px.
+-// 팔레트/조형 레퍼런스: 밤 인디고 마을 + 신스웨이브 네온 간판.
+-
+-export const T = 32;
+-export const MAP_W = 48;
+-export const MAP_H = 36;
+-
+-export const PAL = {
+-  night: '#232049',
+-  // 지면
+-  grass: '#3b3a72',
+-  grassAlt: '#413f7d',
+-  grassDark: '#332f63',
+-  cobble: '#4b4585',
+-  cobbleAlt: '#544d92',
+-  cobbleDark: '#3d3873',
+-  brick: '#6b5a92',
+-  brickAlt: '#7a6aa1',
+-  plaza: '#5a4f96',
+-  plazaAlt: '#635891',
+-  water: '#2f3f8c',
+-  waterLit: '#4c62c4',
+-  wood: '#7c5a63',
+-  woodLit: '#9a707a',
+-  // 조명/네온
+-  lamp: '#ffd9a0',
+-  warm: '#ffb45c',
+-  pink: '#ff6fae',
+-  cyan: '#63e6f2',
+-  yellow: '#ffd166',
+-  mint: '#7cf2c4',
+-  violet: '#b678ff',
+-  // 6번째 구역(디제이 부스) 전용 액센트 — 실제 SOUND_ITEMS.Music이 block을 6개
+-  // 쓰는데 원안 layoutB는 구역이 5개뿐이라 추가함(사용자 확정, 다리 사이 빈
+-  // 포켓 x16-28,y18-24에 배치).
+-  orange: '#ff8659',
+-  ink: '#1a1638',
+-  shade: 'rgba(20,16,48,0.42)',
+-  white: '#f6efff',
+-};
+-
+-export const mulberry32 = (seed) => {
+-  let a = seed >>> 0;
+-  return () => {
+-    a = (a + 0x6d2b79f5) >>> 0;
+-    let t = a;
+-    t = Math.imul(t ^ (t >>> 15), t | 1);
+-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+-  };
+-};
+-
+-const rect = (x, y, w, h) => ({ x, y, w, h });
+-const inRect = (r, x, y) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h;
+-
+-// ------------------------------------------------------------------ 레이아웃
+-
+-// A — 네온 대로 (격자 다운타운)
+-function layoutA() {
+-  return {
+-    label: '네온 대로',
+-    seed: 1204,
+-    spawn: { x: 24, y: 27 },
+-    streets: [
+-      rect(22, 2, 4, 33), rect(2, 13, 44, 3), rect(2, 25, 44, 3),
+-      rect(15, 2, 2, 26), rect(31, 2, 2, 26), rect(8, 28, 32, 2),
+-    ],
+-    plazas: [rect(17, 16, 14, 9)],
+-    water: [], bridges: [],
+-    stage: { x: 19, y: 3, w: 10, h: 8 },
+-    busking: { x: 22, y: 19, w: 5, h: 4 },
+-    districts: [
+-      { block: 1, name: '버스킹 광장', area: rect(17, 16, 14, 9), neon: PAL.pink },
+-      { block: 2, name: '레코드 거리', area: rect(2, 2, 13, 11), neon: PAL.cyan },
+-      { block: 3, name: '악기 골목', area: rect(33, 2, 13, 11), neon: PAL.yellow },
+-      { block: 4, name: '카페 거리', area: rect(2, 28, 19, 7), neon: PAL.mint },
+-      { block: 5, name: '페스티벌 무대', area: rect(27, 28, 19, 7), neon: PAL.violet },
+-    ],
+-    buildings: [
+-      { id: 'rec', x: 4, y: 4, w: 6, h: 6, label: 'RECORDS', wall: '#4a5a9c', wallLit: '#5a6cb4', roof: '#2f3a६8'.replace('६', '6'), roofLit: '#3d4a82', neon: PAL.cyan, roofKind: 'gable', extras: ['discSign', 'antenna'], awning: PAL.cyan },
+-      { id: 'vinyl', x: 4, y: 17, w: 5, h: 5, label: 'VINYL', wall: '#4a4a94', wallLit: '#5a5aab', roof: '#33306e', roofLit: '#413d84', neon: PAL.violet, roofKind: 'flat', extras: ['rooftopGarden'], awning: PAL.violet },
+-      { id: 'gtr', x: 37, y: 4, w: 6, h: 6, label: 'GUITARS', wall: '#8a5a72', wallLit: '#a06b85', roof: '#5a3550', roofLit: '#6f4463', neon: PAL.yellow, roofKind: 'gable', extras: ['guitarSign', 'chimney'], awning: PAL.yellow },
+-      { id: 'keys', x: 37, y: 17, w: 6, h: 5, label: 'KEYS', wall: '#6a5a9c', wallLit: '#7d6cb4', roof: '#453a7c', roofLit: '#544894', neon: PAL.pink, roofKind: 'mansard', extras: ['keyTrim'], awning: PAL.pink },
+-      { id: 'cafe', x: 6, y: 30, w: 6, h: 5, label: 'CAFE', wall: '#4a7a86', wallLit: '#5a919c', roof: '#2f5560', roofLit: '#3c6a75', neon: PAL.mint, roofKind: 'gable', extras: ['cupSign', 'patio', 'chimney'], awning: PAL.mint },
+-      { id: 'tea', x: 15, y: 30, w: 5, h: 5, label: 'TEA', wall: '#4a6a9c', wallLit: '#5a7db4', roof: '#33487c', roofLit: '#415894', neon: PAL.cyan, roofKind: 'flat', extras: ['patio'], awning: PAL.cyan },
+-      { id: 'studio', x: 30, y: 30, w: 7, h: 5, label: 'STUDIO', wall: '#5a4a94', wallLit: '#6c5aab', roof: '#3d3078', roofLit: '#4a3c8e', neon: PAL.violet, roofKind: 'mansard', extras: ['antenna', 'speakerRoof'], awning: PAL.violet },
+-    ],
+-    fences: [],
+-  };
+-}
+-
+-// B — 강변 레코드 거리 (운하 + 비대칭 코지) ★ 채택안
+-function layoutB() {
+-  return {
+-    label: '강변 레코드 거리',
+-    seed: 8830,
+-    spawn: { x: 21, y: 25 },
+-    water: [
+-      rect(0, 8, 12, 4), rect(10, 10, 8, 4), rect(16, 12, 10, 4),
+-      rect(24, 14, 8, 4), rect(30, 16, 10, 4), rect(38, 18, 10, 4),
+-    ],
+-    bridges: [rect(13, 10, 3, 4), rect(28, 14, 3, 4), rect(41, 18, 3, 4)],
+-    streets: [
+-      rect(6, 2, 3, 8), rect(13, 2, 3, 9), rect(6, 2, 30, 2),
+-      rect(13, 22, 3, 12), rect(4, 24, 40, 3), rect(28, 18, 3, 9),
+-      rect(34, 5, 3, 14), rect(20, 27, 3, 8), rect(38, 22, 3, 12),
+-    ],
+-    plazas: [rect(16, 27, 12, 7)],
+-    stage: { x: 37, y: 6, w: 9, h: 7 },
+-    busking: { x: 19, y: 29, w: 5, h: 4 },
+-    districts: [
+-      { block: 1, name: '버스킹 광장', area: rect(16, 26, 13, 9), neon: PAL.pink },
+-      { block: 2, name: '레코드 거리', area: rect(2, 12, 12, 11), neon: PAL.cyan },
+-      { block: 3, name: '악기 골목', area: rect(18, 2, 16, 9), neon: PAL.yellow },
+-      { block: 4, name: '카페 거리', area: rect(31, 22, 15, 12), neon: PAL.mint },
+-      { block: 5, name: '페스티벌 무대', area: rect(36, 4, 10, 13), neon: PAL.violet },
+-      { block: 6, name: '디제이 부스', area: rect(16, 18, 12, 6), neon: PAL.orange },
+-    ],
+-    buildings: [
+-      { id: 'rec', x: 2, y: 13, w: 6, h: 6, label: 'RECORDS', wall: '#4a5a9c', wallLit: '#5c6fb8', roof: '#303a70', roofLit: '#3e4a86', neon: PAL.cyan, roofKind: 'gable', extras: ['discSign', 'antenna', 'stoop'], awning: PAL.cyan },
+-      { id: 'vinyl', x: 2, y: 19, w: 5, h: 4, label: 'VINYL', wall: '#484a94', wallLit: '#595cab', roof: '#33306e', roofLit: '#413d84', neon: PAL.violet, roofKind: 'flat', extras: ['rooftopGarden'], awning: PAL.violet },
+-      { id: 'gtr', x: 19, y: 4, w: 6, h: 6, label: 'GUITARS', wall: '#8a5a72', wallLit: '#a26d87', roof: '#5a3550', roofLit: '#71465f', neon: PAL.yellow, roofKind: 'gable', extras: ['guitarSign', 'chimney', 'stoop'], awning: PAL.yellow },
+-      { id: 'keys', x: 27, y: 4, w: 6, h: 6, label: 'KEYS', wall: '#6a5a9c', wallLit: '#7f6eb8', roof: '#453a7c', roofLit: '#554896', neon: PAL.pink, roofKind: 'mansard', extras: ['keyTrim', 'antenna'], awning: PAL.pink },
+-      { id: 'radio', x: 37, y: 14, w: 4, h: 4, label: 'RADIO', wall: '#54488e', wallLit: '#6455a4', roof: '#3a3070', roofLit: '#473c84', neon: PAL.cyan, roofKind: 'flat', extras: ['radioTower'], awning: null },
+-      { id: 'cafe', x: 32, y: 27, w: 6, h: 6, label: 'CAFE', wall: '#4a7a86', wallLit: '#5c939f', roof: '#2f5560', roofLit: '#3d6b77', neon: PAL.mint, roofKind: 'gable', extras: ['cupSign', 'patio', 'chimney', 'stoop'], awning: PAL.mint },
+-      { id: 'studio', x: 41, y: 26, w: 5, h: 6, label: 'STUDIO', wall: '#5a4a94', wallLit: '#6d5cae', roof: '#3d3078', roofLit: '#4c3d90', neon: PAL.violet, roofKind: 'mansard', extras: ['antenna', 'speakerRoof'], awning: PAL.violet },
+-      { id: 'tea', x: 6, y: 28, w: 6, h: 6, label: 'TEA', wall: '#4a6a9c', wallLit: '#5c7db4', roof: '#33487c', roofLit: '#42588f', neon: PAL.cyan, roofKind: 'gable', extras: ['patio', 'cupSign'], awning: PAL.cyan },
+-    ],
+-    // 앞마당 철제 울타리 (h: 가로, v: 세로)
+-    fences: [
+-      { x: 2, y: 23, w: 6, dir: 'h' },
+-      { x: 32, y: 33, w: 6, dir: 'h' },
+-      { x: 6, y: 34, w: 6, dir: 'h' },
+-      { x: 45, y: 26, h: 6, dir: 'v' },
+-    ],
+-    // 스트링 라이트 (광장/카페 위를 가로지르는 전구 줄)
+-    strings: [
+-      { x1: 16, y1: 27, x2: 27, y2: 30 },
+-      { x1: 27, y1: 27, x2: 16, y2: 30 },
+-      { x1: 31, y1: 27, x2: 38, y2: 24 },
+-      { x1: 19, y1: 3, x2: 33, y2: 3 },
+-    ],
+-  };
+-}
+-
+-// ------------------------------------------------------------------ 빌드
+-
+-export function buildVillage(variant = 'A') {
+-  const L = variant === 'B' ? layoutB() : layoutA();
+-  const rnd = mulberry32(L.seed);
+-
+-  // terrain: 0 grass, 1 street, 2 plaza, 3 water, 4 stage, 5 bridge
+-  const terrain = [];
+-  for (let y = 0; y < MAP_H; y++) { const row = []; for (let x = 0; x < MAP_W; x++) row.push(0); terrain.push(row); }
+-  const stamp = (r, c) => {
+-    for (let y = r.y; y < r.y + r.h; y++) for (let x = r.x; x < r.x + r.w; x++)
+-      if (x >= 0 && y >= 0 && x < MAP_W && y < MAP_H) terrain[y][x] = c;
+-  };
+-  L.water.forEach((r) => stamp(r, 3));
+-  L.streets.forEach((r) => stamp(r, 1));
+-  L.plazas.forEach((r) => stamp(r, 2));
+-  L.bridges.forEach((r) => stamp(r, 5));
+-  stamp(L.stage, 4);
+-
+-  const colliders = [];
+-  const addCol = (x, y, w, h, tag) => colliders.push({ x, y, w, h, tag });
+-  L.buildings.forEach((b) => addCol(b.x * T - 8, b.y * T, b.w * T + 16, b.h * T, 'building'));
+-  addCol(L.stage.x * T + 8, (L.stage.y + 2) * T, L.stage.w * T - 16, (L.stage.h - 2) * T, 'stage');
+-  addCol(L.busking.x * T + 10, L.busking.y * T + 16, L.busking.w * T - 20, L.busking.h * T - 24, 'busking');
+-  (L.fences || []).forEach((f) => {
+-    if (f.dir === 'h') addCol(f.x * T, f.y * T + 20, f.w * T, 8, 'fence');
+-    else addCol(f.x * T + 12, f.y * T, 8, f.h * T, 'fence');
+-  });
+-  L.water.forEach((r) => {
+-    for (let x = r.x; x < r.x + r.w; x++) {
+-      const bridged = L.bridges.some((br) => x >= br.x && x < br.x + br.w);
+-      if (!bridged) addCol(x * T, r.y * T, T, r.h * T, 'water');
+-    }
+-  });
+-  addCol(-T, 0, T, MAP_H * T, 'edge');
+-  addCol(MAP_W * T, 0, T, MAP_H * T, 'edge');
+-  addCol(0, -T, MAP_W * T, T, 'edge');
+-  addCol(0, MAP_H * T, MAP_W * T, T, 'edge');
+-
+-  const walkable = (tx, ty) => {
+-    if (tx < 1 || ty < 2 || tx > MAP_W - 2 || ty > MAP_H - 2) return false;
+-    if (terrain[ty][tx] === 3) return false;
+-    const px = tx * T + 16, py = ty * T + 24;
+-    return !colliders.some((c) => px > c.x - 12 && px < c.x + c.w + 12 && py > c.y - 12 && py < c.y + c.h + 12);
+-  };
+-
+-  // ---- 소품
+-  const props = [];
+-  const occupied = new Set();
+-  const key = (x, y) => x + ',' + y;
+-  const place = (type, tx, ty, opt) => {
+-    if (occupied.has(key(tx, ty)) || !walkable(tx, ty)) return false;
+-    occupied.add(key(tx, ty));
+-    props.push(Object.assign({ type, tx, ty }, opt || {}));
+-    const solid = !['flowerPatch', 'noteRug', 'puddle', 'grate', 'leaves'].includes(type);
+-    if (solid) addCol(tx * T + 6, ty * T + 14, T - 12, T - 16, type);
+-    return true;
+-  };
+-
+-  // 무대 스피커 스택
+-  place('speaker', L.stage.x - 1, L.stage.y + L.stage.h - 1);
+-  place('speaker', L.stage.x + L.stage.w, L.stage.y + L.stage.h - 1);
+-  place('speaker', L.stage.x - 1, L.stage.y + 1);
+-  place('speaker', L.stage.x + L.stage.w, L.stage.y + 1);
+-  // 건물 앞 화단 · 벤치
+-  L.buildings.forEach((b) => {
+-    place('flowerPatch', b.x, b.y + b.h);
+-    place('flowerPatch', b.x + b.w - 1, b.y + b.h);
+-    if (b.extras && b.extras.indexOf('patio') >= 0) {
+-      place('cafeTable', b.x + 1, b.y + b.h);
+-      place('cafeTable', b.x + b.w - 2, b.y + b.h + 1);
+-    }
+-  });
+-
+-  const themes = {
+-    1: ['micStand', 'benchNeon', 'noteRug', 'lamp', 'crate', 'busTable'],
+-    2: ['crate', 'discSign', 'lamp', 'benchNeon', 'flowerPatch', 'grate'],
+-    3: ['ampStack', 'guitarStand', 'lamp', 'crate', 'flowerPatch', 'signPost'],
+-    4: ['cafeTable', 'planter', 'lamp', 'benchNeon', 'flowerPatch', 'leaves'],
+-    5: ['speaker', 'lightRig', 'lamp', 'crate', 'flowerPatch', 'signPost'],
+-    6: ['speaker', 'lightRig', 'micStand', 'crate', 'signPost', 'lamp'],
+-  };
+-
+-  L.districts.forEach((d) => {
+-    const pool = themes[d.block];
+-    let tries = 0, made = 0;
+-    while (tries < 600 && made < 15) {
+-      tries++;
+-      const tx = d.area.x + Math.floor(rnd() * d.area.w);
+-      const ty = d.area.y + Math.floor(rnd() * d.area.h);
+-      if (tx >= MAP_W || ty >= MAP_H) continue;
+-      const nearPaved = [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => {
+-        const nx = tx + dx, ny = ty + dy;
+-        return nx > 0 && ny > 0 && nx < MAP_W && ny < MAP_H && (terrain[ny][nx] === 1 || terrain[ny][nx] === 2);
+-      });
+-      const type = pool[Math.floor(rnd() * pool.length)];
+-      const wantsPaved = ['lamp', 'benchNeon', 'cafeTable', 'signPost'].includes(type);
+-      if (wantsPaved && !nearPaved) continue;
+-      if (place(type, tx, ty, { neon: d.neon, block: d.block })) made++;
+-    }
+-    let t2 = 0, c2 = 0;
+-    while (t2 < 400 && c2 < 11) {
+-      t2++;
+-      const tx = d.area.x + Math.floor(rnd() * d.area.w);
+-      const ty = d.area.y + Math.floor(rnd() * d.area.h);
+-      if (tx >= MAP_W || ty >= MAP_H || terrain[ty][tx] !== 0) continue;
+-      const r = rnd();
+-      const type = r < 0.5 ? 'tree' : r < 0.72 ? 'bush' : r < 0.88 ? 'flowerPatch' : 'lamp';
+-      if (place(type, tx, ty, { neon: d.neon, block: d.block, tone: rnd() })) c2++;
+-    }
+-  });
+-
+-  // 물가 가로등 줄
+-  L.water.forEach((r) => { if (rnd() < 0.9) place('lamp', r.x + 1, r.y - 1, { neon: PAL.lamp }); });
+-
+-  // ---- 소리 아이템
+-  const items = [];
+-  L.districts.forEach((d) => {
+-    let tries = 0, made = 0;
+-    while (tries < 900 && made < 8) {
+-      tries++;
+-      const tx = d.area.x + Math.floor(rnd() * d.area.w);
+-      const ty = d.area.y + Math.floor(rnd() * d.area.h);
+-      if (tx >= MAP_W || ty >= MAP_H || !walkable(tx, ty) || occupied.has(key(tx, ty))) continue;
+-      if (items.some((it) => Math.abs(it.tx - tx) < 3 && Math.abs(it.ty - ty) < 3)) continue;
+-      occupied.add(key(tx, ty));
+-      items.push({
+-        id: 'Music_' + (100000 + Math.floor(rnd() * 899999)),
+-        tx, ty, block: d.block, neon: d.neon,
+-        cat: ['Musical instrument', 'Percussion', 'Plucked string', 'Keyboard', 'Singing', 'Brass'][Math.floor(rnd() * 6)],
+-        kind: rnd() < 0.5 ? 'note' : 'tape',
+-        phase: rnd() * Math.PI * 2,
+-        collected: false,
+-      });
+-      made++;
+-    }
+-  });
+-
++import {
++  T, MAP_W, MAP_H, PLAYER_BOX, INTERACTION_BOX,
++  STAGE, GATE, BUILDINGS, PROPS, SPAWN, EXIT_TRIGGER,
++  COLLIDERS, SLOT_GROUPS, PRIMARY_SLOTS, RESERVE_SLOTS, ALL_SAFE_SLOTS,
++  isWalkableTile, isSafeMarkerSlot, spawnMusicItems, markerStateFor, validateSlotSet,
++  buildVillage, collides, moveWithCollision, overlapsExitTrigger,
++} from './musicVillageConfig.mjs'
++
++export {
++  T, MAP_W, MAP_H, PLAYER_BOX, INTERACTION_BOX,
++  STAGE, GATE, BUILDINGS, PROPS, SPAWN, EXIT_TRIGGER,
++  SLOT_GROUPS, PRIMARY_SLOTS, RESERVE_SLOTS, ALL_SAFE_SLOTS,
++  isWalkableTile, isSafeMarkerSlot, spawnMusicItems, markerStateFor, validateSlotSet,
++  buildVillage, collides, moveWithCollision, overlapsExitTrigger,
++}
++
++const ASSET_ROOT = '/assets/music-village'
++const STAGE_LAYERS = ['contact-shadow', 'base-platform', 'rear-body', 'opening', 'canopy-s1', 'trim', 'front-stair', 'foreground', 'emissive']
++const GATE_LAYERS = ['contact-shadow', 'posts', 'rail-g1', 'trim', 'foreground', 'emissive']
++const BUILDING_LAYERS = ['contact-shadow', 'body', 'roof', 'door-window', 'trim', 'foreground', 'emissive']
++
++const assetUrl = (path) => `${ASSET_ROOT}/${path}`
++const stageUrl = (layer) => assetUrl(`stage/${layer}.png`)
++const gateUrl = (layer) => assetUrl(`gate/${layer}.png`)
++const buildingUrl = (id, layer) => assetUrl(`buildings/${id}/${layer}.png`)
++const propUrl = (item) => assetUrl(`props/${item.category}/${item.id}.png`)
++
++export const MUSIC_ASSET_URLS = Object.freeze([
++  assetUrl('ground/music-ground-path-map.png'),
++  ...STAGE_LAYERS.map(stageUrl),
++  ...GATE_LAYERS.map(gateUrl),
++  ...BUILDINGS.flatMap(({ id }) => BUILDING_LAYERS.map((layer) => buildingUrl(id, layer))),
++  ...new Set(PROPS.map(propUrl)),
++])
++
++function loadImage(url) {
++  return new Promise((resolve) => {
++    const image = new Image()
++    image.decoding = 'async'
++    image.onload = () => resolve({ url, image, ok: true })
++    image.onerror = () => resolve({ url, image: null, ok: false })
++    image.src = url
++  })
++}
++
++export async function preloadMusicAssets() {
++  const results = await Promise.all(MUSIC_ASSET_URLS.map(loadImage))
+   return {
+-    variant, label: L.label, terrain, colliders, props, items,
+-    districts: L.districts, buildings: L.buildings, stage: L.stage, busking: L.busking,
+-    water: L.water, bridges: L.bridges, fences: L.fences || [], strings: L.strings || [],
+-    spawn: { x: L.spawn.x * T + 16, y: L.spawn.y * T + 20 },
+-    walkable,
+-  };
+-}
+-
+-// ------------------------------------------------------------------ 충돌
+-
+-export const PLAYER_BOX = { w: 20, h: 14 };
+-
+-export function collides(v, cx, cy) {
+-  const half = PLAYER_BOX.w / 2;
+-  const x0 = cx - half, x1 = cx + half, y0 = cy - PLAYER_BOX.h, y1 = cy;
+-  for (const c of v.colliders) if (x1 > c.x && x0 < c.x + c.w && y1 > c.y && y0 < c.y + c.h) return c;
+-  return null;
+-}
+-
+-export function moveWithCollision(v, pos, dx, dy) {
+-  let nx = pos.x, ny = pos.y;
+-  if (dx && !collides(v, pos.x + dx, ny)) nx = pos.x + dx;
+-  if (dy && !collides(v, nx, pos.y + dy)) ny = pos.y + dy;
+-  return { x: nx, y: ny };
+-}
+-
+-// ------------------------------------------------------------------ 드로잉 헬퍼
+-
+-const px = (ctx, x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), Math.round(w), Math.round(h)); };
+-
+-function glow(ctx, x, y, r, color, alpha) {
+-  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+-  g.addColorStop(0, color); g.addColorStop(1, 'rgba(0,0,0,0)');
+-  ctx.globalAlpha = alpha; ctx.fillStyle = g;
+-  ctx.fillRect(x - r, y - r, r * 2, r * 2); ctx.globalAlpha = 1;
+-}
+-
+-function pixelText(ctx, str, x, y, color, size) {
+-  ctx.font = 'bold ' + (size || 10) + 'px "Courier New", monospace';
+-  ctx.textBaseline = 'top';
+-  ctx.fillStyle = color;
+-  ctx.fillText(str, Math.round(x), Math.round(y));
+-}
+-
+-// ============================ 건물 조형 (레퍼런스: 밤 마을 저택/상점) ==========
+-// 핵심: 직선 박스가 아니라 (1) 넓게 흘러내리는 곡면 맨사드 지붕, (2) 비대칭 타워 베이,
+-// (3) 아치형 창 + 셔터, (4) 오목한 현관 포치, (5) 돌 코너 블록으로 실루엣을 깬다.
+-
+-// 계단식 아치 캡 — 픽셀 아트의 둥근 상단
+-function archCap(ctx, x, y, w, color) {
+-  const steps = [
+-    [0.10, 4], [0.22, 3], [0.36, 3], [0.5, 2],
+-  ];
+-  let cy = y;
+-  steps.forEach(([inset, hh]) => {
+-    px(ctx, x + w * inset, cy, w * (1 - inset * 2), hh, color);
+-    cy += hh;
+-  });
+-  return cy - y;
+-}
+-
+-// 아치형 창 + 셔터 + 창대
+-function archWindow(ctx, x, y, w, h, lit, wall, wallLit) {
+-  const frame = '#241f4a';
+-  const capH = 12;
+-  // 아치 프레임
+-  px(ctx, x - 3, y + capH - 2, w + 6, h - capH + 5, frame);
+-  archCap(ctx, x - 3, y - 2, w + 6, frame);
+-  // 유리
+-  const glass = lit ? PAL.warm : '#2f2b58';
+-  px(ctx, x, y + capH, w, h - capH, glass);
+-  archCap(ctx, x, y + 1, w, glass);
+-  if (lit) {
+-    px(ctx, x + 2, y + capH, w - 4, 3, '#ffe4b8');
+-    px(ctx, x + 2, y + h - 6, w - 4, 3, 'rgba(255,180,92,0.55)');
+-  }
+-  // 창살
+-  px(ctx, x + w / 2 - 1, y + 4, 2, h - 4, frame);
+-  px(ctx, x, y + capH + 10, w, 2, frame);
+-  px(ctx, x, y + h - 14, w, 2, frame);
+-  // 창대 + 인방
+-  px(ctx, x - 6, y + h - 2, w + 12, 5, wallLit);
+-  px(ctx, x - 6, y + h + 3, w + 12, 3, 'rgba(20,16,48,0.4)');
+-  // 셔터 (슬랫)
+-  [[x - 12, 1], [x + w + 3, -1]].forEach(([sx]) => {
+-    px(ctx, sx, y + capH - 4, 9, h - capH + 6, '#332c5e');
+-    px(ctx, sx, y + capH - 4, 9, 2, '#463d7a');
+-    for (let i = 0; i < h - capH; i += 5) px(ctx, sx + 1, y + capH + i, 7, 2, '#241f4a');
+-  });
+-}
+-
+-// 원형 창 (오쿨루스)
+-function oculus(ctx, cx, cy, r, lit) {
+-  px(ctx, cx - r - 2, cy - r + 2, (r + 2) * 2, r * 2 - 4, '#241f4a');
+-  px(ctx, cx - r + 2, cy - r - 2, r * 2 - 4, (r + 2) * 2, '#241f4a');
+-  px(ctx, cx - r, cy - r + 3, r * 2, r * 2 - 6, lit ? PAL.warm : '#332c5e');
+-  px(ctx, cx - r + 3, cy - r, r * 2 - 6, r * 2, lit ? PAL.warm : '#332c5e');
+-  px(ctx, cx - r, cy - 1, r * 2, 2, '#241f4a');
+-  px(ctx, cx - 1, cy - r, 2, r * 2, '#241f4a');
+-}
+-
+-// 지붕널 — 대각 엇갈림 결
+-function shingleField(ctx, x, y, w, h, c1, c2) {
+-  for (let ry = 0; ry < h; ry += 6) {
+-    px(ctx, x, y + ry, w, 6, (ry / 6) % 2 ? c1 : c2);
+-    px(ctx, x, y + ry, w, 1, 'rgba(20,16,48,0.28)');
+-    const off = ((ry / 6) % 2) ? 0 : 7;
+-    for (let rx = off; rx < w; rx += 14) px(ctx, x + rx, y + ry + 1, 1, 5, 'rgba(20,16,48,0.22)');
++    images: new Map(results.filter((result) => result.ok).map((result) => [result.url, result.image])),
++    failed: results.filter((result) => !result.ok).map((result) => result.url),
+   }
+ }
+ 
+-// 곡면 맨사드 지붕 덩어리: 아래로 갈수록 급격히 넓어지는 오목 실루엣 + 넓은 처마
+-function mansardMass(ctx, x, y, w, h, roof, roofLit, opts) {
+-  const o = opts || {};
+-  const rows = Math.max(6, Math.round(h / 6));
+-  const rh = h / rows;
+-  const topInset = o.topInset != null ? o.topInset : 0.3;
+-  for (let i = 0; i < rows; i++) {
+-    const t = i / (rows - 1);
+-    // 오목 곡선(ease-in): 위는 좁고 완만, 아래에서 빠르게 벌어진다
+-    const inset = topInset * (1 - Math.pow(t, 2.2));
+-    const rx = x + w * inset, rw = w * (1 - inset * 2);
+-    px(ctx, rx, y + i * rh, rw, rh + 1, i % 2 ? roof : roofLit);
+-    px(ctx, rx, y + i * rh, rw, 1, 'rgba(20,16,48,0.26)');
+-    if (i % 2 === 0) for (let sx = 6; sx < rw; sx += 14) px(ctx, rx + sx, y + i * rh + 1, 1, rh, 'rgba(20,16,48,0.2)');
+-    // 곡면 하이라이트
+-    if (i < rows / 2) px(ctx, rx + 3, y + i * rh, 4, rh, 'rgba(246,239,255,0.07)');
+-  }
+-  // 넓은 처마 (좌우로 크게 흘러나온다)
+-  const eaveY = y + h - 4;
+-  px(ctx, x - 12, eaveY, w + 24, 9, roofLit);
+-  px(ctx, x - 12, eaveY, w + 24, 2, 'rgba(246,239,255,0.2)');
+-  px(ctx, x - 16, eaveY + 5, w + 32, 6, roof);
+-  px(ctx, x - 16, eaveY + 11, w + 32, 4, 'rgba(20,16,48,0.45)');
+-  // 처마 밑 서까래
+-  for (let i = 0; i < w + 32; i += 12) px(ctx, x - 16 + i, eaveY + 11, 5, 4, 'rgba(20,16,48,0.3)');
+-  // 지붕 마루 장식
+-  px(ctx, x + w * topInset, y - 4, w * (1 - topInset * 2), 5, roofLit);
+-  for (let i = 0; i < w * (1 - topInset * 2); i += 10) px(ctx, x + w * topInset + i, y - 8, 3, 5, roof);
+-}
+-
+-// 뾰족 지붕 (타워/박공용) — 계단식 삼각 + 치마 처마
+-function spireMass(ctx, x, y, w, h, roof, roofLit) {
+-  const rows = Math.max(6, Math.round(h / 5));
+-  const rh = h / rows;
+-  for (let i = 0; i < rows; i++) {
+-    const t = i / (rows - 1);
+-    const inset = 0.46 * (1 - Math.pow(t, 1.7));
+-    const rx = x + w * inset, rw = w * (1 - inset * 2);
+-    px(ctx, rx, y + i * rh, rw, rh + 1, i % 2 ? roof : roofLit);
+-    px(ctx, rx, y + i * rh, rw, 1, 'rgba(20,16,48,0.26)');
+-  }
+-  px(ctx, x - 8, y + h - 4, w + 16, 8, roofLit);
+-  px(ctx, x - 10, y + h + 3, w + 20, 5, roof);
+-  px(ctx, x - 10, y + h + 8, w + 20, 3, 'rgba(20,16,48,0.45)');
++const drawImage = (ctx, assets, url, x, y) => {
++  const image = assets?.images?.get(url)
++  if (image) ctx.drawImage(image, x, y)
+ }
+ 
+-// 지붕창 (도머)
+-function dormer(ctx, x, y, w, h, roof, roofLit, lit) {
+-  px(ctx, x, y + 8, w, h, roofLit);
+-  spireMass(ctx, x - 3, y - 10, w + 6, 20, roof, roofLit);
+-  const gw = Math.max(10, w - 14);
+-  px(ctx, x + (w - gw) / 2, y + 14, gw, h - 16, lit ? PAL.warm : '#2f2b58');
+-  px(ctx, x + (w - gw) / 2 - 2, y + 12, gw + 4, 3, '#241f4a');
+-  px(ctx, x + w / 2 - 1, y + 14, 2, h - 16, '#241f4a');
++function drawLandmarkLayer(ctx, assets, layer) {
++  if (STAGE_LAYERS.includes(layer)) drawImage(ctx, assets, stageUrl(layer), STAGE.x * T, STAGE.y * T)
++  if (GATE_LAYERS.includes(layer)) drawImage(ctx, assets, gateUrl(layer), GATE.x * T, GATE.y * T)
+ }
+ 
+-// 돌 코너 블록 (퀀) — 벽 실루엣을 어긋나게
+-function quoins(ctx, x, y, h, wallLit, side) {
+-  for (let i = 0; i < h; i += 18) {
+-    const wide = (i / 18) % 2 === 0;
+-    const bw = wide ? 12 : 8;
+-    px(ctx, side === 'l' ? x : x + 12 - bw, y + i, bw, 16, wallLit);
+-    px(ctx, side === 'l' ? x : x + 12 - bw, y + i, bw, 2, 'rgba(246,239,255,0.16)');
+-    px(ctx, side === 'l' ? x : x + 12 - bw, y + i + 14, bw, 2, 'rgba(20,16,48,0.35)');
++function drawBuildingLayer(ctx, assets, layer) {
++  for (const building of BUILDINGS) {
++    drawImage(ctx, assets, buildingUrl(building.id, layer), building.x * T, building.y * T)
+   }
+ }
+ 
+-// 오목한 포치 + 계단 + 난간 + 랜턴
+-function porch(ctx, cx, baseY, wallDark, wallLit, on) {
+-  const w = 62;
+-  // 오목한 벽감
+-  px(ctx, cx - w / 2, baseY - 62, w, 62, wallDark);
+-  px(ctx, cx - w / 2, baseY - 62, w, 4, 'rgba(20,16,48,0.5)');
+-  px(ctx, cx - w / 2, baseY - 62, 4, 62, 'rgba(20,16,48,0.4)');
+-  px(ctx, cx + w / 2 - 4, baseY - 62, 4, 62, 'rgba(20,16,48,0.4)');
+-  // 문 (아치)
+-  const dw = 30;
+-  px(ctx, cx - dw / 2, baseY - 48, dw, 48, '#5a3f4e');
+-  archCap(ctx, cx - dw / 2, baseY - 56, dw, '#5a3f4e');
+-  px(ctx, cx - dw / 2 + 3, baseY - 44, dw - 6, 40, '#6e4d5e');
+-  px(ctx, cx - 1, baseY - 48, 2, 44, '#4a3341');
+-  px(ctx, cx + dw / 2 - 8, baseY - 26, 4, 4, PAL.yellow);
+-  if (on) {
+-    px(ctx, cx - 8, baseY - 60, 16, 6, PAL.warm);
+-    glow(ctx, cx, baseY - 40, 46, PAL.warm, 0.22);
+-  }
+-  // 랜턴 2개
+-  [-w / 2 + 6, w / 2 - 12].forEach((ox) => {
+-    px(ctx, cx + ox, baseY - 52, 7, 4, '#2a2450');
+-    px(ctx, cx + ox, baseY - 48, 7, 10, on ? PAL.lamp : '#3f3868');
+-    px(ctx, cx + ox + 1, baseY - 38, 5, 3, '#2a2450');
+-    if (on) glow(ctx, cx + ox + 4, baseY - 44, 22, PAL.lamp, 0.4);
+-  });
+-  // 계단 + 난간
+-  for (let i = 0; i < 4; i++) {
+-    px(ctx, cx - 24 + i * 2, baseY + i * 6, 48 - i * 4, 7, i % 2 ? wallLit : wallDark);
+-    px(ctx, cx - 24 + i * 2, baseY + i * 6, 48 - i * 4, 2, 'rgba(246,239,255,0.12)');
+-  }
+-  [-30, 24].forEach((ox) => {
+-    px(ctx, cx + ox, baseY - 6, 6, 30, wallLit);
+-    px(ctx, cx + ox, baseY - 10, 6, 5, 'rgba(246,239,255,0.18)');
+-  });
+-}
+-
+-function neonSign(ctx, x, y, w, label, neon, on) {
+-  px(ctx, x, y, w, 20, PAL.ink);
+-  px(ctx, x, y, w, 2, neon);
+-  px(ctx, x, y + 18, w, 2, neon);
+-  px(ctx, x, y, 2, 20, neon);
+-  px(ctx, x + w - 2, y, 2, 20, neon);
+-  pixelText(ctx, label, x + (w - label.length * 7.2) / 2, y + 6, on ? PAL.white : '#6a5f96', 11);
+-  if (on) glow(ctx, x + w / 2, y + 10, w * 0.85, neon, 0.34);
+-}
+-
+-function stripedAwning(ctx, x, y, w, color) {
+-  px(ctx, x - 3, y, w + 6, 4, '#241f4a');
+-  for (let i = 0; i < w + 6; i += 10) {
+-    px(ctx, x - 3 + i, y + 4, 5, 11, color);
+-    px(ctx, x + 2 + i, y + 4, 5, 11, '#f3eaff');
+-  }
+-  px(ctx, x - 3, y + 15, w + 6, 3, 'rgba(20,16,48,0.35)');
+-  for (let i = 0; i < w + 6; i += 10) px(ctx, x - 3 + i + 2, y + 18, 6, 3, i % 20 ? color : '#f3eaff');
+-}
+-
+-function drawExtras(ctx, b, on) {
+-  const x = b.x * T, y = b.y * T, w = b.w * T, h = b.h * T;
+-  const top = y - 22; // 지붕 마루 근처
+-  (b.extras || []).forEach((e) => {
+-    if (e === 'antenna') {
+-      px(ctx, x + w - 30, top - 26, 3, 28, '#2f2a58');
+-      px(ctx, x + w - 36, top - 26, 15, 3, '#2f2a58');
+-      px(ctx, x + w - 31, top - 32, 5, 5, on ? PAL.pink : '#4a4270');
+-      if (on) glow(ctx, x + w - 28, top - 30, 22, PAL.pink, 0.35);
+-    } else if (e === 'chimney') {
+-      px(ctx, x + 16, top - 22, 20, 34, '#5a4d7a');
+-      px(ctx, x + 16, top - 22, 20, 4, '#6f6094');
+-      for (let i = 0; i < 34; i += 8) px(ctx, x + 16, top - 22 + i, 20, 1, 'rgba(20,16,48,0.3)');
+-      px(ctx, x + 13, top - 27, 26, 6, '#43385f');
+-      ctx.globalAlpha = 0.22;
+-      px(ctx, x + 22, top - 44, 9, 9, '#cfc3ee'); px(ctx, x + 29, top - 58, 11, 10, '#cfc3ee');
+-      ctx.globalAlpha = 1;
+-    } else if (e === 'radioTower') {
+-      const tx = x + w / 2;
+-      for (let i = 0; i < 5; i++) {
+-        px(ctx, tx - 10 + i * 2, top - 18 - i * 14, 3, 16, '#3a3468');
+-        px(ctx, tx + 7 - i * 2, top - 18 - i * 14, 3, 16, '#3a3468');
+-        px(ctx, tx - 10 + i * 2, top - 18 - i * 14, 18 - i * 4, 3, '#4a4280');
+-      }
+-      px(ctx, tx - 4, top - 94, 7, 7, on ? PAL.cyan : '#4a4270');
+-      if (on) { glow(ctx, tx, top - 90, 40, PAL.cyan, 0.4); glow(ctx, tx, top - 90, 90, PAL.cyan, 0.12); }
+-    } else if (e === 'discSign') {
+-      const sx = x + w + 10, sy = y + 54;
+-      px(ctx, sx - 2, sy + 10, 5, 40, '#2f2a58');
+-      px(ctx, sx - 14, sy - 16, 30, 30, PAL.ink);
+-      px(ctx, sx - 10, sy - 12, 22, 22, b.neon);
+-      px(ctx, sx - 2, sy - 4, 8, 8, PAL.ink);
+-      if (on) glow(ctx, sx, sy - 2, 36, b.neon, 0.3);
+-    } else if (e === 'guitarSign') {
+-      const sx = x + w + 12, sy = y + 60;
+-      px(ctx, sx - 2, sy + 8, 5, 40, '#2f2a58');
+-      px(ctx, sx - 11, sy - 6, 24, 22, '#c4552f');
+-      px(ctx, sx - 4, sy - 22, 7, 18, '#8a5a3a');
+-      px(ctx, sx - 3, sy + 1, 8, 8, '#3a1d12');
+-      if (on) glow(ctx, sx, sy, 30, PAL.yellow, 0.22);
+-    } else if (e === 'cupSign') {
+-      const sx = x - 16, sy = y + 62;
+-      px(ctx, sx + 4, sy + 8, 5, 36, '#2f2a58');
+-      px(ctx, sx - 10, sy - 12, 30, 24, PAL.ink);
+-      px(ctx, sx - 4, sy - 7, 15, 14, '#f3eaff');
+-      px(ctx, sx + 12, sy - 3, 5, 6, '#f3eaff');
+-      if (on) glow(ctx, sx + 4, sy, 32, PAL.mint, 0.26);
+-    } else if (e === 'rooftopGarden') {
+-      for (let i = 0; i < w - 20; i += 16) {
+-        px(ctx, x + 12 + i, top + 2, 12, 13, '#2f6f5c');
+-        px(ctx, x + 14 + i, top - 3, 8, 7, '#3d8d74');
+-      }
+-    } else if (e === 'speakerRoof') {
+-      px(ctx, x + w - 50, top - 20, 22, 28, '#2b2450');
+-      px(ctx, x + w - 46, top - 15, 14, 12, '#171338');
+-      px(ctx, x + w - 46, top - 1, 14, 6, '#171338');
+-      if (on) glow(ctx, x + w - 39, top - 8, 26, PAL.violet, 0.24);
+-    }
+-  });
+-}
+-
+-// 비대칭 덩어리 조합: 낮은 측면 윙 + 본체 + 타워 베이
+-function drawBuilding(ctx, b, on) {
+-  const x = b.x * T, y = b.y * T, w = b.w * T, h = b.h * T;
+-  const side = (b.x % 2 === 0) ? 'l' : 'r';           // 타워 위치를 건물마다 다르게
+-  const towerW = 58;
+-  const wallTop = y + 34;
+-  const wallH = h - 34;
+-  const wallDark = 'rgba(20,16,48,0.34)';
+-
+-  // 접지 그림자 — 우하단으로 흐르게
+-  ctx.globalAlpha = 0.36;
+-  px(ctx, x + 14, y + h - 6, w + 16, 16, '#181441');
+-  ctx.globalAlpha = 1;
+-
+-  // ---- 낮은 측면 윙 (본체보다 한 단 낮고 좁게 삐져나온다)
+-  const wingW = 44;
+-  const wingX = side === 'l' ? x + w - 10 : x - wingW + 10;
+-  const wingTop = wallTop + 40;
+-  px(ctx, wingX, wingTop, wingW, y + h - wingTop, b.wall);
+-  px(ctx, wingX, wingTop, wingW, 3, b.wallLit);
+-  px(ctx, side === 'l' ? wingX + wingW - 6 : wingX, wingTop, 6, y + h - wingTop, wallDark);
+-  mansardMass(ctx, wingX - 4, wingTop - 26, wingW + 8, 30, b.roof, b.roofLit, { topInset: 0.22 });
+-  archWindow(ctx, wingX + wingW / 2 - 11, wingTop + 26, 22, 30, on && (b.x % 3 !== 0), b.wall, b.wallLit);
+-
+-  // ---- 본체 벽
+-  px(ctx, x, wallTop, w, wallH, b.wall);
+-  for (let ry = 0; ry < wallH; ry += 9) {
+-    px(ctx, x, wallTop + ry, w, 1, 'rgba(20,16,48,0.14)');
+-    for (let rx = (ry / 9) % 2 ? 0 : 9; rx < w; rx += 18) px(ctx, x + rx, wallTop + ry, 1, 9, 'rgba(20,16,48,0.1)');
+-  }
+-  px(ctx, x, wallTop, 5, wallH, b.wallLit);
+-  px(ctx, x + w - 7, wallTop, 7, wallH, wallDark);
+-  // 기단(석재)
+-  px(ctx, x - 3, y + h - 16, w + 6, 16, b.roof);
+-  px(ctx, x - 3, y + h - 16, w + 6, 3, b.wallLit);
+-  for (let i = 0; i < w + 6; i += 14) px(ctx, x - 3 + i, y + h - 16, 1, 16, 'rgba(20,16,48,0.3)');
+-  quoins(ctx, x, wallTop, wallH - 16, b.wallLit, 'l');
+-  quoins(ctx, x + w - 12, wallTop, wallH - 16, b.wallLit, 'r');
+-
+-  // ---- 아치창 배열 (타워 쪽은 비워둔다)
+-  const zoneX = side === 'l' ? x + towerW - 6 : x + 14;
+-  const zoneW = w - towerW - 8;
+-  const cols = zoneW > 130 ? 3 : 2;
+-  const rows = wallH > 118 ? 2 : 1;
+-  const cw = zoneW / cols;
+-  for (let r = 0; r < rows; r++)
+-    for (let c = 0; c < cols; c++) {
+-      const wx = zoneX + c * cw + (cw - 24) / 2;
+-      const wy = wallTop + 18 + r * 56;
+-      if (wy + 42 > y + h - 24) continue;
+-      const lit = ((c + r * 2 + b.x) % 4) !== 0;
+-      archWindow(ctx, wx, wy, 24, 40, on && lit, b.wall, b.wallLit);
+-      if (on && lit) glow(ctx, wx + 12, wy + 20, 44, PAL.warm, 0.12);
+-    }
+-
+-  // ---- 어닝 + 간판 (상점 성격)
+-  if (b.awning) stripedAwning(ctx, x + 8, y + h - 60, w - 16, b.awning);
+-  const sw = Math.min(w - 26, b.label.length * 9 + 24);
+-  neonSign(ctx, x + (w - sw) / 2, y + h - 98, sw, b.label, b.neon, on);
+-
+-  // ---- 포치 (본체 중앙보다 타워 반대편으로 살짝 치우침)
+-  const porchX = side === 'l' ? x + w * 0.62 : x + w * 0.38;
+-  porch(ctx, porchX, y + h - 14, b.roof, b.wallLit, on);
+-
+-  // ---- 본체 지붕: 곡면 맨사드 + 도머
+-  mansardMass(ctx, x - 6, y - 14, w + 12, 56, b.roof, b.roofLit, { topInset: 0.16 });
+-  dormer(ctx, x + w * (side === 'l' ? 0.58 : 0.26), y + 2, 32, 26, b.roof, b.roofLit, on && b.x % 2 === 0);
+-
+-  // ---- 타워 베이 (본체보다 높고 앞으로 튀어나온다)
+-  const tx = side === 'l' ? x - 10 : x + w - towerW + 10;
+-  const towerTop = y + 4;
+-  px(ctx, tx, towerTop, towerW, y + h - towerTop, b.wallLit);
+-  px(ctx, tx, towerTop, 5, y + h - towerTop, 'rgba(246,239,255,0.14)');
+-  px(ctx, tx + towerW - 8, towerTop, 8, y + h - towerTop, wallDark);
+-  for (let ry = 0; ry < y + h - towerTop; ry += 9) px(ctx, tx, towerTop + ry, towerW, 1, 'rgba(20,16,48,0.14)');
+-  quoins(ctx, tx, towerTop + 40, y + h - towerTop - 56, b.wallLit, 'l');
+-  quoins(ctx, tx + towerW - 12, towerTop + 40, y + h - towerTop - 56, b.wallLit, 'r');
+-  oculus(ctx, tx + towerW / 2, towerTop + 26, 12, false);
+-  archWindow(ctx, tx + towerW / 2 - 13, towerTop + 50, 26, 46, on, b.wall, b.wallLit);
+-  if (h > 170) archWindow(ctx, tx + towerW / 2 - 11, towerTop + 108, 22, 36, on && b.x % 3 !== 1, b.wall, b.wallLit);
+-  spireMass(ctx, tx - 5, towerTop - 44, towerW + 10, 48, b.roof, b.roofLit);
+-  px(ctx, tx + towerW / 2 - 2, towerTop - 60, 4, 18, '#2f2a58');
+-  px(ctx, tx + towerW / 2 - 6, towerTop - 66, 12, 6, b.neon);
+-  if (on) glow(ctx, tx + towerW / 2, towerTop - 62, 26, b.neon, 0.3);
+-
+-  drawExtras(ctx, b, on);
+-}
+-
+-// 축제 무대 — 트러스 + 백드롭 + 스포트라이트
+-function drawStage(ctx, s, on) {
+-  const x = s.x * T, y = s.y * T, w = s.w * T, h = s.h * T;
+-  ctx.globalAlpha = 0.35; px(ctx, x + 10, y + h - 2, w + 10, 14, '#181441'); ctx.globalAlpha = 1;
+-  // 바닥
+-  px(ctx, x, y + T * 1.4, w, h - T * 1.4, '#5b3f7e');
+-  for (let i = 0; i < w; i += 16) px(ctx, x + i, y + T * 1.4, 8, h - T * 1.4, 'rgba(255,255,255,0.045)');
+-  px(ctx, x, y + T * 1.4, w, 5, '#7355a0');
+-  px(ctx, x, y + h - 10, w, 10, 'rgba(20,16,48,0.35)');
+-  // 백드롭
+-  px(ctx, x + 6, y, w - 12, T * 1.5, '#33265c');
+-  px(ctx, x + 6, y, w - 12, 4, '#4a3a7c');
+-  for (let i = 0; i < w - 12; i += 12) px(ctx, x + 6 + i, y + 8, 6, T * 1.5 - 16, 'rgba(255,255,255,0.03)');
+-  pixelText(ctx, 'LIVE', x + w / 2 - 20, y + 14, on ? PAL.pink : '#5b4f86', 16);
+-  if (on) glow(ctx, x + w / 2, y + 22, 80, PAL.pink, 0.3);
+-  // 상단 트러스 + 조명
+-  px(ctx, x - 4, y - 16, w + 8, 8, '#3a3468');
+-  for (let i = 0; i < w + 8; i += 14) px(ctx, x - 4 + i, y - 16, 6, 8, '#4a4280');
+-  [PAL.cyan, PAL.yellow, PAL.pink, PAL.mint].forEach((c, i) => {
+-    const lx = x + 18 + i * (w - 36) / 3;
+-    px(ctx, lx - 6, y - 8, 12, 9, '#2b2450');
+-    px(ctx, lx - 4, y + 1, 8, 4, on ? c : '#4a4270');
+-    if (on) {
+-      glow(ctx, lx, y + 4, 30, c, 0.3);
+-      ctx.globalAlpha = 0.09; ctx.fillStyle = c;
+-      ctx.beginPath(); ctx.moveTo(lx - 5, y + 4); ctx.lineTo(lx + 46, y + h); ctx.lineTo(lx - 56, y + h); ctx.closePath(); ctx.fill();
+-      ctx.globalAlpha = 1;
+-    }
+-  });
+-  // 계단 + 스피커 단
+-  px(ctx, x + w / 2 - 28, y + h, 56, 9, '#4a3a72');
+-  px(ctx, x + w / 2 - 22, y + h + 9, 44, 8, '#413162');
+-  // 깃발
+-  [x + 4, x + w - 10].forEach((fx, i) => {
+-    px(ctx, fx, y - 44, 4, 32, '#2f2a58');
+-    px(ctx, fx + 4, y - 42, 18, 12, i ? PAL.cyan : PAL.pink);
+-  });
+-}
+-
+-// 버스킹 광장 정자 — 팔각 단 + 지붕 + 스트링 라이트
+-function drawBusking(ctx, b, on) {
+-  const x = b.x * T, y = b.y * T, w = b.w * T, h = b.h * T;
+-  ctx.globalAlpha = 0.35; px(ctx, x + 8, y + h - 4, w + 10, 14, '#181441'); ctx.globalAlpha = 1;
+-  // 단
+-  px(ctx, x + 6, y + h - 40, w - 12, 34, '#5e4a8c');
+-  px(ctx, x + 12, y + h - 46, w - 24, 12, '#6f57a2');
+-  px(ctx, x + 12, y + h - 46, w - 24, 4, '#8368bb');
+-  for (let i = 0; i < w - 24; i += 10) px(ctx, x + 12 + i, y + h - 34, 5, 28, 'rgba(20,16,48,0.14)');
+-  // 기둥
+-  [x + 10, x + w - 18].forEach((cx) => {
+-    px(ctx, cx, y + 14, 8, h - 54, '#4a4278');
+-    px(ctx, cx, y + 14, 3, h - 54, '#5d5490');
+-  });
+-  // 지붕 (원뿔형 계단)
+-  for (let i = 0; i < 5; i++) {
+-    const inset = i * (w / 12);
+-    px(ctx, x + 2 + inset, y + i * 7, w - 4 - inset * 2, 8, i % 2 ? '#4a3a7c' : '#5a4894');
+-  }
+-  px(ctx, x - 2, y + 30, w + 4, 7, '#5a4894');
+-  px(ctx, x - 2, y + 30, w + 4, 2, 'rgba(255,255,255,0.16)');
+-  px(ctx, x + w / 2 - 3, y - 14, 6, 16, '#3a3468');
+-  px(ctx, x + w / 2 - 7, y - 20, 14, 7, on ? PAL.pink : '#4a4270');
+-  if (on) glow(ctx, x + w / 2, y - 16, 46, PAL.pink, 0.3);
+-  // 마이크 + 앰프
+-  px(ctx, x + w / 2 - 2, y + h - 62, 3, 24, '#4a3a68');
+-  px(ctx, x + w / 2 - 7, y + h - 70, 12, 11, '#6a5a90');
+-  px(ctx, x + 18, y + h - 32, 22, 22, '#2b2450');
+-  px(ctx, x + 22, y + h - 28, 14, 13, '#171338');
+-  if (on) glow(ctx, x + w / 2, y + h - 60, 44, PAL.cyan, 0.16);
+-}
+-
+-// ------------------------------------------------------------------ 소품
+-
+-const PROP_DRAW = {
+-  // 레퍼런스형 장식 가로등 — 빛 웅덩이는 별도 패스에서
+-  lamp(ctx, x, y, p, on) {
+-    px(ctx, x + 12, y + 22, 8, 8, '#2a2450');
+-    px(ctx, x + 14, y - 14, 4, 38, '#332d5e');
+-    px(ctx, x + 15, y - 14, 1, 38, '#484078');
+-    px(ctx, x + 9, y - 12, 14, 4, '#332d5e');
+-    px(ctx, x + 11, y - 26, 10, 14, on ? PAL.lamp : '#3f3868');
+-    px(ctx, x + 10, y - 29, 12, 4, '#2a2450');
+-    px(ctx, x + 14, y - 33, 4, 5, '#332d5e');
+-    if (on) { glow(ctx, x + 16, y - 19, 34, PAL.lamp, 0.42); glow(ctx, x + 16, y - 19, 76, PAL.warm, 0.1); }
+-  },
+-  speaker(ctx, x, y, p, on) {
+-    px(ctx, x + 3, y - 16, 26, 48, '#262042');
+-    px(ctx, x + 3, y - 16, 26, 4, '#3a3260');
+-    px(ctx, x + 8, y - 10, 16, 16, '#141130');
+-    px(ctx, x + 8, y + 10, 16, 12, '#141130');
+-    px(ctx, x + 13, y - 5, 6, 6, on ? PAL.pink : '#382f58');
+-    px(ctx, x + 3, y + 28, 26, 4, 'rgba(20,16,48,0.4)');
+-    if (on) glow(ctx, x + 16, y + 4, 30, PAL.pink, 0.16);
+-  },
+-  ampStack(ctx, x, y, p, on) {
+-    px(ctx, x + 2, y - 10, 28, 42, '#2f2549');
+-    px(ctx, x + 6, y - 5, 20, 18, '#191338');
+-    px(ctx, x + 6, y + 17, 20, 7, '#443869');
+-    px(ctx, x + 24, y + 19, 3, 3, on ? PAL.yellow : '#4a3a2a');
+-    px(ctx, x + 2, y + 28, 28, 4, 'rgba(20,16,48,0.35)');
+-  },
+-  crate(ctx, x, y) {
+-    px(ctx, x + 3, y + 2, 26, 26, PAL.wood);
+-    px(ctx, x + 3, y + 2, 26, 4, PAL.woodLit);
+-    px(ctx, x + 6, y + 8, 20, 18, '#332a52');
+-    for (let i = 0; i < 4; i++) px(ctx, x + 7 + i * 5, y + 8, 3, 18, i % 2 ? '#6d5aa0' : '#8f6fc4');
+-    px(ctx, x + 3, y + 26, 26, 3, 'rgba(20,16,48,0.35)');
+-  },
+-  discSign(ctx, x, y, p, on) {
+-    px(ctx, x + 15, y + 10, 3, 22, '#332d5e');
+-    px(ctx, x + 5, y - 10, 22, 22, PAL.ink);
+-    px(ctx, x + 9, y - 6, 14, 14, p.neon || PAL.cyan);
+-    px(ctx, x + 14, y - 1, 4, 4, PAL.ink);
+-    if (on) glow(ctx, x + 16, y, 30, p.neon || PAL.cyan, 0.24);
+-  },
+-  guitarStand(ctx, x, y) {
+-    px(ctx, x + 8, y + 24, 16, 4, '#2b2450');
+-    px(ctx, x + 14, y - 6, 4, 28, '#8a5a3a');
+-    px(ctx, x + 7, y + 10, 18, 16, '#c4552f');
+-    px(ctx, x + 12, y + 15, 8, 7, '#3a1d12');
+-  },
+-  micStand(ctx, x, y, p, on) {
+-    px(ctx, x + 9, y + 26, 14, 4, '#2b2450');
+-    px(ctx, x + 15, y - 4, 3, 30, '#4a3a68');
+-    px(ctx, x + 11, y - 12, 11, 11, '#6a5a90');
+-    if (on) glow(ctx, x + 16, y - 7, 26, PAL.pink, 0.2);
+-  },
+-  benchNeon(ctx, x, y, p, on) {
+-    px(ctx, x + 1, y + 12, 30, 8, PAL.wood);
+-    px(ctx, x + 1, y + 4, 30, 6, PAL.woodLit);
+-    px(ctx, x + 3, y + 20, 4, 9, '#2b2450');
+-    px(ctx, x + 25, y + 20, 4, 9, '#2b2450');
+-    px(ctx, x + 1, y + 10, 30, 2, on ? (p.neon || PAL.mint) : '#3a3260');
+-    px(ctx, x + 1, y + 28, 30, 3, 'rgba(20,16,48,0.3)');
+-  },
+-  cafeTable(ctx, x, y, p, on) {
+-    px(ctx, x + 14, y + 16, 4, 12, '#3a3260');
+-    px(ctx, x + 4, y + 9, 24, 8, '#e9dcc8');
+-    px(ctx, x + 4, y + 9, 24, 3, '#fff6e8');
+-    px(ctx, x + 12, y + 3, 8, 6, on ? PAL.mint : '#4a5a58');
+-    px(ctx, x, y + 12, 5, 8, '#5a4a7c');
+-    px(ctx, x + 27, y + 12, 5, 8, '#5a4a7c');
+-    px(ctx, x + 4, y + 26, 24, 3, 'rgba(20,16,48,0.3)');
+-  },
+-  busTable(ctx, x, y, p, on) {
+-    px(ctx, x + 4, y + 8, 24, 16, '#4a3a72');
+-    px(ctx, x + 4, y + 8, 24, 4, '#5c4a8c');
+-    px(ctx, x + 8, y + 2, 7, 7, on ? PAL.yellow : '#4a4270');
+-    px(ctx, x + 18, y + 2, 7, 7, on ? PAL.cyan : '#4a4270');
+-  },
+-  planter(ctx, x, y) {
+-    px(ctx, x + 5, y + 14, 22, 14, '#7c5a63');
+-    px(ctx, x + 5, y + 14, 22, 3, PAL.woodLit);
+-    px(ctx, x + 7, y + 2, 18, 14, '#2f6f5c');
+-    px(ctx, x + 11, y + 6, 7, 6, '#3d8d74');
+-    px(ctx, x + 16, y + 3, 5, 5, PAL.pink);
+-  },
+-  flowerPatch(ctx, x, y, p) {
+-    px(ctx, x + 3, y + 15, 26, 12, '#33325f');
+-    [[7, 13], [15, 18], [22, 12], [11, 21]].forEach(([ox, oy], i) => {
+-      px(ctx, x + ox, y + oy, 5, 5, [PAL.pink, PAL.yellow, PAL.cyan, PAL.mint][i]);
+-      px(ctx, x + ox + 1, y + oy + 5, 2, 4, '#2f6f5c');
+-    });
+-  },
+-  bush(ctx, x, y, p) {
+-    const t = p.tone || 0.4;
+-    px(ctx, x + 3, y + 24, 26, 5, 'rgba(20,16,48,0.32)');
+-    px(ctx, x + 4, y + 10, 24, 16, t > 0.5 ? '#4a3f7a' : '#3a5a6e');
+-    px(ctx, x + 8, y + 5, 16, 10, t > 0.5 ? '#5b4d92' : '#456b80');
+-    px(ctx, x + 12, y + 8, 6, 5, t > 0.5 ? '#6f5eab' : '#547f96');
+-  },
+-  leaves(ctx, x, y) {
+-    [[6, 10], [16, 16], [24, 8], [12, 22]].forEach(([ox, oy], i) => px(ctx, x + ox, y + oy, 4, 3, i % 2 ? '#6b5a92' : '#7a6aa1'));
+-  },
+-  grate(ctx, x, y) {
+-    px(ctx, x + 8, y + 12, 16, 12, '#302a54');
+-    for (let i = 0; i < 4; i++) px(ctx, x + 9 + i * 4, y + 13, 2, 10, '#443c6e');
+-  },
+-  signPost(ctx, x, y, p, on) {
+-    px(ctx, x + 14, y + 6, 4, 24, '#332d5e');
+-    px(ctx, x + 3, y - 6, 26, 10, p.neon || PAL.yellow);
+-    px(ctx, x + 5, y + 6, 22, 8, '#f3eaff');
+-    if (on) glow(ctx, x + 16, y, 26, p.neon || PAL.yellow, 0.22);
+-  },
+-  noteRug(ctx, x, y, p) {
+-    ctx.globalAlpha = 0.3;
+-    px(ctx, x + 1, y + 8, 30, 20, p.neon || PAL.violet);
+-    ctx.globalAlpha = 1;
+-    px(ctx, x + 8, y + 14, 6, 6, p.neon || PAL.violet);
+-    px(ctx, x + 18, y + 12, 6, 8, p.neon || PAL.violet);
+-  },
+-  lightRig(ctx, x, y, p, on) {
+-    px(ctx, x + 4, y + 24, 24, 5, '#2b2450');
+-    px(ctx, x + 14, y + 2, 4, 24, '#3a3260');
+-    px(ctx, x + 3, y - 8, 26, 11, '#262042');
+-    [PAL.pink, PAL.cyan, PAL.yellow].forEach((c, i) => px(ctx, x + 6 + i * 8, y + 3, 6, 4, on ? c : '#382f58'));
+-    if (on) glow(ctx, x + 16, y + 5, 40, PAL.cyan, 0.18);
+-  },
+-  // 레퍼런스형 둥근 활엽수 + 그림자
+-  tree(ctx, x, y, p) {
+-    const t = p.tone || 0.5;
+-    const warm = t > 0.55;
+-    ctx.globalAlpha = 0.34; px(ctx, x + 6, y + 24, 28, 10, '#181441'); ctx.globalAlpha = 1;
+-    px(ctx, x + 13, y + 14, 7, 16, '#4a3a52');
+-    px(ctx, x + 13, y + 14, 3, 16, '#5c4a63');
+-    const c1 = warm ? '#8a5f86' : '#3f5a7a';
+-    const c2 = warm ? '#a3739c' : '#4e6f92';
+-    const c3 = warm ? '#bd8bb2' : '#5f85a8';
+-    px(ctx, x + 2, y - 4, 28, 20, c1);
+-    px(ctx, x + 6, y - 12, 20, 14, c1);
+-    px(ctx, x + 8, y - 14, 16, 10, c2);
+-    px(ctx, x + 4, y - 2, 10, 8, c2);
+-    px(ctx, x + 11, y - 10, 8, 6, c3);
+-    px(ctx, x + 22, y + 2, 6, 5, c3);
+-    px(ctx, x + 20, y - 8, 4, 4, warm ? PAL.pink : PAL.cyan);
+-  },
+-};
+-
+-// ------------------------------------------------------------------ 정적 레이어
+-
+-function drawGround(ctx, v) {
+-  const rnd = mulberry32(99);
+-  for (let y = 0; y < MAP_H; y++) {
+-    for (let x = 0; x < MAP_W; x++) {
+-      const t = v.terrain[y][x], X = x * T, Y = y * T, r = rnd();
+-      if (t === 0) {
+-        px(ctx, X, Y, T, T, r < 0.16 ? PAL.grassAlt : r > 0.94 ? PAL.grassDark : PAL.grass);
+-        if (r > 0.88) { px(ctx, X + 9, Y + 13, 5, 3, '#4a4886'); px(ctx, X + 19, Y + 21, 4, 3, '#4a4886'); }
+-        if (r < 0.06) px(ctx, X + 14, Y + 8, 3, 3, '#514f8f');
+-      } else if (t === 1) {
+-        // 벽돌 인도 (레퍼런스: 헤링본 느낌의 촘촘한 벽돌)
+-        px(ctx, X, Y, T, T, (x + y) % 2 ? PAL.cobble : PAL.cobbleAlt);
+-        for (let by = 0; by < T; by += 8) {
+-          px(ctx, X, Y + by, T, 1, PAL.cobbleDark);
+-          const off = ((y * 4 + by / 8) % 2) ? 0 : 8;
+-          for (let bx = off; bx < T; bx += 16) px(ctx, X + bx, Y + by, 1, 8, PAL.cobbleDark);
+-        }
+-        if (r > 0.965) { px(ctx, X + 6, Y + 12, 12, 1, '#3a3568'); px(ctx, X + 16, Y + 13, 8, 1, '#3a3568'); }
+-      } else if (t === 2) {
+-        px(ctx, X, Y, T, T, (x + y) % 4 < 2 ? PAL.plaza : PAL.plazaAlt);
+-        px(ctx, X, Y, T, 1, 'rgba(20,16,48,0.18)');
+-        px(ctx, X, Y, 1, T, 'rgba(20,16,48,0.18)');
+-        if ((x + y) % 6 === 0) px(ctx, X + 10, Y + 10, 12, 12, 'rgba(246,239,255,0.05)');
+-      } else if (t === 3) {
+-        px(ctx, X, Y, T, T, PAL.water);
+-        px(ctx, X, Y, T, 4, '#28377a');
+-        if (r < 0.3) px(ctx, X + 5, Y + 11, 15, 3, PAL.waterLit);
+-        if (r > 0.85) px(ctx, X + 18, Y + 22, 9, 2, '#6b7fd8');
+-      } else if (t === 4) {
+-        px(ctx, X, Y, T, T, '#5b3f7e');
+-      } else if (t === 5) {
+-        px(ctx, X, Y, T, T, PAL.wood);
+-        px(ctx, X, Y, T, 3, PAL.woodLit);
+-        for (let i = 0; i < T; i += 8) px(ctx, X + i, Y, 1, T, 'rgba(20,16,48,0.22)');
+-        px(ctx, X, Y + T - 4, T, 4, 'rgba(20,16,48,0.3)');
+-      }
+-    }
+-  }
+-  // 인도 경계석
+-  for (let y = 1; y < MAP_H - 1; y++)
+-    for (let x = 1; x < MAP_W - 1; x++) {
+-      const t = v.terrain[y][x];
+-      if (t !== 1 && t !== 2) continue;
+-      const X = x * T, Y = y * T;
+-      if (v.terrain[y - 1][x] === 0) { px(ctx, X, Y, T, 4, PAL.brickAlt); px(ctx, X, Y + 4, T, 1, PAL.cobbleDark); }
+-      if (v.terrain[y + 1][x] === 0) px(ctx, X, Y + T - 4, T, 4, PAL.brick);
+-      if (v.terrain[y][x - 1] === 0) px(ctx, X, Y, 4, T, PAL.brick);
+-      if (v.terrain[y][x + 1] === 0) px(ctx, X + T - 4, Y, 4, T, PAL.brick);
+-    }
+-  // 물가 석축 난간
+-  v.water.forEach((r) => {
+-    px(ctx, r.x * T, r.y * T - 6, r.w * T, 6, PAL.brick);
+-    px(ctx, r.x * T, r.y * T - 6, r.w * T, 2, PAL.brickAlt);
+-    px(ctx, r.x * T, (r.y + r.h) * T, r.w * T, 6, PAL.brick);
+-    px(ctx, r.x * T, (r.y + r.h) * T, r.w * T, 2, PAL.brickAlt);
+-  });
+-}
+-
+-function drawFences(ctx, v) {
+-  v.fences.forEach((f) => {
+-    if (f.dir === 'h') {
+-      const y = f.y * T + 16;
+-      px(ctx, f.x * T, y + 12, f.w * T, 4, '#2b2450');
+-      for (let i = 0; i < f.w * T; i += 8) { px(ctx, f.x * T + i, y - 6, 3, 20, '#3a3468'); px(ctx, f.x * T + i, y - 9, 3, 3, '#4a4280'); }
+-      px(ctx, f.x * T, y, f.w * T, 3, '#423c72');
+-    } else {
+-      const x = f.x * T + 12;
+-      px(ctx, x, f.y * T, 4, f.h * T, '#2b2450');
+-      for (let i = 0; i < f.h * T; i += 8) px(ctx, x - 4, f.y * T + i, 12, 3, '#3a3468');
+-    }
+-  });
+-}
+-
+-function drawStrings(ctx, v, on) {
+-  v.strings.forEach((s) => {
+-    const x1 = s.x1 * T, y1 = s.y1 * T, x2 = s.x2 * T, y2 = s.y2 * T;
+-    const n = 26;
+-    for (let i = 0; i <= n; i++) {
+-      const t = i / n;
+-      const sag = Math.sin(Math.PI * t) * 26;
+-      const x = x1 + (x2 - x1) * t, y = y1 + (y2 - y1) * t + sag;
+-      px(ctx, x, y, 2, 2, '#332d5e');
+-      if (i % 3 === 0) {
+-        px(ctx, x - 1, y + 3, 4, 5, on ? PAL.lamp : '#4a4270');
+-        if (on) glow(ctx, x + 1, y + 5, 14, PAL.warm, 0.3);
+-      }
+-    }
+-  });
+-}
+-
+-// 가로등 빛 웅덩이 — 지면 위, 오브젝트 아래
+-function drawLightPools(ctx, v, on) {
+-  if (!on) return;
+-  v.props.forEach((p) => {
+-    if (p.type !== 'lamp') return;
+-    const x = p.tx * T + 16, y = p.ty * T + 26;
+-    ctx.globalAlpha = 0.16;
+-    ctx.fillStyle = PAL.lamp;
+-    ctx.beginPath(); ctx.ellipse(x, y, 46, 26, 0, 0, Math.PI * 2); ctx.fill();
+-    ctx.globalAlpha = 0.1;
+-    ctx.beginPath(); ctx.ellipse(x, y, 74, 40, 0, 0, Math.PI * 2); ctx.fill();
+-    ctx.globalAlpha = 1;
+-  });
+-}
+-
+-export function drawStatic(ctx, v, opts) {
+-  const on = !opts || opts.neon !== false;
+-  ctx.imageSmoothingEnabled = false;
+-  px(ctx, 0, 0, MAP_W * T, MAP_H * T, PAL.night);
+-  drawGround(ctx, v);
+-  // 구역 테마 색을 포장면에 은은하게
+-  v.districts.forEach((d) => {
+-    for (let y = d.area.y; y < d.area.y + d.area.h; y++)
+-      for (let x = d.area.x; x < d.area.x + d.area.w; x++) {
+-        if (x >= MAP_W || y >= MAP_H) continue;
+-        const t = v.terrain[y][x];
+-        if (t === 1 || t === 2) { ctx.globalAlpha = 0.12; px(ctx, x * T, y * T, T, T, d.neon); ctx.globalAlpha = 1; }
+-      }
+-  });
+-  drawLightPools(ctx, v, on);
+-  drawFences(ctx, v);
+-  drawBusking(ctx, v.busking, on);
+-  drawStage(ctx, v.stage, on);
+-
+-  // y 정렬 합성 (건물/소품)
+-  const ents = [];
+-  v.buildings.forEach((b) => ents.push({ y: b.y + b.h, draw: () => drawBuilding(ctx, b, on) }));
+-  v.props.forEach((p) => {
+-    const f = PROP_DRAW[p.type];
+-    if (f) ents.push({ y: p.ty, draw: () => f(ctx, p.tx * T, p.ty * T, p, on) });
+-  });
+-  ents.sort((a, b) => a.y - b.y).forEach((e) => e.draw());
+-
+-  drawStrings(ctx, v, on);
+-
+-  // 구역 팻말(한글 간판)은 사용자 요청으로 제거 — 건물 네온사인(RECORDS/GUITARS
+-  // 등 영문)만 남기고 district 이름표는 그리지 않는다.
+-}
+-
+-// ------------------------------------------------------------------ 동적 레이어
+-
+-export function drawItem(ctx, it, t) {
+-  const bob = Math.sin(t / 380 + it.phase) * 5;
+-  const x = it.tx * T + 16, y = it.ty * T + 14 + bob;
+-  glow(ctx, x, y, 38, it.neon, 0.42);
+-  ctx.globalAlpha = 0.3; px(ctx, x - 9, y + 20 - bob, 18, 5, '#181441'); ctx.globalAlpha = 1;
+-  if (it.kind === 'note') {
+-    px(ctx, x + 2, y - 13, 4, 19, it.neon);
+-    px(ctx, x - 7, y + 2, 11, 9, it.neon);
+-    px(ctx, x + 4, y - 13, 9, 4, it.neon);
+-    px(ctx, x - 5, y + 4, 4, 3, PAL.white);
++export function drawStatic(ctx, village, assets) {
++  ctx.imageSmoothingEnabled = false
++  ctx.fillStyle = '#aab490'
++  ctx.fillRect(0, 0, MAP_W * T, MAP_H * T)
++  drawImage(ctx, assets, assetUrl('ground/music-ground-path-map.png'), 0, 0)
++
++  drawLandmarkLayer(ctx, assets, 'contact-shadow')
++  drawBuildingLayer(ctx, assets, 'contact-shadow')
++  for (const layer of ['base-platform', 'rear-body', 'opening', 'canopy-s1', 'trim', 'front-stair']) drawLandmarkLayer(ctx, assets, layer)
++  for (const layer of ['posts', 'rail-g1']) drawLandmarkLayer(ctx, assets, layer)
++  for (const layer of ['body', 'roof', 'door-window', 'trim']) drawBuildingLayer(ctx, assets, layer)
++
++  for (const item of village.props.filter((item) => !item.foreground)) drawImage(ctx, assets, propUrl(item), item.x * T, item.top * T)
++
++  drawLandmarkLayer(ctx, assets, 'foreground')
++  drawBuildingLayer(ctx, assets, 'foreground')
++  for (const item of village.props.filter((item) => item.foreground)) drawImage(ctx, assets, propUrl(item), item.x * T, item.top * T)
++
++  drawLandmarkLayer(ctx, assets, 'emissive')
++  drawBuildingLayer(ctx, assets, 'emissive')
++}
++
++const MARKER_COLORS = Object.freeze({
++  active: '#61c8d4', nearby: '#ffe18a', interacting: '#c4a8e8', completed: '#7f8996',
++})
++
++export function drawMarker(ctx, item, state, now) {
++  if (state === 'unavailable') return
++  const color = MARKER_COLORS[state] || MARKER_COLORS.active
++  const pulse = state === 'nearby' ? 1 + Math.sin(now / 170 + item.phase) * 0.08 : 1
++  const x = item.tx * T + T / 2
++  const y = item.ty * T + T / 2
++  ctx.save()
++  ctx.translate(x, y)
++  ctx.scale(pulse, pulse)
++  ctx.globalAlpha = state === 'completed' ? 0.46 : 1
++  ctx.fillStyle = 'rgba(35,43,55,.82)'
++  ctx.strokeStyle = color
++  ctx.lineWidth = state === 'nearby' ? 3 : 2
++  ctx.beginPath()
++  ctx.arc(0, 0, 10, 0, Math.PI * 2)
++  ctx.fill()
++  ctx.stroke()
++  ctx.beginPath()
++  if (state === 'completed') {
++    ctx.moveTo(-4, 0); ctx.lineTo(-1, 4); ctx.lineTo(5, -4)
++  } else if (state === 'interacting') {
++    ctx.moveTo(-3, -4); ctx.lineTo(-3, 4); ctx.moveTo(3, -4); ctx.lineTo(3, 4)
+   } else {
+-    px(ctx, x - 13, y - 9, 26, 18, PAL.ink);
+-    px(ctx, x - 13, y - 9, 26, 3, it.neon);
+-    px(ctx, x - 9, y - 4, 18, 9, it.neon);
+-    px(ctx, x - 6, y - 2, 4, 4, PAL.ink);
+-    px(ctx, x + 3, y - 2, 4, 4, PAL.ink);
++    ctx.arc(0, 1, 4, Math.PI * 1.12, Math.PI * 1.88)
++    ctx.arc(0, -1, 4, Math.PI * 0.12, Math.PI * 0.88)
+   }
+-  if (Math.sin(t / 200 + it.phase) > 0.4) {
+-    px(ctx, x + 14, y - 13, 3, 3, PAL.white);
+-    px(ctx, x - 16, y + 6, 2, 2, PAL.white);
+-  }
+-}
+-
+-export function drawPlayer(ctx, p, t, moving) {
+-  const frame = moving ? Math.floor(t / 110) % 4 : 0;
+-  const step = [0, 1, 0, -1][frame];
+-  const x = Math.round(p.x), y = Math.round(p.y);
+-  ctx.globalAlpha = 0.4; px(ctx, x - 10, y - 3, 20, 6, '#181441'); ctx.globalAlpha = 1;
+-  const back = p.dir === 'up';
+-  px(ctx, x - 6, y - 10, 5, 10, '#3a3260');
+-  px(ctx, x + 1, y - 10, 5, 10, '#3a3260');
+-  px(ctx, x - 7 + (step > 0 ? 1 : 0), y - 2, 6, 3, '#241f45');
+-  px(ctx, x + 1 + (step < 0 ? -1 : 0), y - 2, 6, 3, '#241f45');
+-  px(ctx, x - 8, y - 24, 16, 15, PAL.pink);
+-  px(ctx, x - 8, y - 24, 16, 3, '#ff96c6');
+-  px(ctx, x - 8, y - 16 + step, 16, 3, 'rgba(20,16,48,0.2)');
+-  px(ctx, x - 11, y - 22 + step, 4, 11, '#f2c39a');
+-  px(ctx, x + 7, y - 22 - step, 4, 11, '#f2c39a');
+-  px(ctx, x - 8, y - 38, 16, 15, '#f7d0a1');
+-  px(ctx, x - 9, y - 41, 18, 7, '#5a4a8c');
+-  px(ctx, x - 9, y - 41, 18, 3, '#7a62ac');
+-  if (!back) {
+-    px(ctx, x - 5, y - 32, 3, 4, '#241f45');
+-    px(ctx, x + 3, y - 32, 3, 4, '#241f45');
+-    px(ctx, x - 2, y - 27, 5, 2, '#c98a72');
+-  }
+-  px(ctx, x - 11, y - 36, 4, 9, PAL.cyan);
+-  px(ctx, x + 8, y - 36, 4, 9, PAL.cyan);
+-  px(ctx, x - 10, y - 42, 21, 3, PAL.cyan);
+-}
+-
+-export function drawLockFog(ctx, v, unlockedBlock, t) {
+-  v.districts.forEach((d) => {
+-    if (d.block <= unlockedBlock) return;
+-    const x = d.area.x * T, y = d.area.y * T, w = d.area.w * T, h = d.area.h * T;
+-    ctx.globalAlpha = 0.84; px(ctx, x, y, w, h, '#241f52'); ctx.globalAlpha = 1;
+-    const rnd = mulberry32(d.block * 77);
+-    for (let i = 0; i < 26; i++) {
+-      const cx = x + rnd() * w, cy = y + rnd() * h + Math.sin(t / 900 + i) * 4, r = 18 + rnd() * 26;
+-      ctx.globalAlpha = 0.5;
+-      px(ctx, cx - r, cy - r / 2, r * 2, r, '#3a3272');
+-      px(ctx, cx - r * 0.6, cy - r * 0.8, r * 1.2, r * 0.8, '#463c86');
+-      ctx.globalAlpha = 1;
+-    }
+-    // \uD55C\uAE00 \uAD6C\uC5ED \uC774\uB984\uD45C\uB294 \uC0AC\uC6A9\uC790 \uC694\uCCAD\uC73C\uB85C \uC81C\uAC70 \u2014 \uC7A0\uAE08 \uD45C\uC2DC\uB294 \uC790\uBB3C\uC1E0 \uC774\uBAA8\uC9C0\uB9CC \uB0A8\uAE34\uB2E4.
+-    const label = '\uD83D\uDD12';
+-    ctx.font = 'bold 20px "Courier New", monospace';
+-    pixelText(ctx, label, x + w / 2 - ctx.measureText(label).width / 2, y + h / 2 - 10, 'rgba(246,239,255,0.88)', 20);
+-  });
++  ctx.stroke()
++  ctx.restore()
++}
++
++export function drawExitCue(ctx) {
++  const x = EXIT_TRIGGER.x + EXIT_TRIGGER.w / 2
++  const y = EXIT_TRIGGER.y + 8
++  ctx.save()
++  ctx.font = '700 11px Nunito, sans-serif'
++  ctx.textAlign = 'center'
++  ctx.textBaseline = 'middle'
++  ctx.fillStyle = 'rgba(63,67,88,.82)'
++  ctx.fillRect(x - 30, y - 10, 60, 20)
++  ctx.strokeStyle = '#668f8a'
++  ctx.lineWidth = 2
++  ctx.strokeRect(x - 30, y - 10, 60, 20)
++  ctx.fillStyle = '#f7f1e7'
++  ctx.fillText('↓ 나가기', x, y)
++  ctx.restore()
+ }
+diff --git a/lib/natureVillage.js b/lib/natureVillage.js
+index e3396dc..48efb46 100644
+--- a/lib/natureVillage.js
++++ b/lib/natureVillage.js
+@@ -60,6 +60,12 @@ export async function loadNatureVillage() {
+     g.restore();
+   }
+ 
++  // 다리 — handoff 맵은 나무판자 타일(terrain src 80,288)을 물 위에 그대로
++  // 반복해 깐 것뿐이라 난간·프레임·깊이감이 없어 어색하다. Animal Zone의
++  // 목교(그림자 + 진한 프레임 + 밝은 데크 + 판자 이음자리 + 나뭇결 하이라이트
++  // + 양쪽 난간/기둥)와 같은 조형으로 판자 타일 위에 덮어 그린다.
++  drawBridges(g, mapData.tiles, sheets.terrain);
++
+   const objects = [...mapData.objects].sort((a, b) => a.base - b.base);
+   for (const o of objects) {
+     const img = sheets[o.sheet];
+@@ -96,6 +102,154 @@ export function moveWithCollision(village, pos, dx, dy) {
+   return { x: nx, y: ny };
+ }
+ 
++// ------------------------------------------------------------------ 목교
++// 판자 타일(terrain src 80,288)을 인접끼리 묶어 직사각형 스팬으로 만든다.
++// 마주보는 두 변이 깊은 물(강/연못)에 닿으면 "다리"로 보고 Animal Zone
++// drawBridge와 동일한 조형(그림자 + 진한 프레임 + 밝은 데크 + 판자 이음자리
++// + 나뭇결 하이라이트 + 양쪽 난간/기둥, T=32 공통)으로 그린다. 물을 건너지
++// 않는 스팬(연못가 데크 등)은 난간 없이 판자 데크만 얹는다.
++const WATER_SRC = new Set(['192,208', '16,240', '0,240']); // 강 수면 / 연못 수면
++const SHORE_SRC = new Set(['0,208', '0,192', '16,192', '0,256']); // 물가(뚝방) 타일
++
++function bridgeSpans(tiles) {
++  const set = new Set();
++  for (const t of tiles) if (t[2] === 80 && t[3] === 288) set.add(t[0] + ',' + t[1]);
++  const seen = new Set();
++  const spans = [];
++  for (const key of set) {
++    if (seen.has(key)) continue;
++    const stack = [key];
++    const cells = [];
++    while (stack.length) {
++      const k = stack.pop();
++      if (seen.has(k) || !set.has(k)) continue;
++      seen.add(k);
++      const [x, y] = k.split(',').map(Number);
++      cells.push([x, y]);
++      stack.push((x + 1) + ',' + y, (x - 1) + ',' + y, x + ',' + (y + 1), x + ',' + (y - 1));
++    }
++    const xs = cells.map((c) => c[0]), ys = cells.map((c) => c[1]);
++    spans.push({ x0: Math.min(...xs), x1: Math.max(...xs), y0: Math.min(...ys), y1: Math.max(...ys) });
++  }
++  return spans;
++}
++
++function drawBridges(g, tiles, terrain) {
++  const srcAt = new Map();
++  for (const t of tiles) srcAt.set(t[0] + ',' + t[1], t[2] + ',' + t[3]);
++  const water = (tx, ty) => WATER_SRC.has(srcAt.get(tx + ',' + ty));
++
++  for (const s of bridgeSpans(tiles)) {
++    const wT = s.x1 - s.x0 + 1, hT = s.y1 - s.y0 + 1;
++    const edgeWater = (dx, dy) => {
++      let hit = 0, tot = 0;
++      for (let x = s.x0; x <= s.x1; x++) {
++        for (let y = s.y0; y <= s.y1; y++) {
++          if (dx && x !== (dx > 0 ? s.x1 : s.x0)) continue;
++          if (dy && y !== (dy > 0 ? s.y1 : s.y0)) continue;
++          tot++; if (water(x + dx, y + dy)) hit++;
++        }
++      }
++      return tot > 0 && hit / tot >= 0.5;
++    };
++    const top = edgeWater(0, -1), bot = edgeWater(0, 1);
++    const left = edgeWater(-1, 0), right = edgeWater(1, 0);
++    // 물을 실제로 건너는가(마주보는 두 변이 수면) — 아니면 연못가 데크로 처리
++    const crossesV = top && bot, crossesH = left && right;
++    const isBridge = crossesV || crossesH;
++    const vert = crossesH || (!crossesV && hT > wT); // true=세로 데크(좌우 난간)
++
++    // 원본 판자 타일 지우기 — 다리(물 위)는 강물 타일을 다시 깔아 좁아진
++    // 데크 바깥이 수면으로 보이게 하고, 연못가 데크는 그대로 둔다(데크가 덮음).
++    if (isBridge) {
++      for (let ty = s.y0; ty <= s.y1; ty++)
++        for (let tx = s.x0; tx <= s.x1; tx++)
++          g.drawImage(terrain, 192, 208, SRC_TILE, SRC_TILE, tx * T, ty * T, T, T);
++    }
++
++    // 데크 사각형 — 다리는 진행축(건너는 방향)으로 물+뚝방을 지나 길에 닿을
++    // 때까지 늘이고, 진행과 직각인 폭은 좁게 잡아 "판자 위를 건너는" 실루엣
++    // (레퍼런스 동물 마을 연못 다리)을 만든다.
++    const spanW = wT * T, spanH = hT * T;
++    const cx = s.x0 * T + spanW / 2, cy = s.y0 * T + spanH / 2;
++    const NARROW = 74; // 진행과 직각 방향 데크 폭
++    // 진행축 바깥으로 물/뚝방이 몇 타일 이어지는지(최대 3) — 그만큼 데크를 뻗는다
++    const spanning = (x, y) => {
++      const sc = srcAt.get(x + ',' + y);
++      return WATER_SRC.has(sc) || SHORE_SRC.has(sc) || sc === '80,288';
++    };
++    const reach = (dx, dy) => {
++      for (let k = 3; k >= 1; k--) {
++        let ok = true;
++        for (let x = s.x0; x <= s.x1; x++) {
++          for (let y = s.y0; y <= s.y1; y++) {
++            if (dx && x !== (dx > 0 ? s.x1 : s.x0)) continue;
++            if (dy && y !== (dy > 0 ? s.y1 : s.y0)) continue;
++            for (let j = 1; j <= k; j++) if (!spanning(x + dx * j, y + dy * j)) ok = false;
++          }
++        }
++        if (ok) return k;
++      }
++      return 0;
++    };
++
++    let x0, x1, y0, y1;
++    if (!isBridge) {
++      x0 = s.x0 * T; x1 = (s.x1 + 1) * T; y0 = s.y0 * T; y1 = (s.y1 + 1) * T;
++    } else if (vert) {
++      const bw = Math.min(spanW, NARROW);
++      x0 = Math.round(cx - bw / 2); x1 = Math.round(cx + bw / 2);
++      y0 = s.y0 * T - reach(0, -1) * T - 10;
++      y1 = (s.y1 + 1) * T + reach(0, 1) * T + 10;
++    } else {
++      const bh = Math.min(spanH, NARROW);
++      y0 = Math.round(cy - bh / 2); y1 = Math.round(cy + bh / 2);
++      x0 = s.x0 * T - reach(-1, 0) * T - 10;
++      x1 = (s.x1 + 1) * T + reach(1, 0) * T + 10;
++    }
++    const w = x1 - x0, h = y1 - y0;
++
++    if (isBridge) {
++      g.fillStyle = 'rgba(20,28,36,.32)';
++      g.fillRect(x0 + 3, y0 + 5, w, h);
++    }
++    g.fillStyle = '#5f3c1e';                 // 진한 프레임
++    g.fillRect(x0, y0, w, h);
++    g.fillStyle = '#b9884f';                 // 데크
++    g.fillRect(x0 + 3, y0 + 3, w - 6, h - 6);
++    // 판자 이음자리 — 진행방향과 직각(건너는 방향으로 판자를 깐다)
++    g.fillStyle = 'rgba(92,58,28,.85)';
++    if (vert) for (let y = y0 + 9; y < y1 - 3; y += 9) g.fillRect(x0 + 3, y, w - 6, 2);
++    else      for (let x = x0 + 9; x < x1 - 3; x += 9) g.fillRect(x, y0 + 3, 2, h - 6);
++    // 나뭇결 하이라이트(프레임 안쪽 한 줄)
++    g.fillStyle = 'rgba(255,238,200,.28)';
++    if (vert) g.fillRect(x0 + 4, y0 + 3, 3, h - 6);
++    else      g.fillRect(x0 + 3, y0 + 4, w - 6, 3);
++
++    if (!isBridge) continue; // 연못가 데크는 난간 없이 판자만
++
++    // 난간 — 굵은 세로 기둥 + 그 위를 잇는 손스침대(레퍼런스와 동일 조형)
++    const post = (px, py) => {
++      g.fillStyle = '#4f3216'; g.fillRect(px - 3, py - 14, 6, 16);
++      g.fillStyle = '#8a5c30'; g.fillRect(px - 2, py - 13, 4, 15);
++      g.fillStyle = '#c19a63'; g.fillRect(px - 2, py - 13, 2, 15);
++    };
++    const rail = (rx, ry, rw, rh) => {
++      g.fillStyle = '#5b3a1c'; g.fillRect(rx, ry, rw, rh);
++      g.fillStyle = '#9c6f3c'; g.fillRect(rx, ry, rw, Math.max(1, rh - 1));
++    };
++    if (vert) {
++      rail(x0 - 1, y0 + 6, 5, h - 12);
++      rail(x1 - 4, y0 + 6, 5, h - 12);
++      for (let y = y0 + 12; y <= y1 - 12; y += 15) { post(x0 + 4, y + 13); post(x1 - 4, y + 13); }
++    } else {
++      rail(x0 + 6, y0 - 1, w - 12, 5);
++      rail(x0 + 6, y1 - 4, w - 12, 5);
++      for (let x = x0 + 12; x <= x1 - 12; x += 15) { post(x, y0 + 6); post(x, y1 + 4); }
++    }
++  }
++}
++
+ // ------------------------------------------------------------------ 시드 RNG
+ 
+ export const mulberry32 = (seed) => {
+diff --git a/package.json b/package.json
+index cc94702..c150d78 100644
+--- a/package.json
++++ b/package.json
+@@ -6,7 +6,8 @@
+     "dev": "next dev",
+     "build": "next build",
+     "start": "next start",
+-    "lint": "eslint"
++    "lint": "eslint",
++    "test:music-production": "node scripts/test_music_production.mjs"
+   },
+   "dependencies": {
+     "@supabase/supabase-js": "^2.106.2",

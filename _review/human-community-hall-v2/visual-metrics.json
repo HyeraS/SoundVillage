@@ -1,0 +1,27 @@
+{
+  "referenceSize": [
+    1536,
+    1152
+  ],
+  "implementationSource": "public/assets/human-village/community-map-master-1536x1152-v2.png",
+  "globalSsim": 0.979838,
+  "maskedSsimOutsideEdits": 1.0,
+  "meanAbsoluteRgbDifference": 1.086443,
+  "rmse": 8.520206,
+  "exactRgbPercent": 96.619783,
+  "outsideEditChangedPixels": 0,
+  "editMaskPercent": 3.510821,
+  "edgeJaccardOutsideEdits": 0.999865,
+  "meanReferenceRgb": [
+    120.541,
+    102.958,
+    60.745
+  ],
+  "meanImplementationRgb": [
+    120.204,
+    102.511,
+    60.491
+  ],
+  "landmarkCenterMaxErrorPercent": 0.0,
+  "landmarkSizeMaxErrorPercent": 0.0
+}

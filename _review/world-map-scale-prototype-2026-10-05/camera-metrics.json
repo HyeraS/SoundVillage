@@ -1,0 +1,382 @@
+{
+  "generatedAt": "2026-10-05",
+  "logicalWorld": {
+    "width": 3840,
+    "height": 2880,
+    "tiles": "120x90",
+    "tileSize": 32,
+    "changed": false
+  },
+  "productionDefaultChanged": false,
+  "queryParameter": "worldVisualScale",
+  "allowedDevelopmentValues": [
+    1,
+    0.8,
+    0.75
+  ],
+  "productionFallback": 1,
+  "overview": {
+    "width": 3840,
+    "height": 2880,
+    "scaleIgnored": true
+  },
+  "viewports": [
+    {
+      "viewport": "1280x720",
+      "scales": {
+        "75": {
+          "visualScale": 0.75,
+          "viewW": 1809.48,
+          "viewH": 938.67,
+          "cssPxPerWorld": 0.707386,
+          "playerCss": {
+            "width": 83,
+            "height": 101.444
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0.0001
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 11.6,
+          "averageMapReadyMs": 175.86,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "80": {
+          "visualScale": 0.8,
+          "viewW": 1696.39,
+          "viewH": 880,
+          "cssPxPerWorld": 0.754543,
+          "playerCss": {
+            "width": 83,
+            "height": 101.444
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 11,
+          "averageMapReadyMs": 146.84,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "100": {
+          "visualScale": 1,
+          "viewW": 1357.11,
+          "viewH": 704,
+          "cssPxPerWorld": 0.943181,
+          "playerCss": {
+            "width": 83,
+            "height": 101.444
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 16,
+          "averageVisibleAssets": 8.8,
+          "averageMapReadyMs": 144.46,
+          "browserErrors": 0,
+          "failedAssets": 0
+        }
+      }
+    },
+    {
+      "viewport": "1440x900",
+      "scales": {
+        "75": {
+          "visualScale": 0.75,
+          "viewW": 1601.52,
+          "viewH": 938.67,
+          "cssPxPerWorld": 0.899146,
+          "playerCss": {
+            "width": 105.5,
+            "height": 128.944
+          },
+          "playerSizeDeltaPercent": {
+            "width": -0.0001,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 20,
+          "averageVisibleAssets": 11.6,
+          "averageMapReadyMs": 145.4,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "80": {
+          "visualScale": 0.8,
+          "viewW": 1501.42,
+          "viewH": 880,
+          "cssPxPerWorld": 0.959092,
+          "playerCss": {
+            "width": 105.5,
+            "height": 128.944
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0.0001,
+          "labelMinCssPx": 20,
+          "averageVisibleAssets": 11,
+          "averageMapReadyMs": 134.08,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "100": {
+          "visualScale": 1,
+          "viewW": 1201.14,
+          "viewH": 704,
+          "cssPxPerWorld": 1.198861,
+          "playerCss": {
+            "width": 105.5,
+            "height": 128.944
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 20,
+          "averageVisibleAssets": 8.4,
+          "averageMapReadyMs": 139.78,
+          "browserErrors": 0,
+          "failedAssets": 0
+        }
+      }
+    },
+    {
+      "viewport": "1920x1080",
+      "scales": {
+        "75": {
+          "visualScale": 0.75,
+          "viewW": 1760,
+          "viewH": 938.67,
+          "cssPxPerWorld": 1.090909,
+          "playerCss": {
+            "width": 128,
+            "height": 156.445
+          },
+          "playerSizeDeltaPercent": {
+            "width": -0.0001,
+            "height": 0.0001
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 23,
+          "averageVisibleAssets": 11.6,
+          "averageMapReadyMs": 197.18,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "80": {
+          "visualScale": 0.8,
+          "viewW": 1650,
+          "viewH": 880,
+          "cssPxPerWorld": 1.163636,
+          "playerCss": {
+            "width": 128,
+            "height": 156.444
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 23,
+          "averageVisibleAssets": 11,
+          "averageMapReadyMs": 158.12,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "100": {
+          "visualScale": 1,
+          "viewW": 1320,
+          "viewH": 704,
+          "cssPxPerWorld": 1.454545,
+          "playerCss": {
+            "width": 128,
+            "height": 156.444
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 23,
+          "averageVisibleAssets": 8.6,
+          "averageMapReadyMs": 141.78,
+          "browserErrors": 0,
+          "failedAssets": 0
+        }
+      }
+    },
+    {
+      "viewport": "390x844",
+      "scales": {
+        "75": {
+          "visualScale": 0.75,
+          "viewW": 853.33,
+          "viewH": 1724.17,
+          "cssPxPerWorld": 0.457033,
+          "playerCss": {
+            "width": 98.5,
+            "height": 120.389
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 11.8,
+          "averageMapReadyMs": 157.38,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "80": {
+          "visualScale": 0.8,
+          "viewW": 800,
+          "viewH": 1616.41,
+          "cssPxPerWorld": 0.4875,
+          "playerCss": {
+            "width": 98.5,
+            "height": 120.389
+          },
+          "playerSizeDeltaPercent": {
+            "width": -0.0001,
+            "height": -0.0001
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 11.6,
+          "averageMapReadyMs": 141.76,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "100": {
+          "visualScale": 1,
+          "viewW": 640,
+          "viewH": 1293.13,
+          "cssPxPerWorld": 0.609375,
+          "playerCss": {
+            "width": 98.5,
+            "height": 120.389
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 11,
+          "averageVisibleAssets": 9.4,
+          "averageMapReadyMs": 133.58,
+          "browserErrors": 0,
+          "failedAssets": 0
+        }
+      }
+    },
+    {
+      "viewport": "844x390",
+      "scales": {
+        "75": {
+          "visualScale": 0.75,
+          "viewW": 1940.69,
+          "viewH": 768,
+          "cssPxPerWorld": 0.434897,
+          "playerCss": {
+            "width": 79.125,
+            "height": 96.708
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 12.8,
+          "averageMapReadyMs": 168.54,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "80": {
+          "visualScale": 0.8,
+          "viewW": 1819.4,
+          "viewH": 720,
+          "cssPxPerWorld": 0.463889,
+          "playerCss": {
+            "width": 79.125,
+            "height": 96.708
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 17,
+          "averageVisibleAssets": 10.4,
+          "averageMapReadyMs": 171.38,
+          "browserErrors": 0,
+          "failedAssets": 0
+        },
+        "100": {
+          "visualScale": 1,
+          "viewW": 1455.52,
+          "viewH": 576,
+          "cssPxPerWorld": 0.579861,
+          "playerCss": {
+            "width": 79.125,
+            "height": 96.708
+          },
+          "playerSizeDeltaPercent": {
+            "width": 0,
+            "height": 0
+          },
+          "centralFootErrorCssPx": 0,
+          "labelMinCssPx": 11,
+          "averageVisibleAssets": 9.6,
+          "averageMapReadyMs": 128.5,
+          "browserErrors": 0,
+          "failedAssets": 0
+        }
+      }
+    }
+  ],
+  "browserCoverage": {
+    "dpr1": {
+      "viewports": [
+        "1280x720",
+        "1440x900",
+        "1920x1080",
+        "390x844",
+        "844x390"
+      ],
+      "locations": [
+        "library",
+        "home",
+        "nature",
+        "music",
+        "animal"
+      ],
+      "captures": 75
+    },
+    "dpr2": {
+      "viewports": [
+        "1440x900"
+      ],
+      "locations": [
+        "library",
+        "home",
+        "nature",
+        "music",
+        "animal"
+      ],
+      "captures": 15
+    }
+  }
+}

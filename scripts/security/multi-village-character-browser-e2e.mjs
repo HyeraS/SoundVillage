@@ -41,6 +41,51 @@ async function waitReady(page) {
   await page.getByTestId('shop-item-overalls').waitFor({ state: 'visible' })
 }
 
+async function waitForUserEvents(expectedNames, { forbiddenNames = [], timeout = 15_000, label } = {}) {
+  const deadline = Date.now() + timeout
+  let lastNames = []
+  let lastError = null
+  while (Date.now() < deadline) {
+    const result = await admin.from('user_events').select('event_name')
+      .eq('participant_id', participantId)
+    if (result.error) {
+      lastError = result.error
+    } else {
+      lastNames = result.data.map((event) => event.event_name)
+      const forbidden = forbiddenNames.filter((name) => lastNames.includes(name))
+      assert.deepEqual(forbidden, [], `${label}: forbidden events recorded: ${forbidden.join(', ')}`)
+      if (expectedNames.every((name) => lastNames.includes(name))) return lastNames
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250))
+  }
+  const missing = expectedNames.filter((name) => !lastNames.includes(name))
+  throw new Error([
+    `${label}: timed out waiting for persisted user events`,
+    `missing=${missing.join(',') || 'none'}`,
+    `observed=${[...new Set(lastNames)].sort().join(',') || 'none'}`,
+    `last_db_error=${lastError?.message || 'none'}`,
+  ].join(' '))
+}
+
+async function waitForActionable(locator, page, label) {
+  try {
+    await locator.waitFor({ state: 'visible', timeout: 15_000 })
+    await locator.click({ trial: true, timeout: 15_000 })
+  } catch (error) {
+    const state = await locator.evaluate((element) => ({
+      text: element.textContent?.trim(),
+      disabled: 'disabled' in element ? element.disabled : null,
+      ariaDisabled: element.getAttribute('aria-disabled'),
+      rect: element.getBoundingClientRect().toJSON(),
+      visibility: getComputedStyle(element).visibility,
+      display: getComputedStyle(element).display,
+      pointerEvents: getComputedStyle(element).pointerEvents,
+    })).catch(() => ({ detached: true }))
+    const loadingLabels = await page.getByText(/(처리 중…|장착 중…|출석 확인 중…)/).allTextContents().catch(() => [])
+    throw new Error(`${label} never became actionable: ${error.message}; state=${JSON.stringify(state)}; loading=${JSON.stringify(loadingLabels)}`)
+  }
+}
+
 try {
   await fs.mkdir(reviewDir, { recursive: true })
   const auth = ok(await authClient.auth.signInAnonymously(), 'browser QA sign-in')
@@ -82,10 +127,10 @@ try {
   for (const villageName of ['동물', '인간', '자연', '도시', '음악', '연구']) {
     await page.locator('header').getByText(villageName, { exact: true }).waitFor()
   }
-  await page.waitForTimeout(5_500)
-  const previewEvents = ok(await admin.from('user_events').select('event_name')
-    .eq('participant_id', participantId), 'read preview-load events')
-  const previewEventNames = previewEvents.map((event) => event.event_name)
+  const previewEventNames = await waitForUserEvents(['attendance_panel_opened'], {
+    forbiddenNames: ['attendance_check_attempted', 'attendance_check_succeeded', 'attendance_check_failed'],
+    label: 'preview-load event persistence',
+  })
   assert(previewEventNames.includes('attendance_panel_opened'))
   assert.equal(previewEventNames.some((name) => name.startsWith('attendance_check_')), false,
     'preview load must not record attendance claim events')
@@ -205,16 +250,14 @@ try {
   await screenshot(page, 'desktop-equipped-outfit-accessory.png')
 
   const claimButton = page.getByRole('button', { name: '오늘 출석 보상 받기' })
-  if (await claimButton.count()) {
-    await claimButton.click()
-    await page.getByText(/화폐 \d+개를 받았어요/).first().waitFor()
-  }
-  await page.waitForTimeout(5_500)
-  const claimedEvents = ok(await admin.from('user_events').select('event_name')
-    .eq('participant_id', participantId)
-    .in('event_name', ['attendance_check_attempted', 'attendance_check_succeeded', 'attendance_check_failed']),
-  'read attendance-claim events')
-  const claimedEventNames = claimedEvents.map((event) => event.event_name)
+  assert.equal(await claimButton.count(), 1, 'attendance claim must be available for the fresh browser participant')
+  await waitForActionable(claimButton, page, 'attendance claim button')
+  await claimButton.click()
+  await page.getByText(/화폐 \d+개를 받았어요/).first().waitFor({ state: 'visible', timeout: 15_000 })
+  const claimedEventNames = await waitForUserEvents(
+    ['attendance_check_attempted', 'attendance_check_succeeded'],
+    { forbiddenNames: ['attendance_check_failed'], label: 'attendance-claim event persistence' },
+  )
   assert(claimedEventNames.includes('attendance_check_attempted'))
   assert(claimedEventNames.includes('attendance_check_succeeded'))
   assert.equal(claimedEventNames.includes('attendance_check_failed'), false)

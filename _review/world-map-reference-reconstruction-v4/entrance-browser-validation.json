@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "urlMode": "?natureQa=1&worldStart=<entrance-tile-x>,<entrance-tile-y>",
+  "checks": [
+    { "zone": "Lab", "start": [59.9375, 20.9375], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true },
+    { "zone": "Animal", "start": [100.4375, 23.1875], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true },
+    { "zone": "Urban", "start": [106.6875, 48.5625], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true },
+    { "zone": "Music", "start": [98.9375, 77.1875], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true },
+    { "zone": "Human", "start": [13.6875, 78.0625], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true },
+    { "zone": "Nature", "start": [18.8125, 41.5625], "mapReady": true, "playerVisible": true, "locked": false, "landmarkDepthOverlays": 0, "enterTransition": true }
+  ]
+}

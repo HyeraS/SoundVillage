@@ -65,7 +65,10 @@ cp "$REPO_ROOT/scripts/security/local-test-only-house-compatibility.sql" supabas
 cp "$REPO_ROOT/scripts/security/local-test-only-quest-compatibility.sql" supabase/migrations/20260911000850_local_test_only_quest_compatibility.sql
 cp "$REPO_ROOT/scripts/security/001_auth_foundation.sql" supabase/migrations/20260911000900_auth_foundation.sql
 
-supabase start >"$STAGE8_START_LOG" 2>&1
+# The security rehearsal exercises Database, Auth, PostgREST, Kong and Realtime.
+# Keep unrelated UI/analytics/storage workers out of this disposable stack so
+# concurrent developer stacks cannot starve the authorization test services.
+supabase start --exclude storage-api,imgproxy,postgres-meta,studio,edge-runtime,logflare,vector,supavisor >"$STAGE8_START_LOG" 2>&1
 chmod 600 "$STAGE8_START_LOG"
 supabase db reset --local
 supabase status -o env >"$STAGE8_ENV_FILE"
@@ -98,8 +101,10 @@ run_sql() {
 
 run_sql "$REPO_ROOT/scripts/security/transactional-integrity-preflight.sql"
 cp "$REPO_ROOT/scripts/security/002_enforce_participant_rls.sql" supabase/migrations/20260911001000_enforce_participant_rls.sql
+cp "$REPO_ROOT/scripts/security/002a_template_acl_hardening.sql" supabase/migrations/20260911001050_template_acl_hardening.sql
 cp "$REPO_ROOT/scripts/security/003_transactional_integrity.sql" supabase/migrations/20260911001100_transactional_integrity.sql
 supabase migration up --local
+run_sql "$REPO_ROOT/scripts/security/template-acl-hardening-verify.sql"
 run_sql "$REPO_ROOT/scripts/security/user-event-logging-preflight.sql"
 cp "$REPO_ROOT/scripts/security/004_user_event_logging.sql" supabase/migrations/20260911001200_user_event_logging.sql
 cp "$REPO_ROOT/scripts/security/005_functional_fixes.sql" supabase/migrations/20260911001300_functional_fixes.sql

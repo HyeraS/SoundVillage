@@ -1,0 +1,50 @@
+SoundVillage world-map 80% production scope
+Captured: 2026-10-05
+
+OWNED HUNKS
+
+lib/worldMapCamera.mjs
+- add WORLD_DEFAULT_VISUAL_SCALE = 0.8
+- development default/invalid fallback -> 0.8
+- production always -> 0.8, including query attempts for 1 and 0.75
+- omitted calculateWorldCameraView visualScale -> 0.8
+- retain development comparison values [1, 0.8, 0.75]
+- retain overview full-world behavior
+
+components/WorldMap.js
+- DEFAULT_WORLD_QA.visualScale uses WORLD_DEFAULT_VISUAL_SCALE
+- no world coordinate, collision, navigation, movement, spawn, portal, or interaction hunk owned
+
+components/world-map/WorldMapActors.js
+- WorldCharacter and its world-only render-scale hook default to WORLD_DEFAULT_VISUAL_SCALE
+- existing inverse camera compensation remains the player-size policy
+
+scripts/test-world-map-camera.mjs
+- assert production/development defaults, invalid fallback, production query lock, and base/0.8 FOV
+
+scripts/test-character-render-metrics.mjs
+- rename the camera audit cases to World(default 80), World100, World75
+
+scripts/test-world-map-production-integration.mjs
+- assert the 80% release/query contract and DEFAULT_WORLD_QA binding
+
+scripts/capture-world-map-scale-prototype.mjs
+- add opt-in --review-root, explicit 100% query, production phase, all eight destinations, and two-column production comparison output
+- default prototype review root remains unchanged and existing prototype artifacts were not overwritten
+
+NEW QA SCRIPTS
+- scripts/measure-world-map-80-performance.mjs
+- scripts/test-world-map-80-production.mjs
+
+EXCLUDED PRE-EXISTING HUNKS PRESERVED
+- WorldMap duo identity/equipment sync
+- village-return entrance positioning
+- temporary content/unlock handling
+- Economy and Attendance paths
+- walk-frame changes
+- village/interior cameras and rendering
+- world geometry/collision/navigation/generated data
+
+PROTECTED FILE RESULT
+- 29 protected village/interior/config/world-data files: baseline hash == after hash
+- no commit, push, PR, deployment, staging, reset, checkout, or unrelated formatting

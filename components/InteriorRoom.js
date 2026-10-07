@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useKeys, SPEED } from '@/components/GameEngine'
 import { WORLD_CHARACTER, resolveWorldCharacterLayers } from '@/components/AssetRegistry'
 import { getInteriorItem } from '@/lib/interiorCatalog'
+import { normalizeDuoCharacterLoadout, resolveCharacterEquipmentAssets } from '@/lib/duoCharacterIdentityContract.mjs'
 
 /* ─────────────────────────────────────────────
    집꾸미기 스테이지 — design_handoff_cozy_room/Cozy Room.dc.html의 그리드
@@ -15,11 +16,11 @@ export const STAGE_W = COLS * CELL       // 768
 export const STAGE_H = WALL_H + ROWS * ROWD // 464
 const AVATAR_NATIVE = 32 // avatar.png 원본 픽셀 크기(32x32)
 
-function InteriorCharacter({ direction, outfitSrc, accessorySrc, characterLoadout, scale }) {
+function InteriorCharacter({ direction, moving = false, animationTick = 0, outfitSrc, accessorySrc, characterLoadout, scale }) {
   if (!characterLoadout) return null
   const layers = resolveWorldCharacterLayers({ outfitSrc, accessorySrc, ...characterLoadout })
   const row = WORLD_CHARACTER.rows[direction] ?? WORLD_CHARACTER.rows.down
-  const column = WORLD_CHARACTER.cols[0]
+  const column = WORLD_CHARACTER.cols[moving ? animationTick % WORLD_CHARACTER.cols.length : 0]
   return <span aria-hidden="true" style={{ position:'absolute', inset:0, overflow:'hidden' }}>
     {layers.map((layer, index) => <span key={`${layer.src}-${index}`} data-interior-character-layer={layer.kind || index} data-layer-src={layer.src} style={{
       position:'absolute', inset:0,
@@ -155,6 +156,7 @@ export default function InteriorRoom({
   // 그대로 쓴다. 이 컴포넌트는 자신이 호스트 방인지 방문 중인지 모르고,
   // duoScreen 문자열과 sendPosition/partnerPos만 그대로 전달받아 쓴다.
   duoScreen = null, sendPosition = null, partnerPos = null, partnerLabel = '',
+  partnerCharacterLoadout = null, partnerCharacterStatus = 'idle',
   outfitSrc, accessorySrc, characterLoadout,
 }) {
   const S = pixelScale
@@ -181,8 +183,19 @@ export default function InteriorRoom({
   const AVATAR_W = AVATAR_NATIVE * S, AVATAR_H = AVATAR_NATIVE * S
   const [avatarPos, setAvatarPos] = useState({ x: 2 * CELL + 8, y: 2 })
   const [avatarDirection, setAvatarDirection] = useState('right')
+  const [avatarMoving, setAvatarMoving] = useState(false)
+  const [animationTick, setAnimationTick] = useState(0)
   const avatarPosRef = useRef(avatarPos)
+  const avatarDirectionRef = useRef(avatarDirection)
   const { keys } = useKeys({ disabled: inputBlocked, screen: 'interior' })
+  const normalizedPartnerLoadout = normalizeDuoCharacterLoadout(partnerCharacterLoadout)
+  const partnerEquipment = resolveCharacterEquipmentAssets(normalizedPartnerLoadout)
+
+  useEffect(() => {
+    if (!avatarMoving && !partnerPos?.moving) return undefined
+    const timer = window.setInterval(() => setAnimationTick((value) => value + 1), 120)
+    return () => window.clearInterval(timer)
+  }, [avatarMoving, partnerPos?.moving])
 
   useEffect(() => {
     const maxX = STAGE_W - AVATAR_W
@@ -200,16 +213,19 @@ export default function InteriorRoom({
       if (k.left) dx -= SPEED * dt
       if (k.right) dx += SPEED * dt
       let moved = false
+      let nextDirection = avatarDirectionRef.current
       if (dx || dy) {
         x = Math.max(0, Math.min(maxX, x + dx))
         y = Math.max(0, Math.min(maxY, y + dy))
-        if (Math.abs(dx) >= Math.abs(dy)) setAvatarDirection(dx < 0 ? 'left' : 'right')
-        else setAvatarDirection(dy < 0 ? 'down' : 'up')
+        nextDirection = Math.abs(dx) >= Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : (dy < 0 ? 'down' : 'up')
+        setAvatarDirection(nextDirection)
+        avatarDirectionRef.current = nextDirection
         avatarPosRef.current = { x, y }
         setAvatarPos({ x, y })
         moved = true
       }
-      if (duoScreen) sendPosition?.(x, y, dx < 0 ? 'left' : 'right', duoScreen, moved)
+      setAvatarMoving(moved)
+      if (duoScreen) sendPosition?.(x, y, nextDirection, duoScreen, moved)
       rafId = requestAnimationFrame(loop)
     }
     rafId = requestAnimationFrame(loop)
@@ -283,12 +299,12 @@ export default function InteriorRoom({
             filter: 'drop-shadow(0 3px 0 rgba(58,42,20,.25))',
             transform: !characterLoadout && avatarDirection === 'left' ? 'scaleX(-1)' : undefined,
           }}>
-            <InteriorCharacter direction={avatarDirection} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} scale={S}/>
+            <InteriorCharacter direction={avatarDirection} moving={avatarMoving} animationTick={animationTick} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} scale={S}/>
           </div>
           {partnerPos && partnerPos.screen === duoScreen && (() => {
             const partnerRow = Math.max(0, Math.min(ROWS - 1, Math.round(ROWS - 1 - partnerPos.y / ROWD)))
             return (
-              <div style={{
+              <div data-testid="interior-duo-partner" data-character-sync={partnerCharacterStatus} style={{
                 position: 'absolute', left: partnerPos.x, bottom: partnerPos.y,
                 width: AVATAR_W, height: AVATAR_H, zIndex: partnerRow * 10 + 6,
               }}>
@@ -297,14 +313,9 @@ export default function InteriorRoom({
                   fontSize: 11, fontWeight: 700, color: '#fff', fontFamily: "'Gothic A1', sans-serif",
                   textShadow: '0 0 3px #000, 0 0 3px #000, 0 1px 1px #000', whiteSpace: 'nowrap',
                 }}>{partnerLabel}</div>
-                <div style={{
-                  width: '100%', height: '100%',
-                  backgroundImage: 'url(/assets/interior/avatar.png)', backgroundSize: '100% 100%',
-                  imageRendering: 'pixelated',
-                  animation: 'bob 2.6s ease-in-out infinite',
-                  filter: 'drop-shadow(0 3px 0 rgba(58,42,20,.25))',
-                  transform: `scaleX(${partnerPos.facing === 'left' ? -1 : 1})`,
-                }} />
+                <div style={{ width:'100%', height:'100%', position:'relative', animation:'bob 2.6s ease-in-out infinite', filter:'drop-shadow(0 3px 0 rgba(58,42,20,.25))' }}>
+                  <InteriorCharacter direction={partnerPos.facing || 'down'} moving={Boolean(partnerPos.moving)} animationTick={animationTick} outfitSrc={partnerEquipment.outfitSrc} accessorySrc={partnerEquipment.accessorySrc} characterLoadout={normalizedPartnerLoadout} scale={S}/>
+                </div>
               </div>
             )
           })()}

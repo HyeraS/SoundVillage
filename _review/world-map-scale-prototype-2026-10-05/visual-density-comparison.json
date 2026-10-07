@@ -1,0 +1,158 @@
+{
+  "generatedAt": "2026-10-05",
+  "measurement": "decoded source pixels divided by rendered CSS pixels for visible terrain/object images",
+  "summary": {
+    "75": {
+      "visualScale": 0.75,
+      "meanSourcePixelsPerCssPixelX": 1.586,
+      "meanVisibleAssets": 11.88,
+      "meanMapReadyMs": 168.87,
+      "minimumLabelCssPx": 17,
+      "playerWidthRangeCssPx": [
+        79.125,
+        128
+      ],
+      "consoleOrAssetErrors": 0
+    },
+    "80": {
+      "visualScale": 0.8,
+      "meanSourcePixelsPerCssPixelX": 1.487,
+      "meanVisibleAssets": 11,
+      "meanMapReadyMs": 150.44,
+      "minimumLabelCssPx": 17,
+      "playerWidthRangeCssPx": [
+        79.125,
+        128
+      ],
+      "consoleOrAssetErrors": 0
+    },
+    "100": {
+      "visualScale": 1,
+      "meanSourcePixelsPerCssPixelX": 1.19,
+      "meanVisibleAssets": 8.96,
+      "meanMapReadyMs": 137.62,
+      "minimumLabelCssPx": 11,
+      "playerWidthRangeCssPx": [
+        79.125,
+        128
+      ],
+      "consoleOrAssetErrors": 0
+    }
+  },
+  "byViewport": {
+    "1280x720": {
+      "75": {
+        "meanSourcePixelsPerCssPixelX": 1.414,
+        "meanLandmarkViewportWidth": 0.542,
+        "meanVisibleAssets": 11.6,
+        "minimumLabelCssPx": 17
+      },
+      "80": {
+        "meanSourcePixelsPerCssPixelX": 1.326,
+        "meanLandmarkViewportWidth": 0.578,
+        "meanVisibleAssets": 11,
+        "minimumLabelCssPx": 17
+      },
+      "100": {
+        "meanSourcePixelsPerCssPixelX": 1.06,
+        "meanLandmarkViewportWidth": 0.723,
+        "meanVisibleAssets": 8.8,
+        "minimumLabelCssPx": 16
+      }
+    },
+    "1440x900": {
+      "75": {
+        "meanSourcePixelsPerCssPixelX": 1.112,
+        "meanLandmarkViewportWidth": 0.612,
+        "meanVisibleAssets": 11.6,
+        "minimumLabelCssPx": 20
+      },
+      "80": {
+        "meanSourcePixelsPerCssPixelX": 1.043,
+        "meanLandmarkViewportWidth": 0.653,
+        "meanVisibleAssets": 11,
+        "minimumLabelCssPx": 20
+      },
+      "100": {
+        "meanSourcePixelsPerCssPixelX": 0.834,
+        "meanLandmarkViewportWidth": 0.816,
+        "meanVisibleAssets": 8.4,
+        "minimumLabelCssPx": 20
+      }
+    },
+    "1920x1080": {
+      "75": {
+        "meanSourcePixelsPerCssPixelX": 0.917,
+        "meanLandmarkViewportWidth": 0.557,
+        "meanVisibleAssets": 11.6,
+        "minimumLabelCssPx": 23
+      },
+      "80": {
+        "meanSourcePixelsPerCssPixelX": 0.86,
+        "meanLandmarkViewportWidth": 0.594,
+        "meanVisibleAssets": 11,
+        "minimumLabelCssPx": 23
+      },
+      "100": {
+        "meanSourcePixelsPerCssPixelX": 0.688,
+        "meanLandmarkViewportWidth": 0.743,
+        "meanVisibleAssets": 8.6,
+        "minimumLabelCssPx": 23
+      }
+    },
+    "390x844": {
+      "75": {
+        "meanSourcePixelsPerCssPixelX": 2.188,
+        "meanLandmarkViewportWidth": 1.149,
+        "meanVisibleAssets": 11.8,
+        "minimumLabelCssPx": 17
+      },
+      "80": {
+        "meanSourcePixelsPerCssPixelX": 2.052,
+        "meanLandmarkViewportWidth": 1.226,
+        "meanVisibleAssets": 11.6,
+        "minimumLabelCssPx": 17
+      },
+      "100": {
+        "meanSourcePixelsPerCssPixelX": 1.641,
+        "meanLandmarkViewportWidth": 1.532,
+        "meanVisibleAssets": 9.4,
+        "minimumLabelCssPx": 11
+      }
+    },
+    "844x390": {
+      "75": {
+        "meanSourcePixelsPerCssPixelX": 2.3,
+        "meanLandmarkViewportWidth": 0.505,
+        "meanVisibleAssets": 12.8,
+        "minimumLabelCssPx": 17
+      },
+      "80": {
+        "meanSourcePixelsPerCssPixelX": 2.156,
+        "meanLandmarkViewportWidth": 0.539,
+        "meanVisibleAssets": 10.4,
+        "minimumLabelCssPx": 17
+      },
+      "100": {
+        "meanSourcePixelsPerCssPixelX": 1.725,
+        "meanLandmarkViewportWidth": 0.674,
+        "meanVisibleAssets": 9.6,
+        "minimumLabelCssPx": 11
+      }
+    }
+  },
+  "visualVerdict": {
+    "terrainAndBuildingEdges": "80%에서 명확히 개선, 75%에서 추가 개선. 1920x1080은 75%도 평균 0.917 source-px/CSS-px라 일부 확대가 남음.",
+    "spatialReadability": "75%가 가장 좋지만 80%도 길과 입구의 연결 구조를 충분히 노출함.",
+    "landmarkScale": "80%는 기준의 80%, 75%는 기준의 75%로 정확히 축소되며 과도한 소형화는 없으나 75%의 추가 이득은 제한적.",
+    "playerRatio": "모든 viewport에서 기준 대비 사실상 0% 변화. 월드만 작아져 마을 장면과의 캐릭터 비율에 가까워짐.",
+    "labels": "축소 모드의 월드 라벨은 최소 약 17 CSS px, 터치 입장 버튼은 44x44 CSS px.",
+    "styleMismatch": "카메라는 확대 블러와 점유율을 개선하지만 회화풍 월드와 픽셀풍 마을의 스타일 차이는 남음."
+  },
+  "recommendation": {
+    "choice": "카메라 80% 정식 적용",
+    "rationale": "전체 평균 픽셀 밀도를 25% 높이고 1440x900에서 1 source-px/CSS-px를 넘기면서, 75% 대비 랜드마크 크기와 초기 표시 에셋 수를 덜 희생한다. 80%에서 75%로 더 줄일 때 밀도 이득은 약 6.7%뿐이다.",
+    "logicalWorldScaleRequired": false,
+    "followUp": "1920x1080의 잔여 확대와 화풍 차이는 논리 좌표 축소가 아니라 핵심 원본 에셋 해상도/스타일 정합 작업으로 해결한다."
+  }
+}

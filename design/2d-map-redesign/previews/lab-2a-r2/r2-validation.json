@@ -1,0 +1,139 @@
+{
+  "pass": true,
+  "behaviorAndAvatarAndMarkers": "byte-identical excerpts to R1",
+  "depthAndFade": "same IDs, depths, and bounds",
+  "outsidePatchChangedPixels": 0,
+  "insidePatchChangedPixels": 331776,
+  "assets": [
+    {
+      "id": "rear",
+      "source": [
+        208,
+        44
+      ],
+      "world": [
+        416,
+        88
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "shelf-west",
+      "source": [
+        59,
+        41
+      ],
+      "world": [
+        118,
+        82
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "shelf-east",
+      "source": [
+        59,
+        41
+      ],
+      "world": [
+        118,
+        82
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "desk",
+      "source": [
+        56,
+        36
+      ],
+      "world": [
+        112,
+        72
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "instrument",
+      "source": [
+        24,
+        44
+      ],
+      "world": [
+        48,
+        88
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "west",
+      "source": [
+        16,
+        120
+      ],
+      "world": [
+        32,
+        240
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "east",
+      "source": [
+        16,
+        120
+      ],
+      "world": [
+        32,
+        240
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "front-west",
+      "source": [
+        64,
+        42
+      ],
+      "world": [
+        128,
+        84
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "front-east",
+      "source": [
+        64,
+        42
+      ],
+      "world": [
+        128,
+        84
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    },
+    {
+      "id": "existing-prop",
+      "source": [
+        12,
+        24
+      ],
+      "world": [
+        24,
+        48
+      ],
+      "scale": 2,
+      "binaryAlpha": true
+    }
+  ]
+}

@@ -1,0 +1,240 @@
+{
+  "note": "New RESET-2 artifacts only; self hash excluded.",
+  "files": [
+    {
+      "path": "design/2d-map-redesign/LAB_RESET_2_PLAYSPACE_VALIDATION.md",
+      "bytes": 18952,
+      "sha256": "a5ec1859b5928dd26a993f99769f5894578f0de0fae7156117bd1f501d8c94a5"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/approach-width-audit.json",
+      "bytes": 11381,
+      "sha256": "b39117b41aba384527688961315a60237fa8e64db990773d2b72d4221bfab138"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/approach-width-audit.mjs",
+      "bytes": 1137,
+      "sha256": "1894649bf2df11623dd8b7a043e9b14c5720f1444bbf2e604be1983e42c695cf"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/audit.mjs",
+      "bytes": 5175,
+      "sha256": "cdb55715b477c2f2d4ccfad63856d2fa0f14c32905a8c8bcee2022a399294840"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-checks-final.json",
+      "bytes": 4444,
+      "sha256": "777185ee5b02886e1df0930ea4c13807ac55dfcfffdc024e882f5ceb2193eb1e"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-checks-part1.json",
+      "bytes": 987,
+      "sha256": "f5653ebdd7da908198ba6058fc393691b2731d24d0b98793daa12820e6f90671"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-checks-part2.json",
+      "bytes": 2477,
+      "sha256": "d49f0338396bf7db2871d65d3a32c2a6ec0c01cfd9cb28d327d55dc436ce43e8"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-group-block-switches.json",
+      "bytes": 4576,
+      "sha256": "647e6344e6143cbee78e82dc59eb0cc05871430259b7faad5665086760305d4b"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-path-final.txt",
+      "bytes": 2243,
+      "sha256": "c382972b49451a9540add4a8d68a64b8c53a39f959efcdc283b0be9046c69a18"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/browser-path-log.txt",
+      "bytes": 1391,
+      "sha256": "7b257d4093318c3efc19f15f78f8391be89381f6b6cadcee6c26a5f2a650cc13"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/build-review.py",
+      "bytes": 9954,
+      "sha256": "1e80e626e65cf56d1008e931e8f42ff64d780f38abb13f66b1fe03064377a6a3"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/camera-density-audit.json",
+      "bytes": 202551,
+      "sha256": "c99bedb226f8c595e412d58472fbb74b02546b502f5f1d6ac8b1602c64cfd2e3"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/character-anchor.svg",
+      "bytes": 1156,
+      "sha256": "bb29b2b02ba1285aab9ac47fd24e378ed9fc7f33bd0d95d9acef5b1520e455fc"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-fixed.jpg",
+      "bytes": 242707,
+      "sha256": "d3d015e1cfd65b2873af27c66b7f29bf4313adf6cb6cb4ff9c2518c672bcffaf"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-frame-occlusion.jpg",
+      "bytes": 233571,
+      "sha256": "f4c77d08f13a41b43bb346f7bb25257669b54ba663ae5503a450b712989e0c69"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-grayscale.jpg",
+      "bytes": 236731,
+      "sha256": "266ac1ab8aa770a8331c36014987ac79f715befaa361a01a2dad849f00351e8d"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-logical-overlay.jpg",
+      "bytes": 246489,
+      "sha256": "5be3d2f8660b2a99bd1011a7c7487fa2c22ade873072919789e8709095dd5c46"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-overview.jpg",
+      "bytes": 243343,
+      "sha256": "6439d05d2ee042e8e475cc3ce2aac1872ea62266d800c18b8f8e0180dda1e6f8"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/desktop-recommended.jpg",
+      "bytes": 246794,
+      "sha256": "cc7d0051deee00904f81d919b5238fc4525d9c398f2da35b767823e2793b1d68"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/detail.html",
+      "bytes": 20323,
+      "sha256": "2324023850f45330fc061ba4816af6e326fe1d0dfec4e4f852f4e7e1a1ad408a"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/foreground-plan.svg",
+      "bytes": 2497,
+      "sha256": "b99abd78a7472e04d3f31de775c9a5ddedd39c13d063c294c9bc4046044585e5"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/geometry.mjs",
+      "bytes": 8369,
+      "sha256": "06caf7f0653b34e17cf46bdf4b21a0110756487a9a6171682e8be1823416d2af"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/index.html",
+      "bytes": 4393,
+      "sha256": "9e15752625d2954ea77d7e471eab1cf55d7878e369346f2bf79c61454f618650"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/logical-plan.svg",
+      "bytes": 14434,
+      "sha256": "f094d67c5e640ebaaaa7494ba07868f987de7709628046209e02d843e0cf4a12"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/mobile-320-recommended.jpg",
+      "bytes": 50430,
+      "sha256": "bdce23a29ee73ce93945c4a52abff37b0634a1ca01101532ba9e88afd0fde74e"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/mobile-390-archive.jpg",
+      "bytes": 63526,
+      "sha256": "481ae893a58dc51837f06c380bf34d5fca2480c67f2b4cc0ad0320bf097b2bfe"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/mobile-390-legacy.jpg",
+      "bytes": 72185,
+      "sha256": "fc29acbe71dd0213e51eb63ce600e4456f363b903a6088698ec8ec1efb3261d0"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/mobile-390-recommended.jpg",
+      "bytes": 65064,
+      "sha256": "00a80332cbc11c4711a1977d2dd3d5558223deadb974686e43a862c6f37785f9"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/mobile-landscape.jpg",
+      "bytes": 58480,
+      "sha256": "39970d54eda913fcd9061cf1986b2d263e1a8237221b0df795d9f9b84ed8e5b8"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/play.mjs",
+      "bytes": 11439,
+      "sha256": "76d79cb5f366e867d3a2c8dbef7f4f8d5c22368189b6c51d65ddad3728956a67"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/preservation-before.json",
+      "bytes": 1317973,
+      "sha256": "7b141f3a9701564951e2c5ca0cd232c3c23c755fe1ee2358e1ae739caf5ab357"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/preservation-check.json",
+      "bytes": 198,
+      "sha256": "7757f49622f54907e912ad4cff242d2d884c43e21d2f8f0457b4ad6b6a5f89d0"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/reallocation-review.json",
+      "bytes": 7917,
+      "sha256": "3aa80074349e3708c0b2295ec9ae18a23201232c0f31a326866bdcd16b9848b3"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/reallocation.mjs",
+      "bytes": 2574,
+      "sha256": "e3ea8fd7c822d39a7fdb59174cf0106d100e564ee1737a4a894cb39ca332c9b0"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/report-diagrams.jpg",
+      "bytes": 209668,
+      "sha256": "af208dcad2e33d2435a0d1ffe7adbe4772b37435c9bff633cf6a0d77ee1ebf8e"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/report.html",
+      "bytes": 9814,
+      "sha256": "5aa8645c1f9ce0c98c5ff64cc3e2c313e65b4c6a857803bde6a53f487e9a31c2"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/report.txt",
+      "bytes": 18952,
+      "sha256": "a5ec1859b5928dd26a993f99769f5894578f0de0fae7156117bd1f501d8c94a5"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/review-metrics.mjs",
+      "bytes": 1760,
+      "sha256": "46ab23088860f8cffd429ee18779cb4824b180d1634952bd7a510616fa338d8d"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/serve.py",
+      "bytes": 1470,
+      "sha256": "872f9fef882bc8d18bb6d49f74a428f59ba32b82668412dd29c8f6b57e40c0d6"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/slot-plan.svg",
+      "bytes": 12297,
+      "sha256": "86cedcd5167049aab7b4de13fd5fc24b4c2c86cfb93e612256fcfd3240862c64"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/slots.json",
+      "bytes": 3038,
+      "sha256": "eeece89be7f90823037d5b4abb0e3e6e7e576660416b1be8ca74b85fddb45aa2"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/sound-audit.json",
+      "bytes": 189,
+      "sha256": "c2fd02c9d9e15efe443081e38d08e1185e1b484b2c44ee2ffc7c5d01a3c066da"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/style.css",
+      "bytes": 3323,
+      "sha256": "91793b5a7fc5052e9e198c799daa959f5ab76d51c649a6d06f6e876fd115e295"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/test.mjs",
+      "bytes": 2352,
+      "sha256": "9125a7ed2d8273e755f91925067117e9654617f7df190adc354101fd4b25c62e"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/tests.json",
+      "bytes": 557,
+      "sha256": "5c5440c57406ca315ad354d7aeb452e76b0574d99d9e4986082628943e511dec"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/validation.json",
+      "bytes": 10580,
+      "sha256": "436303e421f4054d3d1ed0f4588824d86509be56c86f6de10bf3573042ff8ce2"
+    },
+    {
+      "path": "design/2d-map-redesign/previews/lab-reset-2/whitebox-delta.svg",
+      "bytes": 1519,
+      "sha256": "b1dd0da6350b5c07ba9676f88003c04ce9cd53b1beaf69e2b8ec228229ac0131"
+    }
+  ]
+}

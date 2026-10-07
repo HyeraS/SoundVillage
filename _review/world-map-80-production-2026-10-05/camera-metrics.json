@@ -1,0 +1,462 @@
+{
+  "generatedAt": "2026-10-05",
+  "productionDefaultScale": 0.8,
+  "logicalWorld": {
+    "width": 3840,
+    "height": 2880,
+    "tiles": {
+      "width": 120,
+      "height": 90
+    },
+    "tileSize": 32,
+    "changed": false
+  },
+  "queryContract": {
+    "development": {
+      "default": 0.8,
+      "allowed": [
+        1,
+        0.8,
+        0.75
+      ],
+      "invalidFallback": 0.8
+    },
+    "production": {
+      "default": 0.8,
+      "attempted1": 0.8,
+      "attempted75": 0.8
+    }
+  },
+  "overview": {
+    "width": 3840,
+    "height": 2880,
+    "ignoresVisualScale": true
+  },
+  "coverage": {
+    "dpr1": {
+      "captures": 40,
+      "viewports": [
+        "1280x720",
+        "1440x900",
+        "1920x1080",
+        "390x844",
+        "844x390"
+      ],
+      "locations": [
+        "library",
+        "home",
+        "lab",
+        "nature",
+        "music",
+        "animal",
+        "urban",
+        "human"
+      ]
+    },
+    "dpr2": {
+      "captures": 8,
+      "viewports": [
+        "1440x900"
+      ],
+      "locations": [
+        "library",
+        "home",
+        "lab",
+        "nature",
+        "music",
+        "animal",
+        "urban",
+        "human"
+      ]
+    }
+  },
+  "viewports": {
+    "1280x720": {
+      "viewW": 1696.39,
+      "viewH": 880,
+      "playerCss": {
+        "width": 83,
+        "height": 101.444
+      },
+      "maxPlayerWidthDeltaPercent": 0,
+      "maxPlayerHeightDeltaPercent": 0.0002,
+      "centralFootErrorCssPx": 0,
+      "minimumLabelCssPx": 17,
+      "consoleHttpImageErrors": 0
+    },
+    "1440x900": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "playerCss": {
+        "width": 105.5,
+        "height": 128.944
+      },
+      "maxPlayerWidthDeltaPercent": 0,
+      "maxPlayerHeightDeltaPercent": 0.0002,
+      "centralFootErrorCssPx": 0.0001,
+      "minimumLabelCssPx": 20,
+      "consoleHttpImageErrors": 0
+    },
+    "1920x1080": {
+      "viewW": 1650,
+      "viewH": 880,
+      "playerCss": {
+        "width": 128,
+        "height": 156.444
+      },
+      "maxPlayerWidthDeltaPercent": 0,
+      "maxPlayerHeightDeltaPercent": 0.0002,
+      "centralFootErrorCssPx": 0,
+      "minimumLabelCssPx": 23,
+      "consoleHttpImageErrors": 0
+    },
+    "390x844": {
+      "viewW": 800,
+      "viewH": 1616.41,
+      "playerCss": {
+        "width": 98.5,
+        "height": 120.389
+      },
+      "maxPlayerWidthDeltaPercent": 0.0001,
+      "maxPlayerHeightDeltaPercent": 0.0001,
+      "centralFootErrorCssPx": 0,
+      "minimumLabelCssPx": 17,
+      "consoleHttpImageErrors": 0
+    },
+    "844x390": {
+      "viewW": 1819.4,
+      "viewH": 720,
+      "playerCss": {
+        "width": 79.125,
+        "height": 96.708
+      },
+      "maxPlayerWidthDeltaPercent": 0.0001,
+      "maxPlayerHeightDeltaPercent": 0.0001,
+      "centralFootErrorCssPx": 0,
+      "minimumLabelCssPx": 17,
+      "consoleHttpImageErrors": 0
+    }
+  },
+  "checks": [
+    {
+      "viewport": "1280x720",
+      "location": "library",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "home",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "lab",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "nature",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 113.5591,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "music",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 127.1409,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "animal",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 118.0864,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "urban",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 80.3591,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1280x720",
+      "location": "human",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 83.203,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "1440x900",
+      "location": "library",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0.0001,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "home",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "lab",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0.0001,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "nature",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 142.6272,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "music",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 73.573,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "animal",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 119.6093,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "urban",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 102.1432,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1440x900",
+      "location": "human",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 105.758,
+      "labelCssHeight": 20
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "library",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "home",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "lab",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "nature",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 175.1273,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "music",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 175.7091,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "animal",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 182.1091,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "urban",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 123.9272,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "1920x1080",
+      "location": "human",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0002,
+      "footErrorCssPx": 128.313,
+      "labelCssHeight": 23
+    },
+    {
+      "viewport": "390x844",
+      "location": "library",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": -0.0001,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "home",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": -0.0001,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "lab",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 81.6563,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "nature",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": -0.0001,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "music",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 49.9688,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "animal",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 54.2125,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "urban",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": -0.0001,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "390x844",
+      "location": "human",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 46.5562,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "library",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "home",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "lab",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 0,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "nature",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 69.8153,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "music",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0.0001,
+      "footErrorCssPx": 78.1653,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "animal",
+      "widthDeltaPercent": -0.0001,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 72.5986,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "urban",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0,
+      "footErrorCssPx": 49.4041,
+      "labelCssHeight": 17
+    },
+    {
+      "viewport": "844x390",
+      "location": "human",
+      "widthDeltaPercent": 0,
+      "heightDeltaPercent": 0.0001,
+      "footErrorCssPx": 50.7958,
+      "labelCssHeight": 17
+    }
+  ]
+}

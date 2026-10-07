@@ -1,0 +1,59 @@
+{
+  "map": "120x90",
+  "camera": "30x22",
+  "spawn": {
+    "tx": 60,
+    "ty": 47
+  },
+  "portals": [
+    {
+      "id": "Lab",
+      "x": 60,
+      "y": 17
+    },
+    {
+      "id": "Animal",
+      "x": 101,
+      "y": 19
+    },
+    {
+      "id": "Urban",
+      "x": 111,
+      "y": 43
+    },
+    {
+      "id": "Music",
+      "x": 101,
+      "y": 71
+    },
+    {
+      "id": "Human",
+      "x": 14,
+      "y": 71
+    },
+    {
+      "id": "Nature",
+      "x": 17,
+      "y": 42
+    },
+    {
+      "id": "Home",
+      "x": 22,
+      "y": 17
+    },
+    {
+      "id": "Sound Library",
+      "x": 60,
+      "y": 41
+    }
+  ],
+  "blockedSamples": [
+    "Nature water",
+    "library body",
+    "north forest",
+    "southwest garden"
+  ],
+  "reachableTileCenters": 4100,
+  "cleanCaptureFlag": "worldClean=1",
+  "status": "PASS"
+}

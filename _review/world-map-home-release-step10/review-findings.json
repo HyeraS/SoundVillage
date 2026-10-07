@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "openReleaseBlockers": [],
+  "resolvedFindings": [
+    {
+      "id": "STEP10-001",
+      "severity": "release-blocker",
+      "status": "resolved-in-isolated-worktree",
+      "title": "Required tests wrote historical review files by default",
+      "files": [
+        "scripts/test-world-map-hd-collision.mjs",
+        "scripts/test-world-map-production-integration.mjs"
+      ],
+      "impact": "Normal verification could add _review outputs and violate the exact 45-path isolated candidate.",
+      "resolution": "Added strict optional --report handling and guarded report directory/file writes. Default test execution is read-only.",
+      "outsideManifestBoundary": false,
+      "originalCheckoutModified": false,
+      "verification": [
+        "Both affected package scripts passed after the correction.",
+        "Final Git path count remained exactly 45 after the full suite and build.",
+        "No new review path appeared in Git status."
+      ]
+    }
+  ],
+  "review": {
+    "authority": {
+      "status": "PASS",
+      "nativeObjects": ["landmark-library", "landmark-home"],
+      "legacyObjectCount": 16,
+      "legacyHomeRollbackRetained": true
+    },
+    "renderer": {
+      "status": "PASS",
+      "atomicUnionCulling": true,
+      "legacyFlatHomeSuppressed": true,
+      "emptyOptionalGroupsSuppressed": true,
+      "renderOrderPreserved": true
+    },
+    "assets": {
+      "status": "PASS",
+      "candidateBCount": 0,
+      "approvedSourceHashMismatches": 0,
+      "retainedRuntimeFileCount": 31,
+      "retainedRuntimeHashMismatches": 0,
+      "newRuntimeAssetCount": 2,
+      "nonUniformResizeAppliedToApprovedSources": false
+    },
+    "collisionNavigation": {
+      "status": "PASS",
+      "homeCollider": [1520, 1472, 1776, 1696],
+      "homeInteractionApproachMinimap": [1648, 1760],
+      "homeGroundContactSortY": 1696,
+      "roadCellX1792Walkable": true,
+      "collisionReasonMismatchCells": 0,
+      "siteGroundColliderCount": 0
+    },
+    "clientBoundary": {
+      "status": "PASS",
+      "compilerAdapterSchemaInClientGraph": false,
+      "nodeBuiltinsInClientGraph": false,
+      "sourcePngInClientBundle": false,
+      "reviewDependencyInProductionGraph": false,
+      "candidateAbsolutePathReferences": 0,
+      "homePresentationLiteralDuplicates": 0
+    },
+    "tests": {
+      "status": "PASS",
+      "legacyRollbackCompiled": true,
+      "assetReviewJsonDependency": false,
+      "collisionCheckWritesProduction": false,
+      "implicitReviewWrites": 0
+    }
+  },
+  "reproducibility": {
+    "runtimeWebpTwoRunByteIdentical": true,
+    "projectionTwoRunByteIdentical": true,
+    "collisionMaskTwoRunByteIdentical": true,
+    "temporaryOrMachinePathsSerialized": 0,
+    "productionGeneratedMismatches": 0
+  },
+  "gitActions": {
+    "staged": false,
+    "committed": false,
+    "pushed": false,
+    "deployed": false
+  }
+}

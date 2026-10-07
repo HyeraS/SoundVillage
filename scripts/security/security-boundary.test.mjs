@@ -77,3 +77,11 @@ test('room save events link by operation key without participant-backed room IDs
   assert.match(interior, /const economyV1 = !visitorMode && !dryRun && economy\.runtimeState === 'cutover'/)
   assert.doesNotMatch(interior, /(?:body|searchParams|query)\??\.economyV1/)
 })
+
+test('interior dry-run preview keeps purchase and save mutations local', async () => {
+  const interior = await read('components/InteriorDecorRoom.js')
+  assert.match(interior, /if \(dryRun\) \{[\s\S]*?setSaved\(deepClone\(room\)\)[\s\S]*?미리보기 방을 저장했어요/)
+  assert.match(interior, /if \(dryRun\) \{[\s\S]*?setBalance\(nextBalance\)[\s\S]*?실제 재화는 사용되지 않아요/)
+  assert.match(interior, /data-testid="interior-preview-notice"/)
+  assert.match(interior, /실제 재화나 DB는 변경되지 않아요/)
+})

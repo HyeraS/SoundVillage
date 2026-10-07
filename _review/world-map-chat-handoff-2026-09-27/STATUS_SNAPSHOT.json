@@ -1,0 +1,56 @@
+{
+  "snapshotDate": "2026-09-27",
+  "project": "SoundVillage world map v4",
+  "originalCheckout": {
+    "path": "/Users/hyera/Documents/SoundVillage-house-decor-2d",
+    "branch": "house-decor-2d",
+    "state": "dirty-user-owned",
+    "releaseActionsAllowed": false
+  },
+  "isolatedReleaseWorktree": {
+    "path": "/private/tmp/soundvillage-home-step10.rUSop0",
+    "branch": "codex/world-map-home-native",
+    "baseHead": "8e6567f896dfde6781dd0f641db197a4255d111f",
+    "changedPathCount": 45,
+    "stagedPathCount": 0,
+    "committed": false,
+    "pushed": false,
+    "deployed": false,
+    "status": "PASS — commit-ready, not staged"
+  },
+  "home": {
+    "artCandidate": "A",
+    "authority": "native",
+    "layers": ["ground", "world"],
+    "visualBox": [1472, 1395, 1824, 1696],
+    "collider": [1520, 1472, 1776, 1696],
+    "groundContact": [1648, 1696],
+    "doorApproachMinimap": [1648, 1760],
+    "sortY": 1696,
+    "foregroundRequired": false,
+    "releaseBlockers": 0
+  },
+  "worldObjectAuthority": {
+    "native": ["landmark-home-player", "landmark-library"],
+    "legacyCount": 16
+  },
+  "homeRelease": {
+    "authoredAndCodeFiles": 35,
+    "generatedFiles": 10,
+    "totalFiles": 45,
+    "allowlistSource": "_review/world-map-home-release-step10/COMMIT_PLAN.md",
+    "recommendedCommitTitle": "feat(world-map): promote Home to a native layered object"
+  },
+  "globalMapQuality": {
+    "status": "not fundamentally solved",
+    "nextStep": "Step 11 — read-only quality baseline and degradation audit",
+    "knownRisks": [
+      "mostly 1x runtime raster density",
+      "fractional SVG camera scaling",
+      "large baked environment clusters",
+      "memory and bandwidth growth from blanket high-density assets"
+    ]
+  },
+  "nextAuthorizedAction": null,
+  "recommendedNextAction": "explicitly approve staging exactly 45 paths in the isolated release worktree"
+}

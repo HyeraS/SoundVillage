@@ -1,0 +1,7 @@
+2026-09-04 final source
+command: node scripts/test_music_production.mjs
+exit: 0
+pass: true
+metadata: A 83 / B 83 / bypass 166
+safe slot capacity: 837
+assets: 54

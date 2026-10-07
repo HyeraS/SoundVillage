@@ -1,0 +1,74 @@
+[
+  {
+    "group": "A",
+    "block": 1,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 11 / completed 0 / locked 5 · 전체 상태 13/0/45"
+  },
+  {
+    "group": "A",
+    "block": 2,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 11 / locked 4 · 전체 상태 3/13/42"
+  },
+  {
+    "group": "A",
+    "block": 3,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 12 / locked 3 · 전체 상태 13/16/29"
+  },
+  {
+    "group": "A",
+    "block": 4,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 0 / completed 13 / locked 3 · 전체 상태 11/29/18"
+  },
+  {
+    "group": "A",
+    "block": 5,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 2 / completed 13 / locked 1 · 전체 상태 14/40/4"
+  },
+  {
+    "group": "A",
+    "block": 6,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 15 / locked 0 · 전체 상태 4/54/0"
+  },
+  {
+    "group": "B",
+    "block": 1,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 11 / completed 0 / locked 5 · 전체 상태 13/0/45"
+  },
+  {
+    "group": "B",
+    "block": 2,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 11 / locked 4 · 전체 상태 3/13/42"
+  },
+  {
+    "group": "B",
+    "block": 3,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 12 / locked 3 · 전체 상태 13/16/29"
+  },
+  {
+    "group": "B",
+    "block": 4,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 0 / completed 13 / locked 3 · 전체 상태 11/29/18"
+  },
+  {
+    "group": "B",
+    "block": 5,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 2 / completed 13 / locked 1 · 전체 상태 14/40/4"
+  },
+  {
+    "group": "B",
+    "block": 6,
+    "status": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · B 표시 58/85 (부족27)",
+    "density": "카메라 원점 448.0, 434.5 · 화면 내 완전 노출 marker active 1 / completed 15 / locked 0 · 전체 상태 4/54/0"
+  }
+]

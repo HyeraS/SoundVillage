@@ -1,33 +1,49 @@
 import assert from 'node:assert/strict'
-import { calculateWorldCamera, worldPointToViewport, WORLD_CAMERA_HUD_HEIGHT } from '../lib/worldMapCamera.mjs'
-import { WORLD_DESTINATIONS, WORLD_MAP_HEIGHT_PX, WORLD_MAP_WIDTH_PX, WORLD_PLAYER, worldDestinationInteractionPoint } from '../lib/worldMapGeometry.mjs'
+import {
+  calculateWorldCamera,
+  resolveWorldCharacterVisualScale,
+  resolveWorldVisualScale,
+  worldPointToViewport,
+  WORLD_CAMERA_HUD_HEIGHT,
+  WORLD_CHARACTER_TARGET_HEIGHT,
+  WORLD_DEFAULT_VISUAL_SCALE,
+  WORLD_VISUAL_SCALES,
+} from '../lib/worldMapCamera.mjs'
+import { WORLD_MAP_HEIGHT_PX, WORLD_MAP_WIDTH_PX, WORLD_PLAYER } from '../lib/worldMapGeometry.mjs'
 
-const viewports = [[1280, 720], [1440, 900], [390, 844], [844, 390]]
-const samples = [
-  { id: 'center', x: WORLD_MAP_WIDTH_PX / 2, y: WORLD_MAP_HEIGHT_PX / 2 },
-  { id: 'northwest', x: WORLD_PLAYER.width / 2, y: WORLD_PLAYER.height / 2 },
-  { id: 'northeast', x: WORLD_MAP_WIDTH_PX - WORLD_PLAYER.width / 2, y: WORLD_PLAYER.height / 2 },
-  { id: 'southwest', x: WORLD_PLAYER.width / 2, y: WORLD_MAP_HEIGHT_PX - WORLD_PLAYER.height / 2 },
-  { id: 'southeast', x: WORLD_MAP_WIDTH_PX - WORLD_PLAYER.width / 2, y: WORLD_MAP_HEIGHT_PX - WORLD_PLAYER.height / 2 },
-  ...WORLD_DESTINATIONS.map(destination => ({ id: destination.id, ...worldDestinationInteractionPoint(destination.target) })),
-]
+const viewports = [[1280, 720], [1440, 900], [1920, 1080], [390, 844], [844, 390]]
+assert.deepEqual(WORLD_VISUAL_SCALES, [1])
+assert.equal(WORLD_DEFAULT_VISUAL_SCALE, 1)
+for (const value of [undefined, '.8', '.75', '1', 2]) assert.equal(resolveWorldVisualScale(value), 1)
 
 const results = []
 for (const [viewportWidth, viewportHeight] of viewports) {
-  let expectedFov = null
-  for (const sample of samples) {
-    const camera = calculateWorldCamera({ focusX: sample.x, focusY: sample.y, viewportWidth, viewportHeight })
-    const screen = worldPointToViewport(sample, camera)
-    assert.ok(screen.x >= 0 && screen.x <= viewportWidth, `${viewportWidth}x${viewportHeight} ${sample.id} is horizontally visible`)
-    assert.ok(screen.y >= WORLD_CAMERA_HUD_HEIGHT && screen.y <= viewportHeight, `${viewportWidth}x${viewportHeight} ${sample.id} is vertically visible`)
-    assert.ok(Math.abs(camera.width / camera.height - viewportWidth / (viewportHeight - WORLD_CAMERA_HUD_HEIGHT)) < 1e-9, 'camera and scene aspect ratios match')
-    assert.ok(camera.x >= 0 && camera.y >= 0 && camera.x + camera.width <= WORLD_MAP_WIDTH_PX + 1e-6 && camera.y + camera.height <= WORLD_MAP_HEIGHT_PX + 1e-6, 'camera clamps to world')
-    const fov = [camera.width / 32, camera.height / 32]
-    if (!expectedFov) expectedFov = fov
-    else assert.deepEqual(fov, expectedFov, 'focus position does not change FOV')
-  }
-  results.push({ viewport: `${viewportWidth}x${viewportHeight}`, viewTiles: expectedFov })
+  const camera = calculateWorldCamera({ focusX:0, focusY:0, viewportWidth, viewportHeight })
+  const movedFocus = calculateWorldCamera({ focusX:WORLD_MAP_WIDTH_PX, focusY:WORLD_MAP_HEIGHT_PX, viewportWidth, viewportHeight })
+  assert.deepEqual(
+    { x:camera.x, y:camera.y, width:camera.width, height:camera.height },
+    { x:0, y:0, width:WORLD_MAP_WIDTH_PX, height:WORLD_MAP_HEIGHT_PX },
+    'camera always shows the full logical map',
+  )
+  assert.deepEqual(camera, movedFocus, 'player position never moves or zooms the camera')
+  assert.ok(camera.contentWidth <= camera.sceneWidth + 1e-9)
+  assert.ok(camera.contentHeight <= camera.sceneHeight + 1e-9)
+  assert.ok(Math.abs(camera.contentWidth / camera.contentHeight - 4 / 3) < 1e-9, 'contain preserves 4:3')
+
+  const topLeft = worldPointToViewport({ x:0, y:0 }, camera)
+  const bottomRight = worldPointToViewport({ x:WORLD_MAP_WIDTH_PX, y:WORLD_MAP_HEIGHT_PX }, camera)
+  assert.ok(topLeft.x >= 0 && topLeft.y >= WORLD_CAMERA_HUD_HEIGHT)
+  assert.ok(bottomRight.x <= viewportWidth && bottomRight.y <= viewportHeight)
+  assert.ok(Math.abs(bottomRight.x - topLeft.x - camera.contentWidth) < 1e-6)
+  assert.ok(Math.abs(bottomRight.y - topLeft.y - camera.contentHeight) < 1e-6)
+
+  const character = resolveWorldCharacterVisualScale({ viewportWidth, viewportHeight, logicalCharacterHeight:WORLD_PLAYER.height })
+  const expectedTarget = viewportWidth <= 720 || viewportHeight - WORLD_CAMERA_HUD_HEIGHT <= 500
+    ? WORLD_CHARACTER_TARGET_HEIGHT.mobile
+    : WORLD_CHARACTER_TARGET_HEIGHT.desktop
+  assert.equal(character.targetScreenHeight, expectedTarget)
+  assert.ok(Math.abs(WORLD_PLAYER.height * camera.contentScale * character.visualScale - expectedTarget) < 1e-9)
+  results.push({ viewport:`${viewportWidth}x${viewportHeight}`, mapScreenScale:camera.contentScale, characterHeight:expectedTarget })
 }
 
-console.log(JSON.stringify({ status: 'PASS', results }, null, 2))
-
+console.log(JSON.stringify({ status:'PASS', results }, null, 2))

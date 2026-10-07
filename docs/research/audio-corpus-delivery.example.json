@@ -1,0 +1,41 @@
+{
+  "format": "sound-village-audio-delivery-v1",
+  "delivery": {
+    "corpus_absolute_path": "/absolute/path/on-validator-host/approved-audio-root",
+    "delivery_identifier": "REPLACE_WITH_NON_SECRET_DELIVERY_ID",
+    "delivery_checksum": {
+      "algorithm": "sha256",
+      "value": "REPLACE_WITH_64_LOWERCASE_HEX_CHARACTERS"
+    },
+    "received_at": "YYYY-MM-DDTHH:MM:SSZ",
+    "received_by": "REPLACE_WITH_REVIEWER_ROLE_OR_PSEUDONYM"
+  },
+  "reviews": {
+    "fsd50k:REPLACE_CANONICAL_ID": {
+      "license": {
+        "status": "verified",
+        "identifier": "SPDX_OR_CONTRACT_REFERENCE_ONLY",
+        "terms_uri": "LOCAL_OR_CONTROLLED_EVIDENCE_REFERENCE",
+        "attribution": "REQUIRED_ATTRIBUTION_OR_NONE"
+      },
+      "provenance": {
+        "status": "verified",
+        "source_uri": "PUBLIC_SOURCE_OR_CONTROLLED_REFERENCE",
+        "source_record_id": "ORIGINAL_SOURCE_RECORD_ID",
+        "rights_holder": "RIGHTS_HOLDER_IF_APPLICABLE",
+        "acquired_at": "YYYY-MM-DD",
+        "evidence_uri": "LOCAL_OR_CONTROLLED_EVIDENCE_REFERENCE",
+        "reviewed_by": "REVIEWER_ROLE_OR_PSEUDONYM",
+        "reviewed_at": "YYYY-MM-DDTHH:MM:SSZ",
+        "notes": "NON_SENSITIVE_REVIEW_NOTES"
+      },
+      "classification": {
+        "status": "approved",
+        "sub_category": "ONE_OF_THE_METADATA_CANDIDATES",
+        "audioset_class": "APPROVED_ANALYSIS_LABEL",
+        "decided_by": "RESEARCHER_ROLE_OR_PSEUDONYM",
+        "decided_at": "YYYY-MM-DDTHH:MM:SSZ"
+      }
+    }
+  }
+}

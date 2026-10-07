@@ -1,0 +1,502 @@
+[
+  {
+    "phase": "scale80",
+    "scale": 0.8,
+    "dpr": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "location": {
+      "id": "library",
+      "label": "기본 스폰 및 도서관",
+      "tx": 60,
+      "ty": 47,
+      "landmarkId": "landmark-library",
+      "labelTestId": "world-museum"
+    },
+    "screenshot": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-scale-prototype-2026-10-05/01-scale-80/1440x900-library-dpr2.png",
+    "expectedScale": 0.8,
+    "worldVisualScale": 0.8,
+    "camera": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "cssPxPerWorldX": 0.9590920595169905,
+      "cssPxPerWorldY": 0.9590909090909091
+    },
+    "player": {
+      "x": 667.2500610351562,
+      "y": 399.8873596191406,
+      "left": 667.2500610351562,
+      "top": 399.8873596191406,
+      "right": 772.7500610351562,
+      "bottom": 528.831787109375,
+      "width": 105.5,
+      "height": 128.94442749023438
+    },
+    "playerWrapper": {
+      "x": 685.4727783203125,
+      "y": 444.43182373046875,
+      "left": 685.4727783203125,
+      "top": 444.43182373046875,
+      "right": 754.52734375,
+      "bottom": 528.831787109375,
+      "width": 69.0545654296875,
+      "height": 84.39996337890625
+    },
+    "playerFootScreen": {
+      "x": 720.0000610351562,
+      "y": 521.159063165838
+    },
+    "playerRenderScale": 1.527778,
+    "landmark": {
+      "x": -21.41432762145996,
+      "y": -126.48689270019531,
+      "left": -21.41432762145996,
+      "top": -126.48689270019531,
+      "right": 1460.1426792144775,
+      "bottom": 560.2433929443359,
+      "width": 1481.5570068359375,
+      "height": 686.7302856445312
+    },
+    "landmarkViewportOccupancy": {
+      "width": 1.0288590325249567,
+      "height": 0.813661475882146
+    },
+    "label": {
+      "x": 690.1443481445312,
+      "y": 463.9592590332031,
+      "left": 690.1443481445312,
+      "top": 463.9592590332031,
+      "right": 745.019287109375,
+      "bottom": 483.9593200683594,
+      "width": 54.87493896484375,
+      "height": 20.00006103515625
+    },
+    "labelCssHeight": 20.00006103515625,
+    "touchTarget": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "visibleAssetCount": 9,
+    "pixelDensity": {
+      "samples": 9,
+      "meanX": 1.0428280792875866,
+      "meanY": 1.042954978379603,
+      "minX": 1.0426540033023104,
+      "minY": 1.042654002383803
+    },
+    "performance": {
+      "mapReadyMs": 98.2,
+      "failedAssetCount": 0,
+      "assetResourceCount": 14
+    },
+    "errors": []
+  },
+  {
+    "phase": "scale80",
+    "scale": 0.8,
+    "dpr": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "location": {
+      "id": "home",
+      "label": "우리 집",
+      "tx": 51.5,
+      "ty": 55,
+      "landmarkId": "landmark-home",
+      "labelTestId": "world-home"
+    },
+    "screenshot": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-scale-prototype-2026-10-05/01-scale-80/1440x900-home-dpr2.png",
+    "expectedScale": 0.8,
+    "worldVisualScale": 0.8,
+    "camera": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "cssPxPerWorldX": 0.9590920595169905,
+      "cssPxPerWorldY": 0.9590909090909091
+    },
+    "player": {
+      "x": 667.25,
+      "y": 399.8873596191406,
+      "left": 667.25,
+      "top": 399.8873596191406,
+      "right": 772.75,
+      "bottom": 528.831787109375,
+      "width": 105.5,
+      "height": 128.94442749023438
+    },
+    "playerWrapper": {
+      "x": 685.4727172851562,
+      "y": 444.43182373046875,
+      "left": 685.4727172851562,
+      "top": 444.43182373046875,
+      "right": 754.5272827148438,
+      "bottom": 528.831787109375,
+      "width": 69.0545654296875,
+      "height": 84.39996337890625
+    },
+    "playerFootScreen": {
+      "x": 720,
+      "y": 521.159063165838
+    },
+    "playerRenderScale": 1.527778,
+    "landmark": {
+      "x": 428.4363708496094,
+      "y": 122.1772689819336,
+      "left": 428.4363708496094,
+      "top": 122.1772689819336,
+      "right": 919.4909057617188,
+      "bottom": 582.540885925293,
+      "width": 491.0545349121094,
+      "height": 460.3636169433594
+    },
+    "landmarkViewportOccupancy": {
+      "width": 0.34101009368896484,
+      "height": 0.5454545224447386
+    },
+    "label": {
+      "x": 660.2031860351562,
+      "y": 527.2591552734375,
+      "left": 660.2031860351562,
+      "top": 527.2591552734375,
+      "right": 778.796875,
+      "bottom": 547.2591552734375,
+      "width": 118.59368896484375,
+      "height": 20
+    },
+    "labelCssHeight": 20,
+    "touchTarget": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "visibleAssetCount": 16,
+    "pixelDensity": {
+      "samples": 16,
+      "meanX": 1.0428322777199186,
+      "meanY": 1.0429958691730141,
+      "minX": 1.0426540033023104,
+      "minY": 1.042654002383803
+    },
+    "performance": {
+      "mapReadyMs": 121.3,
+      "failedAssetCount": 0,
+      "assetResourceCount": 17
+    },
+    "errors": []
+  },
+  {
+    "phase": "scale80",
+    "scale": 0.8,
+    "dpr": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "location": {
+      "id": "nature",
+      "label": "자연 마을 입구",
+      "tx": 18.8125,
+      "ty": 41.5625,
+      "landmarkId": "landmark-nature",
+      "labelTestId": "world-portal-nature"
+    },
+    "screenshot": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-scale-prototype-2026-10-05/01-scale-80/1440x900-nature-dpr2.png",
+    "expectedScale": 0.8,
+    "worldVisualScale": 0.8,
+    "camera": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "cssPxPerWorldX": 0.9590920595169905,
+      "cssPxPerWorldY": 0.9590909090909091
+    },
+    "player": {
+      "x": 524.6227416992188,
+      "y": 399.8873596191406,
+      "left": 524.6227416992188,
+      "top": 399.8873596191406,
+      "right": 630.1227416992188,
+      "bottom": 528.831787109375,
+      "width": 105.5,
+      "height": 128.94442749023438
+    },
+    "playerWrapper": {
+      "x": 542.845458984375,
+      "y": 444.43182373046875,
+      "left": 542.845458984375,
+      "top": 444.43182373046875,
+      "right": 611.9000244140625,
+      "bottom": 528.831787109375,
+      "width": 69.0545654296875,
+      "height": 84.39996337890625
+    },
+    "playerFootScreen": {
+      "x": 577.3727416992188,
+      "y": 521.159063165838
+    },
+    "playerRenderScale": 1.527778,
+    "landmark": {
+      "x": 0.000023026899725664407,
+      "y": -213.94967651367188,
+      "left": 0.000023026899725664407,
+      "top": -213.94967651367188,
+      "right": 921.9990464643997,
+      "bottom": 1108.6419982910156,
+      "width": 921.9990234375,
+      "height": 1322.5916748046875
+    },
+    "landmarkViewportOccupancy": {
+      "width": 0.640277099609375,
+      "height": 1.567051747398919
+    },
+    "label": {
+      "x": 529.8180541992188,
+      "y": 527.2591552734375,
+      "left": 529.8180541992188,
+      "top": 527.2591552734375,
+      "right": 623.9275512695312,
+      "bottom": 547.2591552734375,
+      "width": 94.1094970703125,
+      "height": 20
+    },
+    "labelCssHeight": 20,
+    "touchTarget": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "visibleAssetCount": 10,
+    "pixelDensity": {
+      "samples": 10,
+      "meanX": 1.042799359345883,
+      "meanY": 1.042940510037651,
+      "minX": 1.0426539860228865,
+      "minY": 1.0426540033023104
+    },
+    "performance": {
+      "mapReadyMs": 144.6,
+      "failedAssetCount": 0,
+      "assetResourceCount": 14
+    },
+    "errors": []
+  },
+  {
+    "phase": "scale80",
+    "scale": 0.8,
+    "dpr": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "location": {
+      "id": "music",
+      "label": "음악 마을 입구",
+      "tx": 98.9375,
+      "ty": 77.1875,
+      "landmarkId": "landmark-music",
+      "labelTestId": "world-portal-music"
+    },
+    "screenshot": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-scale-prototype-2026-10-05/01-scale-80/1440x900-music-dpr2.png",
+    "expectedScale": 0.8,
+    "worldVisualScale": 0.8,
+    "camera": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "cssPxPerWorldX": 0.9590920595169905,
+      "cssPxPerWorldY": 0.9590909090909091
+    },
+    "player": {
+      "x": 740.8228149414062,
+      "y": 399.8874816894531,
+      "left": 740.8228149414062,
+      "top": 399.8874816894531,
+      "right": 846.3228149414062,
+      "bottom": 528.831787109375,
+      "width": 105.5,
+      "height": 128.94430541992188
+    },
+    "playerWrapper": {
+      "x": 759.0455322265625,
+      "y": 444.43182373046875,
+      "left": 759.0455322265625,
+      "top": 444.43182373046875,
+      "right": 828.10009765625,
+      "bottom": 528.831787109375,
+      "width": 69.0545654296875,
+      "height": 84.39996337890625
+    },
+    "playerFootScreen": {
+      "x": 793.5728149414062,
+      "y": 521.159063165838
+    },
+    "playerRenderScale": 1.527778,
+    "landmark": {
+      "x": 504.0121154785156,
+      "y": -118.25248718261719,
+      "left": 504.0121154785156,
+      "top": -118.25248718261719,
+      "right": 1440.0001525878906,
+      "bottom": 841.8982086181641,
+      "width": 935.988037109375,
+      "height": 960.1506958007812
+    },
+    "landmarkViewportOccupancy": {
+      "width": 0.649991692437066,
+      "height": 1.1376193078208308
+    },
+    "label": {
+      "x": 746.0184326171875,
+      "y": 527.25927734375,
+      "left": 746.0184326171875,
+      "top": 527.25927734375,
+      "right": 840.1276245117188,
+      "bottom": 547.2591552734375,
+      "width": 94.10919189453125,
+      "height": 19.9998779296875
+    },
+    "labelCssHeight": 19.9998779296875,
+    "touchTarget": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "visibleAssetCount": 9,
+    "pixelDensity": {
+      "samples": 9,
+      "meanX": 1.0429016822885437,
+      "meanY": 1.0433075178319666,
+      "minX": 1.0426540033023104,
+      "minY": 1.0426540724200117
+    },
+    "performance": {
+      "mapReadyMs": 99.2,
+      "failedAssetCount": 0,
+      "assetResourceCount": 12
+    },
+    "errors": []
+  },
+  {
+    "phase": "scale80",
+    "scale": 0.8,
+    "dpr": 2,
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "location": {
+      "id": "animal",
+      "label": "동물 마을 입구",
+      "tx": 100.4375,
+      "ty": 23.1875,
+      "landmarkId": "landmark-animal",
+      "labelTestId": "world-portal-animal"
+    },
+    "screenshot": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-scale-prototype-2026-10-05/01-scale-80/1440x900-animal-dpr2.png",
+    "expectedScale": 0.8,
+    "worldVisualScale": 0.8,
+    "camera": {
+      "viewW": 1501.42,
+      "viewH": 880,
+      "cssPxPerWorldX": 0.9590920595169905,
+      "cssPxPerWorldY": 0.9590909090909091
+    },
+    "player": {
+      "x": 786.8591918945312,
+      "y": 399.8873596191406,
+      "left": 786.8591918945312,
+      "top": 399.8873596191406,
+      "right": 892.3591918945312,
+      "bottom": 528.831787109375,
+      "width": 105.5,
+      "height": 128.94442749023438
+    },
+    "playerWrapper": {
+      "x": 805.0819091796875,
+      "y": 444.43182373046875,
+      "left": 805.0819091796875,
+      "top": 444.43182373046875,
+      "right": 874.136474609375,
+      "bottom": 528.831787109375,
+      "width": 69.0545654296875,
+      "height": 84.39996337890625
+    },
+    "playerFootScreen": {
+      "x": 839.6091918945312,
+      "y": 521.159063165838
+    },
+    "playerRenderScale": 1.527778,
+    "landmark": {
+      "x": 567.5982666015625,
+      "y": -107.82438659667969,
+      "left": 567.5982666015625,
+      "top": -107.82438659667969,
+      "right": 1440.0001220703125,
+      "bottom": 528.0370025634766,
+      "width": 872.40185546875,
+      "height": 635.8613891601562
+    },
+    "landmarkViewportOccupancy": {
+      "width": 0.6058346218532986,
+      "height": 0.7533902715167728
+    },
+    "label": {
+      "x": 792.0548095703125,
+      "y": 527.2591552734375,
+      "left": 792.0548095703125,
+      "top": 527.2591552734375,
+      "right": 886.1639404296875,
+      "bottom": 547.2591552734375,
+      "width": 94.109130859375,
+      "height": 20
+    },
+    "labelCssHeight": 20,
+    "touchTarget": {
+      "x": 0,
+      "y": 0,
+      "left": 0,
+      "top": 0,
+      "right": 0,
+      "bottom": 0,
+      "width": 0,
+      "height": 0
+    },
+    "visibleAssetCount": 11,
+    "pixelDensity": {
+      "samples": 11,
+      "meanX": 1.0429553951310995,
+      "meanY": 1.0431407342213936,
+      "minX": 1.0426540033023104,
+      "minY": 1.0426540033023104
+    },
+    "performance": {
+      "mapReadyMs": 118.1,
+      "failedAssetCount": 0,
+      "assetResourceCount": 12
+    },
+    "errors": []
+  }
+]

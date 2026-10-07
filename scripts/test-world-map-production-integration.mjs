@@ -14,12 +14,15 @@ import {
   WORLD_SPAWN,
   WORLD_WALKABLE_MASK_META,
   isWorldPlayerWalkable,
+  worldDestinationContainsFoot,
   worldDestinationHitbox,
   worldDestinationInteractionPoint,
   worldPlayerTopLeftAtFoot,
   worldRectanglesOverlap,
+  worldZoneEntrancePosition,
 } from '../lib/worldMapGeometry.mjs'
 import { WORLD_MAP_V4_ASSET_IDS, WORLD_MAP_V4_ASSETS } from '../lib/worldMapV4Assets.mjs'
+import { resolveWorldVisualScale, WORLD_DEFAULT_VISUAL_SCALE, WORLD_VISUAL_SCALES } from '../lib/worldMapCamera.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const REVIEW_DIR = path.join(ROOT, '_review/world-map-sequential-fix-2026-09-21/03-navigation-open-paths')
@@ -29,6 +32,12 @@ for (const argument of args) {
 }
 const writeReport = args.has('--report')
 const read = relativePath => readFile(path.join(ROOT, relativePath), 'utf8')
+
+assert.equal(WORLD_DEFAULT_VISUAL_SCALE, 1)
+assert.deepEqual(WORLD_VISUAL_SCALES, [1])
+for (const value of [undefined, null, '', 'invalid', 1, .8, .75]) {
+  assert.equal(resolveWorldVisualScale(value), 1, `fixed camera ignores ${String(value)}`)
+}
 
 const [pageSource, worldSource, sceneSource, actorSource, engineSource, interiorSource] = await Promise.all([
   read('app/page.js'),
@@ -40,7 +49,14 @@ const [pageSource, worldSource, sceneSource, actorSource, engineSource, interior
 ])
 
 assert.match(pageSource, /if \(screen === 'world'\)[\s\S]*?<WorldMap[\s\S]*?onEnterZone=\{handleEnterZone\}[\s\S]*?onEnterMuseum=\{handleEnterMuseum\}[\s\S]*?onEnterHouse=\{handleEnterHouse\}/)
+assert.match(pageSource, /setWorldReturnZone\(activeZone\)[\s\S]{0,180}?setScreen\('world'\)/)
+assert.match(pageSource, /initialZone=\{worldReturnZone\}/)
+assert.match(worldSource, /worldZoneEntrancePosition\(initialZone, TILE\)/)
 assert.match(worldSource, /<WorldMapScene/)
+assert.match(worldSource, /viewBox="0 0 3840 2880"/)
+assert.match(worldSource, /data-world-render-mode=\{WORLD_MAP_RENDER_MODE\}/)
+assert.doesNotMatch(worldSource, /<WorldMinimap|<WorldMapOverlay/)
+assert.match(sceneSource, /data-layer="flat-background"/)
 assert.match(sceneSource, /queryWorldMapObjects\(camera\)/)
 assert.match(sceneSource, /data-layer="depth-sorted"/)
 assert.match(sceneSource, /data-layer="foreground"/)
@@ -54,7 +70,7 @@ const zoneComponents = {
   Animal: 'AnimalZoneMap',
   Nature: 'NatureZoneMap',
   Human: 'HumanZoneMap',
-  Urban: 'UrbanZoneMap',
+  Urban: 'UrbanV3ZoneMap',
   Music: 'MusicZoneMap',
   Lab: 'LabZoneMap',
 }
@@ -66,15 +82,32 @@ for (const [zone, component] of Object.entries(zoneComponents)) {
 assert.match(pageSource, /if \(screen === 'museum'\)[\s\S]*?<SoundMuseum[\s\S]*?onExit=\{handleMuseumExit\}/)
 assert.match(pageSource, /if \(screen === 'house'\)[\s\S]*?<InteriorDecorRoom[\s\S]*?onExit=\{handleExitHouse\}/)
 assert.match(pageSource, /const ZONES_LOCKED_AT_START = ZONES\.filter\(z => z !== FIRST_ZONE\)/)
-assert.match(pageSource, /const TEMPORARILY_UNLOCK_ALL_ZONES = true/)
 assert.match(pageSource, /activeZone === FIRST_ZONE && currentBlock === 1 && allDone && !villagesUnlocked/)
-assert.match(pageSource, /const allZonesUnlocked = !worldLockQaEnabled && \([\s\S]{0,180}?TEMPORARILY_UNLOCK_ALL_ZONES/)
+if (pageSource.includes("from '@/lib/temporaryUnlocks'")) {
+  const unlockSource = await read('lib/temporaryUnlocks.js')
+  assert.match(pageSource, /import \{ INTERNAL_BROWSER_QA, TEMPORARILY_UNLOCK_ALL_CONTENT \} from '@\/lib\/temporaryUnlocks'/)
+  assert.match(unlockSource, /export const TEMPORARILY_UNLOCK_ALL_CONTENT = process\.env\.NODE_ENV === 'development'/)
+  assert.match(pageSource, /const allZonesUnlocked = !worldLockQaEnabled && \([\s\S]{0,180}?TEMPORARILY_UNLOCK_ALL_CONTENT/)
+} else {
+  assert.match(pageSource, /const TEMPORARILY_UNLOCK_ALL_ZONES = true/)
+  assert.match(pageSource, /const allZonesUnlocked = !worldLockQaEnabled && \([\s\S]{0,180}?TEMPORARILY_UNLOCK_ALL_ZONES/)
+}
 assert.match(pageSource, /lockedZones=\{allZonesUnlocked \? \[\] : ZONES_LOCKED_AT_START\}/)
 
 assert.match(pageSource, /process\.env\.NODE_ENV === 'development'[\s\S]{0,260}?worldOverview/)
 assert.match(pageSource, /process\.env\.NODE_ENV === 'development' && query\.get\('natureQa'\) === '1'/)
 assert.match(pageSource, /process\.env\.NODE_ENV === 'development' && query\.get\('worldLockQa'\) === '1'/)
-assert.match(worldSource, /process\.env\.NODE_ENV !== 'development'[\s\S]{0,220}?collisionDebug\s*:\s*false/)
+if (worldSource.includes('const internalBrowserQa')) {
+  assert.match(worldSource, /const internalBrowserQa = process\.env\.NODE_ENV === 'development'[\s\S]{0,160}?NEXT_PUBLIC_ENABLE_INTERNAL_BROWSER_QA === 'true'/)
+  if (worldSource.includes('DEFAULT_WORLD_QA')) {
+    assert.match(worldSource, /DEFAULT_WORLD_QA = Object\.freeze\(\{[\s\S]{0,180}?collisionDebug\s*:\s*false/)
+    assert.match(worldSource, /typeof window === 'undefined' \|\| !internalBrowserQa[\s\S]{0,120}?return DEFAULT_WORLD_QA/)
+  } else {
+    assert.match(worldSource, /typeof window === 'undefined' \|\| !internalBrowserQa[\s\S]{0,220}?collisionDebug\s*:\s*false/)
+  }
+} else {
+  assert.match(worldSource, /process\.env\.NODE_ENV !== 'development'[\s\S]{0,220}?collisionDebug\s*:\s*false/)
+}
 for (const queryName of ['worldClean', 'worldCapture', 'worldOverview', 'worldStart', 'worldCollisionDebug', 'worldReferenceOverlay', 'worldLayer', 'natureQa']) {
   assert.ok(pageSource.includes(queryName) || worldSource.includes(queryName), `${queryName} remains auditable`)
 }
@@ -94,6 +127,10 @@ assert.match(interiorSource, /data-room-load-state=\{loadError \? 'fallback' : '
 assert.match(interiorSource, /disabled=\{loadError \|\| !mutationsAllowed\} onClick=\{startEdit\}/)
 
 const runtimeAssets = [
+  'public/assets/world/spring-sound-archive-garden-flat-v2/world-map-flat-v2.webp',
+  'public/assets/world/spring-sound-archive-garden-flat-v2/world-map-flat-v2.png',
+  'public/assets/world/spring-sound-archive-garden-flat-v2/walkable-clearance-mask.png',
+  'public/assets/world/spring-sound-archive-garden-flat-v2/collision-debug.png',
   ...WORLD_MAP_V4_ASSET_IDS.map(assetId => `public${WORLD_MAP_V4_ASSETS[assetId].src}`),
   'public/assets/world/sound-archive-garden-v4/walkable-clearance-mask.png',
   'public/assets/world/sound-archive-garden-v4/obstacle-mask.png',
@@ -123,6 +160,12 @@ for (const destination of WORLD_DESTINATIONS) {
   assert.ok(target.ty + target.h <= WORLD_MAP_HEIGHT_TILES, `${destination.id} height stays inside map`)
   const interaction = worldDestinationInteractionPoint(target)
   assert.ok(isWorldPlayerWalkable(...Object.values(worldPlayerTopLeftAtFoot(interaction.x / WORLD_MAP_TILE_SIZE, interaction.y / WORLD_MAP_TILE_SIZE))), `${destination.id} interaction point is walkable`)
+}
+for (const portal of WORLD_PORTALS) {
+  const entrancePosition = worldZoneEntrancePosition(portal.zone)
+  assert.ok(entrancePosition, `${portal.zone} has a world return entrance`)
+  assert.ok(isWorldPlayerWalkable(entrancePosition.x, entrancePosition.y), `${portal.zone} return entrance is walkable`)
+  assert.ok(worldDestinationContainsFoot(entrancePosition, portal), `${portal.zone} return entrance stays at its portal`)
 }
 for (let i = 0; i < WORLD_DESTINATIONS.length; i += 1) {
   for (let j = i + 1; j < WORLD_DESTINATIONS.length; j += 1) {

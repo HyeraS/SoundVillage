@@ -1,0 +1,8 @@
+2026-09-04 final source
+command: node --test lib/studyAccess.test.mjs lib/natureFarmLayout.test.mjs
+exit: 0
+tests: 8 passed / 0 failed
+
+Covered: two traversable bridges, water/building/crop/trunk/rail collisions,
+large-dt anti-tunneling and axis sliding, Nature A/B/combined deterministic
+placement and reachability, Study access normalization and fixed-group lookup.

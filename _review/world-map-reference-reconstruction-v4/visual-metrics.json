@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "referenceSize": [
+    2896,
+    2172
+  ],
+  "hdRuntimeSize": [
+    5792,
+    4344
+  ],
+  "reconstructionSize": [
+    2896,
+    2172
+  ],
+  "meanRgbAbsoluteError255": 1.4715162994448006,
+  "differentPixelBounds": [
+    0,
+    0,
+    2896,
+    2172
+  ],
+  "hdMasterMeanRgbAbsoluteError255": 0.0,
+  "hdMasterDifferentPixelBounds": null,
+  "terrainPanelCount": 12,
+  "semanticLayerCount": 18,
+  "assetCount": 31,
+  "coordinateTransform": "worldX=referenceX*(3840/2896); worldY=referenceY*(2880/2172)"
+}

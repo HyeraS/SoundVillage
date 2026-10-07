@@ -59,7 +59,9 @@ function TestInner() {
       }
 
       if (mode === 'peek') {
-        const status = await getAttendanceStatus(claimedPid)
+        const statusResult = await getAttendanceStatus(claimedPid)
+        if (!statusResult.ok) throw new Error(statusResult.code)
+        const status = statusResult.data
         setResult(status)
         push(`오늘 상태: ${status.today ? `streak_day=${status.today.streak_day}, reward=${status.today.reward_currency}` : '아직 출석 안 함'}`)
         push('=== 완료(peek) ===')
@@ -82,7 +84,9 @@ function TestInner() {
       const after = await getCurrencyBalance(claimedPid)
       push(`체크인 후 잔액: ${after} (증가분 ${after - before})`)
 
-      const status = await getAttendanceStatus(claimedPid)
+      const statusResult = await getAttendanceStatus(claimedPid)
+      if (!statusResult.ok) throw new Error(statusResult.code)
+      const status = statusResult.data
       setResult({ before, after, delta: after - before, checkIn: row, status })
       push('=== 완료 ===')
     })().catch(err => { push('ERROR: ' + (err?.message || String(err))); console.error(err) })

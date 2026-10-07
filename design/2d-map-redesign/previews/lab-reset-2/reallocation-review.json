@@ -1,0 +1,572 @@
+{
+  "method": "36 deterministic global packings at64px, then constrained region assignment; heuristic not maximum-capacity proof",
+  "candidateGridPoints": 652,
+  "bestGlobalPacking": 67,
+  "expandedRegionCounts": [
+    {
+      "block": 1,
+      "need": 15,
+      "assigned": 10
+    },
+    {
+      "block": 2,
+      "need": 15,
+      "assigned": 6
+    },
+    {
+      "block": 3,
+      "need": 15,
+      "assigned": 12
+    },
+    {
+      "block": 4,
+      "need": 15,
+      "assigned": 11
+    },
+    {
+      "block": 5,
+      "need": 15,
+      "assigned": 13
+    },
+    {
+      "block": 6,
+      "need": 10,
+      "assigned": 6
+    }
+  ],
+  "remainingNeed": 27,
+  "geometryChanged": false,
+  "primarySlotFileChanged": false,
+  "points": [
+    {
+      "x": 576,
+      "y": 256,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 944,
+      "y": 256,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 1008,
+      "y": 256,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 720,
+      "y": 272,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 784,
+      "y": 272,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 624,
+      "y": 304,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 848,
+      "y": 304,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 288,
+      "y": 320,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 912,
+      "y": 320,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 976,
+      "y": 320,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 1312,
+      "y": 320,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1376,
+      "y": 320,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 688,
+      "y": 336,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 336,
+      "y": 368,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 1312,
+      "y": 384,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1376,
+      "y": 384,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 816,
+      "y": 400,
+      "blocks": [
+        4
+      ],
+      "block": 4
+    },
+    {
+      "x": 1152,
+      "y": 400,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1216,
+      "y": 400,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 176,
+      "y": 416,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 384,
+      "y": 416,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 304,
+      "y": 432,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 1296,
+      "y": 448,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1360,
+      "y": 448,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1152,
+      "y": 464,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 352,
+      "y": 480,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 560,
+      "y": 480,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 1360,
+      "y": 512,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 352,
+      "y": 544,
+      "blocks": [
+        3
+      ],
+      "block": 3
+    },
+    {
+      "x": 1152,
+      "y": 576,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 1024,
+      "y": 608,
+      "blocks": [
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 464,
+      "y": 704,
+      "blocks": [
+        2
+      ],
+      "block": 2
+    },
+    {
+      "x": 1088,
+      "y": 736,
+      "blocks": [
+        6
+      ],
+      "block": 6
+    },
+    {
+      "x": 512,
+      "y": 752,
+      "blocks": [
+        2
+      ],
+      "block": 2
+    },
+    {
+      "x": 880,
+      "y": 752,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 448,
+      "y": 768,
+      "blocks": [
+        2
+      ],
+      "block": 2
+    },
+    {
+      "x": 576,
+      "y": 800,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 816,
+      "y": 800,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 928,
+      "y": 800,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 1072,
+      "y": 800,
+      "blocks": [
+        6
+      ],
+      "block": 6
+    },
+    {
+      "x": 640,
+      "y": 816,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 1136,
+      "y": 816,
+      "blocks": [
+        6
+      ],
+      "block": 6
+    },
+    {
+      "x": 704,
+      "y": 832,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 816,
+      "y": 864,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 1072,
+      "y": 864,
+      "blocks": [
+        6
+      ],
+      "block": 6
+    },
+    {
+      "x": 688,
+      "y": 896,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 816,
+      "y": 928,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 688,
+      "y": 960,
+      "blocks": [
+        1
+      ],
+      "block": 1
+    },
+    {
+      "x": 512,
+      "y": 256,
+      "blocks": [
+        3,
+        4
+      ],
+      "block": 3
+    },
+    {
+      "x": 512,
+      "y": 320,
+      "blocks": [
+        3,
+        4
+      ],
+      "block": 3
+    },
+    {
+      "x": 1024,
+      "y": 368,
+      "blocks": [
+        4,
+        5
+      ],
+      "block": 5
+    },
+    {
+      "x": 496,
+      "y": 384,
+      "blocks": [
+        3,
+        4
+      ],
+      "block": 3
+    },
+    {
+      "x": 496,
+      "y": 448,
+      "blocks": [
+        3,
+        4
+      ],
+      "block": 3
+    },
+    {
+      "x": 224,
+      "y": 592,
+      "blocks": [
+        2,
+        3
+      ],
+      "block": 2
+    },
+    {
+      "x": 288,
+      "y": 592,
+      "blocks": [
+        2,
+        3
+      ],
+      "block": 2
+    },
+    {
+      "x": 1312,
+      "y": 592,
+      "blocks": [
+        5,
+        6
+      ],
+      "block": 6
+    },
+    {
+      "x": 352,
+      "y": 608,
+      "blocks": [
+        2,
+        3
+      ],
+      "block": 2
+    },
+    {
+      "x": 1216,
+      "y": 608,
+      "blocks": [
+        5,
+        6
+      ],
+      "block": 6
+    }
+  ],
+  "proposedRegions": [
+    {
+      "id": "B1",
+      "type": "rect",
+      "x": 572.817679558011,
+      "y": 742.5414364640884,
+      "w": 397.7900552486188,
+      "h": 233.37016574585635,
+      "note": "manual ground contact"
+    },
+    {
+      "id": "B2",
+      "type": "rect",
+      "x": 73.19337016574585,
+      "y": 583.4254143646409,
+      "w": 480.5303867403315,
+      "h": 316.11049723756906,
+      "note": "manual ground contact"
+    },
+    {
+      "id": "B3",
+      "type": "rect",
+      "x": 73.19337016574585,
+      "y": 250.34254143646407,
+      "w": 489.01657458563534,
+      "h": 407.3370165745856,
+      "note": "manual ground contact"
+    },
+    {
+      "id": "B4",
+      "type": "rect",
+      "x": 472.0441988950276,
+      "y": 152.75138121546962,
+      "w": 584.4861878453038,
+      "h": 302.3204419889503,
+      "note": "manual ground contact"
+    },
+    {
+      "id": "B5",
+      "type": "rect",
+      "x": 1008.7955801104972,
+      "y": 250.34254143646407,
+      "w": 452.9502762430939,
+      "h": 405.21546961325964,
+      "note": "manual ground contact"
+    },
+    {
+      "id": "B6",
+      "type": "rect",
+      "x": 1033.1933701657458,
+      "y": 583.4254143646409,
+      "w": 428.55248618784526,
+      "h": 316.11049723756906,
+      "note": "manual ground contact"
+    }
+  ]
+}

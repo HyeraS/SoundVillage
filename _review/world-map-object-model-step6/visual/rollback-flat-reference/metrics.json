@@ -1,0 +1,1196 @@
+[
+  {
+    "screen": "spawn",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/spawn-1280x720.png",
+    "metrics": {
+      "imageNodes": 12,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 45236356,
+      "assetResourceCount": 9,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        }
+      ]
+    }
+  },
+  {
+    "screen": "library",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/library-1280x720.png",
+    "metrics": {
+      "imageNodes": 14,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 52609156,
+      "assetResourceCount": 11,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        },
+        {
+          "bottom": 610,
+          "left": 477,
+          "right": 803,
+          "top": 531
+        }
+      ]
+    }
+  },
+  {
+    "screen": "objects",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/objects-1280x720.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-north-forest",
+        "environment-west-stream-forest",
+        "environment-east-forest",
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-forest",
+        "environment-south-center-garden",
+        "landmark-guesthouse",
+        "landmark-lab",
+        "landmark-animal",
+        "landmark-library",
+        "landmark-nature",
+        "landmark-urban",
+        "landmark-home",
+        "landmark-human",
+        "landmark-music"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "foreground",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/foreground-1280x720.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [
+        "foreground-south-gate"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 130212976,
+      "assetResourceCount": 31,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/foreground-south-gate.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "collision",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/collision-1280x720.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/collision-debug.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "minimap-library",
+    "viewport": "1280x720",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/minimap-library-1280x720.png",
+    "metrics": {
+      "imageNodes": 14,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 52609156,
+      "assetResourceCount": 11,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        },
+        {
+          "bottom": 610,
+          "left": 477,
+          "right": 803,
+          "top": 531
+        }
+      ]
+    }
+  },
+  {
+    "screen": "spawn",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/spawn-1440x900.png",
+    "metrics": {
+      "imageNodes": 12,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 45236356,
+      "assetResourceCount": 9,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        }
+      ]
+    }
+  },
+  {
+    "screen": "library",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/library-1440x900.png",
+    "metrics": {
+      "imageNodes": 14,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 52609156,
+      "assetResourceCount": 11,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        },
+        {
+          "bottom": 790,
+          "left": 557,
+          "right": 883,
+          "top": 711
+        }
+      ]
+    }
+  },
+  {
+    "screen": "objects",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/objects-1440x900.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-north-forest",
+        "environment-west-stream-forest",
+        "environment-east-forest",
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-forest",
+        "environment-south-center-garden",
+        "landmark-guesthouse",
+        "landmark-lab",
+        "landmark-animal",
+        "landmark-library",
+        "landmark-nature",
+        "landmark-urban",
+        "landmark-home",
+        "landmark-human",
+        "landmark-music"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "foreground",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/foreground-1440x900.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [
+        "foreground-south-gate"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 130212976,
+      "assetResourceCount": 31,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/foreground-south-gate.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "collision",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/collision-1440x900.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/collision-debug.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "minimap-library",
+    "viewport": "1440x900",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/minimap-library-1440x900.png",
+    "metrics": {
+      "imageNodes": 14,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 52609156,
+      "assetResourceCount": 11,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 263,
+          "left": 201,
+          "right": 224,
+          "top": 240
+        },
+        {
+          "bottom": 790,
+          "left": 557,
+          "right": 883,
+          "top": 711
+        }
+      ]
+    }
+  },
+  {
+    "screen": "spawn",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/spawn-390x844.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-center-garden",
+        "landmark-lab",
+        "landmark-library",
+        "landmark-home"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 60670536,
+      "assetResourceCount": 14,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 233,
+          "left": 346,
+          "right": 365,
+          "top": 214
+        }
+      ]
+    }
+  },
+  {
+    "screen": "library",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/library-390x844.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-center-garden",
+        "landmark-lab",
+        "landmark-library",
+        "landmark-home"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 60670536,
+      "assetResourceCount": 14,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 233,
+          "left": 346,
+          "right": 365,
+          "top": 214
+        },
+        {
+          "bottom": 732,
+          "left": 87,
+          "right": 303,
+          "top": 679
+        }
+      ]
+    }
+  },
+  {
+    "screen": "objects",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/objects-390x844.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-north-forest",
+        "environment-west-stream-forest",
+        "environment-east-forest",
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-forest",
+        "environment-south-center-garden",
+        "landmark-guesthouse",
+        "landmark-lab",
+        "landmark-animal",
+        "landmark-library",
+        "landmark-nature",
+        "landmark-urban",
+        "landmark-home",
+        "landmark-human",
+        "landmark-music"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "foreground",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/foreground-390x844.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [
+        "foreground-south-gate"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 130212976,
+      "assetResourceCount": 31,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/foreground-south-gate.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "collision",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/collision-390x844.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/collision-debug.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "minimap-library",
+    "viewport": "390x844",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/minimap-library-390x844.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-center-garden",
+        "landmark-lab",
+        "landmark-library",
+        "landmark-home"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 60670536,
+      "assetResourceCount": 14,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 233,
+          "left": 346,
+          "right": 365,
+          "top": 214
+        },
+        {
+          "bottom": 732,
+          "left": 87,
+          "right": 303,
+          "top": 679
+        }
+      ]
+    }
+  },
+  {
+    "screen": "spawn",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/spawn-844x390.png",
+    "metrics": {
+      "imageNodes": 12,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 45236356,
+      "assetResourceCount": 9,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 190,
+          "left": 112,
+          "right": 135,
+          "top": 167
+        }
+      ]
+    }
+  },
+  {
+    "screen": "library",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/library-844x390.png",
+    "metrics": {
+      "imageNodes": 12,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 45236356,
+      "assetResourceCount": 9,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 190,
+          "left": 112,
+          "right": 135,
+          "top": 167
+        },
+        {
+          "bottom": 280,
+          "left": 259,
+          "right": 585,
+          "top": 201
+        }
+      ]
+    }
+  },
+  {
+    "screen": "objects",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/objects-844x390.png",
+    "metrics": {
+      "imageNodes": 17,
+      "visibleObjectIds": [
+        "environment-north-forest",
+        "environment-west-stream-forest",
+        "environment-east-forest",
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "environment-south-forest",
+        "environment-south-center-garden",
+        "landmark-guesthouse",
+        "landmark-lab",
+        "landmark-animal",
+        "landmark-library",
+        "landmark-nature",
+        "landmark-urban",
+        "landmark-home",
+        "landmark-human",
+        "landmark-music"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "foreground",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/foreground-844x390.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [
+        "foreground-south-gate"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 130212976,
+      "assetResourceCount": 31,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/foreground-south-gate.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "collision",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/collision-844x390.png",
+    "metrics": {
+      "imageNodes": 1,
+      "visibleObjectIds": [],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 128493076,
+      "assetResourceCount": 30,
+      "assetRequests": [
+        "/assets/world/sound-archive-garden-v4/collision-debug.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-east-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-north-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-center-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-south-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-west-stream-forest.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-animal.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-lab.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-music.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-nature.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-urban.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-0.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-3.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": []
+    }
+  },
+  {
+    "screen": "minimap-library",
+    "viewport": "844x390",
+    "file": "/Users/hyera/Documents/SoundVillage-house-decor-2d/_review/world-map-object-model-step6/visual/rollback-flat-reference/minimap-library-844x390.png",
+    "metrics": {
+      "imageNodes": 12,
+      "visibleObjectIds": [
+        "environment-central-gardens",
+        "environment-southwest-garden",
+        "environment-southeast-garden",
+        "landmark-library",
+        "landmark-home",
+        "landmark-human"
+      ],
+      "failedAssetCount": 0,
+      "decodedAssetBytes": 45236356,
+      "assetResourceCount": 9,
+      "assetRequests": [
+        "/assets/world/player_body.png",
+        "/assets/world/player_clothes.png",
+        "/assets/world/player_hair.png",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-home-hub.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp"
+      ],
+      "animated": [
+        {
+          "bottom": 190,
+          "left": 112,
+          "right": 135,
+          "top": 167
+        },
+        {
+          "bottom": 280,
+          "left": 259,
+          "right": 585,
+          "top": 201
+        }
+      ]
+    }
+  }
+]

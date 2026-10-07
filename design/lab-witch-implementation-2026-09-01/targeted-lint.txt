@@ -1,0 +1,5 @@
+2026-09-04 final source
+command: npx eslint components/LabZoneMap.js lib/labVillage.js lib/labVillageConfig.mjs scripts/test_lab_production.mjs scripts/render_lab_review.mjs scripts/labQaControls.jsx scripts/lab_qa_server.mjs
+exit: 0
+errors: 0
+warnings: 0

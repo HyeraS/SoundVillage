@@ -1,0 +1,51 @@
+{
+  "pass": true,
+  "metadata": {
+    "groupA": 83,
+    "groupB": 83,
+    "bypass": 166,
+    "blocks": {
+      "1": 15,
+      "2": 15,
+      "3": 15,
+      "4": 15,
+      "5": 15,
+      "6": 8
+    }
+  },
+  "slots": {
+    "primary": 83,
+    "safeCapacity": 837
+  },
+  "collision": {
+    "stage": 1,
+    "gatePosts": 2,
+    "buildings": 4,
+    "map": "48x36"
+  },
+  "assets": 54
+}
+(node:79209) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///Users/hyera/Documents/SoundVillage-house-decor-2d/lib/urbanAssetArt.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /Users/hyera/Documents/SoundVillage-house-decor-2d/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+Urban production validation passed
+  world: 48x36 tiles · 8 buildings · elevated metro + 30 props
+  safe slot capacity: 1:44 / 2:75 / 3:60 / 4:70 / 5:38 / 6:16
+  production sounds: A 83 / B 83 · deterministic, unique, reachable
+✔ Brookside layout has exactly two traversable bridges and no walkable islands (5.407166ms)
+✔ water, buildings, crop footprints, tree trunks and bridge rails collide at the feet (0.510291ms)
+✔ large dt movement cannot tunnel through creek and blocked axes still slide (0.821791ms)
+✔ Nature group A items are complete, unique, deterministic and reachable by block (14.081541ms)
+✔ Nature group B items are complete, unique, deterministic and reachable by block (4.830958ms)
+✔ group-bypass A+B research list still gets unique reachable positions (2.482125ms)
+✔ normalizes study access IDs and detects special access (0.393667ms)
+✔ resolves the fixed group for group-scoped study access IDs (0.072792ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 77.232291

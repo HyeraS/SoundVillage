@@ -1,0 +1,335 @@
+{
+  "schemaVersion": 1,
+  "scope": "offline art review only; no production integration",
+  "measurementMethod": {
+    "luminance": "Rec.709",
+    "gradient": "x/y central difference, Euclidean magnitude",
+    "alphaThreshold": 16,
+    "strongEdgeThreshold": 48,
+    "detailEdgeThreshold": 32
+  },
+  "approvalBand": {
+    "meanEdge": [
+      7.1,
+      10.64
+    ],
+    "strongEdgeMax": 0.08,
+    "strongEdgePreferred": 0.05
+  },
+  "comparisons": {
+    "Current Home": {
+      "pixelSize": [
+        448,
+        384
+      ],
+      "alphaBbox0": {
+        "left": 30,
+        "top": 5,
+        "right": 408,
+        "bottom": 375,
+        "width": 378,
+        "height": 370
+      },
+      "alphaBbox8": {
+        "left": 83,
+        "top": 26,
+        "right": 406,
+        "bottom": 327,
+        "width": 323,
+        "height": 301
+      },
+      "alphaBbox16": {
+        "left": 83,
+        "top": 26,
+        "right": 406,
+        "bottom": 327,
+        "width": 323,
+        "height": 301
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 21.4389,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.091938,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.221092,
+        "visiblePixelCount": 73223
+      },
+      "alphaComponents16": {
+        "componentCount": 1,
+        "largestComponentPixels": 73223,
+        "smallComponentCountLt9": 0,
+        "isolatedPixelCount": 0
+      }
+    },
+    "Candidate A": {
+      "pixelSize": [
+        352,
+        301
+      ],
+      "alphaBbox0": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "alphaBbox8": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "alphaBbox16": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 9.5236,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.027513,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.058612,
+        "visiblePixelCount": 81997
+      },
+      "alphaComponents16": {
+        "componentCount": 1,
+        "largestComponentPixels": 81997,
+        "smallComponentCountLt9": 0,
+        "isolatedPixelCount": 0
+      },
+      "aspectProcessing": {
+        "sourceAspect": 1.1762162162162162,
+        "croppedAspect": 1.1697297297297298,
+        "cropPercent": 0.5514705882352922
+      }
+    },
+    "Candidate B": {
+      "pixelSize": [
+        352,
+        301
+      ],
+      "alphaBbox0": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "alphaBbox8": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "alphaBbox16": {
+        "left": 0,
+        "top": 0,
+        "right": 352,
+        "bottom": 301,
+        "width": 352,
+        "height": 301
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 10.2909,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.030146,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.066623,
+        "visiblePixelCount": 75034
+      },
+      "alphaComponents16": {
+        "componentCount": 1,
+        "largestComponentPixels": 75034,
+        "smallComponentCountLt9": 0,
+        "isolatedPixelCount": 0
+      },
+      "aspectProcessing": {
+        "sourceAspect": 1.1865079365079365,
+        "croppedAspect": 1.1696428571428572,
+        "cropPercent": 1.421404682274252
+      }
+    },
+    "Library": {
+      "pixelSize": [
+        1545,
+        717
+      ],
+      "alphaBbox0": {
+        "left": 0,
+        "top": 11,
+        "right": 1542,
+        "bottom": 714,
+        "width": 1542,
+        "height": 703
+      },
+      "alphaBbox8": {
+        "left": 0,
+        "top": 13,
+        "right": 1540,
+        "bottom": 712,
+        "width": 1540,
+        "height": 699
+      },
+      "alphaBbox16": {
+        "left": 0,
+        "top": 13,
+        "right": 1539,
+        "bottom": 711,
+        "width": 1539,
+        "height": 698
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 8.001,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.008541,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.031227,
+        "visiblePixelCount": 1000114
+      },
+      "alphaComponents16": {
+        "componentCount": 1,
+        "largestComponentPixels": 1000114,
+        "smallComponentCountLt9": 0,
+        "isolatedPixelCount": 0
+      }
+    },
+    "Guesthouse": {
+      "pixelSize": [
+        816,
+        597
+      ],
+      "alphaBbox0": {
+        "left": 24,
+        "top": 37,
+        "right": 813,
+        "bottom": 594,
+        "width": 789,
+        "height": 557
+      },
+      "alphaBbox8": {
+        "left": 26,
+        "top": 39,
+        "right": 811,
+        "bottom": 591,
+        "width": 785,
+        "height": 552
+      },
+      "alphaBbox16": {
+        "left": 26,
+        "top": 39,
+        "right": 810,
+        "bottom": 591,
+        "width": 784,
+        "height": 552
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 9.7338,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.008471,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.043848,
+        "visiblePixelCount": 369388
+      },
+      "alphaComponents16": {
+        "componentCount": 1,
+        "largestComponentPixels": 369388,
+        "smallComponentCountLt9": 0,
+        "isolatedPixelCount": 0
+      }
+    }
+  },
+  "candidateChecks": {
+    "Candidate A": {
+      "meanEdgeInBand": true,
+      "strongEdgeAtMost8Pct": true,
+      "strongEdgePreferredAtMost5Pct": true,
+      "visibleSizeWithinTolerance": true,
+      "opaquePixelsWorldXGte1824": 0,
+      "doorAxisErrorPx": 0,
+      "isolatedAlphaPixels16": 0
+    },
+    "Candidate B": {
+      "meanEdgeInBand": true,
+      "strongEdgeAtMost8Pct": true,
+      "strongEdgePreferredAtMost5Pct": true,
+      "visibleSizeWithinTolerance": true,
+      "opaquePixelsWorldXGte1824": 0,
+      "doorAxisErrorPx": 0,
+      "isolatedAlphaPixels16": 0
+    }
+  },
+  "siteChecks": {
+    "groundWorldRect": {
+      "left": 1344,
+      "top": 1344,
+      "right": 1856,
+      "bottom": 1824
+    },
+    "authoredSiteBounds": {
+      "left": 1440,
+      "top": 1344,
+      "right": 1856,
+      "bottom": 1824
+    },
+    "eastRoadObstacleDecorations": 0,
+    "southPassageTallDecorations": 0,
+    "apronTallDecorations": 0,
+    "waitingAreaTallDecorations": 0,
+    "duplicateDecorationOwnership": 0,
+    "southPassageRawHeightPx": 64,
+    "doorGroundPathAxisErrorPx": 0,
+    "foregroundRequired": false,
+    "foregroundReason": "Both building silhouettes stop at the structural base; no authored site decoration needs to occlude a character."
+  },
+  "cameraChecks": {
+    "1280x720": {
+      "scale": 0.9432,
+      "houseScreenPx": [
+        332,
+        284
+      ],
+      "status": "PASS"
+    },
+    "1440x900": {
+      "scale": 1.1983,
+      "houseScreenPx": [
+        422,
+        361
+      ],
+      "status": "PASS"
+    },
+    "390x844": {
+      "scale": 0.6094,
+      "houseScreenPx": [
+        214,
+        183
+      ],
+      "status": "PASS"
+    },
+    "844x390": {
+      "scale": 0.58,
+      "houseScreenPx": [
+        204,
+        175
+      ],
+      "status": "PASS"
+    }
+  },
+  "recommendedCandidate": "Candidate A",
+  "result": "PASS"
+}

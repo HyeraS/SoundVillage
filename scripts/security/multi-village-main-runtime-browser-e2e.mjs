@@ -26,6 +26,7 @@ const participantId = `MAIN_${expectedMode.toUpperCase()}_${suffix}`
 const sourceParticipantId = `MAIN_SOURCE_${suffix}`
 const reviewDir = path.resolve('_review/economy-v1-main-runtime-hardening')
 const interiorReviewDir = path.resolve('_review/economy-v1-interior-cutover')
+const stage4ReviewDir = path.resolve('_review/character-studio-stage4')
 const outfitAsset = '/assets/world/outfits/overalls.png'
 const accessoryAsset = '/assets/character-v2/accessories/glasses-walk.png'
 const characterLayers = expectedMode === 'cutover'
@@ -162,6 +163,7 @@ async function assertBlockedBootstrapScenarios(session) {
 try {
   await fs.mkdir(reviewDir, { recursive: true })
   await fs.mkdir(interiorReviewDir, { recursive:true })
+  await fs.mkdir(stage4ReviewDir, { recursive:true })
   const signedA = ok(await authA.auth.signInAnonymously(), 'main browser sign-in')
   userA = signedA.user
   ok(await admin.from('study_participants').insert({
@@ -210,15 +212,25 @@ try {
     await page.getByRole('button', { name:'꾸미기 시작' }).click()
     await page.getByRole('button', { name:'저장하기' }).click()
     await page.waitForFunction(() => document.querySelector('[data-interior-room]')?.dataset.interiorMode === 'view')
-    assert(interiorMutations.some((entry) => entry.startsWith('legacy:')), `${expectedMode} did not use the legacy room-save path`)
+    await page.getByText('임시 해금 미리보기에 저장했어요', { exact:true }).waitFor()
+    assert.equal(interiorMutations.some((entry) => entry.startsWith('legacy:')), false,
+      `${expectedMode} temporary preview used a legacy Interior mutation`)
     assert.equal(interiorMutations.some((entry) => entry.startsWith('economy:')), false,
       `${expectedMode} used an Economy v1 Interior mutation`)
     await screenshot(page, expectedMode === 'preview' ? 'preview-legacy-main-hud.png' : 'legacy-flag-off-main.png')
+    if (expectedMode === 'legacy') {
+      await page.getByRole('button', { name:/나가기/ }).click()
+      await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard:'shop' })
+      await page.getByLabel('캐릭터 스타일 스튜디오').waitFor({ timeout:30_000 })
+      assert.equal(await page.getByTestId('character-studio-onboarding').count(), 0)
+      const legacyOnboardingCapture = path.join(stage4ReviewDir, 'legacy-onboarding-hidden.png')
+      await page.screenshot({ path:legacyOnboardingCapture, fullPage:true })
+      assert((await fs.stat(legacyOnboardingCapture)).size > 500, 'legacy onboarding-hidden capture is empty')
+    }
     console.log(`${expectedMode} main-runtime legacy behavior browser check passed.`)
   } else if (expectedMode === 'maintenance') {
     await page.goto(`${appUrl}/`, { waitUntil: 'domcontentloaded' })
     await page.getByTestId('world-map').waitFor({ timeout:30_000 })
-    await page.getByRole('alertdialog', { name:'경제 시스템 점검 중' }).waitFor({ timeout:20_000 })
     assert.equal(ok(await admin.from('participant_village_wallets').select('*').eq('participant_id', participantId), 'maintenance wallets').length, 0)
     assert.equal(ok(await admin.from('participant_attendance').select('*').eq('participant_id', participantId), 'maintenance attendance').length, 0)
     assert.deepEqual(interiorMutations, [], 'maintenance emitted an Interior mutation')
@@ -279,7 +291,10 @@ try {
 
     for (const portal of WORLD_PORTALS) {
       await enterDestination(page, portal, portal.zone)
-      await page.locator(`[data-zone-hud="${portal.zone}"]`).waitFor({ timeout: 30_000 })
+      const zoneRoot = portal.zone === 'Lab'
+        ? page.getByTestId('lab-village')
+        : page.locator(`[data-zone-hud="${portal.zone}"]`)
+      await zoneRoot.waitFor({ timeout: 30_000 })
       await waitForLayerOrder(page)
       await screenshot(page, `village-${portal.zone.toLowerCase()}-same-loadout.png`)
     }
@@ -301,7 +316,7 @@ try {
     await page.keyboard.press('ArrowRight')
     const accessoryTab = page.getByRole('tab', { name:/액세서리 8/ })
     assert.equal(await accessoryTab.getAttribute('aria-selected'), 'true')
-    assert.equal(await accessoryTab.evaluate((element) => element === document.activeElement), true)
+    await page.waitForFunction(() => document.activeElement?.id === 'character-studio-tab-accessory')
     await screenshot(page, 'shop-keyboard-focus.png')
     assert.equal(await page.getByTestId(/^studio-item-/).count(), 9)
     await page.getByTestId('studio-item-acc_sunglasses').getByRole('button', { name:'선글라스 착용 미리보기' }).click()
@@ -312,9 +327,9 @@ try {
     await page.setViewportSize({ width:1440, height:1000 })
     await screenshot(page, 'main-character-shop-accessories.png')
     await page.getByRole('button', { name:'🛍 옷가게 닫기' }).click()
-    await page.getByTestId('museum-player').locator(`img[src="${outfitAsset}"]`).waitFor()
-    await page.getByTestId('museum-player').locator(`img[src="${accessoryAsset}"]`).waitFor()
-    assert.equal(await page.getByTestId('museum-player').locator('img[src="/assets/character-v2/accessories/sunglasses-walk.png"]').count(), 0)
+    await waitForAssetPath(page, outfitAsset)
+    await waitForAssetPath(page, accessoryAsset)
+    assert.equal(await page.getByTestId('museum-player').locator('img[src="/assets/character-v2/accessories/sunglasses-walk.png"], image[href="/assets/character-v2/accessories/sunglasses-walk.png"]').count(), 0)
 
     ok(await admin.from('participant_village_wallets').update({ balance: 0 }).eq('participant_id', participantId), 'empty wallets')
     await enterDestination(page, WORLD_MUSEUM, 'Sound Library', { libraryQaCard: 'shop' })

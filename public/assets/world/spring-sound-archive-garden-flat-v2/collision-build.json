@@ -1,0 +1,24 @@
+{
+  "status": "PASS",
+  "source": "modular-v4-colliders-with-flat-v2-home-registration",
+  "width": 960,
+  "height": 720,
+  "cellSize": 4,
+  "totalCells": 691200,
+  "walkableCells": 636464,
+  "blockedCells": 54736,
+  "homeCollider": {
+    "objectId": "landmark-home",
+    "colliderId": "home-body",
+    "collisionRole": "building-body",
+    "shapes": [
+      {
+        "type": "rect",
+        "left": 1155,
+        "top": 1470,
+        "right": 1405,
+        "bottom": 1705
+      }
+    ]
+  }
+}

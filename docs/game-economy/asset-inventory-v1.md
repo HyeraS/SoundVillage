@@ -56,7 +56,7 @@ The five paid outfit runtime sheets are exact matches for the first 256×128 wal
 - All eight launch accessories use their catalog `sourcePaletteIndex` and resolve through `ACCESSORY_SHEETS` at `/assets/character-v2/accessories/*-walk.png`. The optional renderer layer is appended after hair and is absent by default, preserving the previous body → clothes → hair result.
 - Master and `separate/walk` pixels match exactly for 17 paid outfits and all eight accessories. `clown` contains a source-pack-authored 20-pixel color variance between the two source files while dimensions and alpha anchors match; the catalog-referenced master is authoritative and the validator pins that variance.
 - Store previews are separate from gameplay sheets at `/assets/economy/previews/outfits/{id}.png` and `/assets/economy/previews/accessories/{id}.png`. Each uses Down row 0, idle column 0 with the current player body and representative hair.
-- Six 32×32 transparent currency review icons are at `/assets/economy/village-currencies/{animal|human|nature|urban|music|lab}.png`. They are not wired to wallet or shop UI in this phase.
+- Six approved 32×32 transparent currency icons are at `/assets/economy/village-currencies/{animal|human|nature|urban|music|lab}.png`. Wallet, shop, attendance, purchase UI, and the matching village's in-world sound-data markers reuse these same files.
 - Reproducible generation is in `scripts/build-character-v2-runtime-assets.py`; pixel, hash, catalog, registry, preview, and icon checks are in `scripts/validate-character-v2-runtime-assets.py` and `scripts/character-v2-assets.test.mjs`.
 
 ## Cozy Interior inventory

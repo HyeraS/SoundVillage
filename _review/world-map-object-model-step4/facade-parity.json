@@ -1,0 +1,104 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "authority": {
+    "count": 18,
+    "legacyCount": 18,
+    "nativeCount": 0,
+    "library": "legacy",
+    "entries": {
+      "environment-north-forest": "legacy",
+      "environment-west-stream-forest": "legacy",
+      "environment-east-forest": "legacy",
+      "environment-central-gardens": "legacy",
+      "environment-southwest-garden": "legacy",
+      "environment-southeast-garden": "legacy",
+      "environment-south-center-garden": "legacy",
+      "environment-south-forest": "legacy",
+      "landmark-guesthouse": "legacy",
+      "landmark-lab": "legacy",
+      "landmark-animal": "legacy",
+      "landmark-nature": "legacy",
+      "landmark-library": "legacy",
+      "landmark-urban": "legacy",
+      "landmark-human": "legacy",
+      "landmark-music": "legacy",
+      "landmark-home": "legacy",
+      "foreground-south-gate": "legacy"
+    }
+  },
+  "production": {
+    "importsGeneratedRuntime": true,
+    "importsGeneratedCollision": true,
+    "assetRegistryDuplicatedInGeneratedRuntime": false,
+    "libraryPresentationChanged": false,
+    "homeChanged": false,
+    "sceneChanged": false,
+    "diagramChanged": false
+  },
+  "compiler": {
+    "productionFacadeDependency": false,
+    "generatedOutputDependency": false,
+    "isolatedRebuildWithoutGeneratedFiles": true,
+    "deterministic": true
+  },
+  "parity": {
+    "legacySourceMove": {
+      "deepEqual": true,
+      "serializedBytes": 45398,
+      "sha256": "84b755152fa58029530f8f606f706e43910e3f5330ac4a6bd2c59e306553805f"
+    },
+    "renderObjects": { "expected": 17, "actual": 17, "deepEqual": true },
+    "foreground": { "expected": 1, "actual": 1, "deepEqual": true },
+    "destinations": { "expected": 8, "actual": 8, "deepEqual": true },
+    "logicalDestinations": { "expected": 8, "actual": 8, "deepEqual": true },
+    "guidePaths": { "expected": 8, "actual": 8, "deepEqual": true },
+    "minimapPoints": { "expected": 8, "actual": 8, "deepEqual": true },
+    "collisionObjects": { "expected": 8, "actual": 8, "deepEqual": true },
+    "spatialIndex": { "expectedEntries": 48, "actualEntries": 48, "deepEqual": true },
+    "immutability": true,
+    "objectIdentity": true
+  },
+  "importGraph": {
+    "valid": true,
+    "clientBuildOnlyModuleCount": 0,
+    "clientNodeBuiltinCount": 0,
+    "representativeAssetRegistryOccurrences": 1
+  },
+  "visual": {
+    "viewports": ["1280x720", "1440x900", "390x844", "844x390"],
+    "screens": ["spawn", "library", "objects", "foreground", "collision", "minimap-library"],
+    "comparisons": 24,
+    "domMetricsEqual": 24,
+    "byteExactScreenshots": 13,
+    "staticQaDecodedPixelExact": 12,
+    "unexpectedPixelDiff": 0,
+    "animatedRegionsWithRawDiff": 11,
+    "animatedRegionNames": ["minimapPulse", "world-map-enter-prompt pulse/popIn"],
+    "svgImageNodeDelta": 0,
+    "assetRequestCountDelta": 0,
+    "decodedAssetBytesDelta": 0,
+    "missingAssets": 0,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "labelsEqual": true
+  },
+  "bundle": {
+    "rootClientRawBefore": 1662837,
+    "rootClientRawAfter": 1667763,
+    "rootClientRawDelta": 4926,
+    "rootClientGzipBefore": 406160,
+    "rootClientGzipAfter": 406887,
+    "rootClientGzipDelta": 727,
+    "gzipDeltaWithinOneKiB": true,
+    "generatedRuntimeBytesBefore": 26088,
+    "generatedRuntimeBytesAfter": 16271,
+    "generatedCollisionBytesBefore": 2195,
+    "generatedCollisionBytesAfter": 2195
+  },
+  "integrity": {
+    "collisionMaskFilesChanged": 0,
+    "runtimeAssetFilesCompared": 31,
+    "runtimeAssetFilesChanged": 0
+  }
+}

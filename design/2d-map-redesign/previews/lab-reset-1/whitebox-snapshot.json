@@ -1,0 +1,743 @@
+{
+  "MAP": {
+    "width": 48,
+    "height": 36,
+    "tile": 32,
+    "pixelWidth": 1536,
+    "pixelHeight": 1152
+  },
+  "SPAWN": {
+    "tx": 24,
+    "ty": 33
+  },
+  "EXIT": {
+    "x": 22,
+    "y": 35,
+    "w": 5,
+    "h": 1
+  },
+  "STRUCTURES": {
+    "archive": {
+      "label": "ARCHIVE LAB",
+      "subtitle": "quiet storage / cataloguing",
+      "x": 3,
+      "y": 3,
+      "w": 13,
+      "h": 9,
+      "entrance": {
+        "x": 8,
+        "y": 12,
+        "w": 3,
+        "h": 1
+      },
+      "approach": {
+        "x": 8,
+        "y": 12,
+        "w": 3,
+        "h": 3
+      }
+    },
+    "spectrum": {
+      "label": "SPECTRUM LAB",
+      "subtitle": "measurement / comparison",
+      "x": 31,
+      "y": 3,
+      "w": 14,
+      "h": 10,
+      "entrance": {
+        "x": 37,
+        "y": 13,
+        "w": 3,
+        "h": 1
+      },
+      "approach": {
+        "x": 37,
+        "y": 13,
+        "w": 3,
+        "h": 3
+      }
+    },
+    "signal": {
+      "label": "SIGNAL LAB",
+      "subtitle": "capture / relay",
+      "x": 34,
+      "y": 22,
+      "w": 11,
+      "h": 10,
+      "entrance": {
+        "x": 33,
+        "y": 26,
+        "w": 1,
+        "h": 3
+      },
+      "approach": {
+        "x": 31,
+        "y": 26,
+        "w": 3,
+        "h": 3
+      }
+    }
+  },
+  "OBSERVATORY": {
+    "footprint": {
+      "x": 18,
+      "y": 12,
+      "w": 12,
+      "h": 13
+    },
+    "core": {
+      "cx": 24,
+      "cy": 18.5,
+      "rx": 3.35,
+      "ry": 3.35
+    },
+    "label": "CENTRAL OBSERVATORY"
+  },
+  "SAFE_SLOTS": {
+    "1": [
+      {
+        "tx": 15,
+        "ty": 30,
+        "block": 1
+      },
+      {
+        "tx": 16,
+        "ty": 28,
+        "block": 1
+      },
+      {
+        "tx": 18,
+        "ty": 33,
+        "block": 1
+      },
+      {
+        "tx": 18,
+        "ty": 28,
+        "block": 1
+      },
+      {
+        "tx": 17,
+        "ty": 31,
+        "block": 1
+      },
+      {
+        "tx": 16,
+        "ty": 33,
+        "block": 1
+      },
+      {
+        "tx": 14,
+        "ty": 32,
+        "block": 1
+      },
+      {
+        "tx": 14,
+        "ty": 28,
+        "block": 1
+      },
+      {
+        "tx": 32,
+        "ty": 33,
+        "block": 1
+      },
+      {
+        "tx": 30,
+        "ty": 28,
+        "block": 1
+      },
+      {
+        "tx": 30,
+        "ty": 32,
+        "block": 1
+      },
+      {
+        "tx": 32,
+        "ty": 29,
+        "block": 1
+      },
+      {
+        "tx": 32,
+        "ty": 31,
+        "block": 1
+      },
+      {
+        "tx": 26,
+        "ty": 30,
+        "block": 1
+      },
+      {
+        "tx": 27,
+        "ty": 28,
+        "block": 1
+      },
+      {
+        "tx": 28,
+        "ty": 33,
+        "block": 1
+      },
+      {
+        "tx": 28,
+        "ty": 31,
+        "block": 1
+      },
+      {
+        "tx": 26,
+        "ty": 32,
+        "block": 1
+      }
+    ],
+    "2": [
+      {
+        "tx": 3,
+        "ty": 29,
+        "block": 2
+      },
+      {
+        "tx": 3,
+        "ty": 31,
+        "block": 2
+      },
+      {
+        "tx": 3,
+        "ty": 25,
+        "block": 2
+      },
+      {
+        "tx": 3,
+        "ty": 27,
+        "block": 2
+      },
+      {
+        "tx": 3,
+        "ty": 22,
+        "block": 2
+      },
+      {
+        "tx": 12,
+        "ty": 22,
+        "block": 2
+      },
+      {
+        "tx": 17,
+        "ty": 25,
+        "block": 2
+      },
+      {
+        "tx": 12,
+        "ty": 24,
+        "block": 2
+      },
+      {
+        "tx": 15,
+        "ty": 26,
+        "block": 2
+      },
+      {
+        "tx": 14,
+        "ty": 21,
+        "block": 2
+      },
+      {
+        "tx": 16,
+        "ty": 23,
+        "block": 2
+      },
+      {
+        "tx": 11,
+        "ty": 32,
+        "block": 2
+      },
+      {
+        "tx": 13,
+        "ty": 26,
+        "block": 2
+      },
+      {
+        "tx": 16,
+        "ty": 21,
+        "block": 2
+      },
+      {
+        "tx": 13,
+        "ty": 30,
+        "block": 2
+      },
+      {
+        "tx": 11,
+        "ty": 26,
+        "block": 2
+      },
+      {
+        "tx": 11,
+        "ty": 28,
+        "block": 2
+      },
+      {
+        "tx": 11,
+        "ty": 30,
+        "block": 2
+      }
+    ],
+    "3": [
+      {
+        "tx": 3,
+        "ty": 14,
+        "block": 3
+      },
+      {
+        "tx": 3,
+        "ty": 17,
+        "block": 3
+      },
+      {
+        "tx": 3,
+        "ty": 20,
+        "block": 3
+      },
+      {
+        "tx": 13,
+        "ty": 17,
+        "block": 3
+      },
+      {
+        "tx": 12,
+        "ty": 20,
+        "block": 3
+      },
+      {
+        "tx": 14,
+        "ty": 13,
+        "block": 3
+      },
+      {
+        "tx": 13,
+        "ty": 15,
+        "block": 3
+      },
+      {
+        "tx": 11,
+        "ty": 18,
+        "block": 3
+      },
+      {
+        "tx": 11,
+        "ty": 16,
+        "block": 3
+      },
+      {
+        "tx": 12,
+        "ty": 13,
+        "block": 3
+      },
+      {
+        "tx": 14,
+        "ty": 19,
+        "block": 3
+      },
+      {
+        "tx": 16,
+        "ty": 18,
+        "block": 3
+      },
+      {
+        "tx": 17,
+        "ty": 15,
+        "block": 3
+      },
+      {
+        "tx": 17,
+        "ty": 12,
+        "block": 3
+      },
+      {
+        "tx": 15,
+        "ty": 15,
+        "block": 3
+      },
+      {
+        "tx": 6,
+        "ty": 15,
+        "block": 3
+      },
+      {
+        "tx": 5,
+        "ty": 18,
+        "block": 3
+      },
+      {
+        "tx": 5,
+        "ty": 20,
+        "block": 3
+      }
+    ],
+    "4": [
+      {
+        "tx": 17,
+        "ty": 4,
+        "block": 4
+      },
+      {
+        "tx": 18,
+        "ty": 9,
+        "block": 4
+      },
+      {
+        "tx": 21,
+        "ty": 10,
+        "block": 4
+      },
+      {
+        "tx": 20,
+        "ty": 7,
+        "block": 4
+      },
+      {
+        "tx": 19,
+        "ty": 3,
+        "block": 4
+      },
+      {
+        "tx": 29,
+        "ty": 11,
+        "block": 4
+      },
+      {
+        "tx": 21,
+        "ty": 3,
+        "block": 4
+      },
+      {
+        "tx": 19,
+        "ty": 5,
+        "block": 4
+      },
+      {
+        "tx": 25,
+        "ty": 9,
+        "block": 4
+      },
+      {
+        "tx": 24,
+        "ty": 5,
+        "block": 4
+      },
+      {
+        "tx": 26,
+        "ty": 11,
+        "block": 4
+      },
+      {
+        "tx": 23,
+        "ty": 3,
+        "block": 4
+      },
+      {
+        "tx": 24,
+        "ty": 7,
+        "block": 4
+      },
+      {
+        "tx": 22,
+        "ty": 7,
+        "block": 4
+      },
+      {
+        "tx": 23,
+        "ty": 10,
+        "block": 4
+      },
+      {
+        "tx": 25,
+        "ty": 3,
+        "block": 4
+      },
+      {
+        "tx": 28,
+        "ty": 4,
+        "block": 4
+      },
+      {
+        "tx": 28,
+        "ty": 9,
+        "block": 4
+      }
+    ],
+    "5": [
+      {
+        "tx": 32,
+        "ty": 15,
+        "block": 5
+      },
+      {
+        "tx": 30,
+        "ty": 18,
+        "block": 5
+      },
+      {
+        "tx": 30,
+        "ty": 20,
+        "block": 5
+      },
+      {
+        "tx": 30,
+        "ty": 15,
+        "block": 5
+      },
+      {
+        "tx": 32,
+        "ty": 19,
+        "block": 5
+      },
+      {
+        "tx": 32,
+        "ty": 21,
+        "block": 5
+      },
+      {
+        "tx": 44,
+        "ty": 20,
+        "block": 5
+      },
+      {
+        "tx": 44,
+        "ty": 18,
+        "block": 5
+      },
+      {
+        "tx": 44,
+        "ty": 14,
+        "block": 5
+      },
+      {
+        "tx": 44,
+        "ty": 16,
+        "block": 5
+      },
+      {
+        "tx": 40,
+        "ty": 18,
+        "block": 5
+      },
+      {
+        "tx": 42,
+        "ty": 14,
+        "block": 5
+      },
+      {
+        "tx": 40,
+        "ty": 20,
+        "block": 5
+      },
+      {
+        "tx": 42,
+        "ty": 16,
+        "block": 5
+      },
+      {
+        "tx": 42,
+        "ty": 20,
+        "block": 5
+      },
+      {
+        "tx": 40,
+        "ty": 14,
+        "block": 5
+      },
+      {
+        "tx": 40,
+        "ty": 16,
+        "block": 5
+      },
+      {
+        "tx": 37,
+        "ty": 20,
+        "block": 5
+      }
+    ],
+    "6": [
+      {
+        "tx": 30,
+        "ty": 22,
+        "block": 6
+      },
+      {
+        "tx": 28,
+        "ty": 25,
+        "block": 6
+      },
+      {
+        "tx": 30,
+        "ty": 24,
+        "block": 6
+      },
+      {
+        "tx": 26,
+        "ty": 26,
+        "block": 6
+      },
+      {
+        "tx": 32,
+        "ty": 23,
+        "block": 6
+      },
+      {
+        "tx": 32,
+        "ty": 25,
+        "block": 6
+      },
+      {
+        "tx": 30,
+        "ty": 26,
+        "block": 6
+      },
+      {
+        "tx": 21,
+        "ty": 26,
+        "block": 6
+      },
+      {
+        "tx": 20,
+        "ty": 29,
+        "block": 6
+      },
+      {
+        "tx": 20,
+        "ty": 31,
+        "block": 6
+      },
+      {
+        "tx": 19,
+        "ty": 26,
+        "block": 6
+      },
+      {
+        "tx": 21,
+        "ty": 33,
+        "block": 6
+      },
+      {
+        "tx": 22,
+        "ty": 29,
+        "block": 6
+      },
+      {
+        "tx": 22,
+        "ty": 31,
+        "block": 6
+      },
+      {
+        "tx": 41,
+        "ty": 33,
+        "block": 6
+      },
+      {
+        "tx": 43,
+        "ty": 33,
+        "block": 6
+      },
+      {
+        "tx": 34,
+        "ty": 33,
+        "block": 6
+      },
+      {
+        "tx": 36,
+        "ty": 33,
+        "block": 6
+      }
+    ]
+  },
+  "SLOT_REGIONS": [
+    {
+      "block": 1,
+      "label": "Arrival / first observation",
+      "x0": 14,
+      "y0": 28,
+      "x1": 33,
+      "y1": 33
+    },
+    {
+      "block": 2,
+      "label": "Quiet court",
+      "x0": 3,
+      "y0": 21,
+      "x1": 17,
+      "y1": 32
+    },
+    {
+      "block": 3,
+      "label": "Archive court",
+      "x0": 3,
+      "y0": 12,
+      "x1": 18,
+      "y1": 21
+    },
+    {
+      "block": 4,
+      "label": "North observatory ridge",
+      "x0": 17,
+      "y0": 3,
+      "x1": 30,
+      "y1": 11
+    },
+    {
+      "block": 5,
+      "label": "Spectrum court",
+      "x0": 30,
+      "y0": 13,
+      "x1": 44,
+      "y1": 21
+    },
+    {
+      "block": 6,
+      "label": "Signal court / south radial edge",
+      "x0": 19,
+      "y0": 20,
+      "x1": 44,
+      "y1": 34
+    }
+  ],
+  "existingOnly": {
+    "pass": true,
+    "errors": [],
+    "warnings": [],
+    "capacities": {
+      "1": 18,
+      "2": 18,
+      "3": 18,
+      "4": 18,
+      "5": 18,
+      "6": 18
+    },
+    "slotTotal": 108,
+    "reachableTiles": 1047
+  },
+  "actualMetadataAudit": {
+    "total": 169,
+    "groups": {
+      "A": {
+        "total": 84,
+        "blocks": [
+          15,
+          15,
+          15,
+          15,
+          15,
+          9
+        ]
+      },
+      "B": {
+        "total": 85,
+        "blocks": [
+          15,
+          15,
+          15,
+          15,
+          15,
+          10
+        ]
+      }
+    }
+  },
+  "newConceptCapacity": "UNVERIFIED"
+}

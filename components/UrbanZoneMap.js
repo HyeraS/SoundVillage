@@ -10,6 +10,7 @@ import {
   drawUrbanExitCue, markerStateFor,
 } from '@/lib/urbanVillage'
 import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
+import { useWalkFrame } from '@/components/useWalkFrame'
 import {
   loadUrbanAssetSet, drawUrbanAssetStatic, drawUrbanAssetYSort,
 } from '@/lib/urbanAssetArt'
@@ -58,7 +59,7 @@ export default function UrbanZoneMap({
   const movingRef = useRef(false)
   const [dir, setDir] = useState('up')
   const [moving, setMoving] = useState(false)
-  const [, setAnimTick] = useState(0)
+  const frameIndex = useWalkFrame(moving)
   const [collecting, setCollecting] = useState(null)
   useCollectiblePromptLogging(collecting, 'Urban')
   const collectingRef = useRef(false)
@@ -124,13 +125,6 @@ export default function UrbanZoneMap({
     const observer = new ResizeObserver(resize)
     observer.observe(stage)
     return () => observer.disconnect()
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      if (movingRef.current) setAnimTick((tick) => tick + 1)
-    }, 100)
-    return () => window.clearInterval(timer)
   }, [])
 
   const beginCollect = (item) => {
@@ -201,9 +195,13 @@ export default function UrbanZoneMap({
         if (pressed.left) { dx -= speed; nextDir = 'left' }
         if (pressed.right) { dx += speed; nextDir = 'right' }
       }
-      const moved = dx !== 0 || dy !== 0
-      if (moved) {
-        posRef.current = moveWithCollision(village, posRef.current, dx, dy, blockNumRef.current)
+      const hasMovementInput = dx !== 0 || dy !== 0
+      let moved = false
+      if (hasMovementInput) {
+        const previousPosition = posRef.current
+        const nextPosition = moveWithCollision(village, previousPosition, dx, dy, blockNumRef.current)
+        moved = Math.abs(nextPosition.x - previousPosition.x) > 0.01 || Math.abs(nextPosition.y - previousPosition.y) > 0.01
+        posRef.current = nextPosition
         if (nextDir && nextDir !== dirRef.current) {
           dirRef.current = nextDir
           setDir(nextDir)
@@ -215,6 +213,11 @@ export default function UrbanZoneMap({
       }
 
       const { x: playerX, y: playerY } = posRef.current
+      if (playerWrapRef.current) {
+        playerWrapRef.current.dataset.worldX = playerX.toFixed(2)
+        playerWrapRef.current.dataset.worldY = playerY.toFixed(2)
+        playerWrapRef.current.dataset.movementBlocked = hasMovementInput && !moved ? 'true' : 'false'
+      }
       const currentItems = itemsRef.current
       if (dismissedItemIdRef.current) {
         const dismissed = currentItems.find((item) => item.id === dismissedItemIdRef.current)
@@ -390,11 +393,11 @@ export default function UrbanZoneMap({
           position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 1,
           background: 'radial-gradient(115% 92% at 50% 45%, transparent 55%, rgba(3,7,22,.36) 100%)',
         }} />
-        <div ref={playerWrapRef} data-testid="urban-player" style={{
+        <div ref={playerWrapRef} data-testid="urban-player" data-frame-index={frameIndex} style={{
           position: 'absolute', left: 0, top: 0, width: SPRITE_W, height: SPRITE_H,
           transformOrigin: '0 0', pointerEvents: 'none', zIndex: 2,
         }}>
-          <PixelChar dir={dir} moving={moving} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
+          <PixelChar dir={dir} moving={moving} frameIndex={frameIndex} outfitSrc={outfitSrc} accessorySrc={accessorySrc} characterLoadout={characterLoadout} />
         </div>
         <canvas ref={foregroundCanvasRef} aria-label="Urban foreground layer" style={{
           position: 'absolute', inset: 0, display: 'block', width: '100%', height: '100%', imageRendering: 'pixelated', pointerEvents: 'none', zIndex: 3,

@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "chain": [
+    "design/world-map-v4/source-assets/landmark-home-player-{building,site-ground}.png",
+    "data/world-map-v4/sourceAssets.mjs",
+    "public/assets/world/sound-archive-garden-v4/runtime/*.webp",
+    "lib/worldMapV4Assets.mjs",
+    "data/world-map-v4/worldObjects.mjs",
+    "scripts/build-world-map-object-projections.mjs",
+    "lib/generated/worldMapV4{Runtime,Collision}Objects.mjs",
+    "lib/worldMapV4Manifest.mjs",
+    "lib/worldMapRenderLayers.mjs",
+    "components/world-map/WorldMapScene.js SVG image nodes"
+  ],
+  "prohibitedDependencies": {
+    "productionRuntimeReview": 0,
+    "productionRuntimeTmp": 0,
+    "clientAbsolutePaths": 0,
+    "clientCodexPaths": 0,
+    "clientAttachments": 0,
+    "candidateBRegistry": 0,
+    "candidateBGeneratedRuntime": 0,
+    "candidateBClientBundle": 0,
+    "sourcePngClientBundle": 0
+  },
+  "allowedReferences": [
+    "Optional --review output in scripts/build-world-map-v4-collision.mjs",
+    "Historical/review-only report scripts and provenance documents",
+    "Tests that write reports after assertions; no report is a production input"
+  ],
+  "nextJs1627": {
+    "production": "next build creates the optimized production build; lint is a separate command in Next 16",
+    "public": "public files are served from base-URL paths",
+    "outputTracing": "Next traces imports/require/fs usage into .nft.json; no banned Home path appeared in traces",
+    "clientGraph": "all imports below a use-client boundary enter the client graph, so authored/build modules remain behind generated literals"
+  }
+}

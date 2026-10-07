@@ -1,0 +1,66 @@
+ M components/world-map/WorldMapDiagram.js
+ M components/world-map/WorldMapScene.js
+ M lib/worldMapGeometry.mjs
+ M lib/worldMapMinimap.mjs
+ M lib/worldMapV4Manifest.mjs
+ M lib/worldWalkableMaskData.mjs
+ M package.json
+ M public/assets/world/sound-archive-garden-v4/collision-build.json
+ M public/assets/world/sound-archive-garden-v4/collision-debug.png
+ M public/assets/world/sound-archive-garden-v4/obstacle-mask.png
+ M public/assets/world/sound-archive-garden-v4/walkable-clearance-mask.png
+ M scripts/build-world-map-hd-assets.py
+ M scripts/build-world-map-v4-collision.mjs
+ M scripts/build-world-map-v4-collision.py
+ M scripts/test-world-map-hd-collision.mjs
+ M scripts/test-world-map-home-hub.mjs
+ M scripts/test-world-map-minimap-browser.mjs
+ M scripts/test-world-map-production-integration.mjs
+?? CODEX_FUNCTIONAL_AUDIT_HANDOFF.md
+?? "Codex 이미지 2026년 8월 30일 오후 03_52_53.png"
+?? "Cozy Christmas Market Map Design/"
+?? SoundVillage-house-decor-2d.code-workspace
+?? _review/animal-base-map-integration/
+?? _review/house-hub-redesign-2026-09-24/
+?? _review/human-community-hall-v2/
+?? _review/human-community-hall/
+?? _review/music-collision-depth-fix/
+?? _review/urban-advanced-city/
+?? _review/world-map-hd-collision-fix/
+?? _review/world-map-home-art-step7/
+?? _review/world-map-home-circulation-step1/
+?? _review/world-map-home-integration-step0/
+?? _review/world-map-modular-v3/
+?? _review/world-map-object-collision-step2/
+?? _review/world-map-object-model-step1/
+?? _review/world-map-object-model-step2/
+?? _review/world-map-object-model-step3/
+?? _review/world-map-object-model-step4/
+?? _review/world-map-object-model-step5/
+?? _review/world-map-object-model-step6/
+?? _review/world-map-production-integration/
+?? _review/world-map-reference-match-v2/
+?? _review/world-map-reference-reconstruction-v4/
+?? _review/world-map-reskin-v1/
+?? _review/world-map-sequential-fix-2026-09-21/
+?? "cozy animal village map design/"
+?? data/world-map-v4/
+?? design/
+?? docs/CODEX_FUNCTIONAL_AUDIT_HANDOFF.md
+?? docs/CODEX_NEW_CHAT_HANDOFF_2026-09-12.md
+?? docs/research/
+?? docs/security/
+?? lib/generated/
+?? lib/worldMapCollision.mjs
+?? lib/worldMapCollision.test.mjs
+?? lib/worldMapCollisionContract.mjs
+?? lib/worldMapObjectSchema.mjs
+?? lib/worldMapObjectSchema.test.mjs
+?? lib/worldMapRenderLayers.mjs
+?? lib/worldMapRenderLayers.test.mjs
+?? scripts/build-world-map-object-projections.mjs
+?? scripts/test-world-map-library-object-pilot.mjs
+?? scripts/test-world-map-object-projections.mjs
+?? scripts/test-world-map-render-layers.mjs
+?? scripts/world-map/
+?? tmp/

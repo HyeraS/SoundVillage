@@ -1,0 +1,52 @@
+{
+  "kind": "static review only; no gameplay testing",
+  "referenceRoutes": [
+    "/nature-test",
+    "/animal-test",
+    "/human-village-test",
+    "/music-test"
+  ],
+  "referenceViewport": [
+    768,
+    632
+  ],
+  "referenceMapCrop": [
+    0,
+    56,
+    768,
+    576
+  ],
+  "checks": [
+    {
+      "brokenImages": [],
+      "height": 844,
+      "name": "mobile390",
+      "scrollWidth": 390,
+      "viewBox": "192 240 768 576",
+      "width": 390
+    },
+    {
+      "height": 844,
+      "name": "mobile320",
+      "scrollWidth": 320,
+      "width": 320
+    },
+    {
+      "height": 1000,
+      "markers": 9,
+      "name": "desktop",
+      "scrollWidth": 1440,
+      "viewBox": "192 240 768 576",
+      "width": 1440
+    },
+    {
+      "grayscale": true,
+      "markerHidden": true,
+      "name": "layer toggles",
+      "oldSlotDots": 108,
+      "oldVisible": true,
+      "routeVisible": true
+    }
+  ],
+  "console": []
+}

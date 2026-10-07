@@ -1,4 +1,4 @@
-import { duoResponseWithRealtime, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
+import { duoResponse, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
 import { createOrRotateDuoSession, deriveDuoJoinToken, hashDuoJoinToken } from '@/lib/duoSession.server'
 
 export const dynamic = 'force-dynamic'
@@ -24,5 +24,5 @@ export async function POST(request) {
     auth.mode === 'cutover' ? 'economy_v1' : 'legacy',
   )
   if (error) return duoStorageFailure('host', error)
-  return duoResponseWithRealtime(data, auth.user.id, parsed.body.clientId, data?.ok ? { inviteToken } : {})
+  return duoResponse(data, data?.ok ? { inviteToken } : {})
 }

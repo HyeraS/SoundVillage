@@ -19,8 +19,14 @@ import {
 import { CHARACTER_IDENTITY_CATALOG_VERSION, hasCompleteCharacterLoadout, identityRequestFromLoadout } from '@/lib/characterIdentityContract.mjs'
 import { normalizeCharacterLoadout } from '@/lib/characterStudioState.mjs'
 import { trackEvent } from '@/lib/userEvents'
+import { TEMPORARILY_UNLOCK_ALL_CONTENT } from '@/lib/temporaryUnlocks'
 
 export const SUPPORTED_ECONOMY_CATALOG_VERSION = ECONOMY_CATALOG_VERSION
+const CHARACTER_SAVED_EVENT = 'soundvillage:character-loadout-saved'
+
+function announceCharacterSaved() {
+  window.dispatchEvent(new Event(CHARACTER_SAVED_EVENT))
+}
 
 const EconomyRuntimeContext = createContext(null)
 
@@ -131,6 +137,7 @@ export function EconomyRuntimeProvider({ children }) {
     if (equip.ok) {
       setPreviewLoadout(null)
       setProfile((profile) => profile ? { ...profile, loadout: equip.loadout } : profile)
+      announceCharacterSaved()
     }
     return { ...purchase, equip, purchaseKey, equipKey }
   }, [load, setProfile])
@@ -162,6 +169,13 @@ export function EconomyRuntimeProvider({ children }) {
     if (stateRef.current.runtimeState !== 'cutover') {
       return { ok: false, code: 'economy_runtime_blocked', retryable: false }
     }
+    if (TEMPORARILY_UNLOCK_ALL_CONTENT) {
+      const key = slot === 'outfit' ? 'outfitId' : 'accessoryId'
+      const loadout = { ...(stateRef.current.profile?.loadout || {}), [key]:itemId }
+      setPreviewLoadout(null)
+      setProfile((profile) => profile ? { ...profile, loadout } : profile)
+      return { ok:true, code:'temporary_local_unlock', loadout }
+    }
     const equipMapKey = `${slot}:${itemId || 'none'}`
     const idempotencyKey = equipKeys.current.get(equipMapKey) || newEconomyOperationKey()
     equipKeys.current.set(equipMapKey, idempotencyKey)
@@ -170,6 +184,7 @@ export function EconomyRuntimeProvider({ children }) {
     if (result.ok) {
       setPreviewLoadout(null)
       setProfile((profile) => profile ? { ...profile, loadout: result.loadout } : profile)
+      announceCharacterSaved()
     }
     return { ...result, idempotencyKey }
   }, [setProfile])
@@ -234,6 +249,7 @@ export function EconomyRuntimeProvider({ children }) {
       identityOperation.current = null
       setPreviewLoadout(null)
       setProfile((profile) => profile ? { ...profile, loadout:normalizeCharacterLoadout(result.loadout) } : profile)
+      announceCharacterSaved()
       trackEvent('character_identity_save_succeeded', {
         target_type:'character_identity', target_id:Object.values(validated).join('|'), outcome:'succeeded',
         operation_type:'character_identity_save', operation_idempotency_key:operation.key,
@@ -274,7 +290,14 @@ export function EconomyRuntimeProvider({ children }) {
     loadout: effectiveLoadout,
     savedLoadout,
     previewLoadout,
-    ownedItemIds: state.profile?.ownedItemIds || [],
+    ownedItemIds: TEMPORARILY_UNLOCK_ALL_CONTENT
+      ? [...new Set([
+          ...(state.profile?.ownedItemIds || []),
+          ...state.items.map((item) => item.id),
+          ...state.interiorItems.map((item) => item.id),
+          ...state.interiorStarters.map((item) => item.id),
+        ])]
+      : state.profile?.ownedItemIds || [],
     load,
     reset,
     setProfile,

@@ -1,0 +1,40 @@
+{
+  "source": {
+    "path": "public/assets/world/sound-archive-garden-v2/world-base-clean.png",
+    "width": 2896,
+    "height": 2172,
+    "bytes": 4253049,
+    "estimatedDecodedRgbaBytes": 25160448
+  },
+  "master": {
+    "path": "design/concepts/world-map-reskin-2026-09-18/02-sound-archive-garden-hd-master.png",
+    "width": 5792,
+    "height": 4344,
+    "bytes": 30953431,
+    "estimatedDecodedRgbaBytes": 100641792
+  },
+  "runtime": {
+    "path": "public/assets/world/sound-archive-garden-v2/world-base-hd.webp",
+    "width": 5792,
+    "height": 4344,
+    "bytes": 5021332,
+    "estimatedDecodedRgbaBytes": 100641792
+  },
+  "registration": {
+    "scale": 2,
+    "origin": [
+      0,
+      0
+    ],
+    "landmarkSilhouetteOffsetPx": 0,
+    "roadCenterlineOffsetPx": 0
+  },
+  "mask": {
+    "width": 960,
+    "height": 720,
+    "worldPxPerCell": 4,
+    "rawWalkableCells": 149083,
+    "clearanceCells": 111304
+  },
+  "method": "deterministic 2x Lanczos reconstruction plus bounded source-luminance detail restoration; no generative geometry"
+}

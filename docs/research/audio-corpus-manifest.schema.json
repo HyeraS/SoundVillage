@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sound-village.invalid/schemas/audio-corpus-manifest-v1.json",
+  "title": "Sound Village production audio corpus manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format", "generated_at", "corpus_root", "requirements", "summary",
+    "global_issues", "duplicate_blobs", "cross_zone_filename_collisions",
+    "entries", "validation"
+  ],
+  "properties": {
+    "format": { "const": "sound-village-audio-corpus-v1" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "corpus_root": { "type": "string", "minLength": 1 },
+    "requirements": {
+      "type": "object",
+      "required": ["metadata_rows", "canonical_identities", "full_verification_required"],
+      "properties": {
+        "metadata_rows": { "const": 1000 },
+        "canonical_identities": { "const": 995 },
+        "full_verification_required": { "const": true }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "required": [
+        "metadata_rows", "canonical_identities", "alias_pairs", "files_discovered",
+        "files_present_canonical", "fully_verified_canonical", "unverified_canonical"
+      ],
+      "properties": {
+        "metadata_rows": { "type": "integer", "minimum": 0 },
+        "canonical_identities": { "type": "integer", "minimum": 0 },
+        "alias_pairs": { "type": "integer", "minimum": 0 },
+        "files_discovered": { "type": "integer", "minimum": 0 },
+        "files_present_canonical": { "type": "integer", "minimum": 0 },
+        "fully_verified_canonical": { "type": "integer", "minimum": 0 },
+        "unverified_canonical": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "global_issues": { "type": "array", "items": { "type": "string" } },
+    "duplicate_blobs": { "type": "array", "items": { "$ref": "#/$defs/duplicateBlob" } },
+    "cross_zone_filename_collisions": { "type": "array", "items": { "$ref": "#/$defs/pathCollision" } },
+    "entries": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/entry" }
+    },
+    "validation": {
+      "type": "object",
+      "required": ["ok", "errors"],
+      "properties": {
+        "ok": { "type": "boolean" },
+        "errors": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "duplicateBlob": {
+      "type": "object",
+      "required": ["sha256", "canonical_audio_ids"],
+      "properties": {
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "canonical_audio_ids": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+      }
+    },
+    "pathCollision": {
+      "type": "object",
+      "required": ["filename", "paths"],
+      "properties": {
+        "filename": { "type": "string" },
+        "paths": { "type": "array", "minItems": 2, "items": { "type": "string" } }
+      }
+    },
+    "reviewRecord": {
+      "type": "object",
+      "required": ["status"],
+      "properties": { "status": { "type": "string" } }
+    },
+    "file": {
+      "type": "object",
+      "required": [
+        "relative_path", "sha256", "byte_size", "mime", "codec",
+        "duration_seconds", "decode_ok", "probe_tool", "probe_error"
+      ],
+      "properties": {
+        "relative_path": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "byte_size": { "type": "integer", "minimum": 1 },
+        "mime": { "enum": ["audio/mpeg", "audio/wav", "audio/ogg", "application/octet-stream"] },
+        "codec": { "type": ["string", "null"] },
+        "duration_seconds": { "type": ["number", "null"], "exclusiveMinimum": 0 },
+        "decode_ok": { "type": "boolean" },
+        "probe_tool": { "type": ["string", "null"] },
+        "probe_error": { "type": ["string", "null"] }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_audio_id", "sound_ids", "alias_count", "zone", "group_id",
+        "expected_base_paths", "metadata_categories", "metadata_audioset_classes",
+        "source_dataset", "original_filename", "file", "license", "provenance",
+        "classification", "issues", "fully_verified"
+      ],
+      "properties": {
+        "canonical_audio_id": { "type": "string", "minLength": 1 },
+        "sound_ids": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+        "alias_count": { "type": "integer", "minimum": 1 },
+        "zone": { "type": ["string", "null"] },
+        "group_id": { "type": ["string", "null"] },
+        "expected_base_paths": { "type": "array", "items": { "type": "string" } },
+        "metadata_categories": { "type": "array", "items": { "type": "string" } },
+        "metadata_audioset_classes": { "type": "array", "items": { "type": "string" } },
+        "source_dataset": { "type": ["string", "null"] },
+        "original_filename": { "type": ["string", "null"] },
+        "file": { "oneOf": [{ "$ref": "#/$defs/file" }, { "type": "null" }] },
+        "license": { "$ref": "#/$defs/reviewRecord" },
+        "provenance": { "$ref": "#/$defs/reviewRecord" },
+        "classification": { "$ref": "#/$defs/reviewRecord" },
+        "issues": { "type": "array", "items": { "type": "string" } },
+        "fully_verified": { "type": "boolean" }
+      }
+    }
+  }
+}

@@ -1,8 +1,9 @@
 'use client'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import AnnotationPanel from '@/components/AnnotationPanel'
 import MusicZoneMap from '@/components/MusicZoneMap'
 import soundMetadata from '@/data/sound_metadata.json'
+import { WALK_ANIMATION_QA_CHARACTER } from '@/lib/walkAnimationQa.mjs'
 
 // 격리된 Moonlit Music Zone 테스트 — 실제 게임 흐름(app/page.js, WorldMap
 // 내비게이션)은 건드리지 않는다. urban-test/library-test와 같은 패턴: 순수 시각 검증
@@ -18,6 +19,14 @@ export default function MusicTestPage() {
   const [blockNum, setBlockNum] = useState(1)
   const [activeSound, setActiveSound] = useState(null)
   const [debug, setDebug] = useState(false)
+  const [walkAnimationQa, setWalkAnimationQa] = useState(false)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setWalkAnimationQa(new URLSearchParams(window.location.search).get('walkAnimationQa') === '1')
+    }, 0)
+    return () => window.clearTimeout(timer)
+  }, [])
 
   const selectGroup = (nextGroup) => {
     setGroup(nextGroup)
@@ -42,6 +51,7 @@ export default function MusicTestPage() {
         }
       `}</style>
       <MusicZoneMap
+        {...(walkAnimationQa ? WALK_ANIMATION_QA_CHARACTER : {})}
         sounds={musicSounds}
         onCollectSound={setActiveSound}
         onExit={() => {}}

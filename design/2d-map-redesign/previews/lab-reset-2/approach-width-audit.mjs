@@ -1,0 +1,5 @@
+import fs from 'node:fs';import * as G from './geometry.mjs';
+const base=new URL('./',import.meta.url),slots=JSON.parse(fs.readFileSync(new URL('slots.json',base)));
+function approach(x,y,dx,dy){const r={x:x-32+Math.min(0,dx*64),y:y-32+Math.min(0,dy*64),w:64+Math.abs(dx*64),h:64+Math.abs(dy*64)};if(G.SOLIDS.some(s=>G.boxHits(r,s)))return false;for(let xx=r.x;xx<=r.x+r.w;xx+=4)for(let yy=r.y;yy<=r.y+r.h;yy+=4)if(!G.inside(xx,yy,G.FLOOR))return false;return true;}
+const candidates=slots.map(s=>({...s,clearDirections:[[1,0],[-1,0],[0,1],[0,-1]].filter(([dx,dy])=>approach(s.x,s.y,dx,dy))}));
+const counts=Array.from({length:6},(_,i)=>candidates.filter(s=>s.block===i+1&&s.clearDirections.length).length);const result={note:'Additional conservative 64px-wide x64px-long swept approach plus32px end margins. Static subset of58 candidates; no repacking, no final art certification.',candidateCount:slots.length,strictCounts:counts,strictTotal:counts.reduce((a,b)=>a+b,0),candidates};fs.writeFileSync(new URL('approach-width-audit.json',base),JSON.stringify(result,null,2));console.log(JSON.stringify({counts,total:result.strictTotal}));

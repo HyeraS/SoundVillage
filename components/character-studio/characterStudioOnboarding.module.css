@@ -1,0 +1,37 @@
+.card {
+  position: relative;
+  width: auto;
+  max-height: min(420px, calc(100dvh - 24px));
+  margin: 0 0 16px;
+  overflow: auto;
+  padding: 20px;
+  border: 3px solid #3a2a14;
+  border-radius: 18px;
+  background: #fff8e8;
+  color: #3a2a14;
+  box-shadow: 7px 7px 0 #3a2a14aa;
+  font-family: 'Gothic A1', sans-serif;
+}
+
+.card h2 { margin: 4px 30px 10px 0; font-size: 20px; line-height: 1.35; }
+.card ul { margin: 0 0 14px; padding-left: 21px; font-size: 13px; line-height: 1.65; }
+.eyebrow { color: #8b6a3a; font-size: 11px; font-weight: 900; letter-spacing: .08em; }
+.close { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border: 2px solid #3a2a14; border-radius: 50%; background: #f5edd8; color: #3a2a14; font-size: 22px; cursor: pointer; }
+.confirm { width: 100%; padding: 11px 14px; border: 3px solid #3a2a14; border-radius: 10px; background: #91cdb2; color: #26351f; font: inherit; font-weight: 900; cursor: pointer; box-shadow: 3px 3px 0 #3a2a14; }
+.close:focus-visible, .confirm:focus-visible { outline: 4px solid #e9b44c; outline-offset: 2px; }
+
+@media (max-width: 600px) and (orientation: portrait) {
+  .card { width: auto; padding: 18px; }
+  .card h2 { font-size: 18px; }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .card { width: auto; max-height: 52vh; padding: 14px 16px; }
+  .card h2 { margin-bottom: 6px; font-size: 16px; }
+  .card ul { margin-bottom: 8px; font-size: 11px; line-height: 1.45; }
+  .confirm { padding: 8px 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card { scroll-behavior: auto; }
+}

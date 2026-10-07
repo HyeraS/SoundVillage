@@ -1,13 +1,14 @@
 'use client'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import LibraryRoom from '@/components/LibraryRoom'
+import QaCharacterStudioPanel from '@/components/character-studio/QaCharacterStudioPanel'
 
 // 격리된 Library 룸 워크스루 테스트 — 실제 게임 흐름(SoundMuseum/app/page.js)은
 // 건드리지 않는다. fence-test와 같은 패턴: 순수 시각+상호작용 검증 전용 페이지.
 //
 // 쿼리 파라미터:
-//   ?open=vote|exhibits|shop            — 외부 쓰기 없는 플레이스홀더 카드 열기
+//   ?open=vote|exhibits|shop            — 외부 쓰기 없는 QA 카드 열기
 //   ?qa=collision|depth|interactions|clean
 //   ?state=empty|partial|complete       — 6개 전시 상태 fixture
 //   ?walk=dir:ms,dir:ms,enter,esc,...  — keydown 이벤트 없이 물리/상호작용
@@ -24,6 +25,7 @@ function parseWalk(spec) {
 
 function LibraryTestInner() {
   const params = useSearchParams()
+  const [exited, setExited] = useState(false)
   const autoWalk = parseWalk(params.get('walk'))
   const open = ['vote', 'exhibits', 'shop'].includes(params.get('open')) ? params.get('open') : null
   const qa = ['collision', 'depth', 'interactions', 'clean'].includes(params.get('qa')) ? params.get('qa') : 'clean'
@@ -34,7 +36,23 @@ function LibraryTestInner() {
     : state === 'complete'
       ? { collected:8, total:8 }
       : { collected:index + 1, total:8 }]))
-  return <LibraryRoom autoWalk={autoWalk} initialOpen={open} qaMode={qa} zoneCounts={zoneCounts} activeStations={state === 'empty' ? 0 : state === 'complete' ? 5 : 3}/>
+  if (exited) return <main data-testid="library-test-world-return" style={{ minHeight:'100dvh', display:'grid', placeItems:'center', background:'#E8F0DC', fontFamily:'Nunito, sans-serif' }}>
+    <section style={{ textAlign:'center', color:'#29401F' }}>
+      <h1>월드맵 복귀 완료</h1>
+      <button type="button" onClick={() => setExited(false)}>Sound Museum 다시 들어가기</button>
+    </section>
+  </main>
+  return <LibraryRoom
+    autoWalk={autoWalk}
+    initialOpen={open}
+    qaMode={qa}
+    zoneCounts={zoneCounts}
+    activeStations={state === 'empty' ? 0 : state === 'complete' ? 5 : 3}
+    cards={{
+      shop:{ render:() => <QaCharacterStudioPanel sessionKey="library-test-shop"/> },
+    }}
+    onExit={() => setExited(true)}
+  />
 }
 
 export default function LibraryTestPage() {

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "hashAlgorithm": "sha256",
+  "determinism": {
+    "compileRun1": {
+      "lib/generated/worldMapV4RuntimeObjects.mjs": "46861d8ffa8adc2b1265dd7cd0d3039a3cadb672101a260c80dc59e90475ab6b",
+      "lib/generated/worldMapV4CollisionObjects.mjs": "ce657526b92921517d56a58e932141f13e0f4cda55e27db7608922e0feb12ce7"
+    },
+    "compileRun2": {
+      "lib/generated/worldMapV4RuntimeObjects.mjs": "46861d8ffa8adc2b1265dd7cd0d3039a3cadb672101a260c80dc59e90475ab6b",
+      "lib/generated/worldMapV4CollisionObjects.mjs": "ce657526b92921517d56a58e932141f13e0f4cda55e27db7608922e0feb12ce7"
+    },
+    "identical": true
+  },
+  "generatedFiles": {
+    "lib/generated/worldMapV4RuntimeObjects.mjs": {
+      "bytes": 26088,
+      "sha256": "46861d8ffa8adc2b1265dd7cd0d3039a3cadb672101a260c80dc59e90475ab6b"
+    },
+    "lib/generated/worldMapV4CollisionObjects.mjs": {
+      "bytes": 2195,
+      "sha256": "ce657526b92921517d56a58e932141f13e0f4cda55e27db7608922e0feb12ce7"
+    }
+  },
+  "step3SourceFiles": {
+    "data/world-map-v4/worldObjects.mjs": "f85c135a53b49a17bfdc5487dbae3c22ca6d607dc0ea974892689550b50cb357",
+    "scripts/world-map/legacy-world-object-adapter.mjs": "e7805e65ea7c4ed68c182a6ea572b8e0415490f85df08f896098b543aa9a3864",
+    "scripts/build-world-map-object-projections.mjs": "a431514ef34fa6f2f8ad98e85e2ad4a0997997727074ce86d3332e237c98ce62",
+    "scripts/test-world-map-object-projections.mjs": "2ca400b8613ae3efdbe1177170a826b425668aa2e976ebc6eb36cf59bba93c02"
+  },
+  "preImplementationRelevantHashes": {
+    "lib/worldMapObjectSchema.mjs": "2af7393eadc67a4717705ea1870f4356a8c9e77c405de252c8d306f83298b23d",
+    "lib/worldMapObjectSchema.test.mjs": "255f7f758a357b16fcd75d815de0b56077bf7138364b25fefe27bde9aad9a48a",
+    "lib/worldMapV4Manifest.mjs": "561a89143afd572062a6f12165da01050f8215c08952ce552dacdd27af08f880",
+    "lib/worldMapGeometry.mjs": "c1eb303acf6dfe3c9bb5ada236592480a0d0c40ae8dc476eacd045366a0d062a",
+    "lib/worldMapCollision.mjs": "3704aafc62f777ec433ae38a01428c5e0f0abc67e97bcf4f7b4ded601c9b830b",
+    "lib/worldMapNavigation.mjs": "3853397aca686a6a45e1fbc4d3756ba373e309e1dc8ea85ee433309e49e62e05",
+    "lib/worldMapMinimap.mjs": "001da1be997c8e279f5411aae51d4f6e85a6683c1510fda366427b85f877e0bb",
+    "lib/worldMapV4Assets.mjs": "39f0d97bae315e086df8d49fddeb82e120e7ff08696b34ec85b844e3ca2bd1f2",
+    "components/world-map/WorldMapScene.js": "3670664d7327f9c236a60950b3b85459ea8847361de691b7549367903239e5df",
+    "components/world-map/WorldMapDiagram.js": "ddbeaa88000880c2f3d065d1b6a279b31a8e284f02a565926f8ef0242a70fb0b",
+    "package.json": "26ad4ef1329961e1acfd1f0fba1b3b2e3e63ffd0b82adba9553a2ed29e7de025",
+    "_review/world-map-object-model-step2/baseline.json": "ca456dacdc857ae5750e145de2b65e843fd470ea92a4720ebc0a9596d037082e"
+  },
+  "postImplementationIntegrity": {
+    "collisionAndPackedMaskFilesCompared": 5,
+    "collisionAndPackedMaskFilesChanged": 0,
+    "runtimeAssetFilesCompared": 31,
+    "runtimeAssetFilesChanged": 0,
+    "productionFilesComparedExcludingPackage": 10,
+    "productionFilesChanged": 0,
+    "componentImportGraphChanged": false,
+    "generatedProjectionInProductionClientGraph": false,
+    "packageHash": "cbf5eb0a6de64fc7ff0f622c37481585213137b2230c01ae2f52ef7704a585d8",
+    "packageChange": "Added build:world-object-projections and test:world-object-projections only"
+  },
+  "step2BaselineHashes": {
+    "obstacleMask": "dfc3665c58f929d5e6ce44276df0bb280fbba9e492a35c3062dbbbcbe8c73617",
+    "walkableClearanceMask": "90c42850c4ca4e4fc9d019b8675405fa8e2342e8bb1a2e0c5ccc2f6a3dd7f12f",
+    "collisionDebug": "03f79edc28b644cbdaa6ff1762e61efc085edde5c8512656b7c4935989a3819a",
+    "collisionBuild": "557e83a7717663a2d502ed61b59444a39b86d034c641cc79dddd47730fe41192",
+    "packedMaskModule": "01707f39a1e5219e4f73ec3738d4b107591fd2bfa12091410378555d367e8abd"
+  }
+}

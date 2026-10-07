@@ -1,0 +1,203 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "productionAuthority": {
+    "totalObjects": 18,
+    "nativeObjects": 1,
+    "legacyFallbackObjects": 17,
+    "library": "native",
+    "home": "legacy",
+    "productionLayerOverrideObjects": 1,
+    "layerOverrideKeys": [
+      "landmark-library"
+    ],
+    "homeLayerOverridePresent": false
+  },
+  "libraryCanary": {
+    "objectId": "landmark-library",
+    "layerId": "body",
+    "role": "body",
+    "renderBand": "world",
+    "assetId": "landmark-library",
+    "rect": {
+      "x": 1146.9613259668508,
+      "y": 828.7292817679557,
+      "width": 1544.7513812154696,
+      "height": 716.0220994475138
+    },
+    "sortY": 1339.2265193370165,
+    "domImageNodes": 1,
+    "duplicateCompatibilityImageNodes": 0
+  },
+  "testFixture": {
+    "productionOutput": false,
+    "layerCount": 5,
+    "layerIds": [
+      "site-ground",
+      "body",
+      "body-trim",
+      "front-occluder",
+      "optional-effect"
+    ],
+    "validated": [
+      "world projection",
+      "union bounds",
+      "positive scale",
+      "layer offsets",
+      "explicit primary layer",
+      "band order",
+      "state visibility",
+      "stable ties",
+      "duplicate suppression",
+      "object culling",
+      "layer culling",
+      "invalid identifier rejection",
+      "invalid asset rejection",
+      "non-zero rotation rejection",
+      "zero and negative scale rejection",
+      "collision independence"
+    ]
+  },
+  "bandOrder": [
+    "terrain",
+    "environment",
+    "ground",
+    "world",
+    "object-foreground",
+    "global-foreground",
+    "overlay",
+    "interaction-debug"
+  ],
+  "stableWorldTieOrder": [
+    "fixture-layered-building/body",
+    "fixture-layered-building/body-trim",
+    "local-player"
+  ],
+  "culling": {
+    "objectUnionFirst": true,
+    "perLayerSecond": true,
+    "halfOpenIntersection": true,
+    "boundaryTouchObjectCulled": true,
+    "partialFixtureViewEmittedLayerIds": [
+      "site-ground"
+    ],
+    "partialFixtureViewLayerCullCount": 4
+  },
+  "productionDom": {
+    "imageNodeDelta": 0,
+    "assetRequestDelta": 0,
+    "decodedAssetBytesDelta": 0,
+    "imageNodesByViewportAndScreen": {
+      "1280x720": {
+        "spawn": 12,
+        "library": 14,
+        "objects": 17,
+        "foreground": 1,
+        "collision": 1,
+        "minimap-library": 14
+      },
+      "1440x900": {
+        "spawn": 12,
+        "library": 14,
+        "objects": 17,
+        "foreground": 1,
+        "collision": 1,
+        "minimap-library": 14
+      },
+      "390x844": {
+        "spawn": 17,
+        "library": 17,
+        "objects": 17,
+        "foreground": 1,
+        "collision": 1,
+        "minimap-library": 17
+      },
+      "844x390": {
+        "spawn": 12,
+        "library": 12,
+        "objects": 17,
+        "foreground": 1,
+        "collision": 1,
+        "minimap-library": 12
+      }
+    },
+    "objectGroundGroups": 0,
+    "objectForegroundGroups": 0,
+    "objectOverlayGroups": 0,
+    "southGateNodes": 1,
+    "southGateRect": {
+      "x": 1458.5635359116022,
+      "y": 2439.779005524862,
+      "width": 974.5856353591159,
+      "height": 440.2209944751381
+    }
+  },
+  "projectionCounts": {
+    "renderObjects": 17,
+    "foregroundObjects": 1,
+    "destinations": 8,
+    "logicalDestinations": 8,
+    "guidePaths": 8,
+    "minimapPoints": 8,
+    "collisionObjects": 8,
+    "spatialIndexEntries": 48
+  },
+  "visualRegression": {
+    "comparisons": 24,
+    "staticPixelExact": 12,
+    "unexpectedPixels": 0,
+    "imageNodeMismatches": 0,
+    "visibleObjectOrderMismatches": 0,
+    "assetRequestMismatches": 0,
+    "decodedAssetByteMismatches": 0,
+    "consoleErrors": 0,
+    "consoleWarnings": 0,
+    "missingAssets": 0
+  },
+  "bundle": {
+    "rootRouteRawBytes": {
+      "step5": 1667776,
+      "step6": 1671077,
+      "delta": 3301
+    },
+    "rootRouteGzipBytes": {
+      "step5": 406900,
+      "step6": 407793,
+      "delta": 893,
+      "budget": 2048
+    },
+    "generatedRuntimeBytes": {
+      "step5": 16437,
+      "step6": 16930,
+      "delta": 493
+    },
+    "generatedCollisionBytes": {
+      "step5": 2195,
+      "step6": 2195,
+      "delta": 0
+    },
+    "renderPlannerSourceBytes": 4444
+  },
+  "integrity": {
+    "collisionAndMaskFilesCompared": 5,
+    "collisionAndMaskFilesChanged": 0,
+    "runtimeAssetsCompared": 31,
+    "runtimeAssetsChanged": 0,
+    "generatedCollisionChanged": false,
+    "homeContentChanged": false
+  },
+  "clientImportAudit": {
+    "buildOnlySymbolOccurrences": 0,
+    "nodeBuiltinOccurrences": 0,
+    "libraryRuntimeAssetPathOccurrences": 1
+  },
+  "rollback": {
+    "rendererOnly": true,
+    "step5FixtureHash": "3670664d7327f9c236a60950b3b85459ea8847361de691b7549367903239e5df",
+    "authorityRollbackRequired": false,
+    "assetRegenerationRequired": false,
+    "collisionMaskRegenerationRequired": false,
+    "homeRollbackRequired": false,
+    "sameEnvironmentVisualVerification": "PASS"
+  }
+}

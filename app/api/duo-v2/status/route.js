@@ -1,4 +1,4 @@
-import { duoResponse, duoResponseWithRealtime, duoStorageFailure, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
+import { duoResponse, duoStorageFailure, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
 import { getDuoSessionStatus } from '@/lib/duoSession.server'
 
 export const dynamic = 'force-dynamic'
@@ -15,5 +15,5 @@ export async function GET(request) {
   if (invalid) return invalid
   const { data, error } = await getDuoSessionStatus(auth.user.id, body.sessionId, body.clientId)
   if (error) return duoStorageFailure('status', error)
-  return duoResponseWithRealtime(data, auth.user.id, body.clientId)
+  return duoResponse(data)
 }

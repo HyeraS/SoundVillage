@@ -1,0 +1,41 @@
+{
+  "version": "2C-C-v1",
+  "productionRoute": "/music-test",
+  "responsiveRoute": "/music-responsive-test",
+  "browser": {
+    "assets": "ready",
+    "consoleWarnings": 0,
+    "consoleErrors": 0,
+    "desktopCssViewport": "1280x720",
+    "desktopCanvasBackingStore": "2560x1328",
+    "responsiveFrames": ["390x640", "720x390"]
+  },
+  "captures": {
+    "comparison": "legacy-vs-production-comparison.png",
+    "overview": "production-overview.png",
+    "emissiveOff": "production-emissive-off.png",
+    "grayscale": "production-grayscale.png",
+    "collisionSlots": "collision-slot-clearance-overlay.png",
+    "playerHitbox": "player-20x14-corner-tests.png",
+    "entrances": "stage-gate-building-entrances.png",
+    "groupABlock1": "desktop-start-group-a-block-1.png",
+    "groupBBlock1": "desktop-start-group-b-block-1.png",
+    "groupBBlock6": "desktop-group-b-block-6.png",
+    "completed15": "desktop-group-b-block-1-completed-15.png",
+    "completed83": "desktop-group-b-completed-83.png",
+    "responsive": "mobile-responsive-contact-sheet.png",
+    "keyboardHold": "desktop-gate-keyboard-hold.png"
+  },
+  "automated": {
+    "metadata": "pass",
+    "groupA83": "pass",
+    "groupB83": "pass",
+    "researcherBypass166": "pass-diagnostic-only",
+    "deterministicOrder": "pass",
+    "uniqueSlots": "pass",
+    "collisionAndClearance": "pass",
+    "scopedLint": "pass",
+    "productionBuild": "pass"
+  },
+  "manualFollowUp": "Sustained tactile walkthrough recommended; macOS accessibility denied subsequent held-key injection (error 1002)."
+}

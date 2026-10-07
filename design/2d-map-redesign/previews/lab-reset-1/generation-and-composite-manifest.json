@@ -1,0 +1,267 @@
+{
+  "date": "2026-08-30",
+  "tool": "built-in image_gen",
+  "calls": 2,
+  "selected": "concept-main.png",
+  "rejectedDraft": "concept-draft-not-selected.png",
+  "requestedSize": [
+    1536,
+    1152
+  ],
+  "actualSize": [
+    1448,
+    1086
+  ],
+  "worldReviewSize": [
+    1536,
+    1152
+  ],
+  "scale": 1.0607734806629834,
+  "resampling": "nearest-neighbor, non-integer review resampling only; not final pixel specification",
+  "references": [
+    {
+      "path": "design/concepts/lab-sound-observatory-concept-v1.png",
+      "sha256": "e7d7530c3ccd319d3cdb9aa472e661d49f08d7e527ac90e9f1c9eb7ae56e5d61"
+    },
+    {
+      "path": "Codex 이미지 2026년 8월 30일 오후 03_52_53.png",
+      "sha256": "e7d7530c3ccd319d3cdb9aa472e661d49f08d7e527ac90e9f1c9eb7ae56e5d61"
+    }
+  ],
+  "prompts": [
+    "imagegen-prompt.txt",
+    "imagegen-correction-prompt.txt"
+  ],
+  "correctionReference": "concept-draft-not-selected.png",
+  "character": {
+    "source": "components/ZoneMap.js PixelChar + components/AssetRegistry.js WORLD_CHARACTER",
+    "layers": [
+      "public/assets/world/player_body.png",
+      "public/assets/world/player_clothes.png",
+      "public/assets/world/player_hair.png"
+    ],
+    "sourceFrame": [
+      32,
+      32
+    ],
+    "rows": {
+      "down": 0,
+      "up": 1
+    },
+    "column": 0,
+    "displayBox": [
+      72,
+      88
+    ],
+    "preserveAspectRatio": "default xMidYMid meet",
+    "content": [
+      72,
+      72
+    ],
+    "offset": [
+      0,
+      8
+    ],
+    "footAnchor": "display box bottom center; visible sprite ends 8px above anchor, matching existing SVG",
+    "sourceAlphaBounds": [
+      9,
+      12,
+      14,
+      20
+    ]
+  },
+  "markers": {
+    "reference": "app/lab-observatory-art-preview/ObservatoryPreview.js",
+    "innerRadius": 14,
+    "activeOuterRadius": 20,
+    "opacity": {
+      "active": 1,
+      "completed": 0.58,
+      "locked": 0.3
+    },
+    "positions": [
+      {
+        "x": 704,
+        "y": 880,
+        "state": "active"
+      },
+      {
+        "x": 848,
+        "y": 928,
+        "state": "completed"
+      },
+      {
+        "x": 816,
+        "y": 800,
+        "state": "locked"
+      },
+      {
+        "x": 512,
+        "y": 480,
+        "state": "active"
+      },
+      {
+        "x": 528,
+        "y": 720,
+        "state": "completed"
+      },
+      {
+        "x": 400,
+        "y": 552,
+        "state": "locked"
+      },
+      {
+        "x": 1024,
+        "y": 512,
+        "state": "active"
+      },
+      {
+        "x": 1024,
+        "y": 656,
+        "state": "completed"
+      },
+      {
+        "x": 1008,
+        "y": 704,
+        "state": "locked"
+      }
+    ],
+    "realSounds": false
+  },
+  "cameras": {
+    "full": {
+      "label": "전체 맵",
+      "cam": [
+        0,
+        0,
+        1536,
+        1152
+      ],
+      "player": [
+        768,
+        960
+      ]
+    },
+    "entrance": {
+      "label": "입구 · 현행 시야 기준",
+      "cam": [
+        384,
+        576,
+        768,
+        576
+      ],
+      "player": [
+        768,
+        960
+      ]
+    },
+    "approach": {
+      "label": "중앙 접근 · 구도 제안",
+      "cam": [
+        384,
+        260,
+        768,
+        576
+      ],
+      "player": [
+        768,
+        790
+      ]
+    },
+    "adjacent": {
+      "label": "중앙 + 서측 연구 구역 · 구도 제안",
+      "cam": [
+        192,
+        240,
+        768,
+        576
+      ],
+      "player": [
+        500,
+        570
+      ]
+    },
+    "mobile": {
+      "label": "모바일 390 · 24×18 비교 창",
+      "cam": [
+        192,
+        240,
+        768,
+        576
+      ],
+      "player": [
+        500,
+        570
+      ],
+      "output": [
+        390,
+        293
+      ]
+    },
+    "mobile320": {
+      "label": "모바일 320 · 24×18 비교 창",
+      "cam": [
+        192,
+        240,
+        768,
+        576
+      ],
+      "player": [
+        500,
+        570
+      ],
+      "output": [
+        320,
+        240
+      ]
+    },
+    "portrait": {
+      "label": "현행 Lab 세로 시야 위험 검토",
+      "cam": [
+        358,
+        268,
+        285,
+        576
+      ],
+      "player": [
+        500,
+        570
+      ],
+      "output": [
+        390,
+        788
+      ]
+    },
+    "landscape": {
+      "label": "현행 Lab 가로 시야 기준",
+      "cam": [
+        0,
+        268,
+        1242,
+        576
+      ],
+      "player": [
+        500,
+        570
+      ],
+      "output": [
+        720,
+        334
+      ]
+    }
+  },
+  "portraitCalculation": "HUD 56; worldH 576; worldW=round(576*390/(844-56))=285; following foot minus14 center; no camera implementation changed",
+  "landscapeCalculation": "worldW=round(576*720/(390-56))=1242",
+  "layers": [
+    "environment",
+    "player",
+    "markers",
+    "route",
+    "old-whitebox",
+    "concept-guide"
+  ],
+  "newConceptCapacity": "UNVERIFIED",
+  "newCollision": "NOT_IMPLEMENTED",
+  "emissiveOff": "NOT_AVAILABLE; generated lighting is baked into environment",
+  "protection": "all writes limited to new lab-reset-1 review folder and requested report"
+}

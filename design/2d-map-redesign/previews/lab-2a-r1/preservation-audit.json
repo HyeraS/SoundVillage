@@ -1,0 +1,9 @@
+{
+  "existingFilesChecked": 9709,
+  "changedExistingFiles": [
+    "components/WorldMap.js",
+    "lib/animalVillage.js",
+    "lib/natureVillage.js"
+  ],
+  "missingExistingFiles": []
+}

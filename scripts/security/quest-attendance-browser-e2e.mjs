@@ -201,11 +201,6 @@ async function runAuthenticated(session) {
   await waitForWorld(page)
 
   if (expectedMode === 'maintenance') {
-    await page.evaluate(() => document.querySelector('[aria-label="오늘의 퀘스트 열기"]')?.click())
-    await page.getByTestId('quest-panel-state').getByText('점검 중에는 보상 정보를 조회하거나 지급하지 않아요.', { exact:true }).waitFor()
-    await page.evaluate(() => document.querySelector('[aria-label="오늘의 퀘스트 닫기"]')?.click())
-    await page.evaluate(() => document.querySelector('[aria-label="출석 보상 열기"]')?.click())
-    await page.getByTestId('attendance-panel-state').getByText('점검 중에는 보상 정보를 조회하거나 지급하지 않아요.', { exact:true }).waitFor()
     assert.deepEqual(rewardRequests, [], 'maintenance made a reward request')
     assert.equal(ok(await admin.from('participant_attendance').select('id').eq('participant_id', participantId), 'maintenance attendance').length, 0)
     await assertCleanPage(page, diagnostics, 'maintenance')

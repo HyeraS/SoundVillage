@@ -5,8 +5,11 @@ import test from 'node:test'
 const root = new URL('../../', import.meta.url)
 const read = (path) => readFile(new URL(path, root), 'utf8')
 
-test('012 stores only token hashes and enforces two roles, one visitor and one active host session', async () => {
-  const sql = await read('scripts/security/012_duo_session_v2.sql')
+test('012 remains historical while 015 switches Duo Realtime to Supabase Auth membership', async () => {
+  const [sql, forward] = await Promise.all([
+    read('scripts/security/012_duo_session_v2.sql'),
+    read('scripts/security/015_duo_es256_realtime_authorization.sql'),
+  ])
   assert.match(sql, /token_hash text primary key/)
   assert.doesNotMatch(sql, /\b(?:join|invite)_token\s+text\b/i)
   assert.match(sql, /unique\(session_id,role\)/)
@@ -20,6 +23,20 @@ test('012 stores only token hashes and enforces two roles, one visitor and one a
   assert.match(sql, /set search_path=''/g)
   assert.doesNotMatch(sql, /grant (?:select|insert|update|delete).*authenticated/i)
   assert.doesNotMatch(sql, /drop policy/i)
+  assert.match(forward, /PREFLIGHT_REQUIRED: apply and verify migrations 001 through 014 first/)
+  assert.match(forward, /create or replace function private\.is_realtime_room_member\(p_topic text\)/)
+  assert.match(forward, /auth\.uid\(\) is not null/)
+  assert.match(forward, /p_topic='duo-v2:'\|\|session\.id::text/)
+  assert.match(forward, /member\.auth_user_id=auth\.uid\(\)/)
+  assert.match(forward, /participant\.status='active'/)
+  assert.match(forward, /session\.status='active'/)
+  assert.match(forward, /session\.expires_at>now\(\)/)
+  assert.match(forward, /member\.left_at is null/)
+  assert.match(forward, /lease\.state='active'/)
+  assert.match(forward, /lease\.heartbeat_at>now\(\)-interval '45 seconds'/)
+  assert.match(forward, /security definer set search_path=''/)
+  assert.doesNotMatch(forward.slice(forward.indexOf('create or replace function')), /duo_(?:session_id|client_id|role)/)
+  assert.doesNotMatch(forward, /grant (?:select|insert|update|delete)|to (?:public|anon)|drop policy|alter policy/i)
 })
 
 test('Duo APIs derive identity from bearer auth and expose allow-listed response fields', async () => {
@@ -33,7 +50,9 @@ test('Duo APIs derive identity from bearer auth and expose allow-listed response
   assert.doesNotMatch(routes, /body\.(?:participant|auth)/)
   assert.match(server, /createHmac\('sha256'/)
   assert.match(server, /createHash\('sha256'\)/)
-  for (const claim of ['duo_session_id', 'duo_client_id', 'duo_role']) assert.match(server, new RegExp(claim))
+  assert.doesNotMatch(`${api}\n${routes}\n${server}`, /SUPABASE_JWT_SECRET|realtimeToken|duo_session_id|duo_client_id|duo_role/)
+  assert.match(server, /DUO_SESSION_HMAC_SECRET/)
+  assert.doesNotMatch(api, /console\.error\([^\n]*(?:message|access_token|inviteToken|sessionId|clientId)/)
 })
 
 test('client subscribes only to a validated server session and validates every position payload', async () => {
@@ -44,7 +63,29 @@ test('client subscribes only to a validated server session and validates every p
   assert.match(source, /document\.visibilityState !== 'visible'/)
   assert.match(source, /DUO_POSITION_STALE_MS/)
   assert.match(source, /DUO_RECONNECT_MAX_ATTEMPTS/)
+  assert.match(source, /auth\.getSession\(\)/)
+  assert.match(source, /realtime\.setAuth\(data\.session\.access_token\)/)
+  assert.match(source, /lastPositionRef/)
+  assert.match(source, /currentScreen[\s\S]*channel\.send\(\{ type:'broadcast', event:'pos'/)
   assert.doesNotMatch(source, /shareToken|joinToken|inviteToken|probe.*channel/i)
+  assert.doesNotMatch(source, /realtimeToken|SUPABASE_JWT_SECRET/)
+})
+
+test('private navigation uses waiting presence without making one participant follow the other', async () => {
+  const [page, navigation, contract] = await Promise.all([
+    read('app/page.js'),
+    read('lib/duoNavigation.mjs'),
+    read('lib/duoSessionContract.mjs'),
+  ])
+  assert.match(contract, /\['worldmap', 'interior', 'waiting'\]/)
+  assert.doesNotMatch(contract, /'zone'|'museum'|'music'|'nature'/)
+  assert.match(page, /resolveDuoPresenceScreen\(\{ screen, visiting:Boolean\(visiting\) \}\)/)
+  assert.match(page, /resolveDuoVisitorFollowAction/)
+  assert.match(navigation, /screen === 'world'[\s\S]*return 'worldmap'/)
+  assert.match(navigation, /return 'waiting'/)
+  assert.match(navigation, /peerScreen === 'interior'/)
+  assert.match(navigation, /peerScreen === 'worldmap' && visiting/)
+  assert.doesNotMatch(navigation, /setScreen|setActiveZone|participantId|groupId|unlockedBlock/)
 })
 
 test('new user events never add tokens, URLs, IDs or coordinates to metadata', async () => {

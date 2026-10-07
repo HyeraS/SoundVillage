@@ -1,0 +1,30 @@
+ M PROJECT_SUMMARY.md
+ M app/music-test/page.js
+ M app/page.js
+ M components/GameEngine.js
+ M components/LibraryRoom.js
+ M components/MusicZoneMap.js
+ M components/WorldMap.js
+ M components/ZoneMap.js
+ M lib/animalVillage.js
+ M lib/musicVillage.js
+ M lib/natureVillage.js
+ M package.json
+?? "Codex \354\235\264\353\257\270\354\247\200 2026\353\205\204 8\354\233\224 30\354\235\274 \354\230\244\355\233\204 03_52_53.png"
+?? "Cozy Christmas Market Map Design/"
+?? SoundVillage-house-decor-2d.code-workspace
+?? app/animal-test/
+?? app/lab-observatory-art-preview/
+?? app/lab-observatory-cohesion-preview/
+?? app/lab-observatory-identity-preview/
+?? app/lab-observatory-pixel-preview/
+?? app/lab-whitebox-preview/
+?? app/music-responsive-test/
+?? app/music-whitebox-preview/
+?? components/AnimalZoneMap.js
+?? "cozy animal village map design/"
+?? design/
+?? lib/musicVillageConfig.mjs
+?? public/assets/music-village/
+?? public/design-previews/
+?? scripts/test_music_production.mjs

@@ -1,0 +1,37 @@
+{
+  "baseUrl": "http://localhost:3003",
+  "desktop": {
+    "viewport": "1280x720",
+    "normalModeHomeObjects": 1,
+    "failedAssets": 0,
+    "onboardingDistanceText": "약 12타일",
+    "autoWalkArrived": true,
+    "nearDestination": "Home",
+    "playerAtArrival": { "x": 1628, "y": 1712 },
+    "keyboardEnterOpenedInterior": true
+  },
+  "mobile": {
+    "viewport": "390x844",
+    "homeHudTextVisible": true,
+    "homeObjectCount": 1,
+    "confirmControl": { "text": "↵ 입장", "ariaLabel": "우리 집 들어가기", "width": 44, "height": 44 },
+    "touchEntryOpenedInterior": true
+  },
+  "layers": {
+    "normalGameplayHome": 1,
+    "objectsModeHome": 1,
+    "objectsModeGuesthouse": 1,
+    "homeLayer": "gameplay",
+    "homeAssetId": "landmark-home-hub"
+  },
+  "invite": {
+    "requiredFurnitureCount": 4,
+    "qaEmptyUrlNodes": 0,
+    "qaCopyButtons": 0,
+    "tokenErrorUrlNodes": 0,
+    "tokenErrorCopyButtons": 0,
+    "tokenErrorRetryButtons": 1,
+    "tokenErrorMessage": "네트워크 연결이 없어 초대 토큰을 받지 못했어요."
+  },
+  "console": { "errors": 0, "warnings": 0 }
+}

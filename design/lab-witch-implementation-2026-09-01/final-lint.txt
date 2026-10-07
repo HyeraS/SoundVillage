@@ -1,0 +1,537 @@
+
+> soundmimic-village@0.1.0 lint
+> eslint
+
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/Cozy Christmas Market Map Design/support.js
+   192:10  warning  React Hook React.useMemo has an unnecessary dependency: 'entry.propsMeta'. Either exclude it or remove the dependency array. Outer scope values like 'entry.propsMeta' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+   198:10  error    ReactDOM.render is deprecated since React 18.0.0, use createRoot instead, see https://reactjs.org/link/switch-to-createroot                                                                                                                             react/no-deprecated
+  1215:9   error    Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable                                                                                                                                                 @next/next/no-assign-module-variable
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/daily-quest-test/page.js
+  144:6  warning  React Hook useEffect has a missing dependency: 'peekOnly'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/fence-test/page.js
+  26:5   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+  73:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/house-decor-test/page.js
+  14:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  12 |     const invitedHouse = new URLSearchParams(window.location.search).get('house')?.trim()
+  13 |     if (!invitedHouse) return
+> 14 |     setVisitorMode(true)
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  15 |     setParticipantId(invitedHouse)
+  16 |   }, [])
+  17 |  react-hooks/set-state-in-effect
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/interior-test/page.js
+  33:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  31 |   const [meId, setMeId] = useState('AUDIOTEST')
+  32 |   useEffect(() => {
+> 33 |     setMeId(new URLSearchParams(window.location.search).get('me')?.trim() || 'AUDIOTEST')
+     |     ^^^^^^^ Avoid calling setState() directly within an effect
+  34 |   }, [])
+  35 |
+  36 |   useEffect(() => {                                                                                                react-hooks/set-state-in-effect
+  38:21  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  36 |   useEffect(() => {
+  37 |     const houseId = new URLSearchParams(window.location.search).get('house')?.trim()
+> 38 |     if (!houseId) { setCheckedVisit(true); return }
+     |                     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  39 |     let cancelled = false
+  40 |     probeHost(houseId).then(({ screen }) => {
+  41 |       if (cancelled) return  react-hooks/set-state-in-effect
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/nature-village/page.js
+  97:9  error  Do not use an `<a>` element to navigate to `/`. Use `<Link />` from `next/link` instead. See: https://nextjs.org/docs/messages/no-html-link-for-pages  @next/next/no-html-link-for-pages
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/app/page.js
+  190:40  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  188 |   }, [participantId, effectiveGroupId, bypassGroupFilter])
+  189 |
+> 190 |   useEffect(() => { if (participantId) refreshCounts() }, [participantId, refreshCounts])
+      |                                        ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  191 |
+  192 |   // 출석 체크인 — 오늘 처음 월드에 들어왔을 때 한 번만 자동 지급.
+  193 |   // lib/attendance.js가 "이미 오늘 체크인했음"을 자체적으로 판별하므로                                                                                           react-hooks/set-state-in-effect
+  276:40  error    Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  274 |   }, [participantId, effectiveGroupId, bypassGroupFilter, studyAccessEnabled, findSoundByDbId])
+  275 |
+> 276 |   useEffect(() => { if (participantId) checkVillagesUnlocked() }, [participantId, checkVillagesUnlocked])
+      |                                        ^^^^^^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  277 |
+  278 |   /* ── DB sound_id → 재생 가능한 sound 오브젝트 (메타데이터에 없으면 합성) ── */
+  279 |   const resolveSoundFromDbId = useCallback((dbId, all) => {  react-hooks/set-state-in-effect
+  387:6   warning  React Hook useCallback has an unnecessary dependency: 'findSoundByDbId'. Either exclude it or remove the dependency array                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/exhaustive-deps
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/components/AnnotationPanel.js
+   73:65  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  71 | function SegmentedWaveform({ accent, progress, segLabel, isSegmented, segs, onSeek }) {
+  72 |   const BAR = 44;
+> 73 |   const heights = useRef(Array.from({ length: BAR }, () => 18 + Math.random() * 65));
+     |                                                                 ^^^^^^^^^^^^^ Cannot call impure function
+  74 |   const wrapRef = useRef(null);
+  75 |
+  76 |   // 파형 내 세그먼트 경계 비율 (0~1)                                                                                                                 react-hooks/purity
+  133:10  error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  131 |         }}
+  132 |       >
+> 133 |         {heights.current.map((h, i) => (
+      |          ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  134 |           <div
+  135 |             key={i}
+  136 |             style={{                                                                                                                                                                                                                                                                         react-hooks/refs
+  133:10  error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  131 |         }}
+  132 |       >
+> 133 |         {heights.current.map((h, i) => (
+      |          ^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  134 |           <div
+  135 |             key={i}
+  136 |             style={{                                                                                                                                                                                                                                                                     react-hooks/refs
+  298:3   warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/exhaustive-deps')
+  329:10  error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  327 |   const getDuration = useCallback(() => durationRef.current, []);
+  328 |
+> 329 |   return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual, getDuration };
+      |          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  330 | }
+  331 |
+  332 | /* ─────────────────────────────────────────────  react-hooks/refs
+  329:92  error    Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  327 |   const getDuration = useCallback(() => durationRef.current, []);
+  328 |
+> 329 |   return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segsRef.current, toggle, seekVirtual, getDuration };
+      |                                                                                            ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  330 | }
+  331 |
+  332 | /* ─────────────────────────────────────────────                                      react-hooks/refs
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/components/LibraryRoom.js
+  133:7   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  142:7   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  159:31  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  157 |   const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
+  158 |   const row = rows[dir] ?? rows.down
+> 159 |   const walkTick = Math.floor(Date.now() / 100) % cols.length
+      |                               ^^^^^^^^^^ Cannot call impure function
+  160 |   const srcCol = cols[moving ? walkTick : 0]
+  161 |   const scaleX = SPRITE_W / fs, scaleY = SPRITE_H / fs
+  162 |   return (  react-hooks/purity
+  165:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  489:9   warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  499:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  503:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+  507:11  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element                                                                                                                                                                                                                                                                                                                                                                                                                                                    @next/next/no-img-element
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/components/SoundMuseum.js
+   58:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  56 |     pausedRef.current = false
+  57 |     durRef.current = null
+> 58 |     setPlaying(false)
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  59 |     setProgress(0)
+  60 |     setError('')
+  61 |   }, [filePath, clearPoll])                                                                                                                                                                                                                          react-hooks/set-state-in-effect
+  106:65  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  104 | function MiniWave({ progress, accent }) {
+  105 |   const BAR = 30
+> 106 |   const heights = useRef(Array.from({ length: BAR }, () => 15 + Math.random() * 72))
+      |                                                                 ^^^^^^^^^^^^^ Cannot call impure function
+  107 |   return (
+  108 |     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '32px', margin: '8px 0' }}>
+  109 |       {heights.current.map((h, i) => {                                                                                                                                                                                                                                                                                                                                                                                               react-hooks/purity
+  109:8   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  107 |   return (
+  108 |     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '32px', margin: '8px 0' }}>
+> 109 |       {heights.current.map((h, i) => {
+      |        ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  110 |         const filled = (i + 0.5) / BAR <= progress
+  111 |         return (
+  112 |           <div key={i} style={{                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react-hooks/refs
+  109:8   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  107 |   return (
+  108 |     <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '32px', margin: '8px 0' }}>
+> 109 |       {heights.current.map((h, i) => {
+      |        ^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  110 |         const filled = (i + 0.5) / BAR <= progress
+  111 |         return (
+  112 |           <div key={i} style={{                                                                                                                                                                                                                                                                                                                                                                                                                                                                 react-hooks/refs
+  246:21  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  244 |   }, [participantId])
+  245 |
+> 246 |   useEffect(() => { refresh() }, [refresh])
+      |                     ^^^^^^^ Avoid calling setState() directly within an effect
+  247 |
+  248 |   const handleBuy = async (product) => {
+  249 |     const price = getEffectivePrice(product, dailyDeal)                                                                                                                                                                                 react-hooks/set-state-in-effect
+  421:19  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  419 |   // 후보 표현 로드 — 투표할 소리가 없으면(sound=null) 아예 요청하지 않는다.
+  420 |   useEffect(() => {
+> 421 |     if (!sound) { setCandidates([]); setLoading(false); return }
+      |                   ^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  422 |     getCandidateExpressions(sound.sound_id, myExpression)
+  423 |       .then(data => setCandidates(data.slice(0, 5)))
+  424 |       .catch(err => { console.error('[Museum] 후보 로드 오류:', err); setCandidates([]) })  react-hooks/set-state-in-effect
+  533:23  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react/no-unescaped-entities
+  676:27  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react/no-unescaped-entities
+  676:47  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              react/no-unescaped-entities
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/components/WorldMap.js
+  1456:28  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  1454 |
+  1455 | function PixelChar({ dir, moving, outfitSrc }) {
+> 1456 |   const tick  = Math.floor(Date.now() / 160) % 2
+       |                            ^^^^^^^^^^ Cannot call impure function
+  1457 |   const frame = moving ? tick : 0
+  1458 |
+  1459 |   if (ASSET_READY.world) {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/purity
+  1465:33  error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  1463 |     // 완전한 걷기 사이클(오른발 스텝 0~3 + 왼발 스텝 4~7)이라 100ms마다 한 칸씩 순서대로
+  1464 |     // 돌려야 자연스럽다 — 예전엔 0번/4번 프레임만 번갈아 써서 제자리 씰룩임처럼 보였다.
+> 1465 |     const walkTick = Math.floor(Date.now() / 100) % cols.length
+       |                                 ^^^^^^^^^^ Cannot call impure function
+  1466 |     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
+  1467 |     // 중첩된 svg의 viewBox 암시적 클리핑이 foreignObject 안에서는 이전 프레임 일부가
+  1468 |     // 새어나오는 경우가 있어서(특히 CHAR_W/H가 32x32 프레임과 비율이 다를 때), 기존                                                                                                                                                                                                                                                                                                              react-hooks/purity
+  2010:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  2008 |   useEffect(() => {
+  2009 |     const q = new URLSearchParams(window.location.search)
+> 2010 |     setUrlDuoHostId(q.get('duo')?.trim() || participantId)
+       |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  2011 |   }, [participantId])
+  2012 |   const duoHostId = duoHostIdProp || urlDuoHostId
+  2013 |   const { partnerId, partnerPos, sendPosition } = useDuoSession(duoHostId, participantId)  react-hooks/set-state-in-effect
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/components/ZoneMap.js
+  2563:28   error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  2561 |
+  2562 | export function PixelChar({ dir, moving }) {
+> 2563 |   const tick  = Math.floor(Date.now() / 160) % 2
+       |                            ^^^^^^^^^^ Cannot call impure function
+  2564 |   const frame = moving ? tick : 0
+  2565 |
+  2566 |   if (ASSET_READY.world) {                                                                                                                                                                                                                                                                                                                                                                                                                                                              react-hooks/purity
+  2569:33   error  Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  2567 |     const { frame: fs, rows, cols, layers } = WORLD_CHARACTER
+  2568 |     const row = rows[dir] ?? rows.down
+> 2569 |     const walkTick = Math.floor(Date.now() / 100) % cols.length
+       |                                 ^^^^^^^^^^ Cannot call impure function
+  2570 |     const srcX = cols[moving ? walkTick : 0] * fs, srcY = row * fs
+  2571 |     return (
+  2572 |       <svg width={SPRITE_W} height={SPRITE_H} viewBox={`0:0 ${fs} ${fs}`}                                                                                                                                                                                                                                                                                     react-hooks/purity
+  2984:27   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2982 |   if (zone === 'Lab') {
+  2983 |     const labItems = itemsRef.current.items
+> 2984 |     const labIntrusions = labItems.filter(it => !isLabFloorTile(it.tx, it.ty))
+       |                           ^^^^^^^^ Passing a ref to a function may read its value during render
+  2985 |     console.log(
+  2986 |       `[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 ${labItems.length}개 중 바닥 밖 배치 ${labIntrusions.length}개` +
+  2987 |       (labIntrusions.length ? ` FAIL: ${JSON.stringify(labIntrusions.map(i => ({ tx:i.tx, ty:i.ty })))}` : ' PASS')                                                                                                                                                                       react-hooks/refs
+  2984:27   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2982 |   if (zone === 'Lab') {
+  2983 |     const labItems = itemsRef.current.items
+> 2984 |     const labIntrusions = labItems.filter(it => !isLabFloorTile(it.tx, it.ty))
+       |                           ^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  2985 |     console.log(
+  2986 |       `[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 ${labItems.length}개 중 바닥 밖 배치 ${labIntrusions.length}개` +
+  2987 |       (labIntrusions.length ? ` FAIL: ${JSON.stringify(labIntrusions.map(i => ({ tx:i.tx, ty:i.ty })))}` : ' PASS')                                                                                                                                                                react-hooks/refs
+  2986:47   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2984 |     const labIntrusions = labItems.filter(it => !isLabFloorTile(it.tx, it.ty))
+  2985 |     console.log(
+> 2986 |       `[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 ${labItems.length}개 중 바닥 밖 배치 ${labIntrusions.length}개` +
+       |                                               ^^^^^^^^^^^^^^^ Cannot access ref value during render
+  2987 |       (labIntrusions.length ? ` FAIL: ${JSON.stringify(labIntrusions.map(i => ({ tx:i.tx, ty:i.ty })))}` : ' PASS')
+  2988 |     )
+  2989 |   }                                                                                                                                                                                                                             react-hooks/refs
+  2994:32   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2992 |   // (buildZoneObjects()는 sounds/아이템 위치를 모르는 채로 한 번만 생성되는 정적 목록이라
+  2993 |   // 이렇게 그리는 시점에 교차 필터링하는 게 가장 안전한 지점).
+> 2994 |   const itemTileKeys = new Set(itemsRef.current.items.map(it => `${it.tx},${it.ty}`))
+       |                                ^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  2995 |   const visibleZoneObjects = zoneObjects.current.filter(
+  2996 |     obj => !(obj.type === 'natureTree' && itemTileKeys.has(`${obj.tx},${obj.ty}`))
+  2997 |   )                                                                                                                                                                                                  react-hooks/refs
+  2994:32   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2992 |   // (buildZoneObjects()는 sounds/아이템 위치를 모르는 채로 한 번만 생성되는 정적 목록이라
+  2993 |   // 이렇게 그리는 시점에 교차 필터링하는 게 가장 안전한 지점).
+> 2994 |   const itemTileKeys = new Set(itemsRef.current.items.map(it => `${it.tx},${it.ty}`))
+       |                                ^^^^^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  2995 |   const visibleZoneObjects = zoneObjects.current.filter(
+  2996 |     obj => !(obj.type === 'natureTree' && itemTileKeys.has(`${obj.tx},${obj.ty}`))
+  2997 |   )                                                                                                                                                                                              react-hooks/refs
+  2995:30   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2993 |   // 이렇게 그리는 시점에 교차 필터링하는 게 가장 안전한 지점).
+  2994 |   const itemTileKeys = new Set(itemsRef.current.items.map(it => `${it.tx},${it.ty}`))
+> 2995 |   const visibleZoneObjects = zoneObjects.current.filter(
+       |                              ^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  2996 |     obj => !(obj.type === 'natureTree' && itemTileKeys.has(`${obj.tx},${obj.ty}`))
+  2997 |   )
+  2998 |                                                                                                                                                                                                                                                                         react-hooks/refs
+  2995:30   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  2993 |   // 이렇게 그리는 시점에 교차 필터링하는 게 가장 안전한 지점).
+  2994 |   const itemTileKeys = new Set(itemsRef.current.items.map(it => `${it.tx},${it.ty}`))
+> 2995 |   const visibleZoneObjects = zoneObjects.current.filter(
+       |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  2996 |     obj => !(obj.type === 'natureTree' && itemTileKeys.has(`${obj.tx},${obj.ty}`))
+  2997 |   )
+  2998 |                                                                                                                                                                                                                                                                  react-hooks/refs
+  3046:20   error  Error: Cannot call impure function during render
+
+`performance.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  3044 |   // 게임 루프
+  3045 |   useEffect(() => {
+> 3046 |     let lastTime = performance.now(), tickCount = 0
+       |                    ^^^^^^^^^^^^^^^^^ Cannot call impure function
+  3047 |     const loop = (now) => {
+  3048 |       const dt = Math.min((now - lastTime) / 16.67, 3)
+  3049 |       lastTime  = now                                                                                                                                                                                                                                                                                                                                                                                                                       react-hooks/purity
+  3149:21   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3147 |   }, [dir, collectedIds])
+  3148 |
+> 3149 |   const remaining = itemsRef.current.items.filter(it => !collectedIds.has(it.id)).length
+       |                     ^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  3150 |   const total     = itemsRef.current.items.length
+  3151 |   const collected = total - remaining
+  3152 |                                                                                                                                                                                                                                                                                                                                                  react-hooks/refs
+  3149:21   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3147 |   }, [dir, collectedIds])
+  3148 |
+> 3149 |   const remaining = itemsRef.current.items.filter(it => !collectedIds.has(it.id)).length
+       |                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  3150 |   const total     = itemsRef.current.items.length
+  3151 |   const collected = total - remaining
+  3152 |                                                                                                                                                                                                                                                                                                                                           react-hooks/refs
+  3151:21   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3149 |   const remaining = itemsRef.current.items.filter(it => !collectedIds.has(it.id)).length
+  3150 |   const total     = itemsRef.current.items.length
+> 3151 |   const collected = total - remaining
+       |                     ^^^^^ Cannot access ref value during render
+  3152 |
+  3153 |   // 세로로 보이는 월드 범위는 VIEW_H로 고정, 가로는 창 비율에 맞춰 확장.
+  3154 |   // (맵보다 넓어지는 초광폭 창에선 PX_W로 잘라 맵 밖이 과하게 노출되지 않게 한다.)                                                                                                                                                                                                                                                                                                             react-hooks/refs
+  3166:57   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3164 |
+  3165 |       {/* Zone HUD */}
+> 3166 |       <ZoneHUD zone={zone} collected={collected} total={total} onExit={onExit} blockNum={blockNum} blockTotal={blockTotal}/>
+       |                                                         ^^^^^ Cannot access ref value during render
+  3167 |
+  3168 |       {/* 게임 캔버스 — 컨테이너를 꽉 채운다(레터박스 없음). 세로 줌 고정, 가로만
+  3169 |           창 비율에 맞춰 확장(위 useEffect + viewWorldW/H). */}                                                                                                                                                                                                                                                                                                react-hooks/refs
+  3308:112  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3306 |               (nearGridLine)은 pathTiles를 그리든 안 그리든 좌표 자체로 독립 동작하므로 이 줄을
+  3307 |               빼도 스폰 로직엔 전혀 영향 없다 — 순수 시각 레이어만 끈다. ──*/}
+> 3308 |           {zone !== 'Animal' && zone !== 'Nature' && zone !== 'Urban' && zone !== 'Human' && zone !== 'Lab' && pathTiles.current.map((p, i) => (
+       |                                                                                                                ^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  3309 |             <rect key={i}
+  3310 |               x={p.tx * TILE} y={p.ty * TILE} width={TILE} height={TILE}
+  3311 |               fill={theme.path} stroke={`${theme.path}88`} strokeWidth="0.5"      react-hooks/refs
+  3308:112  error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3306 |               (nearGridLine)은 pathTiles를 그리든 안 그리든 좌표 자체로 독립 동작하므로 이 줄을
+  3307 |               빼도 스폰 로직엔 전혀 영향 없다 — 순수 시각 레이어만 끈다. ──*/}
+> 3308 |           {zone !== 'Animal' && zone !== 'Nature' && zone !== 'Urban' && zone !== 'Human' && zone !== 'Lab' && pathTiles.current.map((p, i) => (
+       |                                                                                                                ^^^^^^^^^^^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  3309 |             <rect key={i}
+  3310 |               x={p.tx * TILE} y={p.ty * TILE} width={TILE} height={TILE}
+  3311 |               fill={theme.path} stroke={`${theme.path}88`} strokeWidth="0.5"  react-hooks/refs
+  3331:12   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3329 |           {/* 소리 아이템 — zone 전체가 한 화면에 있고, 잠긴 구역은 안개(회색 점)로,
+  3330 |               해제된 구역은 아이콘으로, 완료된 것은 톤다운된 채로 계속 보임 */}
+> 3331 |           {itemsRef.current.items.map(item => {
+       |            ^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  3332 |             const state = collectedIds.has(item.id)
+  3333 |               ? 'done'
+  3334 |               : (item.sound.block || 1) <= blockNum ? 'active' : 'locked'                                                                                                                                                                                                                                                                      react-hooks/refs
+  3331:12   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3329 |           {/* 소리 아이템 — zone 전체가 한 화면에 있고, 잠긴 구역은 안개(회색 점)로,
+  3330 |               해제된 구역은 아이콘으로, 완료된 것은 톤다운된 채로 계속 보임 */}
+> 3331 |           {itemsRef.current.items.map(item => {
+       |            ^^^^^^^^^^^^^^^^^^^^^^^^^^ Cannot access ref value during render
+  3332 |             const state = collectedIds.has(item.id)
+  3333 |               ? 'done'
+  3334 |               : (item.sound.block || 1) <= blockNum ? 'active' : 'locked'                                                                                                                                                                                                                                                                  react-hooks/refs
+  3340:27   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3338 |           {/* 아직 열리지 않은 구역을 통째로 덮는 구름 — 그 안의 아이템이
+  3339 |               어디에 분포되어 있는지는 은은하게 비쳐 보이되 상호작용은 불가 */}
+> 3340 |           {Object.entries(zoneRegions).map(([b, region]) => {
+       |                           ^^^^^^^^^^^ Passing a ref to a function may read its value during render
+  3341 |             const bn = Number(b)
+  3342 |             if (bn <= blockNum) return null
+  3343 |             return <BlockCloud key={b} region={region} tick={tick} seed={bn}/>                                                                                                                                                                                                                                 react-hooks/refs
+  3396:27   error  Error: Cannot access refs during render
+
+React refs are values that are not needed for rendering. Refs should only be accessed outside of render, such as in event handlers or effects. Accessing a ref value (the `current` property) during render can cause your component not to update as expected (https://react.dev/reference/react/useRef).
+
+  3394 |
+  3395 |       {/* 완료 모달 */}
+> 3396 |       {remaining === 0 && total > 0 && (
+       |                           ^^^^^ Cannot access ref value during render
+  3397 |         <CompleteModal zone={zone} onExit={onExit}/>
+  3398 |       )}
+  3399 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react-hooks/refs
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/cozy animal village map design/design-reference/support.js
+   192:10  warning  React Hook React.useMemo has an unnecessary dependency: 'entry.propsMeta'. Either exclude it or remove the dependency array. Outer scope values like 'entry.propsMeta' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+   198:10  error    ReactDOM.render is deprecated since React 18.0.0, use createRoot instead, see https://reactjs.org/link/switch-to-createroot                                                                                                                             react/no-deprecated
+  1215:9   error    Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable                                                                                                                                                 @next/next/no-assign-module-variable
+
+/Users/hyera/Documents/SoundVillage-house-decor-2d/design_handoff_music_zone_map/support.js
+   192:10  warning  React Hook React.useMemo has an unnecessary dependency: 'entry.propsMeta'. Either exclude it or remove the dependency array. Outer scope values like 'entry.propsMeta' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+   198:10  error    ReactDOM.render is deprecated since React 18.0.0, use createRoot instead, see https://reactjs.org/link/switch-to-createroot                                                                                                                             react/no-deprecated
+  1215:9   error    Do not assign to the variable `module`. See: https://nextjs.org/docs/messages/no-assign-module-variable                                                                                                                                                 @next/next/no-assign-module-variable
+
+✖ 65 problems (50 errors, 15 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

@@ -1,0 +1,54 @@
+[
+  {
+    "name": "keyboard ArrowUp",
+    "state": "발 위치 (304.0, 458.2) · 충돌 접촉 0 · 이동 가능"
+  },
+  {
+    "name": "baseline blocks doorway",
+    "state": "발 위치 (304.0, 414.5) · 충돌 접촉 38 · 이동 가능"
+  },
+  {
+    "name": "proposed enters front bay",
+    "state": "발 위치 (304.0, 304.0) · 충돌 접촉 0 · 이동 가능"
+  },
+  {
+    "name": "desk collision",
+    "state": "발 위치 (269.1, 304.0) · 충돌 접촉 10 · 이동 가능"
+  },
+  {
+    "name": "rear-wall collision",
+    "state": "발 위치 (301.1, 190.5) · 충돌 접촉 15 · 이동 가능"
+  },
+  {
+    "name": "instrument collision",
+    "state": "발 위치 (429.1, 318.5) · 충돌 접촉 26 · 이동 가능"
+  },
+  {
+    "name": "pass to right of instrument",
+    "state": "발 위치 (461.1, 222.5) · 충돌 접촉 26 · 이동 가능"
+  },
+  {
+    "name": "return to corridor",
+    "state": "발 위치 (301.1, 478.5) · 충돌 접촉 26 · 이동 가능"
+  },
+  {
+    "name": "before same camera and position",
+    "state": "발 위치 (304.0, 464.0) · 충돌 접촉 0 · 이동 가능"
+  },
+  {
+    "name": "behind desk foot visibility",
+    "state": "발 위치 (208.0, 240.0) · 충돌 접촉 0 · 이동 가능"
+  },
+  {
+    "name": "west wall collision",
+    "state": "발 위치 (141.1, 336.0) · 충돌 접촉 32 · 이동 가능"
+  },
+  {
+    "name": "mobile pointer input",
+    "state": "발 위치 (304.0, 458.2) · 충돌 접촉 0 · 이동 가능"
+  },
+  {
+    "name": "mobile entered bay",
+    "state": "발 위치 (304.0, 298.2) · 충돌 접촉 0 · 이동 가능"
+  }
+]

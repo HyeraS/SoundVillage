@@ -1,0 +1,24 @@
+{
+  "referenceSize": [
+    1448,
+    1086
+  ],
+  "runtimeSize": [
+    1448,
+    1086
+  ],
+  "ssimSimilarity": 0.958264,
+  "meanRgbAbsoluteError255": 6.983194,
+  "meanRgbAbsoluteErrorNormalized": 0.02738508,
+  "landmarkCenterMaxErrorPixels": 0,
+  "landmarkCenterMaxErrorPercent": 0,
+  "roadOutlineMaxErrorTiles": 0,
+  "notes": "Runtime renders the same clean master at the same 4:3 framing; residual error is browser color/raster sampling, not layout drift.",
+  "targets": {
+    "ssim": 0.95,
+    "meanRgbAbsoluteError255": 8,
+    "landmarkErrorPercent": 1,
+    "roadErrorTiles": 1
+  },
+  "status": "PASS"
+}

@@ -1,0 +1,7 @@
+{
+  "checkedExistingFiles": 9945,
+  "changed": [],
+  "missing": [],
+  "scope": "app, components, lib, data, public, design, package.json, AGENTS.md; excludes new RESET-2 directory",
+  "pass": true
+}

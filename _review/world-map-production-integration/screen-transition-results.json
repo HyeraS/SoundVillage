@@ -1,0 +1,45 @@
+{
+  "status": "PARTIAL — backend verification required",
+  "rootPath": "/",
+  "browserMode": "development root app with development-only authenticated QA fixture",
+  "world": {
+    "mounted": true,
+    "baseAssetLoaded": true,
+    "assetUrl": "/assets/world/sound-archive-garden-v2/world-base-clean.png",
+    "asset404": false,
+    "aspectRatioStretchObserved": false
+  },
+  "destinations": {
+    "Animal": { "component": "AnimalZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true },
+    "Nature": { "component": "NatureZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true, "reachedFromSpawnByKeyboard": true },
+    "Human": { "component": "HumanZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true },
+    "Urban": { "component": "UrbanZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true },
+    "Music": { "component": "MusicZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true, "reachedFromSpawnByKeyboard": true },
+    "Lab": { "component": "LabZoneMap", "entered": true, "movedInside": true, "returnedToWorld": true, "exitConfirmation": true },
+    "Sound Library": { "component": "SoundMuseum", "entered": true, "returnedToWorld": true, "emptyCandidateSafe": true },
+    "Home": { "component": "InteriorDecorRoom", "entered": true, "returnedToWorld": true, "roomState": "fallback", "savedRoomLoaded": false }
+  },
+  "locking": {
+    "initialMusicOnly": true,
+    "lockedAnimalKeyboardBlocked": true,
+    "lockedAnimalMobileConfirmBlocked": true,
+    "unlockAfterMusicBlock1": "verified by production state contract and integration test; remote participant mutation was not performed"
+  },
+  "input": {
+    "Enter": true,
+    "Space": "same shared activation callback as Enter",
+    "mobileConfirm": true
+  },
+  "responsive": {
+    "desktop": true,
+    "portrait390x844": true,
+    "landscape844x390": true
+  },
+  "productionQueryIsolation": {
+    "url": "/?natureQa=1&worldStart=101,19&worldOverview=1&worldClean=1",
+    "worldMounted": false,
+    "startPanelMounted": true,
+    "result": "development QA query ignored by production build"
+  },
+  "productionSessionRestore": "not exercised because the configured Supabase is remote and no test participant/data mutation was authorized"
+}

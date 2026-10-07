@@ -1,4 +1,4 @@
-import { duoResponse, duoResponseWithRealtime, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
+import { duoResponse, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
 import { normalizeDuoScreen } from '@/lib/duoSessionContract.mjs'
 import { heartbeatDuoSession } from '@/lib/duoSession.server'
 
@@ -13,5 +13,5 @@ export async function POST(request) {
   if (invalid || !normalizeDuoScreen(parsed.body.screen)) return invalid || duoResponse({ ok:false, code:'invalid_request' })
   const { data, error } = await heartbeatDuoSession(auth.user.id, parsed.body.sessionId, parsed.body.clientId, parsed.body.screen, parsed.body.idempotencyKey)
   if (error) return duoStorageFailure('heartbeat', error)
-  return duoResponseWithRealtime(data, auth.user.id, parsed.body.clientId)
+  return duoResponse(data)
 }

@@ -1,0 +1,558 @@
+{
+  "schemaVersion": 1,
+  "scope": "design-and-measurement-only; no production code, runtime asset, or collision mutation",
+  "coordinateSystem": {
+    "unit": "world pixel",
+    "tileSize": 32,
+    "worldSize": [
+      3840,
+      2880
+    ],
+    "origin": "top-left"
+  },
+  "sourceAsset": {
+    "path": "design/world-map-v4/source-assets/landmark-home-player-hub-v1.png",
+    "size": [
+      1448,
+      1086
+    ],
+    "alphaBounds": {
+      "0": {
+        "left": 0,
+        "top": 41,
+        "right": 1331,
+        "bottom": 1086,
+        "width": 1331,
+        "height": 1045
+      },
+      "8": {
+        "left": 246,
+        "top": 111,
+        "right": 1205,
+        "bottom": 931,
+        "width": 959,
+        "height": 820
+      },
+      "16": {
+        "left": 246,
+        "top": 112,
+        "right": 1205,
+        "bottom": 931,
+        "width": 959,
+        "height": 819
+      }
+    },
+    "selectedCropThreshold": 8,
+    "selectedCropAspect": 1.169512,
+    "reason": "alpha > 8 and alpha > 16 differ by only one row; alpha > 0 expands to noise at the canvas edges"
+  },
+  "currentRuntime": {
+    "declaredWorldBox": {
+      "left": 1440,
+      "top": 1368,
+      "right": 1888,
+      "bottom": 1752,
+      "width": 448,
+      "height": 384
+    },
+    "runtimeAssetSize": [
+      448,
+      384
+    ],
+    "runtimeAlphaBounds": {
+      "0": {
+        "left": 30,
+        "top": 5,
+        "right": 408,
+        "bottom": 375,
+        "width": 378,
+        "height": 370
+      },
+      "8": {
+        "left": 83,
+        "top": 26,
+        "right": 406,
+        "bottom": 327,
+        "width": 323,
+        "height": 301
+      },
+      "16": {
+        "left": 83,
+        "top": 26,
+        "right": 406,
+        "bottom": 327,
+        "width": 323,
+        "height": 301
+      }
+    },
+    "visibleWorldBoundsAlphaGt8": {
+      "left": 1523,
+      "top": 1394,
+      "right": 1846,
+      "bottom": 1695,
+      "width": 323,
+      "height": 301
+    },
+    "visibleSizeAlphaGt8": [
+      323,
+      301
+    ],
+    "visibleBottomCenterAlphaGt8": [
+      1684.5,
+      1695
+    ],
+    "declaredSortY": 1752,
+    "declaredApproachPoint": [
+      1664,
+      1792
+    ],
+    "declaredCollisionBounds": {
+      "left": 1536,
+      "top": 1472,
+      "right": 1792,
+      "bottom": 1752,
+      "width": 256,
+      "height": 280
+    },
+    "aspectDistortionPercent": -8.2447,
+    "edgeMetrics": {
+      "alphaThreshold": 16,
+      "meanBoundaryStrength255": 21.4389,
+      "strongEdgeThreshold255": 48,
+      "strongEdgeRatio": 0.091938,
+      "detailEdgeThreshold255": 32,
+      "detailEdgeRatio": 0.221092,
+      "visiblePixelCount": 73223
+    }
+  },
+  "sizeCandidates": {
+    "currentDistorted": {
+      "visibleSize": [
+        323,
+        301
+      ],
+      "aspect": 1.07309,
+      "aspectErrorPercent": -8.2447,
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 21.4389,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.091938,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.221092,
+        "visiblePixelCount": 73223
+      }
+    },
+    "recommended": {
+      "visibleSize": [
+        352,
+        301
+      ],
+      "aspect": 1.169435,
+      "aspectErrorPercent": -0.0066,
+      "edgeMetricsUsingExistingArt": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 21.4551,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.096505,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.224673,
+        "visiblePixelCount": 79747
+      }
+    },
+    "boxFill": {
+      "visibleSize": [
+        448,
+        383
+      ],
+      "aspect": 1.169713,
+      "aspectErrorPercent": 0.0172,
+      "edgeMetricsUsingExistingArt": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 19.8732,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.083593,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.198049,
+        "visiblePixelCount": 128887
+      }
+    }
+  },
+  "comparators": {
+    "guesthouse": {
+      "runtimeAssetSize": [
+        816,
+        597
+      ],
+      "alphaBoundsGt16": {
+        "left": 26,
+        "top": 39,
+        "right": 810,
+        "bottom": 591,
+        "width": 784,
+        "height": 552
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 9.7338,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.008471,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.043848,
+        "visiblePixelCount": 369388
+      },
+      "role": "small-building scale and low-frequency facade detail"
+    },
+    "library": {
+      "runtimeAssetSize": [
+        1545,
+        717
+      ],
+      "alphaBoundsGt16": {
+        "left": 0,
+        "top": 13,
+        "right": 1539,
+        "bottom": 711,
+        "width": 1539,
+        "height": 698
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 8.001,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.008541,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.031227,
+        "visiblePixelCount": 1000114
+      },
+      "role": "roof/facade edge weight, contact shadow, and plaza integration"
+    },
+    "centralGardenWestSample": {
+      "worldRect": {
+        "left": 1280,
+        "top": 1536,
+        "right": 1792,
+        "bottom": 2048,
+        "width": 512,
+        "height": 512
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 7.4775,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.003963,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.024132,
+        "visiblePixelCount": 262144
+      },
+      "role": "ground texture, vegetation density, and shadow palette"
+    },
+    "centralPlazaSample": {
+      "worldRect": {
+        "left": 1792,
+        "top": 1408,
+        "right": 2112,
+        "bottom": 1792,
+        "width": 320,
+        "height": 384
+      },
+      "edgeMetrics": {
+        "alphaThreshold": 16,
+        "meanBoundaryStrength255": 4.8081,
+        "strongEdgeThreshold255": 48,
+        "strongEdgeRatio": 0.004403,
+        "detailEdgeThreshold255": 32,
+        "detailEdgeRatio": 0.017424,
+        "visiblePixelCount": 122880
+      },
+      "role": "path material and seam target"
+    }
+  },
+  "recommended": {
+    "decision": "352x301 is the preferred visual envelope; it preserves current height and restores source aspect, but requires new/reworked art to meet edge-density targets",
+    "visualBox": {
+      "left": 1488,
+      "top": 1395,
+      "right": 1840,
+      "bottom": 1696,
+      "width": 352,
+      "height": 301
+    },
+    "groundContact": {
+      "x": 1664,
+      "y": 1696,
+      "definition": "bottom-center anchor of the building artwork"
+    },
+    "siteBounds": {
+      "left": 1440,
+      "top": 1344,
+      "right": 1856,
+      "bottom": 1824,
+      "width": 416,
+      "height": 480
+    },
+    "coreSiteMask": {
+      "left": 1440,
+      "top": 1344,
+      "right": 1792,
+      "bottom": 1824,
+      "width": 352,
+      "height": 480
+    },
+    "roadSeamPatch": {
+      "left": 1792,
+      "top": 1664,
+      "right": 1856,
+      "bottom": 1792,
+      "width": 64,
+      "height": 128
+    },
+    "visualFootprint": {
+      "left": 1536,
+      "top": 1472,
+      "right": 1792,
+      "bottom": 1696,
+      "width": 256,
+      "height": 224
+    },
+    "recommendedCollisionBoundsForNextImplementationStep": {
+      "left": 1536,
+      "top": 1472,
+      "right": 1792,
+      "bottom": 1696,
+      "width": 256,
+      "height": 224
+    },
+    "doorPoint": {
+      "x": 1664,
+      "y": 1760,
+      "definition": "visible entrance ground point at the end of the apron"
+    },
+    "approachPoint": {
+      "x": 1664,
+      "y": 1760,
+      "definition": "player interaction foot point; same as doorPoint"
+    },
+    "roadConnectionPoint": {
+      "x": 1824,
+      "y": 1760
+    },
+    "approachPathMaskRects": [
+      {
+        "left": 1632,
+        "top": 1696,
+        "right": 1696,
+        "bottom": 1792,
+        "width": 64,
+        "height": 96
+      },
+      {
+        "left": 1632,
+        "top": 1728,
+        "right": 1792,
+        "bottom": 1792,
+        "width": 160,
+        "height": 64
+      },
+      {
+        "left": 1792,
+        "top": 1696,
+        "right": 1856,
+        "bottom": 1792,
+        "width": 64,
+        "height": 96
+      }
+    ],
+    "minimumApproachWidthPx": 64,
+    "minimumApproachWidthTiles": 2,
+    "sortY": 1696
+  },
+  "backgroundDisposition": [
+    {
+      "action": "move",
+      "element": "north inner bench",
+      "worldBounds": {
+        "left": 1504,
+        "top": 1328,
+        "right": 1664,
+        "bottom": 1416,
+        "width": 160,
+        "height": 88
+      },
+      "note": "relocate outside core lot on the west ring tangent"
+    },
+    {
+      "action": "remove",
+      "element": "potted topiary behind facade",
+      "worldBounds": {
+        "left": 1616,
+        "top": 1376,
+        "right": 1696,
+        "bottom": 1496,
+        "width": 80,
+        "height": 120
+      }
+    },
+    {
+      "action": "move",
+      "element": "west inner bench",
+      "worldBounds": {
+        "left": 1432,
+        "top": 1496,
+        "right": 1584,
+        "bottom": 1608,
+        "width": 152,
+        "height": 112
+      },
+      "note": "relocate west of x=1440"
+    },
+    {
+      "action": "remove",
+      "element": "small path light and shrub cluster",
+      "worldBounds": {
+        "left": 1536,
+        "top": 1568,
+        "right": 1616,
+        "bottom": 1664,
+        "width": 80,
+        "height": 96
+      }
+    },
+    {
+      "action": "remove",
+      "element": "curved low wall, flowerbed, and shrubs",
+      "worldBounds": {
+        "left": 1432,
+        "top": 1600,
+        "right": 1792,
+        "bottom": 1816,
+        "width": 360,
+        "height": 216
+      },
+      "note": "replace with one site-ground composition"
+    },
+    {
+      "action": "move",
+      "element": "west plaza lamp",
+      "worldBounds": {
+        "left": 1728,
+        "top": 1568,
+        "right": 1808,
+        "bottom": 1816,
+        "width": 80,
+        "height": 248
+      },
+      "proposedGroundContact": [
+        1824,
+        1792
+      ],
+      "note": "site foreground or independent depth-sorted prop; do not bake into building"
+    },
+    {
+      "action": "keep",
+      "element": "main plaza and north/south road",
+      "worldBounds": {
+        "left": 1792,
+        "top": 1280,
+        "right": 1952,
+        "bottom": 1888,
+        "width": 160,
+        "height": 608
+      }
+    },
+    {
+      "action": "keep",
+      "element": "outer west vegetation and ring path",
+      "worldBounds": {
+        "left": 1280,
+        "top": 1440,
+        "right": 1432,
+        "bottom": 1888,
+        "width": 152,
+        "height": 448
+      }
+    }
+  ],
+  "layerPlan": {
+    "home-site-ground": [
+      "replacement ground within site mask",
+      "64 px access path and seam patch",
+      "low fence/flowerbed/shrubs",
+      "world-matched contact shadow"
+    ],
+    "home-building": [
+      "house body",
+      "front door",
+      "porch",
+      "minimum steps"
+    ],
+    "home-foreground": [
+      "only tall front elements that must occlude the player",
+      "optional and independently depth-sorted"
+    ],
+    "home-site metadata": [
+      "visualBox",
+      "groundContact",
+      "footprint",
+      "collision",
+      "doorPoint",
+      "approachPoint",
+      "sortY",
+      "siteBounds"
+    ]
+  },
+  "edgeMeasurementMethod": {
+    "luminance": "Rec.709 RGB coefficients",
+    "gradient": "centered x/y finite difference, Euclidean magnitude",
+    "sampleMask": "alpha > 16 for transparent assets; full crop for opaque world samples",
+    "meanBoundaryStrengthScale": "0..255",
+    "strongEdgeThreshold": 48
+  },
+  "approvalTargets": {
+    "meanBoundaryStrength255": {
+      "targetBand": [
+        7.1,
+        10.64
+      ],
+      "basis": "guesthouse/library median 8.8674 +/-20%"
+    },
+    "strongEdgeRatioMax": 0.08,
+    "strongEdgeRatioPreferredMax": 0.05,
+    "aspectDistortionPercentAbsoluteMax": 1.0,
+    "doorPointToInteractionPointMaxPx": 8,
+    "visualFootprintToCollisionMaxPx": 16,
+    "duplicateDecorationInsideSite": 0,
+    "continuousApproachPathRequired": true,
+    "minimumImportantVisualPeriodWorldPx": 4
+  },
+  "cameraScaleChecks": {
+    "desktop1280x720": {
+      "worldToScreenScale": 0.9432,
+      "recommendedHouseScreenPxApprox": [
+        332,
+        284
+      ]
+    },
+    "desktop1440x900": {
+      "worldToScreenScale": 1.1983,
+      "recommendedHouseScreenPxApprox": [
+        422,
+        361
+      ]
+    },
+    "mobile390x844": {
+      "worldToScreenScale": 0.6094,
+      "recommendedHouseScreenPxApprox": [
+        214,
+        183
+      ]
+    },
+    "mobileLandscape844x390": {
+      "worldToScreenScale": 0.58,
+      "recommendedHouseScreenPxApprox": [
+        204,
+        175
+      ]
+    }
+  }
+}

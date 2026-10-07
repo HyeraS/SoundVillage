@@ -1,0 +1,61 @@
+▲ Next.js 16.2.7 (webpack)
+
+  Creating an optimized production build ...
+(node:34764) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✓ Compiled successfully in 3.3s
+  Running TypeScript ...
+  Finished TypeScript in 69ms ...
+  Collecting page data using 10 workers ...
+  Generating static pages using 10 workers (0/25) ...
+  Generating static pages using 10 workers (6/25) 
+[HumanZone(마켓) 셀프체크] PLACED 45개 + 스캐터(나무/덤불 62개, 선물 17개) + 울타리 150칸 → 맵 밖 배치 0개
+[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 169개 중 바닥 밖 배치 0개 PASS
+  Generating static pages using 10 workers (12/25) 
+  Generating static pages using 10 workers (18/25) 
+[UrbanZone 셀프체크] 가로 도로 옆 가로등 → 10개 배치, 도로 경계와의 평균 간격 2.0px (0에 가까울수록 도로에 딱 붙음 — 세로 도로 쪽과 동일 기준)
+[UrbanZone 셀프체크] 건물 간격/도로-건물 겹침 → PASS (건물 3동 경계 안, 2타일 이상 간격, 도로 비침범)
+[UrbanZone 그리드 측정] Kenney 타일 단위 16px(alpha 스캔 확인) → 게임 TILE 32px 배치이므로 렌더 scale=2 고정 적용. wallRed 112×64px(7×4타일) × scale2224×128px = 정확히 7×4 게임타일(224/32=7, 128/32=4) 확인
+[UrbanZone 문/창문 비율] 벽 폭 112px 기준 → window 이전 8/112=7.1%(칸의 50%만 채움) → 이후 16/112=14.3%(칸의 100% 꽉 참), door 12/112=10.7%(칸의 75%, 창문보다 좁은 게 정상). sample.png 실측 window/wall ≈ 12.5%(칸 기준 100~125%) — 이제 같은 자릿수로 근접
+[UrbanZone 셀프체크] 구역 [nw](civic) 2,2-15,16(210칸) → 건물 1동, 소품/차량/보행자 9개
+[UrbanZone 셀프체크] 구역 [nmid](shop) 19,2-29,16(165칸) → 건물 1동, 소품/차량/보행자 12개
+[UrbanZone 셀프체크] 구역 [ne](annex) 33,2-45,16(195칸) → 건물 1동, 소품/차량/보행자 7개
+[UrbanZone 셀프체크] 구역 [sw](park) 2,20-15,33(196칸) → 건물 0동, 소품/차량/보행자 19개
+[UrbanZone 셀프체크] 구역 [smid](parking) 19,20-29,33(154칸) → 건물 0동, 소품/차량/보행자 16개
+[UrbanZone 셀프체크] 구역 [se](plaza) 33,20-45,33(182칸) → 건물 0동, 소품/차량/보행자 16개
+[UrbanZone 셀프체크] 도로망 규모 → 간선 도로 3개(324칸), 골목(보조 도로) 3개(45칸)
+[UrbanZone 셀프체크] 절대 커버리지(건물 내부 제외, road+골목+sidewalk블록+공원 기준) → 1261/1261칸 (100.0%)
+[UrbanZone 셀프체크] 건물 3동 좌표 → gov(nw):(6,8)-(12,11), shop(nmid):(21,8)-(27,11), annex(ne):(36,8)-(42,11)
+[UrbanZone 셀프체크] 미적용(어떤 레이어에도 안 속한) 칸 → 0개 (전부 road/골목/sidewalk블록/공원 중 하나로 커버됨)
+✓ Generating static pages using 10 workers (25/25) in 671ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /animal-test
+├ ○ /attendance-test
+├ ○ /daily-quest-test
+├ ○ /fence-test
+├ ○ /house-decor-test
+├ ○ /human-village-test
+├ ○ /interior-test
+├ ○ /lab-observatory-art-preview
+├ ○ /lab-observatory-cohesion-preview
+├ ○ /lab-observatory-identity-preview
+├ ○ /lab-observatory-pixel-preview
+├ ○ /lab-test
+├ ○ /lab-whitebox-preview
+├ ○ /library-test
+├ ○ /music-responsive-test
+├ ○ /music-test
+├ ○ /music-whitebox-preview
+├ ○ /nature-test
+├ ○ /nature-village
+├ ○ /urban-sprite-test
+└ ○ /urban-test
+
+
+○  (Static)  prerendered as static content
+

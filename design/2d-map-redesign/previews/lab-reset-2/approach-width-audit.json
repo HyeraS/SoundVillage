@@ -1,0 +1,887 @@
+{
+  "note": "Additional conservative 64px-wide x64px-long swept approach plus32px end margins. Static subset of58 candidates; no repacking, no final art certification.",
+  "candidateCount": 58,
+  "strictCounts": [
+    13,
+    2,
+    13,
+    11,
+    13,
+    4
+  ],
+  "strictTotal": 56,
+  "candidates": [
+    {
+      "x": 688,
+      "y": 960,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 960,
+      "y": 752,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 576,
+      "y": 800,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 848,
+      "y": 896,
+      "block": 1,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 816,
+      "y": 752,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 704,
+      "y": 832,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 896,
+      "y": 816,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 816,
+      "y": 832,
+      "block": 1,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 816,
+      "y": 960,
+      "block": 1,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 640,
+      "y": 816,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 720,
+      "y": 896,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 880,
+      "y": 752,
+      "block": 1,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 960,
+      "y": 816,
+      "block": 1,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 464,
+      "y": 704,
+      "block": 2,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 448,
+      "y": 784,
+      "block": 2,
+      "clearDirections": []
+    },
+    {
+      "x": 512,
+      "y": 752,
+      "block": 2,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 560,
+      "y": 256,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 176,
+      "y": 416,
+      "block": 3,
+      "clearDirections": [
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 560,
+      "y": 496,
+      "block": 3,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 256,
+      "y": 624,
+      "block": 3,
+      "clearDirections": [
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 384,
+      "y": 368,
+      "block": 3,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 368,
+      "y": 544,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 512,
+      "y": 368,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 288,
+      "y": 320,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 304,
+      "y": 432,
+      "block": 3,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 384,
+      "y": 464,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 352,
+      "y": 624,
+      "block": 3,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 496,
+      "y": 448,
+      "block": 3,
+      "clearDirections": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 512,
+      "y": 304,
+      "block": 3,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 1024,
+      "y": 288,
+      "block": 4,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 784,
+      "y": 288,
+      "block": 4,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 672,
+      "y": 384,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 896,
+      "y": 352,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 944,
+      "y": 256,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 640,
+      "y": 304,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1024,
+      "y": 368,
+      "block": 4,
+      "clearDirections": [
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 720,
+      "y": 272,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 848,
+      "y": 304,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 576,
+      "y": 320,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 960,
+      "y": 320,
+      "block": 4,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1424,
+      "y": 320,
+      "block": 5,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1280,
+      "y": 624,
+      "block": 5,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1232,
+      "y": 416,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1040,
+      "y": 528,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1376,
+      "y": 496,
+      "block": 5,
+      "clearDirections": [
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1152,
+      "y": 592,
+      "block": 5,
+      "clearDirections": []
+    },
+    {
+      "x": 1312,
+      "y": 336,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 1024,
+      "y": 640,
+      "block": 5,
+      "clearDirections": [
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 1152,
+      "y": 480,
+      "block": 5,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1376,
+      "y": 400,
+      "block": 5,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1152,
+      "y": 400,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 1312,
+      "y": 448,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1360,
+      "y": 560,
+      "block": 5,
+      "clearDirections": [
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1216,
+      "y": 608,
+      "block": 5,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1136,
+      "y": 864,
+      "block": 6,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ]
+      ]
+    },
+    {
+      "x": 1104,
+      "y": 736,
+      "block": 6,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ],
+        [
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "x": 1072,
+      "y": 816,
+      "block": 6,
+      "clearDirections": [
+        [
+          1,
+          0
+        ],
+        [
+          0,
+          -1
+        ]
+      ]
+    },
+    {
+      "x": 1040,
+      "y": 704,
+      "block": 6,
+      "clearDirections": [
+        [
+          -1,
+          0
+        ]
+      ]
+    }
+  ]
+}

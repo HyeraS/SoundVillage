@@ -1,0 +1,14 @@
+{
+  "referencePixels": {
+    "width": 1448,
+    "height": 1086
+  },
+  "evaluablePixels": 1392470,
+  "maskedRmse": 1.8536764543686515,
+  "maskedMae": 0.47396760193517035,
+  "maskedExactPixelFraction": 0.9063972652911733,
+  "globalLuminanceSsim": 0.999149231676103,
+  "nonUniformScaleCount": 0,
+  "visualGate": "failed-individual-sprite-alpha-contamination",
+  "knownExample": "tree-01 contains metro pixels in its visible alpha"
+}

@@ -27,5 +27,6 @@ export default function CharacterShopPanel() {
     identityPreviewEnabled={identityEnabled}
     identityCatalog={identityEnabled ? CHARACTER_IDENTITY_CATALOG : null}
     onSaveIdentity={(loadout) => economy.saveIdentity(loadout)}
+    showOnboarding={identityEnabled}
   />
 }

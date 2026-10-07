@@ -1,0 +1,260 @@
+{
+  "alignment": {
+    "conceptCrop": {
+      "x": 36,
+      "y": 54,
+      "w": 1376,
+      "h": 1032
+    },
+    "alignedSize": [
+      1536,
+      1152
+    ]
+  },
+  "screenCoverage": {
+    "approved": {
+      "pathPct": 14.01,
+      "tealPct": 45.17
+    },
+    "final": {
+      "pathPct": 14.55,
+      "tealPct": 45.99
+    },
+    "delta": {
+      "pathPct": 0.54,
+      "tealPct": 0.82
+    },
+    "pass": true
+  },
+  "pixelDifference": {
+    "meanAbsoluteChannelDelta": 6.93
+  },
+  "geometryCoverage": {
+    "pathPct": 24.67,
+    "pondPct": 6.21
+  },
+  "landmarks": {
+    "northwestShop": {
+      "targetFoot": [
+        5.3,
+        10.1
+      ],
+      "actualFoot": [
+        5.3,
+        10.1
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.2
+    },
+    "witchHouse": {
+      "targetFoot": [
+        23.7,
+        11
+      ],
+      "actualFoot": [
+        23.7,
+        11
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.1
+    },
+    "potionShop": {
+      "targetFoot": [
+        5,
+        20.3
+      ],
+      "actualFoot": [
+        5,
+        20.3
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.1
+    },
+    "well": {
+      "targetFoot": [
+        24.2,
+        20.2
+      ],
+      "actualFoot": [
+        24.2,
+        20.2
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.3
+    },
+    "eastHome": {
+      "targetFoot": [
+        41.5,
+        19.2
+      ],
+      "actualFoot": [
+        41.5,
+        19.2
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.1
+    },
+    "market": {
+      "targetFoot": [
+        25.5,
+        28.2
+      ],
+      "actualFoot": [
+        25.5,
+        28.2
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.2
+    },
+    "cart": {
+      "targetFoot": [
+        32,
+        29
+      ],
+      "actualFoot": [
+        32,
+        29
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0.3
+    },
+    "southeastHome": {
+      "targetFoot": [
+        41,
+        27.5
+      ],
+      "actualFoot": [
+        41,
+        27.5
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0
+    },
+    "southwestPond": {
+      "targetFoot": [
+        5.8,
+        32.8
+      ],
+      "actualFoot": [
+        5.8,
+        32.8
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0,
+      "source": "environment master"
+    },
+    "southEntrance": {
+      "targetFoot": [
+        24,
+        35.7
+      ],
+      "actualFoot": [
+        24,
+        35.7
+      ],
+      "positionErrorTiles": 0,
+      "maxVisibleSizeErrorPct": 0,
+      "source": "environment master"
+    }
+  },
+  "densityAudit": {
+    "trees": {
+      "target": 49,
+      "actual": 46,
+      "deviationPct": -6.1
+    },
+    "deadTrees": {
+      "target": 6,
+      "actual": 6,
+      "deviationPct": 0
+    },
+    "lanterns": {
+      "target": 18,
+      "actual": 18,
+      "deviationPct": 0
+    },
+    "pumpkinClusters": {
+      "target": 25,
+      "actual": 25,
+      "deviationPct": 0
+    },
+    "shrubs": {
+      "target": 26,
+      "actual": 26,
+      "deviationPct": 0
+    },
+    "flowers": {
+      "target": 31,
+      "actual": 31,
+      "deviationPct": 0
+    },
+    "mushrooms": {
+      "target": 12,
+      "actual": 12,
+      "deviationPct": 0
+    },
+    "rocks": {
+      "target": 14,
+      "actual": 14,
+      "deviationPct": 0
+    },
+    "woodFenceSegments": {
+      "target": 31,
+      "actual": 31,
+      "deviationPct": 0
+    },
+    "stoneFenceSegments": {
+      "target": 17,
+      "actual": 16,
+      "deviationPct": -5.9
+    },
+    "barrelsCratesSigns": {
+      "target": 21,
+      "actual": 21,
+      "deviationPct": 0
+    },
+    "benches": {
+      "target": 2,
+      "actual": 2,
+      "deviationPct": 0
+    },
+    "docks": {
+      "target": 3,
+      "actual": 3,
+      "deviationPct": 0
+    },
+    "boats": {
+      "target": 1,
+      "actual": 1,
+      "deviationPct": 0
+    }
+  },
+  "kindCounts": {
+    "witch-house": 1,
+    "pumpkin-shop": 1,
+    "potion-shop": 1,
+    "rust-house": 1,
+    "violet-house": 1,
+    "market": 1,
+    "well": 1,
+    "cart": 1,
+    "tree-violet": 16,
+    "tree-jade": 30,
+    "ghost-tree": 6,
+    "wood-fence-h": 21,
+    "wood-fence-v": 10,
+    "stone-fence": 16,
+    "lantern": 18,
+    "pumpkins": 25,
+    "shrub": 26,
+    "rocks": 14,
+    "barrel": 7,
+    "crate": 7,
+    "sign": 7,
+    "mushroom": 12,
+    "flower": 20,
+    "bench": 2,
+    "boat": 1,
+    "fishing": 1
+  }
+}

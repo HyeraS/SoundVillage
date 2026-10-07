@@ -16,6 +16,7 @@ import {
 } from '@/lib/characterStudioState.mjs'
 import { trackEvent } from '@/lib/userEvents'
 import styles from './characterStudio.module.css'
+import CharacterStudioOnboarding from './CharacterStudioOnboarding'
 
 /* eslint-disable @next/next/no-img-element -- exact sprite-sheet clipping must match the world renderer */
 
@@ -123,6 +124,7 @@ export default function CharacterStudioPanel({
   identityPreviewEnabled = false,
   identityCatalog = null,
   onSaveIdentity,
+  showOnboarding = false,
 }) {
   const identityEnabled = ['qa', 'cutover'].includes(environment) && identityPreviewEnabled && Boolean(identityCatalog)
   const identityIsLocalOnly = environment === 'qa'
@@ -369,6 +371,7 @@ export default function CharacterStudioPanel({
     data-studio-state={status}
     data-preview-active={previewing ? 'true' : 'false'}
   >
+    <CharacterStudioOnboarding enabled={showOnboarding}/>
     <header className={styles.header}>
       <div><small>CHARACTER STYLE STUDIO</small><h2>내 캐릭터 스타일링</h2></div>
       {environment === 'qa' && <span className={styles.qaBadge} data-testid="studio-qa-notice">QA dry-run · 실제 저장 없음</span>}

@@ -346,7 +346,7 @@ try {
   await secondPlantCell.focus()
   await pageA.keyboard.press('Enter')
   await pageA.getByText(/현재 2종/).waitFor()
-  await pageA.getByRole('button', { name:'저장하기' }).click()
+  await pageA.getByRole('button', { name:'저장하기' }).press('Enter')
   await pageA.waitForFunction(() => document.querySelector('[data-interior-room]')?.dataset.interiorMode === 'view')
   await pageA.getByText(/현재 3종/).waitFor()
   await screenshot(pageA, 'desktop-invite-progress-duplicate.png')

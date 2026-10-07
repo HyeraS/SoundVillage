@@ -1,0 +1,355 @@
+{
+  "generatedAt": "2026-10-05",
+  "methodology": "Chromium, new non-persistent context per sample, 1440x900 DPR1, default spawn/library, 2.3s frame sample followed by 1.5s camera movement.",
+  "runsPerCondition": 3,
+  "byCondition": {
+    "80": {
+      "scale": 0.8,
+      "coldRuns": 3,
+      "visibleAssets": {
+        "average": 9,
+        "range": [
+          9,
+          9
+        ]
+      },
+      "transferBytes": {
+        "average": 3354890,
+        "range": [
+          3354890,
+          3354890
+        ]
+      },
+      "decodedRGBABytes": {
+        "average": 60700676,
+        "range": [
+          60700676,
+          60700676
+        ]
+      },
+      "mapReadyMs": {
+        "average": 106.13,
+        "range": [
+          96.7,
+          117.9
+        ]
+      },
+      "averageFps": {
+        "average": 120,
+        "range": [
+          120,
+          120
+        ]
+      },
+      "slowFramesOver50Ms": {
+        "average": 0,
+        "range": [
+          0,
+          0
+        ]
+      },
+      "maxFrameMs": {
+        "average": 9.03,
+        "range": [
+          8.6,
+          9.3
+        ]
+      },
+      "cameraMoveAdditionalRequests": {
+        "average": 6,
+        "range": [
+          6,
+          6
+        ]
+      },
+      "heapDeltaBytes": {
+        "average": 0,
+        "range": [
+          0,
+          0
+        ]
+      },
+      "errors": 0
+    },
+    "100": {
+      "scale": 1,
+      "coldRuns": 3,
+      "visibleAssets": {
+        "average": 8,
+        "range": [
+          8,
+          8
+        ]
+      },
+      "transferBytes": {
+        "average": 2762952,
+        "range": [
+          2762952,
+          2762952
+        ]
+      },
+      "decodedRGBABytes": {
+        "average": 45955076,
+        "range": [
+          45955076,
+          45955076
+        ]
+      },
+      "mapReadyMs": {
+        "average": 100.73,
+        "range": [
+          95.5,
+          105
+        ]
+      },
+      "averageFps": {
+        "average": 120,
+        "range": [
+          120,
+          120
+        ]
+      },
+      "slowFramesOver50Ms": {
+        "average": 0,
+        "range": [
+          0,
+          0
+        ]
+      },
+      "maxFrameMs": {
+        "average": 9.3,
+        "range": [
+          9.3,
+          9.3
+        ]
+      },
+      "cameraMoveAdditionalRequests": {
+        "average": 4,
+        "range": [
+          4,
+          4
+        ]
+      },
+      "heapDeltaBytes": {
+        "average": 0,
+        "range": [
+          0,
+          0
+        ]
+      },
+      "errors": 0
+    }
+  },
+  "records": [
+    {
+      "condition": "100",
+      "run": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 1,
+      "mapReadyMs": 101.7,
+      "transferBytes": 2762952,
+      "decodedBytes": 45955076,
+      "resourceCount": 10,
+      "visibleAssets": 8,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 9.3,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 4,
+      "heapAfterMove": 24500000,
+      "errors": []
+    },
+    {
+      "condition": "100",
+      "run": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 1,
+      "mapReadyMs": 105,
+      "transferBytes": 2762952,
+      "decodedBytes": 45955076,
+      "resourceCount": 10,
+      "visibleAssets": 8,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 9.3,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 4,
+      "heapAfterMove": 24500000,
+      "errors": []
+    },
+    {
+      "condition": "100",
+      "run": 3,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 1,
+      "mapReadyMs": 95.5,
+      "transferBytes": 2762952,
+      "decodedBytes": 45955076,
+      "resourceCount": 10,
+      "visibleAssets": 8,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 9.3,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 4,
+      "heapAfterMove": 24500000,
+      "errors": []
+    },
+    {
+      "condition": "80",
+      "run": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 0.8,
+      "mapReadyMs": 117.9,
+      "transferBytes": 3354890,
+      "decodedBytes": 60700676,
+      "resourceCount": 14,
+      "visibleAssets": 9,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 9.3,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 6,
+      "heapAfterMove": 24500000,
+      "errors": []
+    },
+    {
+      "condition": "80",
+      "run": 2,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 0.8,
+      "mapReadyMs": 103.8,
+      "transferBytes": 3354890,
+      "decodedBytes": 60700676,
+      "resourceCount": 14,
+      "visibleAssets": 9,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 9.2,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 6,
+      "heapAfterMove": 24500000,
+      "errors": []
+    },
+    {
+      "condition": "80",
+      "run": 3,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "scale": 0.8,
+      "mapReadyMs": 96.7,
+      "transferBytes": 3354890,
+      "decodedBytes": 60700676,
+      "resourceCount": 14,
+      "visibleAssets": 9,
+      "averageFps": 120,
+      "slowFrames": 0,
+      "maxFrameMs": 8.6,
+      "heapDelta": 0,
+      "worldResourceNames": [
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-preview.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-0-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-1-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-1.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/terrain-panel-2-2.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-central-gardens.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southwest-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/environment-southeast-garden.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-library.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "http://127.0.0.1:3107/assets/world/sound-archive-garden-v4/runtime/landmark-human.webp"
+      ],
+      "additionalRequests": 6,
+      "heapAfterMove": 24500000,
+      "errors": []
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "date": "2026-09-17",
+  "environment": {
+    "app": "http://127.0.0.1:3015",
+    "data": "in-memory PostgREST-shaped mock at 127.0.0.1:4015",
+    "localOnly": true,
+    "realDatabaseReadOrWrite": false,
+    "positionTeleportOrReactStateInjection": false
+  },
+  "mainFlow": {
+    "participant": "LAB_QA_A",
+    "worldPortalEntryWithKeyboardAndEnter": "pass",
+    "initialHud": "0/84 · block 1/6",
+    "automaticDiscoveryAtSpawn": false,
+    "nearbyFeedbackByActualKeyEvents": "pass",
+    "automaticPopupOnApproach": false,
+    "annotationOpenedByEnter": "pass",
+    "virtualWavPlayback": "pass",
+    "localAnnotationSubmission": "pass",
+    "hudAfterSubmission": "1/84 · block 1/6",
+    "exitCancel": "pass",
+    "exitConfirm": "pass",
+    "reentryProgressRestore": "1/84 · block 1/6",
+    "reentryAutomaticDiscovery": false
+  },
+  "lateStage": {
+    "participant": "LAB_QA_A_S6",
+    "restoredHud": "75/84 · block 6/6",
+    "partialMovementWithProductionCollisionLoop": "pass",
+    "singleSessionFullLoopTraversal": "not completed: final browser automation was blocked by policy"
+  },
+  "connectivityEvidence": {
+    "reachableFootCells": 4335,
+    "allActiveItemsReachablePerBlock": true,
+    "productionTest": "node --test scripts/test_lab_production.mjs",
+    "productionTestResult": "12/12 pass"
+  },
+  "responsive": {
+    "portrait": {
+      "viewport": [390, 788],
+      "documentScrollSize": [390, 788],
+      "dpadPointerMovement": "pass",
+      "positionBefore": [768.0, 1008.0],
+      "positionAfter": [765.23, 1008.0],
+      "directionAfter": "left"
+    },
+    "landscape": {
+      "viewport": [844, 390],
+      "documentScrollSize": [844, 390]
+    },
+    "horizontalOrVerticalOverflow": false
+  },
+  "console": {
+    "warnings": 0,
+    "errors": 0
+  },
+  "interactionRefinement": {
+    "walkAnimation": "pass: left movement changed sprite frame x from -224 to 0 and position x from 780.04 to 709.81",
+    "characterDisplay": "64x64 square; source aspect ratio preserved",
+    "highDensityCanvas": "pass: 791x729 CSS viewport rendered at 1582x1458 backing resolution",
+    "automaticPopupOnApproach": false,
+    "nearbyFeedback": "pixel glow, sparkles, Enter prompt and DPad confirm button",
+    "annotationOpensOnlyAfterEnter": "pass"
+  },
+  "captures": [
+    "desktop-entry-block1-1280x720.png",
+    "desktop-collected-1-of-84.png",
+    "desktop-reentry-restored-1-of-84.png",
+    "desktop-late-route-block6-75-of-84.png",
+    "mobile-portrait-390x788.png",
+    "mobile-landscape-844x390.png"
+  ]
+}

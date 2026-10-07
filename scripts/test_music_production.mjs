@@ -5,23 +5,24 @@ import crypto from 'node:crypto'
 import sharp from 'sharp'
 import { fileURLToPath } from 'node:url'
 import { getCharacterRenderMetrics, getVisibleBodyCssBounds } from '../lib/characterRenderMetrics.mjs'
+import { isMusicVillageMaskCellWalkable } from '../lib/generated/musicVillageWalkableMask.mjs'
 import {
   T, MAP_W, MAP_H, WORLD_W, WORLD_H, PLAYER_BOX, INTERACTION_RADIUS,
   MUSIC_PLAYER_SOURCE, MUSIC_PLAYER_W, MUSIC_PLAYER_H, MUSIC_PLAYER_VISIBLE_H,
-  NAV_CELL, NAV_COLS, NAV_ROWS, NAV_TYPES, NAVIGATION_MASK,
+  NAV_CELL, NAV_COLS, NAV_ROWS, NAV_TYPES, POLYGON_NAVIGATION_MASK, NAVIGATION_MASK, MUSIC_VILLAGE_MASK_METADATA,
   STAGE, GATE, BUILDINGS, PROPS, SCENE_TREES, PROP_COLLIDERS, TREE_TRUNK_COLLIDERS, BLOCKING_PROP_COLLIDERS, SPAWN, EXIT_TRIGGER,
-  TERRAIN_FEATURES, PLANTED_LANDSCAPE_FEATURES, TREE_GROVE_FEATURES, PRIORITY_WALKABLE_PATHS, SLOT_GROUPS, PRIMARY_SLOTS, ALL_SAFE_SLOTS, OCCLUSION_OBJECTS,
+  COLLIDERS, TERRAIN_FEATURES, PLANTED_LANDSCAPE_FEATURES, TREE_GROVE_FEATURES, PRIORITY_WALKABLE_PATHS, BLOCK_ZONE_DEFINITIONS, BLOCK_ZONE_SLOTS, SLOT_GROUPS, PRIMARY_SLOTS, ALL_SAFE_SLOTS, OCCLUSION_OBJECTS,
   SILHOUETTE_ENTER_RATIO, SILHOUETTE_EXIT_RATIO,
   getNavigationTypeAtWorld, getNavigationCellAtWorld, isNavigationWalkable, isWalkableTile, isSafeMarkerSlot,
-  spawnMusicItems, distanceToMusicItem, isMusicItemNearby, validateSlotSet,
+  spawnMusicItems, distanceToMusicItem, isMusicItemNearby, markerStateFor, validateSlotSet,
   buildVillage, collides, moveWithCollision, moveWithCollisionDetailed, overlapsExitTrigger,
   getMusicCamera, worldToMusicScreen, getMusicPlayerPlacement,
   splitOcclusionObjects, measureOcclusionAtPlayer, resolveOcclusionState,
 } from '../lib/musicVillageConfig.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const metadata = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/sound_metadata.json'), 'utf8'))
-const music = metadata.sounds.filter((sound) => sound.game_zone === 'Music')
+const soundMetadata = JSON.parse(fs.readFileSync(path.join(ROOT, 'data/sound_metadata.json'), 'utf8'))
+const music = soundMetadata.sounds.filter((sound) => sound.game_zone === 'Music')
 const expectedBlocks = { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 8 }
 const byBlock = (sounds) => Object.fromEntries([1, 2, 3, 4, 5, 6].map((block) => [block, sounds.filter((sound) => sound.block === block).length]))
 const positionMap = (items) => Object.fromEntries(items.map((item) => [item.id, `${item.tx},${item.ty}:${item.place}`]))
@@ -47,18 +48,122 @@ assert.equal(PRIMARY_SLOTS.length, 83)
 assert.ok(ALL_SAFE_SLOTS.length >= 166, 'safe marker capacity covers researcher bypass')
 assert.deepEqual(validateSlotSet(PRIMARY_SLOTS), { pass: true, count: 83, failures: [] })
 for (let block = 1; block <= 6; block++) assert.equal(SLOT_GROUPS[block].length, expectedBlocks[block], `block ${block} slot count`)
+assert.deepEqual(
+  Object.fromEntries(Object.entries(BLOCK_ZONE_SLOTS).map(([block, slots]) => [block, slots.length])),
+  { 1: 48, 2: 31, 3: 35, 4: 40, 5: 83, 6: 76 },
+  'each geographic block zone has stable capacity',
+)
+for (const group of ['A', 'B']) {
+  const placed = spawnMusicItems(music.filter((sound) => sound.group === group))
+  for (let block = 1; block <= 6; block++) {
+    const zone = BLOCK_ZONE_DEFINITIONS[block]
+    const blockItems = placed.filter((item) => item.block === block)
+    assert.ok(blockItems.every((item) => item.zoneId === zone.id && item.place === zone.place), `Music ${group} block ${block} stays in ${zone.label}`)
+    assert.deepEqual(
+      new Set(blockItems.map((item) => `${item.tx},${item.ty}`)),
+      new Set(SLOT_GROUPS[block].map((slot) => `${slot.tx},${slot.ty}`)),
+      `Music ${group} block ${block} uses only its geographic slots`,
+    )
+    assert.ok(
+      blockItems.every((item) => Math.hypot(item.tx - zone.center[0], item.ty - zone.center[1]) <= zone.explorationRadius + .01),
+      `Music ${group} block ${block} remains locally completable`,
+    )
+    const nearestNeighborDistances = blockItems.map((item) => Math.min(...blockItems
+      .filter((candidate) => candidate !== item)
+      .map((candidate) => Math.hypot(item.tx - candidate.tx, item.ty - candidate.ty))))
+    assert.ok(
+      nearestNeighborDistances.reduce((sum, distance) => sum + distance, 0) / nearestNeighborDistances.length >= 1.5,
+      `Music ${group} block ${block} is spread out enough to reward exploration`,
+    )
+  }
+}
 
-// The 4px terrain mask is generated only from map boundary, water, buildings
-// and fixed painted landscaping. Props are kept out of it and resolved once at
-// runtime, so small decoration cannot expand to a 16px blocked square.
+// Like Animal Village, every unlocked data marker is visible from the moment
+// the zone loads. Distance changes interaction state, never discovery state.
+const visibilityItem = bypassItems.find((item) => item.block === 1)
+assert.equal(markerStateFor(visibilityItem, {
+  blockNum: 1,
+  collectedIds: new Set(),
+  nearbyId: null,
+  interactingId: null,
+}), 'active', 'unlocked Music data is visible before the player approaches')
+assert.equal(markerStateFor(visibilityItem, {
+  blockNum: 1,
+  collectedIds: new Set(),
+  nearbyId: visibilityItem.id,
+  interactingId: null,
+}), 'nearby', 'approaching a visible marker only changes its interaction emphasis')
+assert.equal(markerStateFor({ ...visibilityItem, block: 2 }, {
+  blockNum: 1,
+  collectedIds: new Set(),
+  nearbyId: null,
+  interactingId: null,
+}), 'unavailable', 'future-block Music data uses the visible locked-marker state')
+
+// The generated one-bit PNG data is the final walkability authority. Polygon
+// rasterisation remains available separately for terrain meaning and debug.
 assert.equal(NAV_CELL, 4)
 assert.deepEqual({ columns: NAV_COLS, rows: NAV_ROWS }, { columns: 384, rows: 288 })
+assert.deepEqual(MUSIC_VILLAGE_MASK_METADATA, {
+  width: 384,
+  height: 288,
+  cellSize: 4,
+  worldWidth: 1536,
+  worldHeight: 1152,
+  sourceAsset: 'public/assets/world/music-village/navigation/music-walkable-mask.png',
+  sha256: '357e2f184213a0cf9605d7d64a1f9398cf3d9dceddc7d0025dcbfcdcb8efbeea',
+  encoding: '1-bit-msb-row-major-base64',
+  whiteCells: 40023,
+  blackCells: 70569,
+})
+const maskAssetPath = path.join(ROOT, MUSIC_VILLAGE_MASK_METADATA.sourceAsset)
+const maskAssetBytes = fs.readFileSync(maskAssetPath)
+assert.equal(crypto.createHash('sha256').update(maskAssetBytes).digest('hex'), MUSIC_VILLAGE_MASK_METADATA.sha256, 'mask asset SHA-256')
+const maskImage = sharp(maskAssetBytes, { failOn: 'error', limitInputPixels: NAV_COLS * NAV_ROWS })
+const maskImageMetadata = await maskImage.metadata()
+assert.deepEqual(
+  { format: maskImageMetadata.format, width: maskImageMetadata.width, height: maskImageMetadata.height },
+  { format: 'png', width: 384, height: 288 },
+  'mask source is exactly 384x288 PNG',
+)
+const { data: maskPixels, info: maskPixelInfo } = await maskImage.ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+assert.equal(maskPixelInfo.channels, 4)
+let sourceWhiteCells = 0
+for (let index = 0; index < NAV_COLS * NAV_ROWS; index++) {
+  const [red, green, blue, alpha] = maskPixels.subarray(index * 4, index * 4 + 4)
+  assert.equal(alpha, 255, `mask pixel ${index} is fully opaque`)
+  const black = red === 0 && green === 0 && blue === 0
+  const white = red === 255 && green === 255 && blue === 255
+  assert.ok(black || white, `mask pixel ${index} is pure black or white`)
+  if (white) sourceWhiteCells++
+  const col = index % NAV_COLS
+  const row = Math.floor(index / NAV_COLS)
+  assert.equal(isMusicVillageMaskCellWalkable(col, row), white, `generated bit ${col},${row} matches PNG`)
+}
+assert.equal(sourceWhiteCells, MUSIC_VILLAGE_MASK_METADATA.whiteCells)
+assert.equal(POLYGON_NAVIGATION_MASK.length, NAV_COLS * NAV_ROWS)
 assert.equal(NAVIGATION_MASK.length, NAV_COLS * NAV_ROWS)
 assert.equal(NAV_COLS * NAV_CELL, WORLD_W)
 assert.equal(NAV_ROWS * NAV_CELL, WORLD_H)
 for (const type of Object.values(NAV_TYPES)) assert.ok(NAVIGATION_MASK.includes(type), `navigation includes type ${type}`)
 const walkableCells = NAVIGATION_MASK.filter(isNavigationWalkable).length
-assert.ok(walkableCells / NAVIGATION_MASK.length > .3 && walkableCells / NAVIGATION_MASK.length < .5, 'terrain coverage matches paths around the enclosed painted landscaping')
+assert.equal(walkableCells, sourceWhiteCells, 'final navigation walkability exactly matches white PNG cells')
+let newlyWalkableCells = 0
+let newlyBlockedCells = 0
+for (let index = 0; index < NAVIGATION_MASK.length; index++) {
+  const polygonType = POLYGON_NAVIGATION_MASK[index]
+  const finalType = NAVIGATION_MASK[index]
+  const white = isMusicVillageMaskCellWalkable(index % NAV_COLS, Math.floor(index / NAV_COLS))
+  if (white) {
+    assert.equal(isNavigationWalkable(finalType), true, `white cell ${index} is walkable`)
+    assert.equal(finalType, isNavigationWalkable(polygonType) ? polygonType : NAV_TYPES.ROAD, `white cell ${index} preserves/promotes its type`)
+  } else {
+    assert.equal(isNavigationWalkable(finalType), false, `black cell ${index} is blocked`)
+  }
+  if (!isNavigationWalkable(polygonType) && isNavigationWalkable(finalType)) newlyWalkableCells++
+  if (isNavigationWalkable(polygonType) && !isNavigationWalkable(finalType)) newlyBlockedCells++
+}
+assert.deepEqual({ newlyWalkableCells, newlyBlockedCells }, { newlyWalkableCells: 5197, newlyBlockedCells: 15468 })
 assert.equal(getNavigationTypeAtWorld(60, 560), NAV_TYPES.WATER, 'painted west pond is water')
 assert.equal(getNavigationTypeAtWorld(WORLD_W / 2, 900), NAV_TYPES.ROAD, 'south music staff is road')
 assert.deepEqual(getNavigationCellAtWorld(768, 900), { col: 192, row: 225, type: NAV_TYPES.ROAD })
@@ -92,11 +197,7 @@ for (const building of BUILDINGS) {
 assert.equal(BLOCKING_PROP_COLLIDERS.length, 0, 'navigation-baked vegetation is not tested again as a runtime prop')
 assert.ok(PROPS.filter((prop) => prop.id === 'flowerbed-low-a').every((prop) => !prop.movementBlocking), 'decorative flowers are non-blocking')
 assert.ok(PROPS.filter((prop) => prop.id === 'foreground-edge-cluster').every((prop) => !prop.movementBlocking), 'visual foreground is non-blocking')
-for (const rect of TREE_TRUNK_COLLIDERS) {
-  const foot = { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 + PLAYER_BOX.h / 2 }
-  const hit = collides(village, foot.x, foot.y)
-  assert.ok(hit && ['tree', 'vegetation', 'landscape', 'boundary'].includes(hit.type), `${rect.id} blocks at the visible trunk`) 
-}
+assert.ok(TREE_TRUNK_COLLIDERS.every((rect) => rect.navigationBaked), 'legacy tree footprints remain available for semantic/debug inspection')
 assert.equal(collides(village, 380, 400)?.id, 'terrain:west-inner-grove', 'dense inner planting cannot be crossed')
 assert.equal(collides(village, 1156, 400)?.id, 'terrain:east-inner-grove', 'mirrored dense planting cannot be crossed')
 assert.equal(collides(village, 620, 286)?.id, 'terrain:stage-west-planter', 'raised flower bed cannot be crossed')
@@ -148,6 +249,65 @@ for (const group of ['A', 'B']) {
 }
 assert.ok(bypassItems.every((item) => reachable.has(`${item.tx},${item.ty}`)), 'all researcher markers connect to spawn')
 
+function reachableMaskCells(start) {
+  const queue = [start]
+  const seen = new Set([start.join(',')])
+  for (let index = 0; index < queue.length; index++) {
+    const [col, row] = queue[index]
+    for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+      const nextCol = col + dc
+      const nextRow = row + dr
+      const key = `${nextCol},${nextRow}`
+      if (!seen.has(key) && isMusicVillageMaskCellWalkable(nextCol, nextRow)) {
+        seen.add(key)
+        queue.push([nextCol, nextRow])
+      }
+    }
+  }
+  return seen
+}
+const maskStart = [Math.floor(SPAWN.x / NAV_CELL), Math.floor((SPAWN.y - PLAYER_BOX.h / 2) / NAV_CELL)]
+assert.equal(isMusicVillageMaskCellWalkable(...maskStart), true, 'spawn lies on the white mask')
+const connectedWhiteCells = reachableMaskCells(maskStart)
+assert.equal(connectedWhiteCells.size, 39551, 'main white component size is stable')
+const whiteComponentSizes = []
+const visitedWhiteCells = new Set()
+for (let row = 0; row < NAV_ROWS; row++) {
+  for (let col = 0; col < NAV_COLS; col++) {
+    const key = `${col},${row}`
+    if (!isMusicVillageMaskCellWalkable(col, row) || visitedWhiteCells.has(key)) continue
+    const component = reachableMaskCells([col, row])
+    whiteComponentSizes.push(component.size)
+    for (const cell of component) visitedWhiteCells.add(cell)
+  }
+}
+whiteComponentSizes.sort((a, b) => b - a)
+assert.deepEqual(
+  { components: whiteComponentSizes.length, main: whiteComponentSizes[0], disconnected: walkableCells - whiteComponentSizes[0] },
+  { components: 18, main: 39551, disconnected: 472 },
+  'white-region connectivity audit is stable',
+)
+const markerMaskCell = (item) => `${Math.floor((item.tx + .5) * T / NAV_CELL)},${Math.floor((item.ty + .5) * T / NAV_CELL)}`
+assert.ok(bypassItems.every((item) => connectedWhiteCells.has(markerMaskCell(item))), 'all actual sound marker positions belong to the spawn component')
+for (const building of BUILDINGS) {
+  const entranceCells = []
+  for (let ty = building.clearance.y; ty < building.clearance.y + building.clearance.h; ty++) {
+    for (let tx = building.clearance.x; tx < building.clearance.x + building.clearance.w; tx++) {
+      entranceCells.push(`${Math.floor((tx + .5) * T / NAV_CELL)},${Math.floor((ty + .5) * T / NAV_CELL)}`)
+    }
+  }
+  assert.ok(entranceCells.some((cell) => connectedWhiteCells.has(cell)), `${building.id} entrance belongs to the spawn white component`)
+}
+const explicitColliderWhiteCells = []
+for (let row = 0; row < NAV_ROWS; row++) {
+  for (let col = 0; col < NAV_COLS; col++) {
+    if (!isMusicVillageMaskCellWalkable(col, row)) continue
+    const cell = { x: col * NAV_CELL, y: row * NAV_CELL, w: NAV_CELL, h: NAV_CELL }
+    const collider = COLLIDERS.find((rect) => cell.x < rect.x + rect.w && cell.x + cell.w > rect.x && cell.y < rect.y + rect.h && cell.y + cell.h > rect.y)
+    if (collider) explicitColliderWhiteCells.push({ col, row, collider: collider.id || collider.tag })
+  }
+}
+
 // A BFS edge can be traversed in both directions by the same collision function.
 for (const [child, parent] of parents.entries()) {
   const [cx, cy] = child.split(',').map(Number)
@@ -165,40 +325,34 @@ const southRoadTop = { x: 768, y: 770 }
 const southRoadBottom = { x: 768, y: 1138 }
 assert.ok(Math.abs(moveWithCollision(village, southRoadBottom, 0, -368).y - southRoadTop.y) < .01, 'straight road traverses northbound')
 assert.ok(Math.abs(moveWithCollision(village, southRoadTop, 0, 368).y - southRoadBottom.y) < .01, 'straight road traverses southbound')
-assert.equal(collides(village, 680, 900), null, 'visible road edge remains walkable')
+assert.equal(collides(village, 680, 900)?.id, 'terrain:blocked-cell', 'edited PNG can close a polygon road cell')
 assert.equal(collides(village, 620, 600)?.id, 'terrain:resonance-garden', 'fixed landscaped garden remains blocked outside the painted center path')
 
-// Painted clefs and notes are decoration on top of traversable brick. The
-// narrow priority paths cut the central spine and both rings back out of the
-// broader garden/vegetation polygons without weakening water or buildings.
+// Polygon paths remain semantic/debug data, while the edited PNG is allowed to
+// close or open individual path cells. The main north/south spine stays open.
 assert.ok(PRIORITY_WALKABLE_PATHS.length >= 6, 'visible paved corridors have explicit clearance polygons')
 const paintedMusicPathPoints = [
   [768, 365], [768, 520], [768, 680], [768, 790], [768, 930],
-  [440, 425], [448, 620], [1096, 425], [1088, 620], [470, 805], [1066, 805],
+  [470, 805], [1066, 805],
 ]
 for (const [x, y] of paintedMusicPathPoints) {
   assert.equal(collides(village, x, y), null, `painted music path remains walkable at ${x},${y}`)
   assert.ok(isNavigationWalkable(getNavigationTypeAtWorld(x, y)), `painted music path is walkable at ${x},${y}`)
+}
+for (const [x, y] of [[440, 425], [448, 620], [1096, 425], [1088, 620]]) {
+  assert.equal(isNavigationWalkable(getNavigationTypeAtWorld(x, y)), false, `black PNG cell closes polygon path at ${x},${y}`)
 }
 const fullCenterRoadTop = { x: 768, y: 350 }
 const fullCenterRoadBottom = { x: 768, y: 1138 }
 assert.ok(Math.abs(moveWithCollision(village, fullCenterRoadBottom, 0, -788).y - fullCenterRoadTop.y) < .01, 'clef road traverses northbound end-to-end')
 assert.ok(Math.abs(moveWithCollision(village, fullCenterRoadTop, 0, 788).y - fullCenterRoadBottom.y) < .01, 'clef road traverses southbound end-to-end')
 
-// A representative tree trunk reports the same collider from every cardinal
-// approach and fine substeps prevent tunnelling at fast frame deltas.
-const treeRect = TREE_TRUNK_COLLIDERS[10]
-const approaches = [
-  [{ x: treeRect.x - 24, y: treeRect.y + treeRect.h }, 48, 0, 'x'],
-  [{ x: treeRect.x + treeRect.w + 24, y: treeRect.y + treeRect.h }, -48, 0, 'x'],
-  [{ x: treeRect.x + treeRect.w / 2, y: treeRect.y - 16 }, 0, 40, 'y'],
-  [{ x: treeRect.x + treeRect.w / 2, y: treeRect.y + treeRect.h + PLAYER_BOX.h + 16 }, 0, -40, 'y'],
-]
-for (const [start, dx, dy, axis] of approaches) {
-  const result = moveWithCollisionDetailed(village, start, dx, dy)
-  assert.ok(result.blockedAxes.includes(axis), `tree blocks ${axis} approach`)
-  assert.ok(result.collisions.some((hit) => hit.id === treeRect.id || ['tree', 'vegetation'].includes(hit.type)), 'tree collision id/type is direction-independent')
-}
+// Fine substeps prevent tunnelling through a black PNG cell at fast frame
+// deltas, including when that cell used to be a polygon road.
+const blackMaskBarrier = moveWithCollisionDetailed(village, { x: 768, y: 900 }, -160, 0)
+assert.ok(blackMaskBarrier.blockedAxes.includes('x'))
+assert.ok(blackMaskBarrier.collisions.some((hit) => hit.id === 'terrain:blocked-cell' && hit.navigationType === NAV_TYPES.BLOCKED))
+assert.ok(blackMaskBarrier.position.x > 680, 'fast movement stops before the edited black road edge')
 
 // Foot anchor, viewport sizing, dead zone, smoothing, look-ahead and clamps.
 const initialCamera = getMusicCamera({ cssWidth: 1440, cssHeight: 788, playerX: 768, playerY: 576 })
@@ -318,8 +472,17 @@ assert.match(testSource, /music-debug-toggle/)
 console.log(JSON.stringify({
   pass: true,
   metadata: { groupA: 83, groupB: 83, bypass: 166, blocks: expectedBlocks },
-  navigation: { cells: `${NAV_COLS}x${NAV_ROWS}`, walkableCells, walkableTiles: reachable.size },
-  collision: { buildings: BUILDINGS.length, blockingProps: BLOCKING_PROP_COLLIDERS.length, foot: PLAYER_BOX },
+  navigation: {
+    cells: `${NAV_COLS}x${NAV_ROWS}`,
+    walkableCells,
+    walkableTiles: reachable.size,
+    newlyWalkableCells,
+    newlyBlockedCells,
+    whiteComponents: whiteComponentSizes.length,
+    mainWhiteComponent: whiteComponentSizes[0],
+    disconnectedWhiteCells: walkableCells - whiteComponentSizes[0],
+  },
+  collision: { buildings: BUILDINGS.length, blockingProps: BLOCKING_PROP_COLLIDERS.length, explicitColliderWhiteCells: explicitColliderWhiteCells.length, foot: PLAYER_BOX },
   depth: { objects: OCCLUSION_OBJECTS.length, silhouette: true, enter: SILHOUETTE_ENTER_RATIO, exit: SILHOUETTE_EXIT_RATIO },
   assets: manifest.files.length,
 }, null, 2))

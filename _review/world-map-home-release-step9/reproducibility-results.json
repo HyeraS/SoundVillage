@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "sources": {
+    "building": {
+      "sha256": "197931821b40304aa20dcf8a7f1e2aed02e267a24c0469d99e0b2553283c34a8",
+      "size": [
+        352,
+        301
+      ]
+    },
+    "ground": {
+      "sha256": "4e242c074c88b970f9612e661f4fa7bd781f367ebe692922eadb54f53a4ef20b",
+      "size": [
+        512,
+        480
+      ]
+    }
+  },
+  "runtime": {
+    "building": {
+      "sha256": "5185988e7ae8f0e0ca9d1ddf3988cc022c3e1effc31d6c6f367c7d19e77d7f91",
+      "size": [
+        352,
+        301
+      ],
+      "temporaryBuildByteIdentical": true
+    },
+    "ground": {
+      "sha256": "308f71eb6191ea2d88aed364c0cd83dc53bf8da373a78c6e0f3a0fc341f3547b",
+      "size": [
+        512,
+        480
+      ],
+      "temporaryBuildByteIdentical": true
+    },
+    "retainedAssetBaselineCount": 31,
+    "retainedAssetHashMismatches": 0
+  },
+  "builders": {
+    "runtimeAssetCheck": "PASS",
+    "projectionCheck": "PASS",
+    "collisionCheck": "PASS",
+    "twoRunByteIdentity": "PASS",
+    "nondeterministicFieldsFound": 0,
+    "implicitReviewWrites": 0
+  },
+  "projection": {
+    "authority": 18,
+    "native": 2,
+    "legacy": 16,
+    "homeLayers": 2,
+    "homeColliders": 1,
+    "duplicateFallbacks": 0
+  },
+  "collision": {
+    "cells": 691200,
+    "reasonMismatchCells": 0,
+    "changedHomeCellsVsStep8Baseline": 1488,
+    "otherBuildingChangedCells": 0,
+    "x1792Walkable": true,
+    "disconnectedCells": 0,
+    "oneToTwoCellPinches": 0
+  },
+  "cleanRoom": {
+    "path": "/private/tmp/sv-step9-cleanroom-final.KOMfuo",
+    "copiedForbiddenInputs": [],
+    "reusedDependencyRuntime": "node_modules symlink only",
+    "networkDownloads": 0,
+    "nextProductionBuild": "PASS",
+    "lint": "PASS",
+    "generatedFreshness": "PASS",
+    "coreTests": "PASS"
+  }
+}

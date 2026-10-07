@@ -1,0 +1,27 @@
+{
+  "coordinateSystem": "world pixels; 32 px per navigation tile",
+  "spawn": { "tx": 60, "ty": 47, "x": 1920, "y": 1504 },
+  "selectedSite": {
+    "summary": "중앙 광장 서쪽, 도서관과 남쪽 진입부 사이의 생활권",
+    "buildingTiles": { "tx": 48, "ty": 46, "w": 8, "h": 9 },
+    "visualBoundsPx": { "left": 1440, "top": 1368, "right": 1888, "bottom": 1752 },
+    "frontDoorApproachPx": { "x": 1664, "y": 1792 },
+    "collisionBoundsPx": { "left": 1536, "top": 1472, "right": 1792, "bottom": 1752 },
+    "walkableFrontApronPx": 40,
+    "straightDistanceTiles": 12.042,
+    "walkableRouteDistanceTiles": 13.997,
+    "minimapWorldPointPx": { "x": 1664, "y": 1792 },
+    "cameraVisibility": {
+      "desktop1440x900": true,
+      "mobile390x844": true
+    },
+    "routeImpact": "건물 충돌 우측 경계가 x=1792에 끝나 중앙 세로 도로까지 최소 4타일을 남기며, 현관 앞 40px 보행·집결 공간을 확보한다.",
+    "landmarkHierarchy": "도서관의 중앙 대표 실루엣은 유지하고, 집은 광장 서쪽의 더 낮고 따뜻한 개인 코티지 실루엣으로 구분한다."
+  },
+  "formerSite": {
+    "use": "게스트하우스",
+    "interaction": null,
+    "renderLayer": "inspection",
+    "note": "기존 좌상단 건물 그림을 방치하지 않고 비상호작용 게스트하우스로 재분류했다."
+  }
+}

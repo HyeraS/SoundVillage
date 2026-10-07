@@ -16,7 +16,21 @@ const ui = read('components/world-map/WorldMapUI.js')
 const world = read('components/WorldMap.js')
 const page = read('app/page.js')
 const quests = read('lib/dailyQuests.js')
-const attendance = read('lib/rewardRuntime.client.js')
+const rewardRuntime = read('lib/rewardRuntime.client.js')
+const legacyAttendance = read('lib/attendance.js')
+
+const attendanceHarnessKey = `__attendance_harness_${crypto.randomUUID().replaceAll('-', '')}`
+globalThis[attendanceHarnessKey] = { client:null, rewardFailure }
+const executableAttendance = legacyAttendance
+  .replace(/^import .*;\n/gm, '')
+  .replace(/^'use client'\n/, '')
+const attendancePrelude = `
+const getClient = () => globalThis.${attendanceHarnessKey}.client;
+const getOrCreateOperationKey = (scope) => \`test-key:\${scope}\`;
+const persistenceSuccess = (data, operationType, idempotencyKey) => ({ ok:true, data, operationType, idempotencyKey });
+const rewardFailure = (...args) => globalThis.${attendanceHarnessKey}.rewardFailure(...args);
+`
+const attendanceModule = await import(`data:text/javascript;base64,${Buffer.from(attendancePrelude + executableAttendance).toString('base64')}`)
 
 test('QA fixtures are deterministic, complete, and browser-memory-only', () => {
   assert.equal(QA_QUEST_FIXTURE.length, 3)
@@ -39,7 +53,8 @@ test('expected quest and attendance failures are structured without console erro
   assert.deepEqual(panelStateFromResult({ ok:true, data:[] }), { status:'empty', code:'empty', data:[] })
   assert.deepEqual(panelStateFromResult({ ok:false, code:'auth_required' }), { status:'error', code:'auth_required', data:null })
   assert.doesNotMatch(quests, /console\.error/)
-  assert.doesNotMatch(attendance, /console\.error/)
+  assert.doesNotMatch(rewardRuntime, /console\.error/)
+  assert.doesNotMatch(legacyAttendance, /console\.error/)
   assert.doesNotMatch(page.slice(page.indexOf('// 출석 체크인'), page.indexOf('// Museum 관람')), /console\.error|throw new Error/)
 })
 
@@ -91,9 +106,99 @@ test('retry, unmount, and mutation guards are present on both panels', () => {
 
 test('participant IDs remain compatibility inputs and never become reward authority', () => {
   assert.match(quests, /getTodayQuestSummary\(_participantId\)/)
-  assert.match(attendance, /getAttendanceStatusSafe\(_participantId\)/)
+  assert.match(rewardRuntime, /getAttendanceStatusSafe\(_participantId\)/)
   assert.match(quests, /client\.auth\.getSession\(\)/)
-  assert.match(attendance, /client\.auth\.getSession\(\)/)
+  assert.match(rewardRuntime, /client\.auth\.getSession\(\)/)
   assert.doesNotMatch(quests, /p_participant|participant_id/)
-  assert.doesNotMatch(attendance, /p_participant|participant_id/)
+  assert.doesNotMatch(rewardRuntime, /p_participant|participant_id/)
+})
+
+test('legacy attendance uses authenticated structured results for every success and failure path', async () => {
+  const consoleErrors = []
+  const unhandled = []
+  const originalConsoleError = console.error
+  const onUnhandled = (error) => unhandled.push(error)
+  console.error = (...args) => consoleErrors.push(args)
+  process.on('unhandledRejection', onUnhandled)
+
+  const installClient = ({ auth = { data:{ session:{ user:{ id:'auth-user' } } }, error:null }, authThrow, rpcResult, rpcThrow }) => {
+    const rpcCalls = []
+    globalThis[attendanceHarnessKey].client = {
+      auth:{ getSession:async () => {
+        if (authThrow) throw authThrow
+        return auth
+      } },
+      rpc:async (...args) => {
+        rpcCalls.push(args)
+        if (rpcThrow) throw rpcThrow
+        return rpcResult
+      },
+    }
+    return rpcCalls
+  }
+
+  try {
+    let calls = installClient({ auth:{ data:{ session:null }, error:null } })
+    const noAuth = await attendanceModule.ensureTodayCheckIn('FORGED_PARTICIPANT')
+    assert.equal(noAuth.code, 'auth_required')
+    assert.equal(noAuth.retryable, false)
+    assert.equal(calls.length, 0)
+
+    calls = installClient({ authThrow:new TypeError('Failed to fetch auth session') })
+    const authLookupFailure = await attendanceModule.getAttendanceStatus('IGNORED')
+    assert.deepEqual(authLookupFailure, { ok:false, code:'network_error', retryable:true })
+    assert.equal(calls.length, 0)
+
+    calls = installClient({ rpcThrow:new TypeError('Failed to fetch RPC') })
+    const rpcNetworkFailure = await attendanceModule.ensureTodayCheckIn('IGNORED')
+    assert.equal(rpcNetworkFailure.code, 'network_error')
+    assert.equal(rpcNetworkFailure.error.retryable, true)
+    assert.deepEqual(calls[0], ['ensure_today_check_in_v4', { p_idempotency_key:'test-key:attendance_claim:IGNORED' }])
+
+    calls = installClient({ rpcResult:{ data:null, error:null } })
+    const unclaimed = await attendanceModule.getAttendanceStatus('FORGED_PARTICIPANT')
+    assert.deepEqual(unclaimed, { ok:false, code:'auth_required', retryable:false })
+    assert.deepEqual(calls[0], ['get_attendance_status'])
+
+    const status = { today:null, templates:[{ day_index:1, reward_currency:2 }] }
+    calls = installClient({ rpcResult:{ data:status, error:null } })
+    assert.deepEqual(await attendanceModule.getAttendanceStatus('FORGED_PARTICIPANT'), {
+      ok:true, code:'success', retryable:false, data:status,
+    })
+    assert.deepEqual(calls[0], ['get_attendance_status'])
+
+    const claim = { row:{ id:'attendance-row', streak_day:1, reward_currency:2 }, isNew:true }
+    calls = installClient({ rpcResult:{ data:claim, error:null } })
+    const success = await attendanceModule.ensureTodayCheckIn('COMPATIBILITY_INPUT')
+    assert.deepEqual(success, {
+      ok:true,
+      data:claim,
+      operationType:'attendance_claim',
+      idempotencyKey:'test-key:attendance_claim:COMPATIBILITY_INPUT',
+    })
+    assert.deepEqual(calls[0], ['ensure_today_check_in_v4', {
+      p_idempotency_key:'test-key:attendance_claim:COMPATIBILITY_INPUT',
+    }])
+
+    installClient({ rpcResult:{ data:null, error:{ code:'XX000', message:'storage unavailable' } } })
+    const retryable = await attendanceModule.ensureTodayCheckIn('IGNORED')
+    assert.equal(retryable.code, 'database_error')
+    assert.equal(retryable.retryable, true)
+    assert.equal(retryable.error.retryable, true)
+
+    installClient({ rpcResult:{ data:null, error:{ code:'PGRST301', message:'JWT expired' } } })
+    const nonRetryable = await attendanceModule.ensureTodayCheckIn('IGNORED')
+    assert.equal(nonRetryable.code, 'auth_required')
+    assert.equal(nonRetryable.retryable, false)
+    assert.equal(nonRetryable.error.retryable, false)
+
+    await new Promise((resolve) => setImmediate(resolve))
+    assert.deepEqual(consoleErrors, [])
+    assert.deepEqual(unhandled, [])
+    assert.match(page, /if \(!result\.ok\)[\s\S]*?result\.error\.code/)
+    assert.match(read('app/attendance-test/page.js'), /if \(!statusResult\.ok\)[\s\S]*?statusResult\.data/)
+  } finally {
+    console.error = originalConsoleError
+    process.off('unhandledRejection', onUnhandled)
+  }
 })

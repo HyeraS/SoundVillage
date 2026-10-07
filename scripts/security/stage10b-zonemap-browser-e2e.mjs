@@ -66,6 +66,9 @@ try {
 
   await page.reload()
   await page.locator('[data-zone-map="Lab"]').waitFor({ timeout: 20_000 })
+  // The element can arrive in prerendered HTML before useKeys attaches its
+  // client key listeners; wait one paint so the held key is not lost.
+  await sleep(150)
   await page.keyboard.down('ArrowLeft')
   await sleep(5_000)
   await page.keyboard.up('ArrowLeft')
@@ -129,6 +132,7 @@ try {
   await page.goto(`${baseUrl}/`)
   await page.goto(`${baseUrl}/lab-test`)
   await page.locator('[data-zone-map="Lab"]').waitFor({ timeout: 20_000 })
+  await sleep(150)
   await assertStable(page, initial, 'route re-entry')
 
   await page.keyboard.down('ArrowDown')

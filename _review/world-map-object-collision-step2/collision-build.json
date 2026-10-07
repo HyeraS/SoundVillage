@@ -1,0 +1,154 @@
+{
+  "status": "PASS",
+  "source": "logical-object-collision-shapes",
+  "productionAuthority": "scripts/build-world-map-v4-collision.mjs",
+  "rasterization": {
+    "shapeResolution": "1 world pixel",
+    "polygonFillRule": "even-odd using pixel centers",
+    "coordinateBounds": "[left,right) x [top,bottom)",
+    "clearanceKernelPx": [
+      29,
+      17
+    ],
+    "clearanceHalfExtentPx": {
+      "halfWidth": 14,
+      "halfHeight": 8
+    },
+    "cellReduction": "4px max-pool"
+  },
+  "width": 960,
+  "height": 720,
+  "cellSize": 4,
+  "totalCells": 691200,
+  "walkableCells": 636624,
+  "blockedCells": 54576,
+  "walkablePercent": 92.1,
+  "blockedPercent": 7.9,
+  "previousMaskDiff": {
+    "baseline": "reconstructed inclusive-ceil production algorithm",
+    "newlyBlockedCells": 0,
+    "newlyWalkableCells": 1329,
+    "changedCells": 1329
+  },
+  "homeFixture": {
+    "footprintRight": 1776,
+    "clearanceBlockedRightExclusive": 1792,
+    "roadCellX": 1792,
+    "roadCellBlocked": false,
+    "magicCorrectionUsed": false
+  },
+  "blockers": [
+    {
+      "objectId": "landmark-lab",
+      "colliderId": "lab-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 1792,
+          "top": 416,
+          "right": 2048,
+          "bottom": 630
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-animal",
+      "colliderId": "animal-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 3072,
+          "top": 448,
+          "right": 3392,
+          "bottom": 702
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-urban",
+      "colliderId": "urban-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 3392,
+          "top": 1152,
+          "right": 3712,
+          "bottom": 1514
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-music",
+      "colliderId": "music-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 3040,
+          "top": 2080,
+          "right": 3392,
+          "bottom": 2430
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-human",
+      "colliderId": "human-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 224,
+          "top": 2048,
+          "right": 640,
+          "bottom": 2458
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-nature",
+      "colliderId": "nature-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 352,
+          "top": 1120,
+          "right": 736,
+          "bottom": 1290
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-library",
+      "colliderId": "library-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 1728,
+          "top": 1184,
+          "right": 2112,
+          "bottom": 1398
+        }
+      ]
+    },
+    {
+      "objectId": "landmark-home",
+      "colliderId": "home-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 1520,
+          "top": 1472,
+          "right": 1776,
+          "bottom": 1696
+        }
+      ]
+    }
+  ]
+}

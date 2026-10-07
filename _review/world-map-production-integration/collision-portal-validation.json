@@ -1,0 +1,121 @@
+{
+  "map": "120x90",
+  "camera": "30x22",
+  "spawn": {
+    "tx": 60,
+    "ty": 47
+  },
+  "destinations": [
+    {
+      "id": "Lab",
+      "kind": "zone",
+      "zone": "Lab",
+      "target": {
+        "zone": "Lab",
+        "tx": 56,
+        "ty": 13,
+        "w": 8,
+        "h": 8
+      },
+      "reachableApproaches": 114
+    },
+    {
+      "id": "Animal",
+      "kind": "zone",
+      "zone": "Animal",
+      "target": {
+        "zone": "Animal",
+        "tx": 96,
+        "ty": 14,
+        "w": 10,
+        "h": 10
+      },
+      "reachableApproaches": 156
+    },
+    {
+      "id": "Urban",
+      "kind": "zone",
+      "zone": "Urban",
+      "target": {
+        "zone": "Urban",
+        "tx": 106,
+        "ty": 36,
+        "w": 10,
+        "h": 14
+      },
+      "reachableApproaches": 221
+    },
+    {
+      "id": "Music",
+      "kind": "zone",
+      "zone": "Music",
+      "target": {
+        "zone": "Music",
+        "tx": 95,
+        "ty": 65,
+        "w": 11,
+        "h": 11
+      },
+      "reachableApproaches": 186
+    },
+    {
+      "id": "Human",
+      "kind": "zone",
+      "zone": "Human",
+      "target": {
+        "zone": "Human",
+        "tx": 7,
+        "ty": 64,
+        "w": 13,
+        "h": 13
+      },
+      "reachableApproaches": 256
+    },
+    {
+      "id": "Nature",
+      "kind": "zone",
+      "zone": "Nature",
+      "target": {
+        "zone": "Nature",
+        "tx": 11,
+        "ty": 35,
+        "w": 12,
+        "h": 14
+      },
+      "reachableApproaches": 240
+    },
+    {
+      "id": "Sound Library",
+      "kind": "museum",
+      "zone": null,
+      "target": {
+        "tx": 54,
+        "ty": 37,
+        "w": 12,
+        "h": 8
+      },
+      "reachableApproaches": 135
+    },
+    {
+      "id": "Home",
+      "kind": "home",
+      "zone": null,
+      "target": {
+        "tx": 18,
+        "ty": 12,
+        "w": 8,
+        "h": 10
+      },
+      "reachableApproaches": 143
+    }
+  ],
+  "blockedSamples": [
+    "Nature water",
+    "library body",
+    "north forest",
+    "southwest garden"
+  ],
+  "reachablePlayerFootTiles": 3793,
+  "cleanCaptureFlag": "worldClean=1 (development only)",
+  "status": "PASS"
+}

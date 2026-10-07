@@ -1,0 +1,7 @@
+{
+  "status": "PASS",
+  "scope": "fresh browser tab after final code and runtime-asset rebuild; all eight destinations plus locked Animal check",
+  "errors": [],
+  "errorCount": 0,
+  "image404Count": 0
+}

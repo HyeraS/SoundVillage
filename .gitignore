@@ -18,5 +18,6 @@ winter full/
 Character v.2/
 /assets/
 .vercel
+supabase/.temp/
 .env*
 !.env.example

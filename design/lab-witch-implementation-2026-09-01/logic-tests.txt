@@ -1,0 +1,13 @@
+2026-09-04 final source
+command: node --test scripts/test_lab_production.mjs
+exit: 0
+groups: A 84 / B 85 / ALL 169
+safe slots: 415
+reachable foot cells: 4335
+objects: 247
+collision rectangles: 1719
+tests: 12 passed / 0 failed
+
+Covered: spawn/entrance safety, deterministic real-data placement, all-stage
+reachability, collision and axis sliding, capacity failures, data-driven block
+counts, responsive camera, approved blueprint metrics, pond/dock collisions.

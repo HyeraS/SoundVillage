@@ -1,0 +1,176 @@
+{
+  "status": "PASS",
+  "registration": {
+    "width": 960,
+    "height": 720,
+    "cellSize": 4,
+    "worldWidth": 3840,
+    "worldHeight": 2880,
+    "bitOrder": "little",
+    "source": "world-map-v4-reference-registration"
+  },
+  "modularLandmark": {
+    "width": 1534,
+    "height": 1010
+  },
+  "connectivity": {
+    "walkableCells": 111304,
+    "reachableCells": 111304,
+    "disconnectedCells": 0,
+    "oneToTwoCellPinches": 3
+  },
+  "movement": {
+    "speedPxPerFrame": 5.85,
+    "substepPx": 3,
+    "sampledNormalAndLargeDeltaMoves": 18368
+  },
+  "routeCoverage": {
+    "east-plaza-curve": {
+      "requestedWorldTile": {
+        "tx": 83.5,
+        "ty": 39.5
+      },
+      "testedFootWorldPx": {
+        "x": 2674,
+        "y": 1266
+      },
+      "pathCells": 249,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 199
+    },
+    "west-plaza-curve": {
+      "requestedWorldTile": {
+        "tx": 37,
+        "ty": 40
+      },
+      "testedFootWorldPx": {
+        "x": 1186,
+        "y": 1282
+      },
+      "pathCells": 241,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 200
+    },
+    "nature-bridge-gate": {
+      "requestedWorldTile": {
+        "tx": 17,
+        "ty": 42
+      },
+      "testedFootWorldPx": {
+        "x": 526,
+        "y": 1314
+      },
+      "pathCells": 402,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 337
+    },
+    "urban-branch-gate": {
+      "requestedWorldTile": {
+        "tx": 106,
+        "ty": 43
+      },
+      "testedFootWorldPx": {
+        "x": 3306,
+        "y": 1402
+      },
+      "pathCells": 445,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 341
+    },
+    "music-flowerbed-lane": {
+      "requestedWorldTile": {
+        "tx": 96,
+        "ty": 66
+      },
+      "testedFootWorldPx": {
+        "x": 2974,
+        "y": 1974
+      },
+      "pathCells": 451,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 344
+    },
+    "human-market-bench-lane": {
+      "requestedWorldTile": {
+        "tx": 20,
+        "ty": 70
+      },
+      "testedFootWorldPx": {
+        "x": 782,
+        "y": 2242
+      },
+      "pathCells": 536,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 428
+    }
+  },
+  "destinations": {
+    "Lab": {
+      "pathCells": 621,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 406
+    },
+    "Animal": {
+      "pathCells": 520,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 355
+    },
+    "Urban": {
+      "pathCells": 430,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 331
+    },
+    "Music": {
+      "pathCells": 604,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 467
+    },
+    "Human": {
+      "pathCells": 693,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 573
+    },
+    "Nature": {
+      "pathCells": 322,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 266
+    },
+    "Sound Library": {
+      "pathCells": 1,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 0
+    },
+    "Home": {
+      "pathCells": 504,
+      "maxStalledFrames": 0,
+      "largeDeltaChecks": 333
+    }
+  },
+  "obstacleSamples": [
+    {
+      "id": "nature-water",
+      "tx": 6,
+      "ty": 42
+    },
+    {
+      "id": "library-body",
+      "tx": 55.5,
+      "ty": 43
+    },
+    {
+      "id": "north-forest",
+      "tx": 88,
+      "ty": 12
+    },
+    {
+      "id": "southwest-garden",
+      "tx": 36,
+      "ty": 72
+    },
+    {
+      "id": "music-building",
+      "tx": 96,
+      "ty": 74
+    }
+  ]
+}

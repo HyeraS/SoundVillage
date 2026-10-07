@@ -1,0 +1,83 @@
+{
+  "pixelScale": 2,
+  "source": "editable R2 native pixel modules; originals untouched",
+  "assets": [
+    {
+      "name": "records",
+      "size": [
+        59,
+        41
+      ],
+      "world": [
+        118,
+        82
+      ],
+      "reuse": "R2 shelf cornice, feet; source-books small crop",
+      "new": "record files, boxes and small glass bay"
+    },
+    {
+      "name": "measurement",
+      "size": [
+        59,
+        41
+      ],
+      "world": [
+        118,
+        82
+      ],
+      "new": "metal casing, horizontal neutral tick panel, glass bay, drawers"
+    },
+    {
+      "name": "workbench",
+      "size": [
+        56,
+        36
+      ],
+      "world": [
+        112,
+        72
+      ],
+      "reuse": "R2 source-table rim and desk bottom drawers",
+      "new": "low panel, paper, knobs, hooded worklight"
+    },
+    {
+      "name": "frame",
+      "size": [
+        24,
+        44
+      ],
+      "world": [
+        48,
+        88
+      ],
+      "new": "grounded plinth, connected offset half-frames and central small glass plate"
+    },
+    {
+      "name": "emissive",
+      "size": [
+        288,
+        288
+      ],
+      "world": [
+        576,
+        576
+      ],
+      "reuse": "R2 wall-lamp masks",
+      "new": "only glass-column mask replaced with faint frame reflection, small workbench light"
+    }
+  ],
+  "palette": {
+    "dark": "283e4a",
+    "edge": "354c57",
+    "metal": "536c76",
+    "light": "859b9e",
+    "brass": "a38b5e",
+    "gold": "c7ad77",
+    "shade": "6a624f",
+    "glass": "376773",
+    "glassMid": "558992",
+    "glassHi": "86ada9",
+    "paper": "b5ad90",
+    "wood": "6d6655"
+  }
+}

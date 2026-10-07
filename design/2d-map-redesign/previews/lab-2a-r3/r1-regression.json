@@ -1,0 +1,31 @@
+{
+  "pass": true,
+  "unchangedSlots": 108,
+  "originalWhitebox": {
+    "pass": true,
+    "errors": [],
+    "warnings": [],
+    "capacities": {
+      "1": 18,
+      "2": 18,
+      "3": 18,
+      "4": 18,
+      "5": 18,
+      "6": 18
+    },
+    "slotTotal": 108,
+    "reachableTiles": 1047
+  },
+  "changedFootSamples8px": 517,
+  "reachableFootSamples8px": 15032,
+  "movement": {
+    "oldStopsAt": 413.62962962962916,
+    "proposedEntersTo": 304,
+    "deskStopsAt": 268,
+    "instrumentStopsAt": 318.3529411764706,
+    "rearStopsAt": 190.00000000000006,
+    "westStopsAt": 140.29850746268664,
+    "returnsTo": 464.0000000000015
+  },
+  "scope": "Archive-only collision override; no production state"
+}

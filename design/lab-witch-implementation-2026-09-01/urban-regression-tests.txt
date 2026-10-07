@@ -1,0 +1,8 @@
+2026-09-04 final source
+command: node scripts/test_urban_production.mjs
+exit: 0
+result: Urban production validation passed
+metadata: A 83 / B 83
+map: 48x36 / 8 buildings / elevated metro + 30 props
+note: Node emitted the existing MODULE_TYPELESS_PACKAGE_JSON warning for
+lib/urbanAssetArt.js; this is outside the Lab change and the validation passed.

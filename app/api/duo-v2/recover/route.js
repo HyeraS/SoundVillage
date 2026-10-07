@@ -1,4 +1,4 @@
-import { duoResponseWithRealtime, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
+import { duoResponse, duoStorageFailure, readDuoBody, requireDuoUuids, requireDuoUser } from '@/lib/duoApi.server'
 import { recoverDuoSession } from '@/lib/duoSession.server'
 
 export const dynamic = 'force-dynamic'
@@ -12,5 +12,5 @@ export async function POST(request) {
   if (invalid) return invalid
   const { data, error } = await recoverDuoSession(auth.user.id, parsed.body.sessionId, parsed.body.clientId)
   if (error) return duoStorageFailure('recover', error)
-  return duoResponseWithRealtime(data, auth.user.id, parsed.body.clientId)
+  return duoResponse(data)
 }

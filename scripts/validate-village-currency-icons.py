@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import re
 from pathlib import Path
 
@@ -11,10 +12,23 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
+BUILD_SCRIPT = ROOT / "scripts/build-village-currency-icons.py"
+BUILD_SPEC = importlib.util.spec_from_file_location("village_currency_builder", BUILD_SCRIPT)
+assert BUILD_SPEC and BUILD_SPEC.loader
+BUILDER = importlib.util.module_from_spec(BUILD_SPEC)
+BUILD_SPEC.loader.exec_module(BUILDER)
 RUNTIME_DIR = ROOT / "public/assets/economy/village-currencies"
 REVIEW_DIR = ROOT / "_review/economy-v1-assets/currency-pack-selection"
 A_DIR = ROOT / "_review/economy-v1-assets/currency-icons-generated-draft-a"
 VILLAGES = ("animal", "human", "nature", "urban", "music", "lab")
+VILLAGE_RENDERERS = {
+    "animal": "lib/animalVillage.js",
+    "human": "lib/humanVillage.js",
+    "nature": "lib/natureVillage.js",
+    "urban": "lib/urbanVillage.js",
+    "music": "lib/musicVillage.js",
+    "lab": "lib/labVillage.js",
+}
 
 A_HASHES = {
     "animal.png": "5327bf2f6d72e861b510b6229ae9d916f628adec5e1dc8ddc97b20898b1cfd02",
@@ -54,21 +68,7 @@ CHARACTER_RUNTIME_HASHES = {
     "public/assets/world/outfits/witch.png": "a748c8743a7e8427b9eb62969225fd0d81698bd8fac4d97d7676b44af9f31d9b",
 }
 
-WORLD_MAP_HASHES = {
-    "components/world-map/WorldMapDiagram.js": "92d450571aadd4d3067120a54c292f6fb4ce6ede8f19f1c468d6fbffb5f58520",
-    "components/world-map/WorldMapScene.js": "5373b929879fb0b7aaeb8fdc9033d733ffbf7216b4df79557dac42ade6c0c355",
-    "lib/worldMapGeometry.mjs": "fb894bd4ab3eb3d4f050db10dedfb20580ce58468b7ec748dce33dc7e3ea287e",
-    "lib/worldMapMinimap.mjs": "61fe7019f092d156fd00296f8b9d1b1f1cb019e54e2bc787536f2fba546f1887",
-    "lib/worldMapV4Assets.mjs": "09aa7ecc61c350d1eb6443302597e8fc13539b1d58b335dbc9e8144a70bf28bd",
-    "lib/worldMapV4Manifest.mjs": "1abd61bb8c7dc04d74ce8a15393caca695886df7932c828c2bae15e13a529248",
-    "lib/worldWalkableMaskData.mjs": "a1546e6624e73241c57e9273456b252e048852e5865d68cfb07c0e6b32b92be0",
-    "public/assets/world/sound-archive-garden-v4/collision-build.json": "8b3853a8a379775267603e2f7128b0b102bb79d4f29dddd01a335aeeac51c7e6",
-    "public/assets/world/sound-archive-garden-v4/collision-debug.png": "4491d72806353310891b5c94dd110103dcc0809a5bca63964b7a58734a3623d1",
-    "public/assets/world/sound-archive-garden-v4/obstacle-mask.png": "3cc4c06887846a7ae17c8521b9bc72215ad24e0fd2debcc78abe01be5a0f20b3",
-    "public/assets/world/sound-archive-garden-v4/walkable-clearance-mask.png": "c85237a143a741ffde89c766b8fd19219339981f8056f570ac0ecdb8e5b48474",
-}
-
-CATALOG_HASH = "d23e54572af3c84a7163da0ce73434ea83d84ef89957302c4ccfe8c86831f7c8"
+CATALOG_HASH = "e8f4bde2ab86efd8445085bf93aa39f3c9d20e6f5739042202a6ce5a1fd25052"
 REVIEW_FILES = (
     "all-candidates.png",
     "recommended-six.png",
@@ -100,7 +100,6 @@ def main() -> None:
     assert actual_names == expected_names, f"runtime directory must contain only the six 32px icons: {sorted(actual_names)}"
 
     pixel_digests: dict[str, str] = {}
-    alpha_masks: list[bytes] = []
     for village in VILLAGES:
         path = RUNTIME_DIR / f"{village}.png"
         assert path.is_file(), f"missing currency icon: {path}"
@@ -114,11 +113,11 @@ def main() -> None:
             assert alpha.getbbox() == (2, 2, 30, 30), f"{village}: opaque bounds are clipped or margins changed: {alpha.getbbox()}"
             opaque_colors = {pixel[:3] for pixel in image.get_flattened_data() if pixel[3]} if hasattr(image, "get_flattened_data") else {pixel[:3] for pixel in image.getdata() if pixel[3]}
             assert len(opaque_colors) == 5, f"{village}: expected the shared five-role shade system, got {len(opaque_colors)} colors"
-            alpha_masks.append(alpha.tobytes())
+            expected, _silhouette = BUILDER.refined_candidate(village)
+            assert image.tobytes() == expected.tobytes(), f"{village}: runtime icon no longer matches the approved 32px asset"
             pixel_digests[village] = hashlib.sha256(image.tobytes()).hexdigest()
 
     assert len(set(pixel_digests.values())) == len(VILLAGES), "two runtime icons are pixel-identical"
-    assert len(set(alpha_masks)) == 1, "token size, border, margin, or visual footprint differs between villages"
 
     for filename, expected_hash in A_HASHES.items():
         path = A_DIR / filename
@@ -144,15 +143,19 @@ def main() -> None:
         assert re.search(rf"\b{key}:\s*\{{\s*src:\s*['\"]{re.escape(expected_path)}['\"],\s*size:\s*32\s*\}}", body), f"registry path/size mismatch for {key}"
         assert (ROOT / "public" / expected_path.lstrip("/")).is_file(), f"registry target missing for {key}"
 
+        renderer = (ROOT / VILLAGE_RENDERERS[village]).read_text(encoding="utf-8")
+        assert "drawVillageCurrencyIcon" in renderer, f"{village}: renderer does not use the approved icon helper"
+        assert re.search(rf"drawVillageCurrencyIcon\([^\n]*['\"]{key}['\"]", renderer), f"{village}: renderer is not wired to its matching icon"
+
     assert digest(ROOT / "data/economy/catalog-v1.json") == CATALOG_HASH, "catalog items, prices, or village demand changed"
     assert_hashes(CHARACTER_RUNTIME_HASHES, "Character v2 runtime asset")
-    assert_hashes(WORLD_MAP_HASHES, "world-map file")
-
     print("village currency validation passed")
     print("- six unique 32x32 RGBA PNGs with binary transparency")
-    print("- identical token footprint/border/margins and unclipped bounds")
+    print("- approved octagonal icons retain their shared footprint and five-role palettes")
+    print("- runtime assets match the existing refined 32px icon builder")
     print("- runtime registry paths resolve to the six files")
-    print("- generated A archive, Stage 3B catalog, Character v2 runtime, and world-map hashes unchanged")
+    print("- all six village renderers reuse their matching approved icon")
+    print("- generated A archive, economy catalog, and Character v2 runtime hashes unchanged")
 
 
 if __name__ == "__main__":

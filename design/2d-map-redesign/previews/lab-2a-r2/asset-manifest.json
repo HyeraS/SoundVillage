@@ -1,0 +1,249 @@
+[
+  {
+    "name": "stone",
+    "path": "public/assets/world/terrain.png",
+    "sheet": [
+      864,
+      800
+    ],
+    "crop": [
+      16,
+      624,
+      16,
+      16
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "opaqueColors": 12,
+    "usage": "derived: low-contrast blue-grey floor; 2x world"
+  },
+  {
+    "name": "paving",
+    "path": "public/assets/world/terrain-town.png",
+    "sheet": [
+      720,
+      1072
+    ],
+    "crop": [
+      576,
+      16,
+      16,
+      16
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "opaqueColors": 6,
+    "usage": "derived: masonry facing modules; 2x world"
+  },
+  {
+    "name": "table",
+    "path": "public/assets/lab/tables.png",
+    "sheet": [
+      448,
+      352
+    ],
+    "crop": [
+      256,
+      48,
+      32,
+      32
+    ],
+    "alphaBounds": [
+      1,
+      11,
+      30,
+      21
+    ],
+    "opaqueColors": 6,
+    "usage": "derived: native edge/center modules; 2x world"
+  },
+  {
+    "name": "shelf",
+    "path": "public/assets/lab/storage.png",
+    "sheet": [
+      448,
+      576
+    ],
+    "crop": [
+      327,
+      516,
+      16,
+      27
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      16,
+      27
+    ],
+    "opaqueColors": 6,
+    "usage": "derived: three bays + one extra shelf row; 2x world"
+  },
+  {
+    "name": "books",
+    "path": "public/assets/interior/books.png",
+    "sheet": [
+      23,
+      11
+    ],
+    "crop": [
+      0,
+      0,
+      23,
+      11
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      23,
+      11
+    ],
+    "opaqueColors": 16,
+    "usage": "derived: muted paper/wood colours; 2x world"
+  },
+  {
+    "name": "lamp",
+    "path": "public/assets/lab/decorations.png",
+    "sheet": [
+      960,
+      624
+    ],
+    "crop": [
+      304,
+      176,
+      32,
+      32
+    ],
+    "alphaBounds": [
+      5,
+      6,
+      24,
+      26
+    ],
+    "opaqueColors": 18,
+    "usage": "reuse desk lamp; native crop trimmed on composition; 2x world"
+  },
+  {
+    "name": "dresser",
+    "path": "public/assets/interior/dresser.png",
+    "sheet": [
+      29,
+      30
+    ],
+    "crop": [
+      0,
+      0,
+      29,
+      30
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      29,
+      30
+    ],
+    "opaqueColors": 8,
+    "usage": "excluded whole: exceeds fixed desk pedestal height; drawer module reused"
+  },
+  {
+    "name": "nature-ground",
+    "path": "public/assets/world/nature_village_map/terrain.png",
+    "sheet": [
+      2368,
+      1136
+    ],
+    "crop": [
+      16,
+      16,
+      16,
+      16
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      16,
+      16
+    ],
+    "opaqueColors": 1,
+    "usage": "reference: Nature terrain world32x32"
+  },
+  {
+    "name": "nature-fence",
+    "path": "public/assets/world/nature_village_map/terrain.png",
+    "sheet": [
+      2368,
+      1136
+    ],
+    "crop": [
+      0,
+      498,
+      32,
+      16
+    ],
+    "alphaBounds": [
+      0,
+      1,
+      32,
+      15
+    ],
+    "opaqueColors": 10,
+    "usage": "reference: Nature fence world64x32"
+  },
+  {
+    "name": "animal-path",
+    "path": "public/assets/world/terrain-town.png",
+    "sheet": [
+      720,
+      1072
+    ],
+    "crop": [
+      80,
+      40,
+      32,
+      32
+    ],
+    "alphaBounds": [
+      0,
+      0,
+      32,
+      32
+    ],
+    "opaqueColors": 3,
+    "usage": "reference: Animal path world32x32"
+  },
+  {
+    "name": "animal-bench",
+    "path": "public/assets/world/terrain-town.png",
+    "sheet": [
+      720,
+      1072
+    ],
+    "crop": [
+      264,
+      938,
+      32,
+      20
+    ],
+    "alphaBounds": [
+      0,
+      6,
+      32,
+      14
+    ],
+    "opaqueColors": 5,
+    "usage": "reference candidate: see renderer individual scale; not used as desk"
+  },
+  {
+    "name": "device",
+    "usage": "new: native 24x44 raster pixel drawing; 2x = 48x88; no matching device in inspected sheets",
+    "alpha": "binary; no antialiasing"
+  }
+]

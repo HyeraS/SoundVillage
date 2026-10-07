@@ -1,0 +1,11 @@
+{
+  "baselineFiles": 9776,
+  "changedExistingFiles": [
+    "components/WorldMap.js",
+    "lib/animalVillage.js"
+  ],
+  "missingExistingFiles": [
+    "app/nature-bridge-preview/page.js"
+  ],
+  "note": "R2 writes only new R2 files; listed differences are concurrent workspace edits, not reverted."
+}

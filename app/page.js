@@ -30,6 +30,9 @@ import { canonicalAudioId, uniqueSoundsByCanonicalAudio } from '@/lib/soundIdent
 import { FRIEND_ROOM } from '@/lib/interiorFixtures'
 import { INTERIOR_CATALOG, INTERIOR_STARTER_IDS } from '@/lib/interiorCatalog'
 import { getUniquePlacedInteriorIds } from '@/lib/homeHub.mjs'
+import { INTERNAL_BROWSER_QA, TEMPORARILY_UNLOCK_ALL_CONTENT } from '@/lib/temporaryUnlocks'
+import { DUO_VISITOR_FOLLOW_ACTIONS, resolveDuoPresenceScreen, resolveDuoVisitorFollowAction } from '@/lib/duoNavigation.mjs'
+import { buildCatalogExhibitCounts, mergeExhibitCounts } from '@/lib/museumExhibitCounts.mjs'
 import soundMetadata from '@/data/sound_metadata.json'
 
 /* ─────────────────────────────────────────────
@@ -37,11 +40,9 @@ import soundMetadata from '@/data/sound_metadata.json'
 ───────────────────────────────────────────── */
 const ZONES = ['Animal', 'Human', 'Nature', 'Urban', 'Music', 'Lab']
 
-// 임시 플레이테스트: 일반 플레이에서는 모든 마을을 처음부터 열어 둔다.
-// false로 바꾸면 기존 Music 구역 1 완료 기반 순차 해금으로 즉시 복귀한다.
+// 임시 플레이테스트 해금은 lib/temporaryUnlocks.js 한 곳에서 관리한다.
 const FIRST_ZONE          = 'Music'
 const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
-const TEMPORARILY_UNLOCK_ALL_ZONES = true
 const NATURE_QA_PARTICIPANT_ID = 'NATURE_QA_LOCAL'
 const HUMAN_QA_PARTICIPANT_ID = 'HUMAN_QA_LOCAL'
 const DUO_RECOVERY_KEY = 'soundvillage-duo-v2-recovery'
@@ -77,8 +78,6 @@ function duoSessionState(result) {
     role:result.role,
     expiresAt:result.expiresAt,
     leaseExpiresAt:result.leaseExpiresAt,
-    realtimeToken:result.realtimeToken,
-    realtimeTokenExpiresAt:result.realtimeTokenExpiresAt,
     reconnectKey:crypto.randomUUID(),
   }
 }
@@ -157,6 +156,10 @@ export default function HomePage() {
   const [qaAttendanceClaimed, setQaAttendanceClaimed] = useState(false)
   const [worldOverviewQa, setWorldOverviewQa] = useState(false)
   const [worldLockQaEnabled, setWorldLockQaEnabled] = useState(false)
+  const [stage4DuoQa] = useState(() => (
+    typeof window !== 'undefined' && INTERNAL_BROWSER_QA
+      && new URLSearchParams(window.location.search).get('stage4DuoQa') === '1'
+  ))
   const [worldHomeQaState] = useState(() => (
     typeof window !== 'undefined' && process.env.NODE_ENV === 'development'
       ? new URLSearchParams(window.location.search).get('worldHomeState') || ''
@@ -170,6 +173,7 @@ export default function HomePage() {
   const localQaRef = useRef(false)
   const worldLockQaRef = useRef(false)
   const [activeZone,    setActiveZone]    = useState(null)
+  const [worldReturnZone, setWorldReturnZone] = useState(null)
   const [activeSound,   setActiveSound]   = useState(null)
   const [myExpression,  setMyExpression]  = useState('')
   const [museumSource,  setMuseumSource]  = useState(null) // 'zone' | 'world'
@@ -289,7 +293,7 @@ export default function HomePage() {
   // 저장된 방을 읽기 전용으로 보여준다(기존과 동일) — 이땐 duo 채널에 아무도
   // 없으니 그냥 조용히 비어 있을 뿐이다.
   const [visiting,      setVisiting]      = useState(null) // null | { token, room }
-  const duoScreen = visiting || screen === 'house' ? 'interior' : screen === 'world' ? 'worldmap' : 'waiting'
+  const duoScreen = resolveDuoPresenceScreen({ screen, visiting:Boolean(visiting) })
   const duo = useDuoSession(duoSession, realtimeClientId, duoScreen)
 
   const createLiveDuoInvite = useCallback(async () => {
@@ -376,7 +380,8 @@ export default function HomePage() {
       setDuoJoinState({ status:'joined', code:null })
       if (roomResult.ok && roomResult.room) {
         setDuoVisitRoom(roomResult.room)
-        setVisiting({ sessionId:result.sessionId, room:roomResult.room, fallback:false })
+        setVisiting(null)
+        setScreen('world')
       } else {
         setVisiting(null)
         setScreen('world')
@@ -523,15 +528,21 @@ export default function HomePage() {
   useEffect(() => {
     if (duoSession?.role !== 'visitor' || !duo.partnerPos?.screen) return
     const id = window.setTimeout(() => {
-      if (duo.partnerPos.screen === 'worldmap') {
+      const action = resolveDuoVisitorFollowAction({
+        role:duoSession.role,
+        peerScreen:duo.partnerPos.screen,
+        visiting:Boolean(visiting),
+        hasSharedRoom:Boolean(duoVisitRoom),
+      })
+      if (action === DUO_VISITOR_FOLLOW_ACTIONS.LEAVE_SHARED_INTERIOR) {
         setVisiting(null)
         setScreen('world')
-      } else if (duo.partnerPos.screen === 'interior' && duoVisitRoom) {
+      } else if (action === DUO_VISITOR_FOLLOW_ACTIONS.ENTER_SHARED_INTERIOR) {
         setVisiting({ sessionId:duoSession.sessionId, room:duoVisitRoom, fallback:false })
       }
     }, 0)
     return () => window.clearTimeout(id)
-  }, [duo.partnerPos?.screen, duoSession, duoVisitRoom])
+  }, [duo.partnerPos?.screen, duoSession?.role, duoSession?.sessionId, duoVisitRoom, visiting])
 
   useEffect(() => {
     if (!duoSession || !['closed', 'stale'].includes(duo.status)) return
@@ -604,9 +615,15 @@ export default function HomePage() {
   const studyAccessGroup   = getStudyAccessGroup(participantId)
   const effectiveGroupId   = studyAccessGroup || groupId
   const bypassGroupFilter  = studyAccessEnabled && !studyAccessGroup
+  // 원격 진척도를 기다리는 동안에도 카탈로그의 실제 배정 개수는 즉시 표시한다.
+  // 정상 인증 경로에서는 아래 값을 원격 progress 결과가 덮어쓴다.
+  const exhibitZoneCounts = mergeExhibitCounts(
+    buildCatalogExhibitCounts(soundMetadata.sounds, { groupId:effectiveGroupId, bypassGroupFilter }),
+    zoneCounts,
+  )
   // worldLockQa는 잠금 UI 회귀 테스트를 위해 임시 전체 해금보다 우선한다.
   const allZonesUnlocked = !worldLockQaEnabled && (
-    TEMPORARILY_UNLOCK_ALL_ZONES || natureQaEnabled || studyAccessEnabled || villagesUnlocked
+    TEMPORARILY_UNLOCK_ALL_CONTENT || INTERNAL_BROWSER_QA || natureQaEnabled || studyAccessEnabled || villagesUnlocked
   )
 
   /* ── 카운트 갱신 (현재 참여자 + 그룹 기준) ── */
@@ -710,6 +727,19 @@ export default function HomePage() {
 
   /* ── StartPanel → WorldMap ── */
   const handleStart = async (pid, gid) => {
+    if (TEMPORARILY_UNLOCK_ALL_CONTENT) {
+      localQaRef.current = true
+      resetEconomy()
+      setParticipantId(pid)
+      setGroupId(gid)
+      setExperimentProgress({ isComplete:false, assignedCount:0, completedCount:0, zoneCounts:{} })
+      setProgressError('')
+      setVillagesUnlocked(true)
+      setWorldReturnZone(null)
+      setScreen('world')
+      setAuthError('')
+      return
+    }
     const participant = await claimParticipantSession(pid, gid)
     await initializeUserLogging('world')
     const progress = await getMyExperimentProgress()
@@ -722,6 +752,7 @@ export default function HomePage() {
     setExperimentProgress(progress)
     setProgressError('')
     setVillagesUnlocked(enabled)
+    setWorldReturnZone(null)
     setScreen('world')
     setAuthError('')
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
@@ -816,8 +847,8 @@ export default function HomePage() {
       // 현재 언락된 블록 계산 (완료된 블록의 다음 블록)
       const zoneSounds = getGroupSounds(zone, effectiveGroupId, bypassGroupFilter)
       const maxBlock   = zoneSounds.reduce((m, s) => Math.max(m, s.block || 1), 1)
-      let currentBlock = studyAccessEnabled ? maxBlock : 1
-      if (!studyAccessEnabled) {
+      let currentBlock = TEMPORARILY_UNLOCK_ALL_CONTENT || studyAccessEnabled ? maxBlock : 1
+      if (!TEMPORARILY_UNLOCK_ALL_CONTENT && !studyAccessEnabled) {
         for (let b = 1; b <= maxBlock; b++) {
           const bs = zoneSounds.filter(s => (s.block || 1) === b)
           if (bs.length > 0 && bs.every(s => annotatedSet.has(s.sound_id))) {
@@ -843,6 +874,7 @@ export default function HomePage() {
   /* ── ZoneMap → WorldMap (ESC로 복귀) ── */
   const handleExitZone = useCallback(() => {
     trackEvent('zone_exited', { zone: activeZone, target_type: 'button', target_id: 'zone-exit' })
+    setWorldReturnZone(activeZone)
     setActiveZone(null)
     setActiveSound(null)
     setScreen('world')
@@ -861,6 +893,7 @@ export default function HomePage() {
   /* ── WorldMap에서 Sound Museum 직접 진입 ── */
   const handleEnterMuseum = useCallback(async () => {
     trackEvent('museum_candidate_load_attempted', { target_type: 'museum', target_id: 'museum-entry' })
+    setWorldReturnZone(null)
     setMuseumEmpty(false)
     const all = soundMetadata.sounds
     if (!all || all.length === 0) return
@@ -985,6 +1018,7 @@ export default function HomePage() {
   /* ── WorldMap → 우리 집 (ENTER로 진입) ── */
   const handleEnterHouse = useCallback(() => {
     trackEvent('interior_entered', { target_type: 'building', target_id: 'my-house' })
+    setWorldReturnZone(null)
     setScreen('house')
   }, [])
 
@@ -1013,7 +1047,7 @@ export default function HomePage() {
      렌더
   ───────────────────────────────────────────── */
 
-  const economyGuard = participantId && !natureQaEnabled && !humanQaOptions
+  const economyGuard = participantId && !TEMPORARILY_UNLOCK_ALL_CONTENT && !natureQaEnabled && !humanQaOptions
     ? <EconomyRuntimeNotice runtimeState={economy.runtimeState} error={economy.error} onRetry={loadEconomy}/>
     : null
 
@@ -1092,6 +1126,7 @@ export default function HomePage() {
           onEnterZone={handleEnterZone}
           onEnterMuseum={handleEnterMuseum}
           onEnterHouse={handleEnterHouse}
+          initialZone={worldReturnZone}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
           balance={balance}
@@ -1101,7 +1136,7 @@ export default function HomePage() {
           economyAttendance={economy.attendance}
           onEconomyAttendanceClaim={economy.claimAttendance}
           onEconomyRetry={economy.load}
-          dryRun={natureQaEnabled || Boolean(humanQaOptions)}
+          dryRun={TEMPORARILY_UNLOCK_ALL_CONTENT || natureQaEnabled || Boolean(humanQaOptions)}
           dryRunAttendanceClaimed={qaAttendanceClaimed}
           onDryRunAttendanceClaim={() => setQaAttendanceClaimed(true)}
           outfitSrc={runtimeOutfitSrc}
@@ -1115,6 +1150,20 @@ export default function HomePage() {
           duoConnectionState={duoJoinState}
         />
         {economyGuard}
+        {stage4DuoQa && <div style={{ position:'fixed', right:16, bottom:16, zIndex:199, display:'flex', gap:8 }}>
+          <button type="button" data-testid="stage4-enter-music" onClick={() => handleEnterZone('Music')} style={{
+            border:'2px solid #5f8d42', borderRadius:8, background:'#eef8d6',
+            color:'#29401f', padding:'8px 12px', fontWeight:800, cursor:'pointer',
+          }}>QA · 음악 마을 진입</button>
+          <button type="button" data-testid="stage4-enter-nature" onClick={() => handleEnterZone('Nature')} style={{
+            border:'2px solid #5f8d42', borderRadius:8, background:'#eef8d6',
+            color:'#29401f', padding:'8px 12px', fontWeight:800, cursor:'pointer',
+          }}>QA · 자연 마을 진입</button>
+          <button type="button" data-testid="stage4-enter-library" onClick={handleEnterMuseum} style={{
+            border:'2px solid #5f8d42', borderRadius:8, background:'#eef8d6',
+            color:'#29401f', padding:'8px 12px', fontWeight:800, cursor:'pointer',
+          }}>QA · 도서관 진입</button>
+        </div>}
         {!worldOverviewQa && !worldLockQaEnabled && (natureQaEnabled || humanQaOptions?.mode === 'world') && (
           <button type="button" onClick={() => handleEnterZone(natureQaEnabled ? 'Nature' : 'Human')} style={{
             position:'fixed', right:16, bottom:16, zIndex:199,
@@ -1229,7 +1278,7 @@ export default function HomePage() {
         <InteriorDecorRoom participantId={participantId} initialRoom={worldHomeQaState === 'invite-ready' ? FRIEND_ROOM : undefined} roomShareToken={roomShareToken} roomShareState={roomShareState} onRetryRoomShare={prepareRoomShare}
           duo={duo} duoInviteState={duoInviteState} onCreateDuoInvite={createLiveDuoInvite} onCloseDuoSession={closeLiveDuoSession}
           outfitSrc={runtimeOutfitSrc} accessorySrc={runtimeAccessorySrc} characterLoadout={runtimeCharacterLoadout}
-          dryRun={natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
+          dryRun={TEMPORARILY_UNLOCK_ALL_CONTENT || natureQaEnabled || Boolean(humanQaOptions)} onExit={handleExitHouse} onCurrencyChange={refreshCounts} onRoomStatusChange={setHomePlacedCount} />
         {economyGuard}
       </main>
     )
@@ -1248,13 +1297,13 @@ export default function HomePage() {
           myExpression={myExpression}
           participantId={participantId}
           sessionId={groupId}
-          zoneCounts={zoneCounts}
+          zoneCounts={exhibitZoneCounts}
           outfitSrc={runtimeOutfitSrc}
           accessorySrc={runtimeAccessorySrc}
           characterLoadout={runtimeCharacterLoadout}
           economyMode={economy.effectiveMainMode}
           economyViewMode={economy.mode}
-          dryRun={natureQaEnabled || Boolean(humanQaOptions)}
+          dryRun={TEMPORARILY_UNLOCK_ALL_CONTENT || natureQaEnabled || Boolean(humanQaOptions)}
           onEconomyActivity={economy.applyActivityResult}
           onCurrencyChange={refreshCounts}
           onDone={handleMuseumDone}
@@ -1391,7 +1440,7 @@ export default function HomePage() {
             participantId={participantId}
             sessionId={groupId}
             economyMode={economy.effectiveMainMode}
-            dryRun={natureQaEnabled || Boolean(humanQaOptions)}
+            dryRun={TEMPORARILY_UNLOCK_ALL_CONTENT || natureQaEnabled || Boolean(humanQaOptions)}
             onClose={handleAnnotateClose}
             onComplete={handleAnnotateComplete}
           />

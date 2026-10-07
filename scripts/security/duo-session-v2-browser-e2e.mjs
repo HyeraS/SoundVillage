@@ -65,6 +65,36 @@ async function enterHome(page) {
   await page.locator('[data-interior-room="ready"]').waitFor({ timeout:30_000 })
 }
 
+async function authenticatedGet(page, pathname) {
+  return page.evaluate(async ({ pathname, supabaseHost }) => {
+    const storageKey = `sb-${supabaseHost.split('.')[0]}-auth-token`
+    const session = JSON.parse(localStorage.getItem(storageKey) || 'null')
+    const response = await fetch(pathname, {
+      cache:'no-store',
+      headers:{ Authorization:`Bearer ${session?.access_token || ''}` },
+    })
+    return { status:response.status, body:await response.json().catch(() => ({})) }
+  }, { pathname, supabaseHost:new URL(supabaseUrl).hostname })
+}
+
+async function enableStage4DuoQa(page) {
+  const target = new URL(appUrl)
+  target.searchParams.set('stage4DuoQa', '1')
+  await page.goto(target.href, { waitUntil:'domcontentloaded' })
+  await page.getByTestId('world-map').waitFor({ timeout:45_000 })
+}
+
+async function exitPrivateZone(page) {
+  await page.locator('[data-zone-hud-back]').click()
+  const confirm = page.getByRole('button', { name:'네, 나갈게요' })
+  await Promise.race([
+    page.getByTestId('world-map').waitFor({ timeout:3_000 }).catch(() => null),
+    confirm.waitFor({ timeout:3_000 }).catch(() => null),
+  ])
+  if (await confirm.isVisible().catch(() => false)) await confirm.click()
+  await page.getByTestId('world-map').waitFor({ timeout:30_000 })
+}
+
 async function duoEventRows(participantId) {
   return ok(await admin.from('user_events')
     .select('event_name,target_type,target_id,error_code,metadata')
@@ -130,24 +160,35 @@ try {
     'seed visitor legacy balance')
   for (const user of users) ok(await admin.rpc('get_multi_village_character_profile_admin', { p_auth_user_id:user.id }), 'initialize Economy profile')
   const itemIds = ['plant_tall','plant_bush','books','fruitbowl']
+  const hostRoom = { wallpaper:'starter_wall_neutral', floor:'starter_floor_beige', items:itemIds.map((itemId, index) => ({
+    uid:index + 1, itemId, layer:'floor', col:index * 2, row:0, flip:false,
+  })) }
   ok(await admin.from('participant_catalog_items').insert(itemIds.map((itemId) => ({
     participant_id:participantIds[0], item_id:itemId, acquisition_source:'individual_purchase',
   }))), 'seed host ownership')
   ok(await admin.from('participant_economy_v1_rooms').insert({
     participant_id:participantIds[0], revision:1, invite_unique_item_count:4,
-    room:{ wallpaper:'starter_wall_neutral', floor:'starter_floor_beige', items:itemIds.map((itemId, index) => ({
-      uid:index + 1, itemId, layer:'floor', col:index * 2, row:0, flip:false,
-    })) },
+    room:hostRoom,
   }), 'seed host room')
+  ok(await admin.from('participant_interior_items').insert(itemIds.map((itemId) => ({
+    participant_id:participantIds[0], item_id:itemId,
+  }))), 'seed host legacy ownership')
+  ok(await admin.from('participant_room').insert({ participant_id:participantIds[0], room:hostRoom }), 'seed host legacy room')
 
   browser = await chromium.launch({ headless:true })
   contextA = await createContext(signed[0].session)
   contextB = await createContext(signed[1].session)
   contextC = await createContext(signed[2].session)
   const pageA = await contextA.newPage()
-  await openWorld(pageA)
+  await enableStage4DuoQa(pageA)
+  const bootstrap = await authenticatedGet(pageA, '/api/economy-v1/bootstrap')
+  assert.equal(bootstrap.status, 200, `host bootstrap failed: ${JSON.stringify(bootstrap.body)}`)
+  assert.equal(bootstrap.body.economyMode, 'cutover')
+  const seededRoom = await authenticatedGet(pageA, '/api/economy-v1/room')
+  assert.equal(seededRoom.status, 200, `host room load failed: ${JSON.stringify(seededRoom.body)}`)
+  assert.equal(seededRoom.body.inviteUniqueItemCount, 4, `host room fixture was not visible to the product API: ${JSON.stringify(seededRoom.body)}`)
   await enterHome(pageA)
-  await pageA.getByRole('button', { name:'초대', exact:true }).click()
+  await pageA.getByRole('button', { name:/^초대(?:$|\s|\()/ }).click()
   const inviteDialog = pageA.getByRole('dialog', { name:'우리 집에 놀러 올래?' })
   await inviteDialog.getByRole('button', { name:'실시간 초대 링크 만들기' }).click()
   await inviteDialog.getByTestId('duo-invite-ready').waitFor({ timeout:30_000 })
@@ -182,7 +223,9 @@ try {
     assert.equal(new URL(pageB.url()).searchParams.has('duo'), false, 'URL token was not removed before join request')
     await route.continue()
   })
-  await pageB.goto(inviteUrl, { waitUntil:'domcontentloaded' })
+  const visitorInviteUrl = new URL(inviteUrl)
+  visitorInviteUrl.searchParams.set('stage4DuoQa', '1')
+  await pageB.goto(visitorInviteUrl.href, { waitUntil:'domcontentloaded' })
   const visitorRoom = pageB.locator('[data-interior-room="ready"][data-room-visitor="true"]')
   try {
     await visitorRoom.waitFor({ timeout:45_000 })
@@ -272,6 +315,55 @@ try {
   await pageB.waitForTimeout(300)
   await screenshot(pageA, 'worldmap-two-players.png')
 
+  // Private village/library screens are participant-owned. Only world-map
+  // presence and the host's shared interior retain their paired behavior.
+  await pageA.getByTestId('duo-world-status').filter({ hasText:'연결됨' }).waitFor({ timeout:30_000 })
+  await pageB.getByTestId('duo-world-status').filter({ hasText:'연결됨' }).waitFor({ timeout:30_000 })
+
+  await pageA.getByTestId('stage4-enter-music').click()
+  await pageA.locator('[data-zone-hud="Music"]').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('world-map').waitFor()
+  assert.equal(await pageB.locator('[data-zone-hud="Music"]').count(), 0, 'A entering Music forced B into Music')
+  await screenshot(pageA, 'independent-a-music.png')
+  await screenshot(pageB, 'independent-b-world.png')
+
+  await pageB.getByTestId('stage4-enter-nature').click()
+  await pageB.locator('[data-zone-hud="Nature"]').waitFor({ timeout:30_000 })
+  await pageA.locator('[data-zone-hud="Music"]').waitFor()
+  assert.equal(await pageA.locator('[data-zone-hud="Nature"]').count(), 0, 'B entering Nature replaced A Music state')
+  await screenshot(pageA, 'independent-a-music-b-nature-a.png')
+  await screenshot(pageB, 'independent-a-music-b-nature-b.png')
+
+  await exitPrivateZone(pageA)
+  await pageB.locator('[data-zone-hud="Nature"]').waitFor()
+  assert.equal(await pageB.getByTestId('world-map').count(), 0, 'A returning to the world forced B out of Nature')
+  await exitPrivateZone(pageB)
+  await pageA.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+
+  await pageA.getByTestId('stage4-enter-library').click()
+  await pageA.getByTestId('museum-player').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('world-map').waitFor()
+  assert.equal(await pageB.getByTestId('museum-player').count(), 0, 'A entering the library forced B into it')
+  await pageB.getByTestId('stage4-enter-nature').click()
+  await pageB.locator('[data-zone-hud="Nature"]').waitFor({ timeout:30_000 })
+  await pageA.getByTestId('museum-player').waitFor()
+  await pageA.keyboard.press('Escape')
+  await pageA.getByTestId('world-map').waitFor({ timeout:30_000 })
+  await pageB.locator('[data-zone-hud="Nature"]').waitFor()
+  await exitPrivateZone(pageB)
+  await pageA.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+
+  await enterHome(pageA)
+  await pageB.locator('[data-interior-room="ready"][data-room-visitor="true"]').waitFor({ timeout:30_000 })
+  await pageA.getByRole('button', { name:/나가기/ }).first().click()
+  await pageA.getByTestId('world-map').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('world-map').waitFor({ timeout:30_000 })
+  await pageA.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+  await pageB.getByTestId('duo-partner').waitFor({ timeout:30_000 })
+  await screenshot(pageA, 'independent-presence-restored.png')
+
   await pageB.setViewportSize({ width:390, height:844 })
   await screenshot(pageB, 'mobile-portrait.png')
   await pageB.setViewportSize({ width:844, height:390 })
@@ -298,7 +390,7 @@ try {
   }))
 
   await enterHome(pageA)
-  await pageA.getByRole('button', { name:'초대', exact:true }).click()
+  await pageA.getByRole('button', { name:/^초대(?:$|\s|\()/ }).click()
   await pageA.getByRole('dialog', { name:'우리 집에 놀러 올래?' }).getByRole('button', { name:'실시간 세션 종료' }).click()
   await pageB.locator('[data-interior-room="ready"][data-room-visitor="true"]').waitFor({ timeout:45_000 })
   await pageB.getByTestId('duo-connection-state').filter({ hasText:'실시간 세션 종료됨' }).waitFor({ timeout:30_000 })
@@ -331,6 +423,8 @@ try {
   }
   await admin.from('participant_economy_v1_rooms').delete().in('participant_id', participantIds)
   await admin.from('participant_catalog_items').delete().in('participant_id', participantIds)
+  await admin.from('participant_room').delete().in('participant_id', participantIds)
+  await admin.from('participant_interior_items').delete().in('participant_id', participantIds)
   await admin.from('participant_village_wallets').delete().in('participant_id', participantIds)
   await admin.from('participant_multi_village_character_loadouts').delete().in('participant_id', participantIds)
   await admin.from('participant_currency').delete().in('participant_id', participantIds)

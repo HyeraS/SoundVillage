@@ -1,0 +1,503 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "completedAt": "2026-09-27",
+  "authority": {
+    "entries": {
+      "environment-north-forest": "legacy",
+      "environment-west-stream-forest": "legacy",
+      "environment-east-forest": "legacy",
+      "environment-central-gardens": "legacy",
+      "environment-southwest-garden": "legacy",
+      "environment-southeast-garden": "legacy",
+      "environment-south-center-garden": "legacy",
+      "environment-south-forest": "legacy",
+      "landmark-guesthouse": "legacy",
+      "landmark-lab": "legacy",
+      "landmark-animal": "legacy",
+      "landmark-nature": "legacy",
+      "landmark-library": "native",
+      "landmark-urban": "legacy",
+      "landmark-human": "legacy",
+      "landmark-music": "legacy",
+      "landmark-home": "native",
+      "foreground-south-gate": "legacy"
+    },
+    "counts": {
+      "total": 18,
+      "native": 2,
+      "legacy": 16
+    }
+  },
+  "assets": {
+    "approvedSourceHashes": {
+      "building": "197931821b40304aa20dcf8a7f1e2aed02e267a24c0469d99e0b2553283c34a8",
+      "ground": "4e242c074c88b970f9612e661f4fa7bd781f367ebe692922eadb54f53a4ef20b"
+    },
+    "runtimeCount": {
+      "before": 31,
+      "after": 33
+    },
+    "registryCount": {
+      "before": 30,
+      "after": 32
+    },
+    "retainedRuntimeAssetsUnchanged": 31,
+    "retainedRuntimeAssetMismatches": [],
+    "additive": [
+      {
+        "id": "landmark-home-player-building",
+        "src": "/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-building.webp",
+        "width": 352,
+        "height": 301,
+        "hasAlpha": true,
+        "category": "landmark",
+        "bytes": 25226,
+        "decodedRGBA": 423808,
+        "sha256": "5185988e7ae8f0e0ca9d1ddf3988cc022c3e1effc31d6c6f367c7d19e77d7f91"
+      },
+      {
+        "id": "landmark-home-player-site-ground",
+        "src": "/assets/world/sound-archive-garden-v4/runtime/landmark-home-player-site-ground.webp",
+        "width": 512,
+        "height": 480,
+        "hasAlpha": true,
+        "category": "landmark",
+        "bytes": 63768,
+        "decodedRGBA": 983040,
+        "sha256": "308f71eb6191ea2d88aed364c0cd83dc53bf8da373a78c6e0f3a0fc341f3547b"
+      }
+    ],
+    "additiveRuntimeBytes": 88994,
+    "additiveDecodedRGBA": 1406848,
+    "activeViewportDelta": {
+      "requests": 1,
+      "runtimeWebPBytes": 35188,
+      "decodedRGBA": 718720
+    },
+    "existingRuntimeAssetsReencoded": 0,
+    "candidateBIncluded": false
+  },
+  "home": {
+    "flatCompatibility": {
+      "id": "landmark-home",
+      "assetId": "landmark-home-player-building",
+      "category": "landmark",
+      "x": 1344,
+      "y": 1344,
+      "width": 512,
+      "height": 480,
+      "anchorX": 0,
+      "anchorY": 0,
+      "sortY": 1696,
+      "layer": "gameplay",
+      "interaction": {
+        "type": "home",
+        "id": "Home"
+      },
+      "portalId": "Home",
+      "collision": []
+    },
+    "layers": [
+      {
+        "objectId": "landmark-home",
+        "layerId": "site-ground",
+        "role": "ground",
+        "renderBand": "ground",
+        "assetId": "landmark-home-player-site-ground",
+        "x": 1344,
+        "y": 1344,
+        "width": 512,
+        "height": 480,
+        "sortY": 1695,
+        "sortOffsetY": -1,
+        "visibleWhen": null,
+        "layer": "gameplay"
+      },
+      {
+        "objectId": "landmark-home",
+        "layerId": "body",
+        "role": "body",
+        "renderBand": "world",
+        "assetId": "landmark-home-player-building",
+        "x": 1472,
+        "y": 1395,
+        "width": 352,
+        "height": 301,
+        "sortY": 1696,
+        "sortOffsetY": 0,
+        "visibleWhen": null,
+        "layer": "gameplay"
+      }
+    ],
+    "collider": {
+      "objectId": "landmark-home",
+      "colliderId": "home-body",
+      "collisionRole": "building-body",
+      "shapes": [
+        {
+          "type": "rect",
+          "left": 1520,
+          "top": 1472,
+          "right": 1776,
+          "bottom": 1696
+        }
+      ]
+    },
+    "destination": {
+      "tx": 47,
+      "ty": 46,
+      "w": 9,
+      "h": 7,
+      "approach": {
+        "x": 1648,
+        "y": 1760
+      }
+    },
+    "presentation": {
+      "label": "우리 집 · 꾸미기",
+      "icon": "🏠",
+      "color": "#E98265"
+    },
+    "guidePath": [
+      {
+        "x": 1920,
+        "y": 1504
+      },
+      {
+        "x": 1856,
+        "y": 1568
+      },
+      {
+        "x": 1824,
+        "y": 1760
+      },
+      {
+        "x": 1648,
+        "y": 1760
+      }
+    ],
+    "foregroundLayers": 0,
+    "logicalCullingEntries": {
+      "before": 1,
+      "after": 1
+    },
+    "spatialChunks": {
+      "before": [
+        "2,2",
+        "3,2",
+        "2,3",
+        "3,3"
+      ],
+      "after": [
+        "2,2",
+        "3,2",
+        "2,3",
+        "3,3"
+      ]
+    }
+  },
+  "collision": {
+    "cells": 691200,
+    "newlyBlocked": 240,
+    "newlyWalkable": 1248,
+    "changed": 1488,
+    "changedCellBounds": {
+      "left": 376,
+      "top": 366,
+      "right": 452,
+      "bottom": 440
+    },
+    "changedWorldBounds": {
+      "left": 1504,
+      "top": 1464,
+      "right": 1808,
+      "bottom": 1760
+    },
+    "otherBuildingChangedCells": 0,
+    "walkableCells": 636624,
+    "reachableCells": 636624,
+    "disconnectedCells": 0,
+    "oneToTwoCellPinches": 0,
+    "reasonMismatchCells": 0,
+    "protectedRoadCellX1792Walkable": true
+  },
+  "routes": {
+    "requiredCases": 7,
+    "directedRoutes": 9,
+    "stalledFrames": 0,
+    "authoredHome": {
+      "arrived": true,
+      "frames": 71,
+      "waypoints": 4
+    },
+    "productionBrowserAutoWalk": {
+      "arrived": true,
+      "foot": {
+        "x": 1648.7,
+        "y": 1759.8
+      },
+      "blockedX": false,
+      "blockedY": false,
+      "reason": "none"
+    }
+  },
+  "browser": {
+    "viewports": [
+      {
+        "id": "1280x720",
+        "w": 1280,
+        "h": 720,
+        "camera": [
+          1357.11,
+          704
+        ],
+        "decoded": 45955076,
+        "failed": 0,
+        "homeLayers": [
+          {
+            "asset": "landmark-home-player-site-ground",
+            "band": "ground",
+            "rect": [
+              "1344",
+              "1344",
+              "512",
+              "480"
+            ]
+          },
+          {
+            "asset": "landmark-home-player-building",
+            "band": "world",
+            "rect": [
+              "1472",
+              "1395",
+              "352",
+              "301"
+            ]
+          }
+        ],
+        "inner": [
+          1280,
+          720
+        ],
+        "resources": 10,
+        "shotBytes": 131331
+      },
+      {
+        "id": "1440x900",
+        "w": 1440,
+        "h": 900,
+        "camera": [
+          1201.14,
+          704
+        ],
+        "decoded": 45955076,
+        "failed": 0,
+        "homeLayers": [
+          {
+            "asset": "landmark-home-player-site-ground",
+            "band": "ground",
+            "rect": [
+              "1344",
+              "1344",
+              "512",
+              "480"
+            ]
+          },
+          {
+            "asset": "landmark-home-player-building",
+            "band": "world",
+            "rect": [
+              "1472",
+              "1395",
+              "352",
+              "301"
+            ]
+          }
+        ],
+        "inner": [
+          1440,
+          900
+        ],
+        "resources": 10,
+        "shotBytes": 168449
+      },
+      {
+        "id": "390x844",
+        "w": 390,
+        "h": 844,
+        "camera": [
+          640,
+          1293.13
+        ],
+        "decoded": 61389256,
+        "failed": 0,
+        "homeLayers": [
+          {
+            "asset": "landmark-home-player-site-ground",
+            "band": "ground",
+            "rect": [
+              "1344",
+              "1344",
+              "512",
+              "480"
+            ]
+          },
+          {
+            "asset": "landmark-home-player-building",
+            "band": "world",
+            "rect": [
+              "1472",
+              "1395",
+              "352",
+              "301"
+            ]
+          }
+        ],
+        "inner": [
+          390,
+          844
+        ],
+        "resources": 15,
+        "shotBytes": 66736
+      },
+      {
+        "id": "844x390",
+        "w": 844,
+        "h": 390,
+        "camera": [
+          1455.52,
+          576
+        ],
+        "decoded": 45955076,
+        "failed": 0,
+        "homeLayers": [
+          {
+            "asset": "landmark-home-player-site-ground",
+            "band": "ground",
+            "rect": [
+              "1344",
+              "1344",
+              "512",
+              "480"
+            ]
+          },
+          {
+            "asset": "landmark-home-player-building",
+            "band": "world",
+            "rect": [
+              "1472",
+              "1395",
+              "352",
+              "301"
+            ]
+          }
+        ],
+        "inner": [
+          844,
+          390
+        ],
+        "resources": 10,
+        "shotBytes": 60099
+      }
+    ],
+    "homeImageNodes": 2,
+    "groundNodes": 1,
+    "bodyNodes": 1,
+    "legacyHomeNodes": 0,
+    "duplicateHomeAssetRequests": 0,
+    "assetResourceCount": {
+      "before": 9,
+      "after": 10
+    },
+    "decodedAssetBytes": {
+      "before": 45236356,
+      "after": 45955076
+    },
+    "failedAssets": 0,
+    "consoleErrors": 0,
+    "consoleWarnings": 0
+  },
+  "bundle": {
+    "baseline": {
+      "sourceBuildId": "GfFKLWovUlEiyG8YJFUQn",
+      "rootClientRawBytes": 1671077,
+      "rootClientGzipBytes": 407793,
+      "allStaticJsFileCount": 72,
+      "allStaticJsRawBytes": 5917207,
+      "allStaticJsGzipBytes": 851971,
+      "generatedRuntimeBytes": 16930,
+      "generatedCollisionBytes": 2195
+    },
+    "current": {
+      "rootClientRawBytes": 1672107,
+      "rootClientGzipBytes": 407968,
+      "allStaticJsFileCount": 74,
+      "allStaticJsRawBytes": 5920139,
+      "allStaticJsGzipBytes": 852627,
+      "generatedRuntimeBytes": 17951,
+      "generatedCollisionBytes": 2195
+    },
+    "delta": {
+      "rootClientRawBytes": 1030,
+      "rootClientGzipBytes": 175,
+      "allStaticJsRawBytes": 2932,
+      "allStaticJsGzipBytes": 656,
+      "generatedRuntimeBytes": 1021,
+      "generatedCollisionBytes": 0
+    },
+    "rootClientGzipBudgetBytes": 2048,
+    "buildOnlyClientGraphMatches": [],
+    "sourcePngClientGraphMatches": [],
+    "candidateBClientGraphMatches": [],
+    "scannedClientFiles": 74
+  },
+  "invariance": {
+    "otherObjectCount": 17,
+    "unintendedRenderInteractionMinimapCollisionChanges": 0,
+    "visualDiffOutsideAllowedHomeAndDynamicRegions": 0,
+    "evidence": "projection snapshots, retained asset hashes, collision delta bounds, and actual-browser review"
+  },
+  "rollback": {
+    "status": "PASS",
+    "render": {
+      "assetId": "landmark-home-hub",
+      "bounds": {
+        "left": 1440,
+        "top": 1368,
+        "right": 1888,
+        "bottom": 1752
+      },
+      "sortY": 1752
+    },
+    "collider": {
+      "left": 1536,
+      "top": 1472,
+      "right": 1792,
+      "bottom": 1752
+    },
+    "approach": {
+      "x": 1664,
+      "y": 1792
+    },
+    "legacyAssetRetained": true
+  },
+  "validation": {
+    "schema": 28,
+    "projection": 15,
+    "libraryPilot": 7,
+    "homePilot": 7,
+    "renderLayer": 7,
+    "collisionUnit": 8,
+    "minimapUnit": 7,
+    "homeHubUnit": 3,
+    "lint": "PASS",
+    "productionBuild": "PASS",
+    "gitDiffCheck": "PASS",
+    "assetCheck": "PASS",
+    "projectionCheck": "PASS",
+    "minimapBrowser": "PASS",
+    "cameraViewports": 4
+  },
+  "openIssues": []
+}

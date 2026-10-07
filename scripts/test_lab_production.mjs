@@ -2,11 +2,19 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import { T,MAP_W,MAP_H,PLAYER_BOX,SPAWN,EXIT,OBJECTS,BUILDINGS,PATHS,POND,DOCK_WALKS,DOCK_RAILS,GROUND_DECOR_PATCHES,SLOT_CLEARINGS,APPROVED_BLUEPRINT,buildVillage,collides,moveWithCollision,overlapsExit,spawnLabItems,safeSlots,reachableCells,canCollect,labCamera,onPath } from '../lib/labVillageConfig.mjs'
+import { WALKABLE_MASK_METADATA,isMaskCellWalkable,isMaskPointWalkable } from '../lib/generated/labWalkableMask.generated.mjs'
+import { canOccupyMask } from '../lib/villageWorldTransform.mjs'
 const sounds=JSON.parse(fs.readFileSync(new URL('../data/sound_metadata.json',import.meta.url))).sounds.filter(s=>s.game_zone==='Lab')
 const v=buildVillage(sounds),reach=reachableCells(v)
 const positions=items=>Object.fromEntries(items.map(i=>[i.id,[i.x,i.y,i.block,i.sound.group]]))
 test('48x36 map; feet and spawn are valid; entrance cannot fire on entry',()=>{
  assert.deepEqual([MAP_W,MAP_H,T],[48,36,32]);assert.deepEqual(PLAYER_BOX,{w:20,h:14});assert.equal(collides(v,SPAWN.x,SPAWN.y),null);assert.equal(overlapsExit(SPAWN),false);assert.equal(overlapsExit({x:EXIT.x+EXIT.w/2,y:EXIT.y+20}),true);assert.ok(reach.count>500)
+})
+test('walkable mask uses the authored foot anchor instead of eroding white cells with the player box',()=>{
+ const point={x:384,y:64}
+ assert.equal(isMaskPointWalkable(point.x,point.y),true)
+ assert.equal(canOccupyMask(isMaskCellWalkable,WALKABLE_MASK_METADATA,point,PLAYER_BOX,v.transform),false)
+ assert.equal(collides(v,point.x,point.y),null)
 })
 for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, per-block reachability and interaction clearance`,()=>{
  const list=sounds.filter(s=>group==='ALL'||s.group===group),items=spawnLabItems(list,v)

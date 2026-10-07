@@ -1,0 +1,158 @@
+[
+  {
+    "id": "1280x720",
+    "w": 1280,
+    "h": 720,
+    "camera": [
+      1357.11,
+      704
+    ],
+    "decoded": 45955076,
+    "failed": 0,
+    "homeLayers": [
+      {
+        "asset": "landmark-home-player-site-ground",
+        "band": "ground",
+        "rect": [
+          "1344",
+          "1344",
+          "512",
+          "480"
+        ]
+      },
+      {
+        "asset": "landmark-home-player-building",
+        "band": "world",
+        "rect": [
+          "1472",
+          "1395",
+          "352",
+          "301"
+        ]
+      }
+    ],
+    "inner": [
+      1280,
+      720
+    ],
+    "resources": 10,
+    "shotBytes": 131331
+  },
+  {
+    "id": "1440x900",
+    "w": 1440,
+    "h": 900,
+    "camera": [
+      1201.14,
+      704
+    ],
+    "decoded": 45955076,
+    "failed": 0,
+    "homeLayers": [
+      {
+        "asset": "landmark-home-player-site-ground",
+        "band": "ground",
+        "rect": [
+          "1344",
+          "1344",
+          "512",
+          "480"
+        ]
+      },
+      {
+        "asset": "landmark-home-player-building",
+        "band": "world",
+        "rect": [
+          "1472",
+          "1395",
+          "352",
+          "301"
+        ]
+      }
+    ],
+    "inner": [
+      1440,
+      900
+    ],
+    "resources": 10,
+    "shotBytes": 168449
+  },
+  {
+    "id": "390x844",
+    "w": 390,
+    "h": 844,
+    "camera": [
+      640,
+      1293.13
+    ],
+    "decoded": 61389256,
+    "failed": 0,
+    "homeLayers": [
+      {
+        "asset": "landmark-home-player-site-ground",
+        "band": "ground",
+        "rect": [
+          "1344",
+          "1344",
+          "512",
+          "480"
+        ]
+      },
+      {
+        "asset": "landmark-home-player-building",
+        "band": "world",
+        "rect": [
+          "1472",
+          "1395",
+          "352",
+          "301"
+        ]
+      }
+    ],
+    "inner": [
+      390,
+      844
+    ],
+    "resources": 15,
+    "shotBytes": 66736
+  },
+  {
+    "id": "844x390",
+    "w": 844,
+    "h": 390,
+    "camera": [
+      1455.52,
+      576
+    ],
+    "decoded": 45955076,
+    "failed": 0,
+    "homeLayers": [
+      {
+        "asset": "landmark-home-player-site-ground",
+        "band": "ground",
+        "rect": [
+          "1344",
+          "1344",
+          "512",
+          "480"
+        ]
+      },
+      {
+        "asset": "landmark-home-player-building",
+        "band": "world",
+        "rect": [
+          "1472",
+          "1395",
+          "352",
+          "301"
+        ]
+      }
+    ],
+    "inner": [
+      844,
+      390
+    ],
+    "resources": 10,
+    "shotBytes": 60099
+  }
+]

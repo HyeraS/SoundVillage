@@ -2,6 +2,12 @@
 
 Date: 2026-10-01 (Asia/Seoul)
 
+Forward update: 2026-10-06 migration 015 supersedes the custom Realtime JWT
+claims described by the original closure. Duo Realtime now uses the current
+Supabase Auth ES256 access token and database membership authorization. The
+same-user manual token/topic replay limitation is recorded below and in
+`docs/security/duo-es256-realtime-residual-risk.md`.
+
 Scope: Stage 4B local audit, hardening, and disposable verification
 
 Baseline: `4aa2b836` (`feat(economy): complete multi-village interior cutover`)
@@ -12,7 +18,7 @@ Stage 4A record correction: `cf19acdc` (`docs(economy): correct interior cutover
 
 Duo Session V2 is an authenticated, server-approved session for exactly one host and one visitor. A session UUID identifies the server record and private Realtime topic; it is not an invitation credential. A separate 256-bit invitation token is shown only to the host and is stored by PostgreSQL only as its SHA-256 digest. Sessions and invites expire after two hours.
 
-The boundary assumes the Supabase service-role key and JWT signing secret remain server-only, TLS protects non-loopback deployments, and the database clock is authoritative. An attacker may know a session UUID, copy an authenticated user's normal access token, replay a request, race host/join operations, forge room JSON, choose a different client UUID, or attempt a direct private Realtime subscription. None of those facts alone grants a session lease or Realtime access.
+The boundary assumes the Supabase service-role key remains server-only, TLS protects non-loopback deployments, and the database clock is authoritative. An attacker may know a session UUID, replay a request, race host/join operations, forge room JSON, choose a different client UUID, or attempt a direct private Realtime subscription. A different auth user cannot gain membership from those facts. A malicious same-user context that copies an existing access token and active topic has the explicitly documented residual Realtime replay capability.
 
 Only active study participants may host or join. A session has one host role and at most one visitor role. A fresh lease is bound to `(session_id, auth_user_id, client_id)`; the same participant cannot acquire another fresh lease with a different client ID. Presence and Broadcast payloads accept only the `worldmap`, `interior`, and `waiting` screens, four facings, finite bounded coordinates, a boolean movement flag, and the peer role expected by the receiving client.
 
@@ -20,7 +26,7 @@ Visitors can read only the host room selected when the server creates the sessio
 
 ## Migration, API, and Realtime structure
 
-Migration `scripts/security/012_duo_session_v2.sql` adds:
+Migration `scripts/security/012_duo_session_v2.sql` remains the immutable historical baseline and adds:
 
 - `duo_v2_sessions`, including server-selected `room_system` (`legacy` or `economy_v1`)
 - role-unique `duo_v2_session_members`
@@ -30,6 +36,13 @@ Migration `scripts/security/012_duo_session_v2.sql` adds:
 - service-role-only host, join, status, room, recover, heartbeat, leave, revoke, and visitor-mutation RPCs
 - the legacy ledger visitor guard trigger
 - claim-bound extension of the existing authenticated-only Realtime membership function
+
+Forward migration `scripts/security/015_duo_es256_realtime_authorization.sql`
+replaces only that function body. It derives the Duo branch from `auth.uid()`,
+the exact topic, active participant/member/session, unexpired session, and a
+fresh active lease. It preserves the legacy room branch, function ACL,
+`SECURITY DEFINER`, and empty `search_path`, and adds no browser table grant or
+Realtime policy.
 
 All Duo tables have RLS enabled and no browser table mutation grant. Route Handlers derive identity from the bearer access token, validate allow-listed JSON/query fields and UUIDs, call service-only RPCs, map stable error codes, and return allow-listed response fields with `private, no-store` and `no-referrer` headers.
 
@@ -47,7 +60,11 @@ The browser reads `?duo=<token>` during initial state construction and immediate
 
 Host/join idempotency stores request hashes and sanitized results. The same key and payload returns the same result; the same key with a different payload returns `idempotency_key_reused`. After a successful visitor join, recovery storage contains only `{ sessionId, clientId, role }`. Recovery reuses that exact client ID. Terminal failures remove the in-memory invite; leave, expiry, or close invalidates the lease/session boundary.
 
-The server issues a short-lived, HMAC-SHA256 Realtime JWT containing `sub`, `role=authenticated`, `duo_session_id`, `duo_client_id`, and `duo_role`. It is refreshed by heartbeat responses and is kept in memory. It is never logged or persisted.
+The server does not issue a Duo Realtime JWT. The private channel uses the
+current Supabase Auth ES256 access token, and Supabase Auth refresh events
+update Realtime authentication. Heartbeat responses no longer carry a token.
+`DUO_SESSION_HMAC_SECRET` remains limited to deterministic invitation-token
+integrity.
 
 ## Heartbeat, lease, and reconnect policy
 
@@ -65,7 +82,16 @@ The server issues a short-lived, HMAC-SHA256 Realtime JWT containing `sub`, `rol
 
 The WebSocket integration signs the same short-lived claims used by the application and opens real private Realtime channels. The legitimate host and visitor can join Presence and exchange validated Broadcast positions. Outsiders and tampered topics are denied.
 
-A second Supabase client then reuses the visitor's ordinary authenticated access token and known session UUID but has no server-issued lease/client claims. Its direct subscription is denied while the first visitor lease remains active and fresh. The browser suite separately confirms the API path returns `already_open_elsewhere` for the same authenticated visitor in a second context.
+A second normal product context receives `already_open_elsewhere` from the
+recover/status/lease API when it presents a different client ID. Realtime RLS
+also rejects a different auth user, another session topic, an inactive
+participant, a left or closed session, and a stale lease.
+
+Supabase access tokens do not contain the browser client ID. A malicious
+same-user context can therefore copy the legitimate token and active topic and
+open another private WebSocket while the membership and lease remain valid.
+The WebSocket integration deliberately demonstrates this residual limitation;
+it is not treated as cryptographic second-tab isolation.
 
 ## Verification results
 
@@ -95,7 +121,7 @@ The protected Stage 3B source fingerprint, migration-era database rows, ACLs, po
 ## Residual risk
 
 - Session confidentiality still depends on protecting the host's one-time invitation URL until it is consumed or revoked.
-- A fully compromised authorized browser can observe its own in-memory short-lived Realtime JWT until expiry; it cannot mint another client/role/session claim without the server secret.
+- A fully compromised authorized browser can copy its current Supabase Auth access token and active Duo topic. Until leave, close/expiry, participant revocation, or lease staleness, Realtime cannot distinguish that same-user WebSocket from the legitimate tab because the access token has no client ID.
 - Lease freshness and session expiry use database time, so severe clock or infrastructure failure can interrupt availability, but do not widen access.
 - The fingerprint-protected legacy purchase endpoint returns its historical generic `purchase_failed` response when the Stage 4B database trigger rejects an active visitor; it does not expose a new Duo-specific legacy error code. The transaction is nevertheless rolled back and verified to grant no item or ledger mutation.
 - Review PNGs intentionally omit browser chrome, so URL token removal is proven by the pre-request browser assertion and storage/DOM checks rather than by an address-bar image.

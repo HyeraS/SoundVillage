@@ -1,0 +1,26 @@
+{
+  "runtime": {
+    "decoded": "45955076",
+    "failed": "0",
+    "home": [
+      "landmark-home-player-site-ground",
+      "landmark-home-player-building"
+    ],
+    "ready": "true",
+    "resources": "10"
+  },
+  "logs": [
+    {
+      "level": "info",
+      "message": "%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold",
+      "timestamp": "2026-09-27T06:16:46.596Z",
+      "url": "http://localhost:3100/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js"
+    },
+    {
+      "level": "log",
+      "message": "[HMR] connected",
+      "timestamp": "2026-09-27T06:16:47.080Z",
+      "url": "http://localhost:3100/_next/static/chunks/node_modules_next_dist_1ybzpk2._.js"
+    }
+  ]
+}

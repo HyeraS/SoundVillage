@@ -1,0 +1,23 @@
+{
+  "status": "PASS",
+  "browser": "Codex in-app browser",
+  "url": "http://localhost:3100/?natureQa=1",
+  "note": "The supplied 3101 port was not listening; the repository's active development server was discovered on 3100.",
+  "input": { "movement": "production moveWorldPlayer via dev-only route steering", "entry": "real Enter key", "return": "real Escape key; Lab confirmation clicked" },
+  "destinationsPassed": 8,
+  "destinationsFailed": 0,
+  "consoleErrorsInCleanFinalRun": 0,
+  "image404s": 0,
+  "viewportCaptures": [
+    { "css": "1280x720", "dpr": 1, "status": "PASS" },
+    { "css": "1440x900", "dpr": 1, "status": "PASS" },
+    { "css": "1920x1080", "dpr": 1, "status": "PASS" },
+    { "css": "1280x720", "dpr": 2, "status": "PASS", "file": "desktop-native-dpr2.png" },
+    { "css": "390x844", "dpr": 1, "status": "PASS" },
+    { "css": "844x390", "dpr": 1, "status": "PASS" }
+  ],
+  "unavailableViewportCaptures": [
+    { "css": "1440x900", "dpr": 2, "reason": "in-app browser exposes native DPR 2 only at its fixed 1280x720 CSS viewport" },
+    { "css": "1920x1080", "dpr": 2, "reason": "in-app browser exposes native DPR 2 only at its fixed 1280x720 CSS viewport" }
+  ]
+}

@@ -14,9 +14,12 @@ import {
 } from '@/lib/worldMapV4Manifest.mjs'
 import { WORLD_MAP_V4_PREVIEW } from '@/lib/worldMapV4Assets.mjs'
 import { planWorldMapRenderLayers } from '@/lib/worldMapRenderLayers.mjs'
+import { WORLD_MAP_FLAT_V2_ASSET } from '@/lib/worldMapFlatV2.mjs'
+import { WORLD_MAP_RENDER_MODES } from '@/lib/worldMapMode.mjs'
 
 const REFERENCE_SRC = '/assets/world/sound-archive-garden-v2/world-base-clean.png'
 const COLLISION_DEBUG_SRC = '/assets/world/sound-archive-garden-v4/collision-debug.png'
+const FLAT_V2_COLLISION_DEBUG_SRC = '/assets/world/spring-sound-archive-garden-flat-v2/collision-debug.png'
 
 export function WorldMapTerrain({ camera, mode = 'all', onAssetLoad, onAssetError }) {
   if (mode === 'objects' || mode === 'foreground' || mode === 'collision') return null
@@ -78,9 +81,9 @@ function WorldRenderLayer({ item, onAssetLoad, onAssetError }) {
   />
 }
 
-export function WorldMapDebugOverlay({ activeChunks, foot, collisionInfo }) {
+export function WorldMapDebugOverlay({ activeChunks, foot, collisionInfo, debugSrc = COLLISION_DEBUG_SRC }) {
   return <g data-layer="debug" pointerEvents="none">
-    <image href={COLLISION_DEBUG_SRC} x="0" y="0" width={WORLD_MAP_V4.width} height={WORLD_MAP_V4.height} opacity="0.62" preserveAspectRatio="none"/>
+    <image href={debugSrc} x="0" y="0" width={WORLD_MAP_V4.width} height={WORLD_MAP_V4.height} opacity="0.62" preserveAspectRatio="none"/>
     {activeChunks.map(key => {
       const [cx, cy] = key.split(',').map(Number)
       return <rect key={key} x={cx * WORLD_MAP_V4.chunkSize} y={cy * WORLD_MAP_V4.chunkSize}
@@ -94,7 +97,7 @@ export function WorldMapDebugOverlay({ activeChunks, foot, collisionInfo }) {
   </g>
 }
 
-export default function WorldMapScene({
+function ModularWorldMapScene({
   camera,
   characters = [],
   interactionLayer = null,
@@ -147,3 +150,39 @@ export default function WorldMapScene({
 }
 
 export const WORLD_MAP_V4_OBJECT_COUNT = WORLD_MAP_V4_OBJECTS.length
+
+function FlatWorldMapScene({
+  characters = [],
+  interactionLayer = null,
+  qa = {},
+  foot = null,
+  collisionInfo = null,
+  onAssetLoad,
+  onAssetError,
+}) {
+  const sortedCharacters = [...characters].sort((a, b) => a.sortY - b.sortY)
+  return <>
+    <image
+      data-layer="flat-background"
+      data-asset-id={WORLD_MAP_FLAT_V2_ASSET.id}
+      href={WORLD_MAP_FLAT_V2_ASSET.src}
+      x="0"
+      y="0"
+      width={WORLD_MAP_FLAT_V2_ASSET.logicalWidth}
+      height={WORLD_MAP_FLAT_V2_ASSET.logicalHeight}
+      preserveAspectRatio="none"
+      onLoad={() => onAssetLoad?.(WORLD_MAP_FLAT_V2_ASSET.id)}
+      onError={(event) => { event.currentTarget.setAttribute('href', WORLD_MAP_FLAT_V2_ASSET.pngSrc); onAssetError?.(WORLD_MAP_FLAT_V2_ASSET.id) }}
+    />
+    {interactionLayer}
+    {sortedCharacters.length > 0 && <g data-layer="depth-sorted">{sortedCharacters.map(entry => entry.node)}</g>}
+    {qa.collisionDebug && <WorldMapDebugOverlay activeChunks={[]} foot={foot} collisionInfo={collisionInfo} debugSrc={FLAT_V2_COLLISION_DEBUG_SRC}/>}
+    <metadata data-map-version="flat-v2" data-rendered-objects="0" data-active-chunks="all"/>
+  </>
+}
+
+export default function WorldMapScene({ renderMode, ...props }) {
+  return renderMode === WORLD_MAP_RENDER_MODES.FLAT_V2
+    ? <FlatWorldMapScene {...props}/>
+    : <ModularWorldMapScene {...props}/>
+}

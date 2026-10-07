@@ -1,0 +1,317 @@
+[
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "01-entrance-clean",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/01-entrance-clean.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "02-left-listening-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/02-left-listening-access.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "03-vote-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/03-vote-card.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "04-center-owl-ledger-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/04-center-owl-ledger-access.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "05-exhibits-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/05-exhibits-card.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "06-right-shop-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/06-right-shop-access.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "07-shop-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/07-shop-card.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "08-collision-overlay",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/08-collision-overlay.png"
+  },
+  {
+    "viewport": "1280x720",
+    "cssViewport": "1280x720",
+    "dpr": 1,
+    "state": "09-foreground-depth",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1280x720/09-foreground-depth.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "01-entrance-clean",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/01-entrance-clean.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "02-left-listening-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/02-left-listening-access.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "03-vote-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/03-vote-card.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "04-center-owl-ledger-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/04-center-owl-ledger-access.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "05-exhibits-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/05-exhibits-card.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "06-right-shop-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/06-right-shop-access.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "07-shop-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/07-shop-card.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "08-collision-overlay",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/08-collision-overlay.png"
+  },
+  {
+    "viewport": "1440x900",
+    "cssViewport": "1440x900",
+    "dpr": 1,
+    "state": "09-foreground-depth",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1440x900/09-foreground-depth.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "01-entrance-clean",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/01-entrance-clean.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "02-left-listening-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/02-left-listening-access.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "03-vote-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/03-vote-card.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "04-center-owl-ledger-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/04-center-owl-ledger-access.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "05-exhibits-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/05-exhibits-card.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "06-right-shop-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/06-right-shop-access.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "07-shop-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/07-shop-card.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "08-collision-overlay",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/08-collision-overlay.png"
+  },
+  {
+    "viewport": "1920x1080",
+    "cssViewport": "1920x1080",
+    "dpr": 1,
+    "state": "09-foreground-depth",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/1920x1080/09-foreground-depth.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "01-entrance-clean",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/01-entrance-clean.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "02-left-listening-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/02-left-listening-access.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "03-vote-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/03-vote-card.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "04-center-owl-ledger-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/04-center-owl-ledger-access.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "05-exhibits-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/05-exhibits-card.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "06-right-shop-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/06-right-shop-access.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "07-shop-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/07-shop-card.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "08-collision-overlay",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/08-collision-overlay.png"
+  },
+  {
+    "viewport": "2560x1440",
+    "cssViewport": "1280x720",
+    "dpr": 2,
+    "state": "09-foreground-depth",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/2560x1440/09-foreground-depth.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "01-entrance-clean",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/01-entrance-clean.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "02-left-listening-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/02-left-listening-access.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "03-vote-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/03-vote-card.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "04-center-owl-ledger-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/04-center-owl-ledger-access.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "05-exhibits-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/05-exhibits-card.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "06-right-shop-access",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/06-right-shop-access.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "07-shop-card",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/07-shop-card.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "08-collision-overlay",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/08-collision-overlay.png"
+  },
+  {
+    "viewport": "844x390",
+    "cssViewport": "844x390",
+    "dpr": 1,
+    "state": "09-foreground-depth",
+    "file": "design/2d-map-redesign/previews/sound-museum-final-b/844x390/09-foreground-depth.png"
+  }
+]

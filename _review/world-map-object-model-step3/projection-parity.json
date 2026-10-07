@@ -1,0 +1,100 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "counts": {
+    "legacyRenderObjects": 17,
+    "legacyForegroundObjects": 1,
+    "legacyDestinations": 8,
+    "legacyLogicalDestinations": 8,
+    "legacyGuidePaths": 8,
+    "legacyMinimapDestinations": 8,
+    "legacyCollisionObjects": 8,
+    "generatedRenderObjects": 17,
+    "generatedForegroundObjects": 1,
+    "generatedDestinations": 8,
+    "generatedCollisionObjects": 8,
+    "spatialIndexEntriesReconstructed": 48
+  },
+  "legacyProjectionDeepEquality": {
+    "renderObjectsAndOrder": true,
+    "foregroundAndOrder": true,
+    "destinationKeysAndValues": true,
+    "logicalDestinations": true,
+    "guidePathIdsPointsAndOrder": true,
+    "collisionObjectsCollidersShapesAndOrder": true,
+    "minimapIdsAndWorldPoints": true,
+    "assetRegistrationsAndRenderSizes": true,
+    "objectBounds": true,
+    "reconstructedSpatialIndex": true
+  },
+  "libraryCandidate": {
+    "objectId": "landmark-library",
+    "renderObject": true,
+    "assetRegistration": true,
+    "positionAndSize": true,
+    "anchor": true,
+    "runtimeSortY": true,
+    "layerAndCategory": true,
+    "interactionId": true,
+    "portalId": true,
+    "destinationGeometry": true,
+    "approachPoint": true,
+    "collisionObject": true,
+    "minimapWorldPoint": true,
+    "guidePath": true,
+    "cullingBounds": true,
+    "spatialIndexChunkKeys": true,
+    "aliases": {
+      "canonicalDestinationId": "sound-library",
+      "manifestInteractionId": "Library",
+      "externalDestinationId": "Sound Library",
+      "legacyIds": ["Library", "Sound Library"]
+    },
+    "runtimeSortReferenceY": 1010,
+    "runtimeSortY": 1339.2265193370165,
+    "assetBuildSemanticSortReferenceY": 1147,
+    "assetBuildSemanticSortWorldY": 1520.8839779005525,
+    "semanticSortAppliedToRuntime": false,
+    "semanticSortNegativeTestRejected": true,
+    "cullingChunkKeys": ["2,1", "3,1", "4,1", "5,1", "5,2", "5,3", "2,2", "3,2", "4,2", "2,3", "3,3", "4,3"]
+  },
+  "collisionParity": {
+    "deepEqual": true,
+    "maskRegenerated": false,
+    "collisionAndPackedMaskHashChanges": 0,
+    "reasonParityCells": 691200,
+    "reasonMismatchCells": 0
+  },
+  "minimapPointParity": true,
+  "guidePathParity": true,
+  "cullingBoundsAndChunkParity": true,
+  "authorityRegistry": {
+    "entries": 18,
+    "legacyEntries": 18,
+    "nativeEntries": 0,
+    "libraryAuthority": "legacy",
+    "duplicateOutputs": 0,
+    "unknownAuthorityRejected": true,
+    "missingNativeCandidateRejected": true,
+    "missingLegacyObjectRejected": true,
+    "duplicateNativeCandidateRejected": true,
+    "unselectedCandidateDriftRejected": true
+  },
+  "checkMode": {
+    "freshOutputPass": true,
+    "staleOutputRejected": true,
+    "staleExitCode": 1,
+    "restoredExitCode": 0
+  },
+  "determinism": {
+    "twoWritesIdentical": true,
+    "runtimeHash": "46861d8ffa8adc2b1265dd7cd0d3039a3cadb672101a260c80dc59e90475ab6b",
+    "collisionHash": "ce657526b92921517d56a58e932141f13e0f4cda55e27db7608922e0feb12ce7"
+  },
+  "productionConnection": {
+    "generatedProjectionImportedByConsumer": false,
+    "libraryNativeAuthorityEnabled": false,
+    "homeChanged": false,
+    "rendererChanged": false
+  }
+}

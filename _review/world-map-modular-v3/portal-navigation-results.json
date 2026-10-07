@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "method": "development-only automatic steering triggered through the in-app browser; every frame calls the production moveWorldPlayer function and never assigns destination coordinates",
+  "spawn": { "tileX": 60, "tileY": 47 },
+  "destinations": [
+    { "id": "Animal", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Nature", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Human", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Urban", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Music", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Lab", "walked": true, "prompt": true, "entered": true, "returned": true, "note": "exit confirmation accepted" },
+    { "id": "Sound Library", "walked": true, "prompt": true, "entered": true, "returned": true },
+    { "id": "Home", "walked": true, "prompt": true, "entered": true, "returned": true }
+  ],
+  "lockedAnimal": { "musicFirstLocked": true, "entryBlocked": true },
+  "runtimeMovement": { "substepPx": 3, "maskCellSizePx": 4, "footBoxPx": [28, 16] }
+}

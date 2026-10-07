@@ -13,6 +13,7 @@ import CharacterShopPanel from '@/components/economy-v1/CharacterShopPanel'
 import CharacterStudioPanel from '@/components/character-studio/CharacterStudioPanel'
 import QaCharacterStudioPanel from '@/components/character-studio/QaCharacterStudioPanel'
 import { trackEvent } from '@/lib/userEvents'
+import { TEMPORARILY_UNLOCK_ALL_CONTENT } from '@/lib/temporaryUnlocks'
 
 /* ─────────────────────────────────────────────
    동의 정도 슬라이더 라벨 (1~5)
@@ -275,17 +276,19 @@ function Shop({ participantId, onCurrencyChange }) {
       })
       if (!activeRef.current || version !== loadVersionRef.current) return false
       if ('balance' in result.data) setBalance(result.data.balance)
-      if ('ownedOutfits' in result.data) setOwnedOutfits(result.data.ownedOutfits)
+      if ('ownedOutfits' in result.data) setOwnedOutfits(
+        TEMPORARILY_UNLOCK_ALL_CONTENT ? SHOP_PRODUCTS.map((product) => product.id) : result.data.ownedOutfits
+      )
       if ('equipped' in result.data) setEquipped(result.data.equipped)
       if ('totalEarned' in result.data) setTotalEarned(result.data.totalEarned)
-      setAccountReady(result.ok)
-      if (!result.ok) setLoadError('보유 화폐와 옷 정보를 모두 불러오지 못했어요. 구매와 장착은 잠시 잠겨 있어요.')
-      return result.ok
+      setAccountReady(TEMPORARILY_UNLOCK_ALL_CONTENT || result.ok)
+      if (!result.ok && !TEMPORARILY_UNLOCK_ALL_CONTENT) setLoadError('보유 화폐와 옷 정보를 모두 불러오지 못했어요. 구매와 장착은 잠시 잠겨 있어요.')
+      return TEMPORARILY_UNLOCK_ALL_CONTENT || result.ok
     } catch {
       if (activeRef.current && version === loadVersionRef.current) {
-        setOwnedOutfits([])
-        setAccountReady(false)
-        setLoadError('옷가게 정보를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.')
+        setOwnedOutfits(TEMPORARILY_UNLOCK_ALL_CONTENT ? SHOP_PRODUCTS.map((product) => product.id) : [])
+        setAccountReady(TEMPORARILY_UNLOCK_ALL_CONTENT)
+        if (!TEMPORARILY_UNLOCK_ALL_CONTENT) setLoadError('옷가게 정보를 불러오지 못했어요. 연결을 확인한 뒤 다시 시도해 주세요.')
       }
       return false
     } finally {
@@ -350,6 +353,10 @@ function Shop({ participantId, onCurrencyChange }) {
 
   const handleEquip = async (outfitId) => {
     if (equipInFlightRef.current || !accountReady) return
+    if (TEMPORARILY_UNLOCK_ALL_CONTENT) {
+      setEquipped(outfitId)
+      return { ok:true, code:'temporary_local_unlock', loadout:{ outfitId, accessoryId:null } }
+    }
     equipInFlightRef.current = true
     setEquippingId(outfitId)
     if (!equipKey.current || equipKey.current.outfitId !== outfitId) equipKey.current = { outfitId, key: newOperationKey() }

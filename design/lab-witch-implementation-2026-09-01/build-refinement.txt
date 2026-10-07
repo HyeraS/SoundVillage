@@ -1,0 +1,50 @@
+▲ Next.js 16.2.7 (webpack)
+
+  Creating an optimized production build ...
+(node:74176) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+(node:74202) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+✓ Compiled successfully in 5.0s
+  Running TypeScript ...
+  Finished TypeScript in 51ms ...
+  Collecting page data using 10 workers ...
+  Generating static pages using 10 workers (0/26) ...
+[LabZone 셀프체크] 던전 바닥 화이트리스트 → 소리 아이템 169개 중 바닥 밖 배치 0개 PASS
+  Generating static pages using 10 workers (6/26) 
+  Generating static pages using 10 workers (12/26) 
+  Generating static pages using 10 workers (19/26) 
+[HumanZone(마켓) 셀프체크] PLACED 45개 + 스캐터(나무/덤불 62개, 선물 17개) + 울타리 150칸 → 맵 밖 배치 0개
+✓ Generating static pages using 10 workers (26/26) in 385ms
+  Finalizing page optimization ...
+  Collecting build traces ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ○ /animal-test
+├ ○ /attendance-test
+├ ○ /daily-quest-test
+├ ○ /fence-test
+├ ○ /house-decor-test
+├ ○ /human-village-test
+├ ○ /interior-test
+├ ○ /lab-observatory-art-preview
+├ ○ /lab-observatory-cohesion-preview
+├ ○ /lab-observatory-identity-preview
+├ ○ /lab-observatory-pixel-preview
+├ ○ /lab-test
+├ ○ /lab-whitebox-preview
+├ ○ /library-test
+├ ○ /music-responsive-test
+├ ○ /music-test
+├ ○ /music-whitebox-preview
+├ ○ /nature-test
+├ ○ /nature-village
+├ ○ /urban-art-preview
+├ ○ /urban-sprite-test
+└ ○ /urban-test
+
+
+○  (Static)  prerendered as static content
+

@@ -1,0 +1,256 @@
+{
+  "status": "PASS",
+  "registration": {
+    "width": 960,
+    "height": 720,
+    "cellSize": 4,
+    "worldWidth": 3840,
+    "worldHeight": 2880,
+    "bitOrder": "little",
+    "source": "logical-object-collision-shapes",
+    "clearance": {
+      "halfWidth": 14,
+      "halfHeight": 8
+    }
+  },
+  "modularLandmark": {
+    "width": 1545,
+    "height": 717
+  },
+  "connectivity": {
+    "walkableCells": 636624,
+    "reachableCells": 636624,
+    "disconnectedCells": 0,
+    "oneToTwoCellPinches": 0,
+    "reasonMismatchCells": 0
+  },
+  "movement": {
+    "speedPxPerFrame": 5.85,
+    "substepPx": 3,
+    "sampledNormalAndLargeDeltaMoves": 105024
+  },
+  "routeCoverage": {
+    "east-plaza-curve": {
+      "requestedWorldTile": {
+        "tx": 83.5,
+        "ty": 39.5
+      },
+      "testedFootWorldPx": {
+        "x": 2674,
+        "y": 1266
+      },
+      "pathCells": 249,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 243
+    },
+    "west-plaza-curve": {
+      "requestedWorldTile": {
+        "tx": 37,
+        "ty": 40
+      },
+      "testedFootWorldPx": {
+        "x": 1186,
+        "y": 1282
+      },
+      "pathCells": 241,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 231
+    },
+    "nature-bridge-gate": {
+      "requestedWorldTile": {
+        "tx": 17,
+        "ty": 42
+      },
+      "testedFootWorldPx": {
+        "x": 546,
+        "y": 1346
+      },
+      "pathCells": 385,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 375
+    },
+    "urban-branch-gate": {
+      "requestedWorldTile": {
+        "tx": 106,
+        "ty": 43
+      },
+      "testedFootWorldPx": {
+        "x": 3374,
+        "y": 1378
+      },
+      "pathCells": 396,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 390
+    },
+    "music-flowerbed-lane": {
+      "requestedWorldTile": {
+        "tx": 96,
+        "ty": 66
+      },
+      "testedFootWorldPx": {
+        "x": 3074,
+        "y": 2070
+      },
+      "pathCells": 430,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 424
+    },
+    "human-market-bench-lane": {
+      "requestedWorldTile": {
+        "tx": 20,
+        "ty": 70
+      },
+      "testedFootWorldPx": {
+        "x": 658,
+        "y": 2242
+      },
+      "pathCells": 501,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 491
+    }
+  },
+  "destinations": {
+    "Lab": {
+      "pathCells": 260,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 250
+    },
+    "Animal": {
+      "pathCells": 460,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 454
+    },
+    "Urban": {
+      "pathCells": 350,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 346
+    },
+    "Music": {
+      "pathCells": 522,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 514
+    },
+    "Human": {
+      "pathCells": 589,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 577
+    },
+    "Nature": {
+      "pathCells": 320,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 310
+    },
+    "Sound Library": {
+      "pathCells": 1,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 0
+    },
+    "Home": {
+      "pathCells": 95,
+      "maxStalledFrames": 0,
+      "totalStalledFrames": 0,
+      "largeDeltaChecks": 87
+    }
+  },
+  "openTerrainSamples": [
+    {
+      "id": "nature-water",
+      "tx": 6,
+      "ty": 42
+    },
+    {
+      "id": "north-forest",
+      "tx": 88,
+      "ty": 12
+    },
+    {
+      "id": "southwest-garden",
+      "tx": 36,
+      "ty": 72
+    },
+    {
+      "id": "central-garden-arch",
+      "tx": 87,
+      "ty": 72
+    }
+  ],
+  "buildingSamples": [
+    {
+      "objectId": "landmark-lab",
+      "colliderId": "lab-body",
+      "center": {
+        "x": 1920,
+        "y": 523
+      }
+    },
+    {
+      "objectId": "landmark-animal",
+      "colliderId": "animal-body",
+      "center": {
+        "x": 3232,
+        "y": 575
+      }
+    },
+    {
+      "objectId": "landmark-urban",
+      "colliderId": "urban-body",
+      "center": {
+        "x": 3552,
+        "y": 1333
+      }
+    },
+    {
+      "objectId": "landmark-music",
+      "colliderId": "music-body",
+      "center": {
+        "x": 3216,
+        "y": 2255
+      }
+    },
+    {
+      "objectId": "landmark-human",
+      "colliderId": "human-body",
+      "center": {
+        "x": 432,
+        "y": 2253
+      }
+    },
+    {
+      "objectId": "landmark-nature",
+      "colliderId": "nature-body",
+      "center": {
+        "x": 544,
+        "y": 1205
+      }
+    },
+    {
+      "objectId": "landmark-library",
+      "colliderId": "library-body",
+      "center": {
+        "x": 1920,
+        "y": 1291
+      }
+    },
+    {
+      "objectId": "landmark-home",
+      "colliderId": "home-body",
+      "center": {
+        "x": 1648,
+        "y": 1584
+      }
+    }
+  ]
+}

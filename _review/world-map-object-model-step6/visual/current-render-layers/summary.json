@@ -1,0 +1,14 @@
+{
+  "status": "PASS",
+  "comparisons": 24,
+  "staticPixelExact": 12,
+  "unexpectedPixels": 0,
+  "imageNodeMismatches": 0,
+  "visibleObjectOrderMismatches": 0,
+  "assetRequestMismatches": 0,
+  "decodedAssetByteMismatches": 0,
+  "consoleErrors": 0,
+  "consoleWarnings": 0,
+  "missingAssets": 0,
+  "failures": []
+}

@@ -1,0 +1,10 @@
+{
+  "status": "PASS",
+  "comparison": "optimized runtime clean capture vs prior browser-normalized clean baseline",
+  "baselineSsim": 0.961036,
+  "optimizedVsBaselineSsim": 0.991368,
+  "minimumRequiredSsim": 0.95,
+  "capture": "runtime-clean-1448x1086.png",
+  "consoleErrorsAfterStableReload": 0,
+  "failedAssets": 0
+}

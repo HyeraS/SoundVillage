@@ -1,0 +1,18 @@
+[
+  {
+    "label": "actual ArrowUp",
+    "text": "발 768.0, 1027.9 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "actual pointer up",
+    "text": "발 768.0, 1016.2 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "central base stop after developer 1s input",
+    "text": "발 768.0, 728.1 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 central-base · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "behind upper arch",
+    "text": "발 768.0, 366.0 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 central-base · 가림 upper-frame · 수동 · A 표시 57/84 (부족27)"
+  }
+]

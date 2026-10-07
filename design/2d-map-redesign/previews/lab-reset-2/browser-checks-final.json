@@ -1,0 +1,74 @@
+[
+  {
+    "label": "actual ArrowUp",
+    "text": "발 768.0, 1027.9 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "actual pointer up",
+    "text": "발 768.0, 1016.2 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "central base stop after developer 1s input",
+    "text": "발 768.0, 728.1 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 central-base · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "behind upper arch",
+    "text": "발 768.0, 366.0 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 central-base · 가림 upper-frame · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "west wall two left steps",
+    "text": "발 469.5, 371.3 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 archive-boundary-upper · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "Archive desk two left steps",
+    "text": "발 253.0, 367.0 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 archive-desk · 가림 archive-workbench-top · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "fresh spawn",
+    "text": "발 768.0, 1027.9 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "actual keyboard ArrowUp separate",
+    "text": "발 768.0, 1022.0 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "actual pointer up separate",
+    "text": "발 768.0, 1016.2 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "exit entry once",
+    "text": "발 768.0, 1119.3 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 1 충돌 없음 · 가림 없음 · 수동 · A 표시 57/84 (부족27)"
+  },
+  {
+    "label": "desktop recommended central front",
+    "text": "발 768.0, 796.6 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "desktop fixed central front",
+    "text": "발 768.0, 796.6 · 시야 768×576 · 이미지 배율 1.367 · 몸≈43.1px · active 링 54.7px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "390 recommended central front",
+    "text": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "390 legacy central front",
+    "text": "발 768.0, 796.6 · 시야 284×576 · 이미지 배율 1.282 · 몸≈40.4px · active 링 51.3px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "320 recommended central front",
+    "text": "발 768.0, 796.6 · 시야 640×533 · 이미지 배율 0.459 · 몸≈14.5px · active 링 18.4px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "320 direction button left",
+    "text": "발 762.2, 796.6 · 시야 640×533 · 이미지 배율 0.459 · 몸≈14.5px · active 링 18.4px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "844x390 landscape recommended",
+    "text": "발 762.2, 796.6 · 시야 768×576 · 이미지 배율 1.023 · 몸≈32.2px · active 링 40.9px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  },
+  {
+    "label": "390 Archive arrival",
+    "text": "발 344.8, 443.4 · 시야 640×533 · 이미지 배율 0.569 · 몸≈17.9px · active 링 22.8px · EXIT 0 충돌 없음 · 가림 없음 · 수동 · A 표시 58/84 (부족26)"
+  }
+]

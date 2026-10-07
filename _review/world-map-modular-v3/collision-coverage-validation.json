@@ -1,0 +1,17 @@
+{
+  "status": "PASS",
+  "source": "world-map-v3-manifest",
+  "connectedCells": 207007,
+  "totalWalkable": 207007,
+  "destinations": {
+    "Lab": "reachable",
+    "Animal": "reachable",
+    "Urban": "reachable",
+    "Music": "reachable",
+    "Human": "reachable",
+    "Nature": "reachable",
+    "Sound Library": "reachable",
+    "Home": "reachable"
+  },
+  "routeCenterlineSamples": 546
+}

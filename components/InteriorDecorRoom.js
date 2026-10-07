@@ -17,6 +17,7 @@ import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvide
 import VillageCostVector, { villageShortages } from '@/components/economy-v1/VillageCostVector'
 import VillageWalletBar from '@/components/economy-v1/VillageWalletBar'
 import { villageKoreanName } from '@/components/economy-v1/VillageCurrencyIcon'
+import { TEMPORARILY_UNLOCK_ALL_CONTENT } from '@/lib/temporaryUnlocks'
 
 /* ─────────────────────────────────────────────
    픽셀 버튼 — README "버튼 상호작용" 스펙(hover 1px 이동+그림자 강화,
@@ -350,11 +351,11 @@ function InviteModal({ inviteUrl, inviteState, liveInviteState, onCreateLive, on
         </div>
         <div style={{ padding:12, background:'var(--panel-bright)', border:'3px solid var(--border-warm)', marginBottom:14, textAlign:'left' }}>
           <strong style={{ display:'block', fontSize:13, marginBottom:8 }}>실시간 1:1 초대</strong>
-          {liveInviteState?.status === 'ready' ? <>
-            <div data-testid="duo-invite-ready" style={{ display:'flex', gap:8, alignItems:'center' }}>
+          {['ready','active'].includes(liveInviteState?.status) ? <>
+            {liveInviteState.status === 'ready' ? <div data-testid="duo-invite-ready" style={{ display:'flex', gap:8, alignItems:'center' }}>
               <span style={{ flex:1, minWidth:0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', fontSize:11 }}>보안 링크 준비됨 · {liveInviteState.expiresAt ? new Date(liveInviteState.expiresAt).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' }) : '2시간 유효'}</span>
               <PixelButton tone={copied ? 'confirm' : 'default'} onClick={(event) => copy(event, liveInviteState.inviteUrl, 'duo-invite-copy')} style={{ fontSize:12, padding:'9px 12px' }}>{copied ? '복사됨' : '복사'}</PixelButton>
-            </div>
+            </div> : <div data-testid="duo-invite-active" style={{ fontSize:12 }}>실시간 세션 연결됨 · 보안 링크는 다시 표시하지 않아요.</div>}
             <PixelButton tone="danger" onClick={onCloseLive} style={{ width:'100%', marginTop:8, fontSize:12, padding:9 }}>실시간 세션 종료</PixelButton>
           </> : <PixelButton tone="confirm" disabled={liveInviteState?.status === 'loading'} onClick={onCreateLive} style={{ width:'100%', fontSize:12, padding:9 }}>
             {liveInviteState?.status === 'loading' ? '보안 링크 만드는 중…' : '실시간 초대 링크 만들기'}
@@ -419,6 +420,7 @@ export default function InteriorDecorRoom({
   outfitSrc, accessorySrc, characterLoadout,
 }) {
   const economy = useEconomyRuntime()
+  const temporaryPreview = TEMPORARILY_UNLOCK_ALL_CONTENT && !visitorMode
   const economyV1 = !visitorMode && !dryRun && economy.runtimeState === 'cutover'
   const legacyRuntime = dryRun || ['legacy','preview'].includes(economy.runtimeState)
   const mutationsAllowed = !visitorMode && (economyV1 || legacyRuntime)
@@ -434,7 +436,7 @@ export default function InteriorDecorRoom({
   const [loadError, setLoadError] = useState(false)
 
   const duoScreen = 'interior'
-  const { partnerPos = null, sendPosition = null, status:duoStatus = 'idle' } = duo || {}
+  const { partnerPos = null, sendPosition = null, status:duoStatus = 'idle', peerCharacterLoadout = null, peerCharacterStatus = 'idle' } = duo || {}
   const partnerLabel = visitorMode ? visitorName : '방문객'
 
   // 방문객 전용 — 호스트가 이 방을 나가서 다른 화면(주로 월드맵)으로
@@ -577,10 +579,16 @@ export default function InteriorDecorRoom({
   }, [participantId, visitorMode, dryRun, economy.runtimeState, economy.catalogVersion])
 
   const effectiveOwned = useMemo(() => {
+    if (temporaryPreview) {
+      const allItems = economyV1
+        ? [...economy.interiorStarters, ...economy.interiorItems]
+        : INTERIOR_CATALOG
+      return [...new Set(allItems.map((item) => item.id))]
+    }
     if (!economyV1) return owned
     const runtimeIds = new Set([...economy.interiorItems, ...economy.interiorStarters].map((item) => item.id))
     return [...new Set([...INTERIOR_STARTER_IDS, ...economy.ownedItemIds.filter((id) => runtimeIds.has(id))])]
-  }, [economyV1, economy.interiorItems, economy.interiorStarters, economy.ownedItemIds, owned])
+  }, [temporaryPreview, economyV1, economy.interiorItems, economy.interiorStarters, economy.ownedItemIds, owned])
   const [purchasing, setPurchasing] = useState(false)
   const purchasingRef = useRef(false) // 리렌더 전에 두 번째 클릭이 들어와도 balance/owned 클로저가 낡은 값을 또
   const [roomSaving, setRoomSaving] = useState(false)
@@ -791,6 +799,34 @@ export default function InteriorDecorRoom({
     if (roomSaveInFlightRef.current) return
     roomSaveInFlightRef.current = true
     setRoomSaving(true)
+    if (dryRun) {
+      setSaved(deepClone(room))
+      setSavedInviteUniqueItemCount(placedCount)
+      setTool(null)
+      setSelected(null)
+      setHistory([])
+      movePendingRef.current = false
+      setMode('view')
+      roomSaveKeyRef.current = newOperationKey()
+      roomSaveInFlightRef.current = false
+      setRoomSaving(false)
+      say(temporaryPreview ? '임시 해금 미리보기에 저장했어요' : '미리보기 방을 저장했어요')
+      return
+    }
+    if (temporaryPreview) {
+      setSaved(deepClone(room))
+      setSavedInviteUniqueItemCount(placedCount)
+      setTool(null)
+      setSelected(null)
+      setHistory([])
+      movePendingRef.current = false
+      setMode('view')
+      roomSaveKeyRef.current = newOperationKey()
+      roomSaveInFlightRef.current = false
+      setRoomSaving(false)
+      say('임시 해금 미리보기에 저장했어요')
+      return
+    }
     // 실패하면(스키마 미실행/네트워크 오류 등) 편집 모드를 빠져나가지 않는다 —
     // 여기서 view로 돌려버리면 화면상으론 "저장됨"처럼 보이지만 실제로는
     // 서버에 반영이 안 된 채로 편집 세션(되돌리기 스냅샷/실행취소 스택)만
@@ -861,7 +897,7 @@ export default function InteriorDecorRoom({
       roomSaveInFlightRef.current = false
       setRoomSaving(false)
     }
-  }, [room, say, participantId, economyV1, roomRevision, placedCount])
+  }, [room, say, participantId, economyV1, roomRevision, placedCount, dryRun, temporaryPreview])
 
   const clearRoom = useCallback(() => {
     pushHistory()
@@ -912,6 +948,13 @@ export default function InteriorDecorRoom({
       if (effectiveOwned.includes(item.id)) { say('이미 보관함에 있어요'); return }
       const price = LEGACY_INTERIOR_PRICES[item.id]
       if (!economyV1 && balance < price) { say(`음표가 ${price - balance}개 더 필요해요`); return }
+      if (dryRun) {
+        const nextBalance = balance - price
+        setBalance(nextBalance)
+        setOwned(prev => prev.includes(item.id) ? prev : prev.concat([item.id]))
+        setReward({ id:item.id, name:item.name, msg:`미리보기 구매예요. 실제 재화는 사용되지 않아요. 남은 미리보기 음표 ${nextBalance}개` })
+        return
+      }
       const scope = `item:${item.id}`
       const idempotencyKey = economyV1 ? undefined : (purchaseKeysRef.current.get(scope) || newOperationKey())
       if (!economyV1) purchaseKeysRef.current.set(scope, idempotencyKey)
@@ -945,7 +988,7 @@ export default function InteriorDecorRoom({
       purchasingRef.current = false
       setPurchasing(false)
     }
-  }, [effectiveOwned, balance, say, onCurrencyChange, economyV1, economy])
+  }, [effectiveOwned, balance, say, onCurrencyChange, economyV1, economy, dryRun])
 
   // 세트 구매 — 이미 다 갖고 있으면 과금 없이 바로 적용, 아니면
   // purchaseInteriorSet이 미보유 아이템만 지급하고 세트가만 1회 차감한다.
@@ -967,6 +1010,14 @@ export default function InteriorDecorRoom({
         return
       }
       if (!economyV1 && balance < set.price) { say(`음표가 ${set.price - balance}개 더 필요해요`); return }
+      if (dryRun) {
+        const nextBalance = balance - set.price
+        setBalance(nextBalance)
+        setOwned(prev => Array.from(new Set(prev.concat(need))))
+        applySet(setId)
+        say(`${set.name} 테마를 미리보기로 적용했어요`)
+        return
+      }
       const scope = `set:${setId}`
       const idempotencyKey = economyV1 ? undefined : (purchaseKeysRef.current.get(scope) || newOperationKey())
       if (!economyV1) purchaseKeysRef.current.set(scope, idempotencyKey)
@@ -994,7 +1045,7 @@ export default function InteriorDecorRoom({
       purchasingRef.current = false
       setPurchasing(false)
     }
-  }, [effectiveOwned, balance, applySet, say, onCurrencyChange, economyV1, economy, officialSets])
+  }, [effectiveOwned, balance, applySet, say, onCurrencyChange, economyV1, economy, officialSets, dryRun])
 
   const closeReward = useCallback(() => setReward(null), [])
   const placeReward = useCallback(() => {
@@ -1072,6 +1123,14 @@ export default function InteriorDecorRoom({
           방 데이터를 불러오지 못해 임시 빈 방을 읽기 전용으로 열었어요. 나가기는 안전하게 사용할 수 있어요.
         </div>
       )}
+      {dryRun && (
+        <div role="status" data-testid="interior-preview-notice" style={{
+          padding:'10px 14px', background:'#EAF4DF', border:'3px solid var(--text-dark)',
+          color:'var(--text-dark)', fontFamily:"'Gothic A1', sans-serif", fontSize:13, fontWeight:700,
+        }}>
+          미리보기 모드 · 구매와 저장은 이 화면 안에서만 체험되며 실제 재화나 DB는 변경되지 않아요.
+        </div>
+      )}
       {!visitorMode && !mutationsAllowed && (
         <div role="status" aria-live="polite" style={{ padding:'10px 14px', background:'#FFF1CC', border:'3px solid var(--text-dark)', fontWeight:700 }}>
           경제 시스템 상태를 확인하는 동안 구매와 방 저장이 잠겨 있어요. 현재 방은 읽기 전용으로 볼 수 있습니다.
@@ -1146,6 +1205,8 @@ export default function InteriorDecorRoom({
               sendPosition={sendPosition}
               partnerPos={partnerPos}
               partnerLabel={partnerLabel}
+              partnerCharacterLoadout={peerCharacterLoadout}
+              partnerCharacterStatus={peerCharacterStatus}
               outfitSrc={outfitSrc}
               accessorySrc={accessorySrc}
               characterLoadout={characterLoadout}

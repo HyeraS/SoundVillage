@@ -1,0 +1,47 @@
+{
+  "map": "120x90",
+  "camera": "30x22",
+  "pathCollisionBandTiles": 7,
+  "visualPathBandTiles": 7,
+  "collisionVisualDeltaTiles": 0,
+  "portalApproaches": [
+    {
+      "zone": "Animal",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    },
+    {
+      "zone": "Lab",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    },
+    {
+      "zone": "Urban",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    },
+    {
+      "zone": "Nature",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    },
+    {
+      "zone": "Music",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    },
+    {
+      "zone": "Human",
+      "directApproaches": 1,
+      "ringApproaches": 2,
+      "total": 3
+    }
+  ],
+  "registeredRuntimeAssets": 16,
+  "status": "PASS"
+}

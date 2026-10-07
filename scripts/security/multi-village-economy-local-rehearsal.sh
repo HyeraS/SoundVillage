@@ -70,6 +70,20 @@ STAGE8_ID=$(basename "$STAGE8_WORK_DIR" | tr '.[:upper:]' '-[:lower:]')
 STAGE8_DB_CONTAINER="supabase_db_$STAGE8_ID"
 docker inspect "$STAGE8_DB_CONTAINER" >/dev/null
 
+# Mirror the hosted production Realtime gate in this disposable stack. Private
+# channel RLS is tested below; this also makes any accidental public channel fail.
+docker exec "$STAGE8_DB_CONTAINER" psql -U supabase_admin -d postgres -X -v ON_ERROR_STOP=1 -c \
+  "update _realtime.tenants set private_only=true; do \$\$ begin if not exists(select 1 from _realtime.tenants where private_only) then raise exception 'Realtime private_only was not enabled'; end if; end \$\$" \
+  >/dev/null
+STAGE8_REALTIME_CONTAINER="supabase_realtime_$STAGE8_ID"
+REALTIME_RELOAD_STATUS=$(docker exec -e LOCAL_ADMIN_TOKEN="$SERVICE_ROLE_KEY" \
+  "$STAGE8_REALTIME_CONTAINER" sh -lc \
+  "curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Authorization: Bearer '\"\$LOCAL_ADMIN_TOKEN\" http://127.0.0.1:4000/api/tenants/realtime-dev/reload")
+[ "$REALTIME_RELOAD_STATUS" = 204 ] || {
+  echo "Realtime tenant cache reload failed: HTTP $REALTIME_RELOAD_STATUS" >&2
+  exit 1
+}
+
 run_sql() {
   docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -v ON_ERROR_STOP=1 -f /dev/stdin < "$1"
 }
@@ -101,12 +115,34 @@ cp scripts/security/013_character_identity_loadout.sql \
   "$STAGE8_WORK_DIR/supabase/migrations/20261002010000_character_identity_loadout.sql"
 REHEARSAL_STAGE='013 migration apply'
 supabase migration up --local --workdir "$STAGE8_WORK_DIR"
-REHEARSAL_STAGE='008-013 SQL verification'
+cp scripts/security/014_duo_character_identity_sync.sql \
+  "$STAGE8_WORK_DIR/supabase/migrations/20261004010000_duo_character_identity_sync.sql"
+REHEARSAL_STAGE='014 migration apply'
+supabase migration up --local --workdir "$STAGE8_WORK_DIR"
+POST014_ACL="$REHEARSAL_CONTROL_DIR/post014-duo-acl.txt"
+POST015_ACL="$REHEARSAL_CONTROL_DIR/post015-duo-acl.txt"
+docker exec "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt -c \
+  "select concat_ws('|',c.oid::regclass::text,coalesce(c.relacl::text,''),c.relrowsecurity::text) from pg_class c where c.oid in ('public.duo_v2_sessions'::regclass,'public.duo_v2_session_members'::regclass,'public.duo_v2_invites'::regclass,'public.duo_v2_leases'::regclass,'public.duo_v2_operation_results'::regclass,'realtime.messages'::regclass) order by 1; select concat_ws('|',p.oid::regprocedure::text,coalesce(p.proacl::text,''),p.prosecdef::text,coalesce(p.proconfig::text,'')) from pg_proc p where p.oid='private.is_realtime_room_member(text)'::regprocedure; select concat_ws('|',schemaname,tablename,policyname,cmd,roles::text,coalesce(qual,''),coalesce(with_check,'')) from pg_policies where schemaname='realtime' and tablename='messages' order by policyname" \
+  > "$POST014_ACL"
+cp scripts/security/015_duo_es256_realtime_authorization.sql \
+  "$STAGE8_WORK_DIR/supabase/migrations/20261006010000_duo_es256_realtime_authorization.sql"
+REHEARSAL_STAGE='remote-shaped post-014 forward-only 015 migration apply'
+supabase migration up --local --workdir "$STAGE8_WORK_DIR"
+docker exec "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -qAt -c \
+  "select concat_ws('|',c.oid::regclass::text,coalesce(c.relacl::text,''),c.relrowsecurity::text) from pg_class c where c.oid in ('public.duo_v2_sessions'::regclass,'public.duo_v2_session_members'::regclass,'public.duo_v2_invites'::regclass,'public.duo_v2_leases'::regclass,'public.duo_v2_operation_results'::regclass,'realtime.messages'::regclass) order by 1; select concat_ws('|',p.oid::regprocedure::text,coalesce(p.proacl::text,''),p.prosecdef::text,coalesce(p.proconfig::text,'')) from pg_proc p where p.oid='private.is_realtime_room_member(text)'::regprocedure; select concat_ws('|',schemaname,tablename,policyname,cmd,roles::text,coalesce(qual,''),coalesce(with_check,'')) from pg_policies where schemaname='realtime' and tablename='messages' order by policyname" \
+  > "$POST015_ACL"
+cmp -s "$POST014_ACL" "$POST015_ACL" || {
+  echo "Migration 015 changed a Duo table/function ACL, RLS flag, or Realtime policy" >&2
+  diff -u "$POST014_ACL" "$POST015_ACL" >&2 || true
+  exit 1
+}
+REHEARSAL_STAGE='008-015 SQL verification'
 run_sql scripts/security/multi-village-economy-verify.sql
 run_sql scripts/security/multi-village-character-verify.sql
 run_sql scripts/security/multi-village-runtime-verify.sql
 run_sql scripts/security/multi-village-interior-verify.sql
 run_sql scripts/security/duo-session-v2-verify.sql
+run_sql scripts/security/duo-es256-realtime-verify.sql
 run_sql scripts/security/character-identity-stage3-verify.sql
 docker exec -i "$STAGE8_DB_CONTAINER" psql -U postgres -d postgres -X -v ON_ERROR_STOP=1 -c \
   "do \$\$ begin if not exists(select 1 from public.participant_multi_village_character_loadouts where outfit_id='stage3_backfill_outfit' and accessory_id='stage3_backfill_accessory' and skin_id='skin_01' and eyes_id='eyes_green_light' and hair_style_id='hair_buzzcut' and hair_color_id='black') then raise exception 'Stage 3 backfill fixture failed'; end if; end \$\$" >/dev/null
@@ -133,8 +169,6 @@ export SECURITY_TEST_SUPABASE_ANON_KEY="$ANON_KEY"
 export SECURITY_TEST_SUPABASE_SERVICE_ROLE_KEY="$SERVICE_ROLE_KEY"
 export SECURITY_TEST_DB_CONTAINER="$STAGE8_DB_CONTAINER"
 export MULTI_VILLAGE_ECONOMY_HMAC_SECRET
-SUPABASE_JWT_SECRET=${JWT_SECRET:?Disposable Supabase JWT secret is missing}
-export SUPABASE_JWT_SECRET
 DUO_SESSION_HMAC_SECRET=$(node -e "process.stdout.write(require('node:crypto').randomBytes(48).toString('base64url'))")
 export DUO_SESSION_HMAC_SECRET
 
@@ -151,6 +185,7 @@ npm run test:multi-village-interior-local
 REHEARSAL_STAGE='Duo V2 DB concurrency and WebSocket authorization'
 npm run test:duo-v2-local
 npm run test:duo-v2-realtime-local
+npm run test:character-v2-stage4-local
 REHEARSAL_STAGE='legacy RLS, transactions, events, and experiment regression'
 npm run test:rls-local
 npm run test:transactional-integrity-local
@@ -223,21 +258,49 @@ stop_app() {
   NEXT_PID=''
 }
 
+# Focused rerun for Duo product work. It deliberately keeps the complete
+# disposable DB/migration/Realtime setup above, but skips unrelated browser
+# suites so a pre-existing failure cannot prevent the Duo browser gate from
+# running. The default full rehearsal remains unchanged.
+if [ "${DUO_BROWSER_ONLY:-false}" = true ]; then
+  APP_WORK_DIR="$REHEARSAL_CONTROL_DIR/app-duo-production"
+  mkdir -p "$APP_WORK_DIR"
+  rsync -a --delete \
+    --exclude='.git' --exclude='.next' --exclude='node_modules' --exclude='_review' --exclude='tmp' \
+    "$REPO_ROOT/" "$APP_WORK_DIR/"
+  ln -s "$REPO_ROOT/node_modules" "$APP_WORK_DIR/node_modules"
+  REHEARSAL_STAGE='focused Duo isolated production build'
+  NEXT_BUILD_LOG="$REHEARSAL_CONTROL_DIR/next-build.log"
+  if ! (cd "$APP_WORK_DIR" && "$REPO_ROOT/node_modules/.bin/next" build --webpack) > "$NEXT_BUILD_LOG" 2>&1; then
+    echo "Focused Duo isolated Next production build failed" >&2
+    sed -n '1,240p' "$NEXT_BUILD_LOG" >&2
+    exit 1
+  fi
+  start_app cutover production
+  REHEARSAL_STAGE='focused Duo V2 product-path browser E2E'
+  npm run test:duo-v2-browser
+  stop_app
+  REHEARSAL_STAGE='focused Duo complete'
+  REHEARSAL_OK=true
+  echo "Focused Duo V2 local browser rehearsal passed."
+  exit 0
+fi
+
 start_app legacy
 REHEARSAL_STAGE='legacy browser regression'
-EXPECTED_ECONOMY_MODE=legacy npm run test:quest-attendance-browser
+env EXPECTED_ECONOMY_MODE=legacy npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=legacy node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
 start_app preview
 REHEARSAL_STAGE='preview browser regression'
-EXPECTED_ECONOMY_MODE=preview npm run test:quest-attendance-browser
+env EXPECTED_ECONOMY_MODE=preview npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=preview node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
 start_app maintenance
 REHEARSAL_STAGE='maintenance browser regression'
-EXPECTED_ECONOMY_MODE=maintenance npm run test:quest-attendance-browser
+env EXPECTED_ECONOMY_MODE=maintenance npm run test:quest-attendance-browser
 EXPECTED_ECONOMY_MODE=maintenance node scripts/security/multi-village-main-runtime-browser-e2e.mjs
 stop_app
 
@@ -245,11 +308,8 @@ start_app cutover
 REHEARSAL_STAGE='cutover HTTP and browser regression'
 node scripts/security/multi-village-economy-http.integration.mjs
 npm run test:character-v2-stage3-http
-EXPECTED_ECONOMY_MODE=cutover npm run test:quest-attendance-browser
+npm run test:character-v2-stage4-http
 node scripts/security/multi-village-character-browser-e2e.mjs
-EXPECTED_ECONOMY_MODE=cutover node scripts/security/multi-village-main-runtime-browser-e2e.mjs
-REHEARSAL_STAGE='Economy Interior product-path browser E2E'
-npm run test:multi-village-interior-browser
 CHARACTER_IDENTITY_BROWSER_PHASE=qa npm run test:character-v2-stage3-browser
 stop_app
 
@@ -270,10 +330,23 @@ if ! (cd "$APP_WORK_DIR" && "$REPO_ROOT/node_modules/.bin/next" build --webpack)
   exit 1
 fi
 start_app cutover production
+REHEARSAL_STAGE='cutover production quest and attendance browser E2E'
+env EXPECTED_ECONOMY_MODE=cutover npm run test:quest-attendance-browser
+REHEARSAL_STAGE='cutover production main-runtime browser E2E'
+EXPECTED_ECONOMY_MODE=cutover node scripts/security/multi-village-main-runtime-browser-e2e.mjs
+REHEARSAL_STAGE='Economy Interior production product-path browser E2E'
+npm run test:multi-village-interior-browser
+# The Interior flow intentionally keeps multiple authenticated contexts open for
+# several minutes. Give the Character propagation check a fresh production
+# process so a browser-suite process exit cannot masquerade as a product failure.
+stop_app
+start_app cutover production
 REHEARSAL_STAGE='Stage 3 Character Identity production browser E2E'
 CHARACTER_IDENTITY_BROWSER_PHASE=live npm run test:character-v2-stage3-browser
 REHEARSAL_STAGE='Duo V2 A/B/C product-path browser E2E'
 npm run test:duo-v2-browser
+REHEARSAL_STAGE='Stage 4 Duo Character Identity and onboarding production browser E2E'
+npm run test:character-v2-stage4-browser
 stop_app
 
 REHEARSAL_STAGE='final legacy fingerprint comparison'
@@ -288,5 +361,5 @@ cmp -s "$BEFORE_SNAPSHOT" "$FINAL_SNAPSHOT" || {
 REHEARSAL_STAGE='complete'
 REHEARSAL_OK=true
 echo "Multi-village economy local rehearsal passed."
-echo "Disposable migrations 001-013, Character Identity, Interior and Duo verify/integration/browser/WebSocket checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
+echo "Disposable migrations 001-015, post-014 forward rehearsal, Character Identity, peer sync, onboarding, Interior and Duo ES256 verify/integration/browser/WebSocket checks, legacy fingerprints, concurrency, RLS, HTTP, and all four runtime modes passed."
 echo "The disposable Supabase stack and protected temporary secret will now be removed."

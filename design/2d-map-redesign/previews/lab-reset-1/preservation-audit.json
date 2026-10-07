@@ -1,0 +1,13 @@
+{
+  "baselineFileCount": 10652,
+  "changedExistingFiles": [],
+  "deletedExistingFiles": [],
+  "existingFilesUnchanged": true,
+  "authoredPaths": [
+    "design/2d-map-redesign/LAB_RESET_1_CONCEPT_RECOVERY.md",
+    "design/2d-map-redesign/previews/lab-reset-1/"
+  ],
+  "productionModifiedByThisTask": false,
+  "gitCommitBranchPush": false,
+  "publicDeployment": false
+}
