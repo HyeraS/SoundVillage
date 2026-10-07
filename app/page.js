@@ -20,7 +20,7 @@ import { getOrCreateRoomShare, getOwnedInteriorItems, getRoom, getSharedRoom } f
 import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } from '@/lib/economyV1.client'
 import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
 import { useDuoSession } from '@/lib/duoSession'
-import { claimParticipantSession, restoreParticipantSession } from '@/lib/participantAuth'
+import { claimParticipantSession, restoreParticipantSession, signInMasterSession } from '@/lib/participantAuth'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
 import EconomyRuntimeNotice from '@/components/economy-v1/EconomyRuntimeNotice'
@@ -726,6 +726,23 @@ export default function HomePage() {
   }, [attendanceToast])
 
   /* ── StartPanel → WorldMap ── */
+  const enterParticipantSession = async participant => {
+    await initializeUserLogging('world')
+    const progress = await getMyExperimentProgress()
+    trackedParticipantRef.current = participant.participantId
+    previousScreenRef.current = 'world'
+    const enabled = isStudyAccessParticipantId(participant.participantId)
+    resetEconomy()
+    setParticipantId(participant.participantId)
+    setGroupId(participant.groupId)
+    setExperimentProgress(progress)
+    setProgressError('')
+    setVillagesUnlocked(enabled)
+    setWorldReturnZone(null)
+    setScreen('world')
+    setAuthError('')
+  }
+
   const handleStart = async (pid, gid) => {
     if (TEMPORARILY_UNLOCK_ALL_CONTENT) {
       localQaRef.current = true
@@ -741,21 +758,14 @@ export default function HomePage() {
       return
     }
     const participant = await claimParticipantSession(pid, gid)
-    await initializeUserLogging('world')
-    const progress = await getMyExperimentProgress()
-    trackedParticipantRef.current = participant.participantId
-    previousScreenRef.current = 'world'
-    const enabled = isStudyAccessParticipantId(participant.participantId)
-    resetEconomy()
-    setParticipantId(participant.participantId)
-    setGroupId(participant.groupId)
-    setExperimentProgress(progress)
-    setProgressError('')
-    setVillagesUnlocked(enabled)
-    setWorldReturnZone(null)
-    setScreen('world')
-    setAuthError('')
+    await enterParticipantSession(participant)
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
+  }
+
+  const handleMasterStart = async password => {
+    if (TEMPORARILY_UNLOCK_ALL_CONTENT) return handleStart('MASTER', 'A')
+    const participant = await signInMasterSession(password)
+    await enterParticipantSession(participant)
   }
 
   /* ── 집 안에서 방문 중이던 호스트가 다른 화면(주로 월드맵)으로 나갔을 때 —
@@ -1074,7 +1084,7 @@ export default function HomePage() {
   }
   if (visiting) {
     if (!participantId) {
-      return <StartPanel onStart={handleStart} restoring={authRestoring} initialError={authError} />
+      return <StartPanel onStart={handleStart} onMasterStart={handleMasterStart} restoring={authRestoring} initialError={authError} />
     }
     return (
       <main style={{
@@ -1115,7 +1125,7 @@ export default function HomePage() {
 
   // 1. 시작 화면
   if (screen === 'start') {
-    return <StartPanel onStart={handleStart} restoring={authRestoring} initialError={authError} />
+    return <StartPanel onStart={handleStart} onMasterStart={handleMasterStart} restoring={authRestoring} initialError={authError} />
   }
 
   // 2. 월드맵 (zone 진입 로딩 포함)

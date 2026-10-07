@@ -1,6 +1,6 @@
 'use client'
 import { useRef, useState } from 'react'
-import { isStudyAccessParticipantId } from '@/lib/studyAccess.mjs'
+import { isStudyAccessParticipantId, normalizeStudyAccessId } from '@/lib/studyAccess.mjs'
 
 /* ─────────────────────────────────────────────
    Phase 2 StartPanel — Cozy 낮 감성, 마을 테마
@@ -11,29 +11,35 @@ const AUTH_ERROR_MESSAGES = {
   participant_inactive: '현재 비활성화된 참여자 ID입니다. 진행자에게 문의해 주세요.',
   group_mismatch: '배정된 그룹과 선택한 그룹이 다릅니다.',
   anonymous_sign_in_failed: '인증 세션을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  master_sign_in_failed: 'MASTER 비밀번호가 올바르지 않습니다.',
+  master_account_mismatch: 'MASTER 계정 연결을 확인하지 못했습니다. 관리자에게 문의해 주세요.',
   session_restore_failed: '기존 인증 세션을 복구하지 못했습니다. 참여자 ID를 다시 확인해 주세요.',
   claim_unavailable: '인증 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.',
 }
 
-export default function StartPanel({ onStart, restoring = false, initialError = '' }) {
+export default function StartPanel({ onStart, onMasterStart, restoring = false, initialError = '' }) {
   const [participantId, setParticipantId] = useState('')
   const [groupId,       setGroupId]       = useState('')
+  const [masterPassword, setMasterPassword] = useState('')
   const [focused,       setFocused]       = useState(null)
   const [submitting,    setSubmitting]    = useState(false)
   const [localAuthError, setAuthError]    = useState('')
   const startInFlightRef = useRef(false)
   const authError = localAuthError || initialError
   const studyAccessPreview = isStudyAccessParticipantId(participantId)
+  const masterMode = normalizeStudyAccessId(participantId) === 'MASTER'
 
   async function handleStart() {
-    if (!participantId.trim() || !groupId.trim() || startInFlightRef.current || restoring) return
+    if (!participantId.trim() || startInFlightRef.current || restoring) return
+    if (masterMode ? !masterPassword : !groupId.trim()) return
     // 대소문자 차이로 같은 참여자가 다른 사람 취급되지 않도록 정규화
     // (예: "p1"과 "P1"이 Supabase에서 다른 participant_id로 갈라지는 것 방지)
     startInFlightRef.current = true
     setSubmitting(true)
     setAuthError('')
     try {
-      await onStart(participantId.trim().toUpperCase(), groupId.trim())
+      if (masterMode) await onMasterStart(masterPassword)
+      else await onStart(participantId.trim().toUpperCase(), groupId.trim())
     } catch (error) {
       setAuthError(error?.code || 'claim_unavailable')
     } finally {
@@ -41,7 +47,7 @@ export default function StartPanel({ onStart, restoring = false, initialError = 
       setSubmitting(false)
     }
   }
-  const canStart = participantId.trim() && groupId.trim() && !submitting && !restoring
+  const canStart = participantId.trim() && (masterMode ? masterPassword : groupId.trim()) && !submitting && !restoring
 
   return (
     <div style={{
@@ -158,7 +164,7 @@ export default function StartPanel({ onStart, restoring = false, initialError = 
           />
         </div>
 
-        <div style={{ marginBottom: '22px' }}>
+        {!masterMode && <div style={{ marginBottom: '22px' }}>
           <label style={{
             display: 'block', fontSize: '11px', fontWeight: 800,
             color: '#6B4A2A', marginBottom: '6px', letterSpacing: '0.05em',
@@ -191,7 +197,37 @@ export default function StartPanel({ onStart, restoring = false, initialError = 
             <option value="A">그룹 A</option>
             <option value="B">그룹 B</option>
           </select>
-        </div>
+        </div>}
+
+        {masterMode && <div style={{ marginBottom: '22px' }}>
+          <label style={{
+            display: 'block', fontSize: '11px', fontWeight: 800,
+            color: '#6B4A2A', marginBottom: '6px', letterSpacing: '0.05em',
+            textTransform: 'uppercase',
+          }}>
+            🔐 MASTER 비밀번호
+          </label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            placeholder="관리자 비밀번호"
+            value={masterPassword}
+            onChange={e => setMasterPassword(e.target.value)}
+            onFocus={() => setFocused('master-password')}
+            onBlur={() => setFocused(null)}
+            onKeyDown={e => { if (e.key === 'Enter' && canStart) handleStart() }}
+            style={{
+              width: '100%', boxSizing: 'border-box',
+              padding: '11px 14px', borderRadius: '10px',
+              background: '#FFF8ED',
+              border: `2px solid ${focused === 'master-password' ? '#C8A96E' : '#D4C4A0'}`,
+              color: '#3A2A14', fontSize: '14px',
+              fontFamily: 'Nunito, sans-serif', fontWeight: 600,
+              outline: 'none', transition: 'border-color 0.15s',
+              boxShadow: focused === 'master-password' ? '0 0 0 3px #C8A96E33' : 'none',
+            }}
+          />
+        </div>}
 
         {/* 연구용 접근 모드일 때만 확인용으로 표시 — ID 목록 자체는 절대 노출하지 않는다
             (일반 참여자 화면에 힌트가 보이면 그룹/마을 잠금 설계가 무력화됨) */}
