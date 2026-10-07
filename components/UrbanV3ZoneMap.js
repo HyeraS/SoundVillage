@@ -6,6 +6,7 @@ import { CompleteModal, DPad, ExitConfirmModal, PixelChar, ZoneHUD } from '@/com
 import { useWalkFrame } from '@/components/useWalkFrame'
 import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/characterRenderMetrics.mjs'
 import { spawnUrbanV3SoundItems, URBAN_V3_SOUND_INTERACTION_RADIUS } from '@/lib/urbanV3SoundItems.mjs'
+import { drawVillageCurrencyIcon } from '@/lib/villageCurrencyIconCanvas.mjs'
 import {
   OBJECT_COLLIDERS,
   PLAYER_FOOT_BOX,
@@ -30,25 +31,49 @@ const loadImage = (src) => new Promise((resolve, reject) => {
 })
 
 function drawMarkers(context, items, blockNum, collectedIds, nearbyId, now) {
-  context.textAlign = 'center'
-  context.textBaseline = 'middle'
-  context.font = 'bold 12px sans-serif'
   for (const item of items) {
     const unlocked = item.block <= blockNum
     const collected = collectedIds.has(item.id)
     const nearby = item.id === nearbyId
     const pulse = nearby ? 1.5 + Math.sin(now / 130 + item.phase) * 1.5 : 0
-    context.globalAlpha = unlocked ? 1 : 0.28
-    context.beginPath()
-    context.fillStyle = collected ? '#66717a' : nearby ? '#fff19a' : '#50e6ff'
-    context.strokeStyle = nearby ? '#fff' : '#102a52'
-    context.arc(item.x, item.y - 9, 8 + pulse, 0, Math.PI * 2)
-    context.fill()
-    context.stroke()
-    context.fillStyle = collected ? '#cbd0d4' : '#07112b'
-    context.fillText(collected ? '✓' : '♪', item.x, item.y - 9)
+    const x = item.x
+    const y = item.y - 9
+    const iconSize = nearby ? 28 : 24
+    context.save()
+    context.globalAlpha = unlocked ? collected ? 0.38 : 1 : 0.28
+    if (nearby) {
+      context.fillStyle = '#50e6ff33'
+      context.strokeStyle = '#fff19a'
+      context.lineWidth = 2
+      context.beginPath()
+      context.arc(x, y, 16 + pulse, 0, Math.PI * 2)
+      context.fill()
+      context.stroke()
+    }
+    if (!drawVillageCurrencyIcon(context, 'Urban', x, y, { size: iconSize })) {
+      context.beginPath()
+      context.fillStyle = collected ? '#66717a' : nearby ? '#fff19a' : '#50e6ff'
+      context.strokeStyle = nearby ? '#fff' : '#102a52'
+      context.arc(x, y, 8 + pulse, 0, Math.PI * 2)
+      context.fill()
+      context.stroke()
+      context.fillStyle = collected ? '#cbd0d4' : '#07112b'
+      context.textAlign = 'center'
+      context.textBaseline = 'middle'
+      context.font = 'bold 12px sans-serif'
+      context.fillText(collected ? '✓' : '♪', x, y)
+    } else if (collected) {
+      context.globalAlpha = unlocked ? 0.9 : 0.38
+      context.strokeStyle = '#fff'
+      context.lineWidth = 2
+      context.beginPath()
+      context.moveTo(x - 4, y)
+      context.lineTo(x - 1, y + 3)
+      context.lineTo(x + 5, y - 4)
+      context.stroke()
+    }
+    context.restore()
   }
-  context.globalAlpha = 1
 }
 
 export default function UrbanV3ZoneMap({

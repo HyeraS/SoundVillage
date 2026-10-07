@@ -214,42 +214,6 @@ a { color: inherit; text-decoration: none; }
   box-shadow: 0 2px 5px #0004;
 }
 
-.world-home-welcome {
-  position: absolute;
-  top: 112px;
-  left: 50%;
-  z-index: 18;
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  width: min(470px, calc(100vw - 32px));
-  padding: 10px 11px 10px 13px;
-  color: #3a2a14;
-  font-family: Nunito, sans-serif;
-  background: #fff8e8f2;
-  border: 2px solid #e98265;
-  border-radius: 16px;
-  box-shadow: 0 8px 28px #0005;
-  transform: translateX(-50%);
-  backdrop-filter: blur(7px);
-  animation: popIn .25s cubic-bezier(.34,1.56,.64,1);
-}
-
-.world-home-welcome__icon { font-size: 30px; }
-.world-home-welcome__copy { display: grid; flex: 1; gap: 2px; min-width: 0; }
-.world-home-welcome__copy strong { font-size: 13px; }
-.world-home-welcome__copy span { color: #765838; font-size: 11px; line-height: 1.35; }
-.world-home-welcome button {
-  min-width: 48px;
-  min-height: 36px;
-  color: #fff;
-  font: 800 11px Nunito, sans-serif;
-  background: #b95f49;
-  border: 0;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
 @media (hover: hover) and (pointer: fine) {
   .world-map-dpad {
     display: none !important;
@@ -258,7 +222,6 @@ a { color: inherit; text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .world-map-enter-prompt,
-  .world-map-direction__arrow,
   .world-map-hud *,
   .world-map-objective * {
     animation: none !important;
@@ -336,10 +299,6 @@ a { color: inherit; text-decoration: none; }
     bottom: 10px !important;
     padding: 9px !important;
   }
-  .world-map-direction {
-    max-width: calc(100vw - 24px) !important;
-    top: 66px !important;
-  }
   .world-map-dpad {
     display: grid !important;
     left: 10px !important;
@@ -347,16 +306,6 @@ a { color: inherit; text-decoration: none; }
     transform: scale(1);
     transform-origin: bottom left;
   }
-  .world-home-welcome {
-    top: 70px;
-    width: calc(100vw - 20px);
-    gap: 7px;
-    padding: 8px 9px;
-  }
-  .world-home-welcome__icon { font-size: 23px; }
-  .world-home-welcome__copy strong { font-size: 11px; }
-  .world-home-welcome__copy span { font-size: 9px; }
-  .world-home-welcome button { min-width: 44px; min-height: 34px; }
 }
 
 @media (max-height: 440px) and (orientation: landscape) {

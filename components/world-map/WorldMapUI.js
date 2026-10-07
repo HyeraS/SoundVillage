@@ -10,7 +10,7 @@ import {
   panelStateFromResult,
   rewardRuntimePolicy,
 } from '@/lib/rewardReliability.mjs'
-import { TILE, ZONE_META } from '@/components/GameEngine'
+import { ZONE_META } from '@/components/GameEngine'
 import { WORLD_CAMERA_HUD_HEIGHT as HUD_H } from '@/lib/worldMapCamera.mjs'
 import { trackEvent } from '@/lib/userEvents'
 import VillageCurrencyIcon, { VILLAGE_ORDER, villageKoreanName } from '@/components/economy-v1/VillageCurrencyIcon'
@@ -60,14 +60,6 @@ function HudButton({ icon, label, ariaLabel, onClick, kind, badge }) {
   return <button type="button" className={`world-map-hud__action${kind ? ` world-map-hud__action--${kind}` : ''}`} data-kind={kind} onClick={onClick} aria-label={ariaLabel} style={{ position:'relative', display:'flex', flexDirection:'column', alignItems:'center', gap:1, background:'transparent', border:0, cursor:'pointer', padding:'2px 6px', borderRadius:8, fontFamily:'Nunito, sans-serif' }}><span style={{ fontSize:19, lineHeight:1 }}>{icon}</span><span className="world-map-hud__action-label" style={{ fontSize:9, color:'#8B6A3A', fontWeight:700 }}>{label}</span>{badge && <span className="world-map-hud__home-badge">{badge}</span>}</button>
 }
 
-export function WorldHomeWelcome({ distance, onDismiss }) {
-  return <section className="world-home-welcome" role="status" aria-label="우리 집 안내">
-    <div className="world-home-welcome__icon" aria-hidden="true">🏡</div>
-    <div className="world-home-welcome__copy"><strong>가까이에 나만의 생활 허브가 있어요</strong><span>코랄 지붕의 <b>우리 집</b>에서 꾸미고 친구를 초대해요 · 약 {distance}칸</span></div>
-    <button type="button" onClick={onDismiss} aria-label="우리 집 안내 닫기">확인</button>
-  </section>
-}
-
 export function WorldObjective({ nearZone, nearMuseum, nearHome, nearZoneLocked, objective, objectiveLabel }) {
   const nearLabel = nearZone ? `${ZONE_META[nearZone].emoji} ${ZONE_META[nearZone].label}${nearZoneLocked ? ' (잠김)' : ''}` : nearMuseum ? '🏛 도서관' : nearHome ? '🏠 우리 집' : null
   const title = objective?.reason === 'prerequisite'
@@ -78,7 +70,7 @@ export function WorldObjective({ nearZone, nearMuseum, nearHome, nearZoneLocked,
   const description = objective?.arrived
     ? `${objectiveLabel}에 도착했어요`
     : objective?.destinationId
-      ? `화살표와 미니맵을 따라 ${objectiveLabel}(으)로 이동하세요`
+      ? `지도를 보고 ${objectiveLabel}(으)로 이동하세요`
       : 'Sound Museum과 우리 집도 둘러보세요'
   return <div className="world-map-objective" style={{ position:'absolute', bottom:16, right:16, width:200, background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:12, padding:12, fontFamily:'Nunito, sans-serif', boxShadow:'0 4px 16px #0004', zIndex:10 }}>
     <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:8 }}><span>🚩</span><span style={{ fontSize:11, fontWeight:800, color:'#3A2A14' }}>현재 목표</span></div>
@@ -87,12 +79,6 @@ export function WorldObjective({ nearZone, nearMuseum, nearHome, nearZoneLocked,
     {nearLabel && <><hr style={{ border:0, borderTop:'1px solid #D4C4A0', margin:'6px 0' }}/><div style={{ fontSize:10, color:nearZoneLocked ? '#8A5A45' : '#37642B', fontWeight:700 }}>{nearZoneLocked ? `🔒 ${nearLabel} · 선행 목표 필요` : `${nearLabel} · ENTER로 진입`}</div></>}
     <hr style={{ border:0, borderTop:'1px solid #D4C4A0', margin:'6px 0 4px' }}/><div style={{ fontSize:10, color:'#8B6A3A' }}>💡 WASD / 방향키로 이동</div>
   </div>
-}
-
-export function WorldDirection({ playerFoot, target, label, arrived = false }) {
-  const angle = Math.atan2(target.y - playerFoot.y, target.x - playerFoot.x) * 180 / Math.PI
-  const distance = Math.round(Math.hypot(target.x - playerFoot.x, target.y - playerFoot.y) / TILE)
-  return <div className="world-map-direction" aria-label={arrived ? `${label} 도착` : `${label}까지 ${distance}칸`} style={{ position:'absolute', top:HUD_H + 12, left:'50%', transform:'translateX(-50%)', zIndex:14, display:'flex', alignItems:'center', gap:7, padding:'7px 11px', borderRadius:18, background:arrived ? '#37642Be8' : '#172014d9', color:'#fff', border:'1px solid #F1CE79', boxShadow:'0 3px 12px #0006', font:'700 11px/1 Nunito, sans-serif', pointerEvents:'none' }}><span className="world-map-direction__arrow" aria-hidden="true" style={{ display:'inline-block', color:'#F1CE79', fontSize:17, transform:arrived ? 'none' : `rotate(${angle}deg)` }}>{arrived ? '✓' : '➜'}</span><span>{arrived ? `${label} · 도착` : `${label} · ${distance}칸`}</span></div>
 }
 
 export function WorldEnterPrompt({ emoji, label, color, locked }) {

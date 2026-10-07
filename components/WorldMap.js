@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SPEED, TILE, ZONE_META, useKeys } from '@/components/GameEngine'
 import WorldMapScene, { WORLD_MAP_V4_OBJECT_COUNT } from '@/components/world-map/WorldMapScene'
 import { WorldCharacter, WorldLandmarkHotspot, WorldPortalHotspot } from '@/components/world-map/WorldMapActors'
-import { WorldAttendancePanel, WorldEconomyAttendancePanel, WorldDPad, WorldDirection, WorldEnterPrompt, WorldHomeWelcome, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
+import { WorldAttendancePanel, WorldEconomyAttendancePanel, WorldDPad, WorldEnterPrompt, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
 import WorldMinimap from '@/components/world-map/WorldMinimap'
 import WorldMapOverlay from '@/components/world-map/WorldMapOverlay'
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
@@ -72,10 +72,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   const [questOpen, setQuestOpen] = useState(false)
   const [attendanceOpen, setAttendanceOpen] = useState(false)
   const [fullMapOpen, setFullMapOpen] = useState(false)
-  const [homeIntroOpen, setHomeIntroOpen] = useState(() => {
-    if (worldQa.overview || typeof window === 'undefined') return false
-    return worldQa.homeIntro || window.localStorage.getItem('soundvillage-home-hub-intro-v1') !== 'seen'
-  })
   const [questPanelInstanceId, setQuestPanelInstanceId] = useState(null)
   const [animationTick, setAnimationTick] = useState(0)
   const [mapReady, setMapReady] = useState(false)
@@ -111,10 +107,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
     const updateViewport = () => setViewport({ width:window.innerWidth, height:window.innerHeight })
     updateViewport(); window.addEventListener('resize', updateViewport)
     return () => window.removeEventListener('resize', updateViewport)
-  }, [])
-  const dismissHomeIntro = useCallback(() => {
-    window.localStorage.setItem('soundvillage-home-hub-intro-v1', 'seen')
-    setHomeIntroOpen(false)
   }, [])
   useEffect(() => {
     let active = true
@@ -261,11 +253,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
   const objectiveDestination = WORLD_MINIMAP_DESTINATIONS.find(destination => destination.id === objective.destinationId)
   const objectiveMeta = objectiveDestination?.zone ? ZONE_META[objectiveDestination.zone] : null
   const objectiveLabel = objectiveDestination?.zone === 'Lab' ? '연구소 마을' : objectiveMeta?.label
-  const homeDestination = WORLD_MINIMAP_DESTINATIONS.find(destination => destination.id === 'Home')
-  const homeDistance = Math.round(Math.hypot(homeDestination.worldPoint.x - playerFoot.x, homeDestination.worldPoint.y - playerFoot.y) / TILE)
   const homeState = worldQa.homeState || getHomeLandmarkState({ ...homeHubStatus, visitorConnected:partnerOnMap })
-  const directionDestination = homeIntroOpen ? homeDestination : objectiveDestination
-  const directionLabel = homeIntroOpen ? '우리 집' : objectiveLabel
   const nearDestinationId = nearZone || (nearMuseum ? 'Sound Library' : nearHome ? 'Home' : null)
   const minimapDisplaySize = viewport.width <= 720 ? { width:144, height:108 } : { width:240, height:180 }
   const minimapPlayer = worldToMinimap(playerFoot, WORLD_MINIMAP_SIZE, minimapDisplaySize)
@@ -293,6 +281,6 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, tot
     </div>
     {worldQa.collisionDebug && <div data-testid="world-collision-debug-panel" style={{ position:'fixed', zIndex:200, left:12, top:worldQa.overview ? 12 : HUD_H + 12, padding:'10px 12px', borderRadius:8, background:'#101713e8', color:'#fff', font:'12px/1.5 ui-monospace, monospace', pointerEvents:'none', whiteSpace:'pre-line' }}>{`foot: ${playerFoot.x.toFixed(1)}, ${playerFoot.y.toFixed(1)}\ninput: ${collisionInfo.input}\nblocked X: ${collisionInfo.blockedX ? 'yes' : 'no'}\nblocked Y: ${collisionInfo.blockedY ? 'yes' : 'no'}\nreason: ${collisionInfo.reason || 'none'}\nrendered: ${sceneStats.objects.length}\nculled: ${WORLD_MAP_V4_OBJECT_COUNT - sceneStats.objects.length}\nchunks: ${sceneStats.chunks.join(' ')}\nassets loaded: ${loadedAssetCount}/${Object.keys(WORLD_MAP_V4_ASSET_MANIFEST).length}`}</div>}
     {worldQa.minimapQa && <div data-testid="world-minimap-qa" style={{ position:'fixed', zIndex:140, left:12, top:worldQa.overview ? 12 : HUD_H + 230, padding:'9px 11px', borderRadius:8, background:'#101713e8', color:'#fff', font:'11px/1.5 ui-monospace, monospace', pointerEvents:'none', whiteSpace:'pre-line' }}>{`world: ${playerFoot.x.toFixed(1)}, ${playerFoot.y.toFixed(1)}\nminimap: ${minimapPlayer.x.toFixed(1)}, ${minimapPlayer.y.toFixed(1)}\ntarget: ${objective.destinationId || 'none'}${objective.arrived ? ' (arrived)' : ''}\nmarkers: ${WORLD_MINIMAP_DESTINATIONS.length}\nsize: ${minimapDisplaySize.width}×${minimapDisplaySize.height}\nscale: ${(minimapDisplaySize.width / WORLD_MINIMAP_SIZE.width).toFixed(4)}`}</div>}
-    {!worldQa.overview && <>{homeIntroOpen && <WorldHomeWelcome distance={homeDistance} onDismiss={dismissHomeIntro}/>} {directionDestination && <WorldDirection playerFoot={playerFoot} target={directionDestination.worldPoint} label={directionLabel} arrived={homeIntroOpen ? nearHome : objective.arrived}/>}<WorldObjective nearZone={nearZone} nearMuseum={nearMuseum} nearHome={nearHome} nearZoneLocked={nearZone && lockedSet.has(nearZone)} objective={objective} objectiveLabel={objectiveLabel}/>{nearZone && <WorldEnterPrompt emoji={ZONE_META[nearZone].emoji} label={ZONE_META[nearZone].label} color={ZONE_META[nearZone].color} locked={lockedSet.has(nearZone)}/>} {!nearZone && nearMuseum && <WorldEnterPrompt emoji="🏛" label="도서관" color="#C8A96E"/>}{!nearZone && !nearMuseum && nearHome && <WorldEnterPrompt emoji="🏠" label="우리 집 · 꾸미기와 초대" color="#91CDB2"/>}<WorldDPad press={press} release={release} confirmLabel={nearHome ? '우리 집' : nearMuseum ? '도서관' : nearZone ? ZONE_META[nearZone].label : '장소'} onConfirm={nearZone || nearMuseum || nearHome ? () => activateNearbyDestination('touch') : null}/></>}
+    {!worldQa.overview && <><WorldObjective nearZone={nearZone} nearMuseum={nearMuseum} nearHome={nearHome} nearZoneLocked={nearZone && lockedSet.has(nearZone)} objective={objective} objectiveLabel={objectiveLabel}/>{nearZone && <WorldEnterPrompt emoji={ZONE_META[nearZone].emoji} label={ZONE_META[nearZone].label} color={ZONE_META[nearZone].color} locked={lockedSet.has(nearZone)}/>} {!nearZone && nearMuseum && <WorldEnterPrompt emoji="🏛" label="도서관" color="#C8A96E"/>}{!nearZone && !nearMuseum && nearHome && <WorldEnterPrompt emoji="🏠" label="우리 집 · 꾸미기와 초대" color="#91CDB2"/>}<WorldDPad press={press} release={release} confirmLabel={nearHome ? '우리 집' : nearMuseum ? '도서관' : nearZone ? ZONE_META[nearZone].label : '장소'} onConfirm={nearZone || nearMuseum || nearHome ? () => activateNearbyDestination('touch') : null}/></>}
   </div>
 }
