@@ -28,7 +28,9 @@
     "test:transactional-integrity-local": "node scripts/security/transactional-integrity.integration.mjs",
     "test:rls-local": "node scripts/security/rls.integration.mjs",
     "test:user-events": "node --test scripts/security/user-events.test.mjs",
-    "test:audio-lifecycle": "node --test lib/listeningTimer.test.mjs",
+    "test:audio-lifecycle": "node --test lib/listeningTimer.test.mjs lib/audioPlaybackCore.test.mjs",
+    "test:audio-browser": "node scripts/test-audio-reliability-browser.mjs",
+    "test:audio-direct-origin": "node scripts/test-audio-direct-origin.mjs",
     "test:input-lifecycle": "node --test scripts/input-lifecycle.test.mjs",
     "test:world-production": "node scripts/test-world-map-production-integration.mjs",
     "test:world-hd-collision": "node scripts/test-world-map-hd-collision.mjs",
@@ -94,14 +96,15 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.106.2",
     "howler": "^2.2.4",
-    "next": "16.2.7",
+    "next": "16.3.8",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.3.8",
+    "playwright": "1.62.1",
     "tailwindcss": "^4"
   }
 }
