@@ -248,10 +248,6 @@ export default function NatureZoneMap({ sounds, onCollectSound, onExit, collecte
           ctx.drawImage(village.assets.walkableMask, 0, 0, village.baseWorldWidth, village.baseWorldHeight)
           ctx.restore()
           ctx.save()
-          ctx.fillStyle = 'rgba(255,60,70,.24)'
-          for (let ty = 0; ty < village.explicitCollision.length; ty += 1) for (let tx = 0; tx < village.explicitCollision[ty].length; tx += 1) {
-            if (village.explicitCollision[ty][tx]) ctx.fillRect(tx * T, ty * T, T, T)
-          }
           ctx.strokeStyle = '#fff45c'
           ctx.strokeRect(px / scaleX - PLAYER_BOX.w / 2, py / scaleY - PLAYER_BOX.h, PLAYER_BOX.w, PLAYER_BOX.h)
           ctx.restore()

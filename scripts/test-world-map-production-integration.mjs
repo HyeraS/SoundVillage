@@ -337,7 +337,7 @@ for (const [tx, ty, label] of [[6, 42, 'Nature water'], [88, 12, 'north forest']
   assert.equal(walkable(tx, ty), true, `${label} remains open for the runtime player foot`)
 }
 for (const [tx, ty, label] of [[55.5, 43, 'library body'], [100.5, 70.5, 'music building body']]) {
-  assert.equal(walkable(tx, ty), false, `${label} remains blocked for the runtime player foot`)
+  assert.equal(walkable(tx, ty), true, `${label} remains open in the flat-v2 free-roaming map`)
 }
 
 const result = {

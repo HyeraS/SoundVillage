@@ -5,6 +5,7 @@ import crypto from 'node:crypto'
 import sharp from 'sharp'
 import { fileURLToPath } from 'node:url'
 import { getCharacterRenderMetrics, getVisibleBodyCssBounds } from '../lib/characterRenderMetrics.mjs'
+import { canOccupyCollisionMask } from '../lib/collisionMaskEditor.mjs'
 import { isMusicVillageMaskCellWalkable } from '../lib/generated/musicVillageWalkableMask.mjs'
 import {
   T, MAP_W, MAP_H, WORLD_W, WORLD_H, PLAYER_BOX, INTERACTION_RADIUS,
@@ -13,9 +14,9 @@ import {
   STAGE, GATE, BUILDINGS, PROPS, SCENE_TREES, PROP_COLLIDERS, TREE_TRUNK_COLLIDERS, BLOCKING_PROP_COLLIDERS, SPAWN, EXIT_TRIGGER,
   COLLIDERS, TERRAIN_FEATURES, PLANTED_LANDSCAPE_FEATURES, TREE_GROVE_FEATURES, PRIORITY_WALKABLE_PATHS, BLOCK_ZONE_DEFINITIONS, BLOCK_ZONE_SLOTS, SLOT_GROUPS, PRIMARY_SLOTS, ALL_SAFE_SLOTS, OCCLUSION_OBJECTS,
   SILHOUETTE_ENTER_RATIO, SILHOUETTE_EXIT_RATIO,
-  getNavigationTypeAtWorld, getNavigationCellAtWorld, isNavigationWalkable, isWalkableTile, isSafeMarkerSlot,
+  getNavigationTypeAtWorld, getNavigationCellAtWorld, isNavigationWalkable, createMusicRuntimeCollisionMask, isWalkableTile, isSafeMarkerSlot,
   spawnMusicItems, distanceToMusicItem, isMusicItemNearby, markerStateFor, validateSlotSet,
-  buildVillage, collides, moveWithCollision, moveWithCollisionDetailed, overlapsExitTrigger,
+  buildVillage, collides, collidesPlayerAt, collidesPlacementAt, moveWithCollision, moveWithCollisionDetailed, overlapsExitTrigger,
   getMusicCamera, worldToMusicScreen, getMusicPlayerPlacement,
   splitOcclusionObjects, measureOcclusionAtPlayer, resolveOcclusionState,
 } from '../lib/musicVillageConfig.mjs'
@@ -148,6 +149,14 @@ assert.equal(NAV_ROWS * NAV_CELL, WORLD_H)
 for (const type of Object.values(NAV_TYPES)) assert.ok(NAVIGATION_MASK.includes(type), `navigation includes type ${type}`)
 const walkableCells = NAVIGATION_MASK.filter(isNavigationWalkable).length
 assert.equal(walkableCells, sourceWhiteCells, 'final navigation walkability exactly matches white PNG cells')
+const editorMask = createMusicRuntimeCollisionMask()
+assert.equal(editorMask.length, NAV_COLS * NAV_ROWS)
+let editorMaskMismatches = 0
+for (let index = 0; index < editorMask.length; index++) {
+  const generatedWalkable = isMusicVillageMaskCellWalkable(index % NAV_COLS, Math.floor(index / NAV_COLS))
+  if (editorMask[index] !== (generatedWalkable ? 1 : 0)) editorMaskMismatches++
+}
+assert.equal(editorMaskMismatches, 0, 'editor and generated/final walkability agree across all 110,592 cells')
 let newlyWalkableCells = 0
 let newlyBlockedCells = 0
 for (let index = 0; index < NAVIGATION_MASK.length; index++) {
@@ -184,8 +193,61 @@ assert.deepEqual(
   'Music diagnostics follow the full-source 72x88 xMidYMid meet layout',
 )
 assert.equal(collides(village, SPAWN.x, SPAWN.y), null, 'spawn is walkable')
+assert.equal(collidesPlayerAt(village, SPAWN.x, SPAWN.y), null, 'explicit player collision API accepts spawn')
 assert.equal(overlapsExitTrigger({ x: SPAWN.x, y: SPAWN.y }), false)
 assert.equal(overlapsExitTrigger({ x: EXIT_TRIGGER.x + EXIT_TRIGGER.w / 2, y: EXIT_TRIGGER.y + EXIT_TRIGGER.h }), true)
+
+const editorCanOccupy = (point) => canOccupyCollisionMask(
+  editorMask,
+  NAV_COLS,
+  NAV_ROWS,
+  NAV_CELL,
+  point,
+  { width: PLAYER_BOX.w, height: PLAYER_BOX.h },
+)
+let occupancyMismatches = 0
+for (let y = 0; y < WORLD_H; y += 8) {
+  for (let x = 0; x < WORLD_W; x += 8) {
+    if (editorCanOccupy({ x, y }) !== (collidesPlayerAt(village, x, y) === null)) occupancyMismatches++
+  }
+}
+assert.equal(occupancyMismatches, 0, 'editor footprint occupancy and collidesPlayerAt agree at every 8px sample')
+
+for (const [label, point, expected] of [
+  ['spawn', SPAWN, true],
+  ['black mask', { x: 680, y: 900 }, false],
+  ['south exit approach', { x: 768, y: 1138 }, true],
+  ['building', { x: 768, y: 160 }, false],
+  ['pond', { x: 60, y: 570 }, false],
+  ['garden', { x: 620, y: 600 }, false],
+]) {
+  assert.equal(editorCanOccupy(point), expected, `${label}: editor occupancy`)
+  assert.equal(collidesPlayerAt(village, point.x, point.y) === null, expected, `${label}: player collision`)
+}
+
+const whiteFootCenterWithBlackEdge = { x: 416, y: 200 }
+assert.ok(isNavigationWalkable(getNavigationTypeAtWorld(
+  whiteFootCenterWithBlackEdge.x,
+  whiteFootCenterWithBlackEdge.y - PLAYER_BOX.h / 2,
+)), 'representative foot center lies on a white mask cell')
+assert.equal(editorCanOccupy(whiteFootCenterWithBlackEdge), false,
+  'the full foot box is blocked when only its center is white')
+assert.ok(collidesPlayerAt(village, whiteFootCenterWithBlackEdge.x, whiteFootCenterWithBlackEdge.y))
+
+const syntheticCollider = Object.freeze({
+  x: SPAWN.x - 2, y: SPAWN.y - 6, w: 4, h: 4, id: 'synthetic-placement-collider',
+})
+const syntheticVillage = { colliders: [syntheticCollider] }
+assert.equal(collidesPlayerAt(syntheticVillage, SPAWN.x, SPAWN.y), null,
+  'an injected collider cannot block a white player-movement cell')
+assert.equal(collidesPlacementAt(syntheticVillage, SPAWN.x, SPAWN.y)?.id, syntheticCollider.id,
+  'the injected collider still blocks placement safety')
+assert.equal(moveWithCollision(syntheticVillage, SPAWN, 4, 0).x, SPAWN.x + 4,
+  'moveWithCollision ignores placement-only collider metadata')
+const detailedSyntheticMove = moveWithCollisionDetailed(syntheticVillage, SPAWN, 4, 0)
+assert.equal(detailedSyntheticMove.position.x, SPAWN.x + 4,
+  'moveWithCollisionDetailed uses only player movement authority')
+assert.deepEqual(detailedSyntheticMove.blockedAxes, [])
 
 // Buildings, water and the fixed landscape come from terrain; explicitly solid
 // props use tuned foot insets. Decorative flowers/shrubs/foreground do not.
@@ -474,6 +536,8 @@ console.log(JSON.stringify({
   metadata: { groupA: 83, groupB: 83, bypass: 166, blocks: expectedBlocks },
   navigation: {
     cells: `${NAV_COLS}x${NAV_ROWS}`,
+    editorMaskMismatches,
+    occupancy8pxMismatches: occupancyMismatches,
     walkableCells,
     walkableTiles: reachable.size,
     newlyWalkableCells,

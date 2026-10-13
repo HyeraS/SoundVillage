@@ -75,7 +75,7 @@ const currentLibrary = WORLD_MAP_V4_OBJECTS.find(object => object.id === 'landma
 const sha256 = value => createHash('sha256').update(value).digest('hex')
 const mapEntries = map => [...map].map(([key, objects]) => ({ key, objectIds: objects.map(object => object.id) }))
 const REPOSITORY_ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
-const LEGACY_SNAPSHOT_SHA256 = 'cb311187288252d6e88ff1a9216aa32bdb15361c93fc7849d716e42b0ea71346'
+const LEGACY_SNAPSHOT_SHA256 = '35d5a6f06c96bc0fa9a3303959583cfe420555f8fd7a49b95955378ba2f101f1'
 const GENERATED_RUNTIME = {
   schemaVersion: WORLD_MAP_V4_GENERATED_SCHEMA_VERSION,
   world: WORLD_MAP_V4_GENERATED_WORLD,

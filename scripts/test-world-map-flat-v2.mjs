@@ -8,7 +8,9 @@ import { WORLD_MAP_RENDER_MODE, WORLD_MAP_RENDER_MODES, resolveWorldMapRenderMod
 import {
   WORLD_DESTINATIONS,
   WORLD_HOME,
+  WORLD_WALKABLE_MASK_META,
   isWorldPlayerWalkable,
+  isWorldWalkableMaskCell,
   worldPlayerTopLeftAtFoot,
 } from '../lib/worldMapGeometry.mjs'
 import { getWorldNavigationRoute } from '../lib/worldMapNavigation.mjs'
@@ -41,11 +43,25 @@ assert.deepEqual(WORLD_HOME.approach, WORLD_MAP_FLAT_V2_HOME.target.approach)
 assert.deepEqual(WORLD_DESTINATIONS.find(destination => destination.id === 'Home'), WORLD_MAP_FLAT_V2_HOME)
 const homePosition = worldPlayerTopLeftAtFoot(WORLD_HOME.approach.x / 32, WORLD_HOME.approach.y / 32)
 assert.ok(isWorldPlayerWalkable(homePosition.x, homePosition.y), 'flat-v2 Home approach is walkable')
-const blockedInsideHome = worldPlayerTopLeftAtFoot(1280 / 32, 1600 / 32)
-assert.equal(isWorldPlayerWalkable(blockedInsideHome.x, blockedInsideHome.y), false, 'flat-v2 Home body blocks movement')
+const insideHome = worldPlayerTopLeftAtFoot(1280 / 32, 1600 / 32)
+assert.equal(isWorldPlayerWalkable(insideHome.x, insideHome.y), true, 'flat-v2 landmarks do not block movement')
+let blockedCells = 0
+for (let y = 0; y < WORLD_WALKABLE_MASK_META.height; y += 1) {
+  for (let x = 0; x < WORLD_WALKABLE_MASK_META.width; x += 1) {
+    if (!isWorldWalkableMaskCell(x, y)) blockedCells += 1
+  }
+}
+assert.equal(blockedCells, 0, 'flat-v2 has no internal collision cells')
 const route = getWorldNavigationRoute('Home')
 assert.deepEqual(route.authoredPoints, WORLD_MAP_FLAT_V2_HOME.guidePath)
 assert.deepEqual(route.points.at(-1), WORLD_MAP_FLAT_V2_HOME.target.approach)
+
+const nature = WORLD_DESTINATIONS.find(destination => destination.id === 'Nature')
+assert.deepEqual(nature.target.approach, { x:712, y:600 })
+const naturePosition = worldPlayerTopLeftAtFoot(nature.target.approach.x / 32, nature.target.approach.y / 32)
+assert.ok(isWorldPlayerWalkable(naturePosition.x, naturePosition.y), 'Nature building-front approach is walkable')
+const natureRoute = getWorldNavigationRoute('Nature')
+assert.deepEqual(natureRoute.points.at(-1), nature.target.approach)
 
 const [worldSource, sceneSource] = await Promise.all([
   readFile(path.join(ROOT, 'components/WorldMap.js'), 'utf8'),
@@ -61,5 +77,5 @@ console.log(JSON.stringify({
   status:'PASS',
   asset:{ width:webpInfo.width, height:webpInfo.height, pngBytes:pngStat.size, webpBytes:webpStat.size },
   home:{ approach:WORLD_HOME.approach, collision:WORLD_MAP_FLAT_V2_HOME.collision, routeWaypoints:route.points.length },
+  nature:{ approach:nature.target.approach, routeWaypoints:natureRoute.points.length },
 }, null, 2))
-

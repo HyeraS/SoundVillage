@@ -349,9 +349,10 @@ export default function MusicZoneMap({
         if (debugPanelRef.current) {
           const nearby = occlusionState.objects.slice(0, 3).map((entry) => `${entry.id} ${(entry.ratio * 100).toFixed(1)}%`).join('\n') || 'none'
           debugPanelRef.current.textContent = [
-            `foot ${playerX.toFixed(1)},${playerY.toFixed(1)} · ${PLAYER_BOX.w}x${PLAYER_BOX.h}`,
+            `player foot ${playerX.toFixed(1)},${playerY.toFixed(1)} · ${PLAYER_BOX.w}x${PLAYER_BOX.h}`,
+            'movement authority final authored/generated mask',
             `nav [${navigationCell.col},${navigationCell.row}] type=${navigationCell.type}`,
-            `hit ${collision?.id || collision?.tag || 'none'} (${collision?.type || 'none'})`,
+            `movement hit ${collision?.id || collision?.tag || 'none'} (${collision?.type || 'none'})`,
             `blocked axis ${movementDebug.blockedAxes.join(',') || 'none'}`,
             `occlusion ${nearby}`,
             `alpha overlap ${(occlusionState.ratio * 100).toFixed(1)}%`,

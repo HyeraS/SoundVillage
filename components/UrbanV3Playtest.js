@@ -12,15 +12,9 @@ import {
 } from '@/lib/urbanV3SoundItems.mjs'
 import {
   ACCESSIBILITY_TARGETS,
-  BLOCKED_ROAD_REGIONS,
-  CROSSWALK_REGIONS,
-  ENTRANCE_REGIONS,
   OBJECT_COLLIDERS,
   PLAYER_FOOT_BOX,
-  PLAZA_REGIONS,
-  SIDEWALK_REGIONS,
   SPAWN_POINTS,
-  STAIR_REGIONS,
   VILLAGE_MANIFEST,
   WORLD_HEIGHT,
   WORLD_WIDTH,
@@ -63,31 +57,11 @@ function paintDebugOverlay(canvas, view, position, maskImage) {
     context.restore()
   }
 
-  const paintRegions = (regions, fillStyle, strokeStyle) => {
-    context.fillStyle = fillStyle
-    context.strokeStyle = strokeStyle
-    for (const region of regions) {
-      if (!region.points) {
-        context.fillRect(region.x, region.y, region.w, region.h)
-        context.strokeRect(region.x, region.y, region.w, region.h)
-        continue
-      }
-      context.beginPath()
-      region.points.forEach((point, index) => {
-        if (index === 0) context.moveTo(point.x, point.y)
-        else context.lineTo(point.x, point.y)
-      })
-      context.closePath()
-      context.fill()
-      context.stroke()
-    }
-  }
-
-  paintRegions(BLOCKED_ROAD_REGIONS, 'rgba(255, 147, 45, 0.34)', 'rgba(255, 178, 82, 0.9)')
-  paintRegions([...SIDEWALK_REGIONS, ...PLAZA_REGIONS], 'rgba(47, 224, 120, 0.25)', 'rgba(103, 255, 162, 0.8)')
-  paintRegions([...CROSSWALK_REGIONS, ...STAIR_REGIONS, ...ENTRANCE_REGIONS], 'rgba(32, 224, 220, 0.35)', 'rgba(86, 255, 249, 0.95)')
-  paintRegions(OBJECT_COLLIDERS, 'rgba(255, 61, 77, 0.38)', 'rgba(255, 112, 123, 0.95)')
-  paintRegions([playerFootRectAt(position.x, position.y)], 'rgba(255, 225, 39, 0.55)', 'rgba(255, 247, 126, 1)')
+  const foot = playerFootRectAt(position.x, position.y)
+  context.fillStyle = 'rgba(255, 225, 39, 0.55)'
+  context.strokeStyle = 'rgba(255, 247, 126, 1)'
+  context.fillRect(foot.x, foot.y, foot.w, foot.h)
+  context.strokeRect(foot.x, foot.y, foot.w, foot.h)
   context.restore()
 }
 

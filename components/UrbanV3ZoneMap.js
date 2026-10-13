@@ -8,7 +8,6 @@ import { getCharacterRenderMetrics, placeCharacterAtScreenFoot } from '@/lib/cha
 import { spawnUrbanV3SoundItems, URBAN_V3_SOUND_INTERACTION_RADIUS } from '@/lib/urbanV3SoundItems.mjs'
 import { drawVillageCurrencyIcon } from '@/lib/villageCurrencyIconCanvas.mjs'
 import {
-  OBJECT_COLLIDERS,
   PLAYER_FOOT_BOX,
   SPAWN_POINTS,
   VILLAGE_MANIFEST,
@@ -17,7 +16,7 @@ import {
   overlapsExitTrigger,
   playerFootRectAt,
 } from '@/lib/urbanV3WorldConfig.mjs'
-import { basePointToCurrent, baseRectToCurrent, createWorldTransform } from '@/lib/villageWorldTransform.mjs'
+import { basePointToCurrent, createWorldTransform } from '@/lib/villageWorldTransform.mjs'
 
 const BASE_FOV_HEIGHT = 700 / 1.3
 const BASE_SPEED = SPEED * BASE_FOV_HEIGHT / (18 * TILE)
@@ -262,13 +261,6 @@ export default function UrbanV3ZoneMap({
           overlay.globalAlpha = 0.28
           overlay.drawImage(assets.mask, 0, 0, currentWorldWidth, currentWorldHeight)
           overlay.restore()
-          overlay.fillStyle = 'rgba(255,60,70,.32)'
-          overlay.strokeStyle = '#ff7b85'
-          for (const collider of OBJECT_COLLIDERS) {
-            const current = baseRectToCurrent(collider, transform)
-            overlay.fillRect(current.x, current.y, current.w, current.h)
-            overlay.strokeRect(current.x, current.y, current.w, current.h)
-          }
           const foot = playerFootRectAt(after.x, after.y, worldSize)
           overlay.fillStyle = 'rgba(255,235,55,.5)'
           overlay.fillRect(foot.x, foot.y, foot.w, foot.h)

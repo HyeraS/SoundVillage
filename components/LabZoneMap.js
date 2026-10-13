@@ -132,9 +132,7 @@ export default function LabZoneMap({ sounds, onCollectSound, onExit, collectedId
      renderLabScene(back.getContext('2d'),front.getContext('2d'),loaded,renderItems,basePosition,now,l.blockNum,l.collectedIds,camera,r.village.regionProgress,r.selected?.id||null)
      if(debugCollision&&loaded.walkableMask){
        const overlay=front.getContext('2d');overlay.save();overlay.globalAlpha=.28;overlay.drawImage(loaded.walkableMask,0,0,r.village.baseWorldWidth,r.village.baseWorldHeight);overlay.restore()
-       overlay.save();overlay.strokeStyle='#ff6370';overlay.fillStyle='#ff3c4644';overlay.lineWidth=2/camera.zoom
-       for(const solid of r.village.solids){const x=solid.x/r.village.transform.scaleX,y=solid.y/r.village.transform.scaleY,w=solid.w/r.village.transform.scaleX,h=solid.h/r.village.transform.scaleY;overlay.fillRect(x,y,w,h);overlay.strokeRect(x,y,w,h)}
-       overlay.strokeStyle='#fff45c';overlay.strokeRect(basePosition.x-10,basePosition.y-14,20,14);overlay.restore()
+       overlay.save();overlay.strokeStyle='#fff45c';overlay.lineWidth=2/camera.zoom;overlay.strokeRect(basePosition.x-10,basePosition.y-14,20,14);overlay.restore()
      }
      if(playerRef.current){
        const metrics=getCharacterRenderMetrics({stageWidth:viewport.width,stageHeight:viewport.height,sceneCameraScale:camera.zoom})

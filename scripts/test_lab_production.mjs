@@ -1,20 +1,23 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import fs from 'node:fs'
-import { T,MAP_W,MAP_H,PLAYER_BOX,SPAWN,EXIT,OBJECTS,BUILDINGS,PATHS,POND,DOCK_WALKS,DOCK_RAILS,GROUND_DECOR_PATCHES,SLOT_CLEARINGS,APPROVED_BLUEPRINT,buildVillage,collides,moveWithCollision,overlapsExit,spawnLabItems,safeSlots,reachableCells,canCollect,labCamera,onPath } from '../lib/labVillageConfig.mjs'
+import { T,MAP_W,MAP_H,PLAYER_BOX,SPAWN,EXIT,OBJECTS,BUILDINGS,PATHS,POND,DOCK_WALKS,DOCK_RAILS,GROUND_DECOR_PATCHES,SLOT_CLEARINGS,APPROVED_BLUEPRINT,buildVillage,collides,collidesPlayerAt,collidesPlacementAt,moveWithCollision,overlapsExit,spawnLabItems,safeSlots,reachableCells,reachablePlacementCells,canCollect,labCamera,onPath } from '../lib/labVillageConfig.mjs'
 import { WALKABLE_MASK_METADATA,isMaskCellWalkable,isMaskPointWalkable } from '../lib/generated/labWalkableMask.generated.mjs'
 import { canOccupyMask } from '../lib/villageWorldTransform.mjs'
 const sounds=JSON.parse(fs.readFileSync(new URL('../data/sound_metadata.json',import.meta.url))).sounds.filter(s=>s.game_zone==='Lab')
 const v=buildVillage(sounds),reach=reachableCells(v)
 const positions=items=>Object.fromEntries(items.map(i=>[i.id,[i.x,i.y,i.block,i.sound.group]]))
+const positionHash=items=>createHash('sha256').update(JSON.stringify(positions(items))).digest('hex')
+const EXPECTED_POSITION_HASHES={A:'28174d3d81fb653b3e230fbe3e49d8df04a3b39fcd9418fbbdd3527db5d5e306',B:'7c86fd530d43dae97db8d2e8ef5245b87e98db3d8a0dd6a23279d5af05155450',ALL:'c1a573f4dc0e62626d12a1a56ac13b147068249ef73c503b402a7fc4099274d7'}
 test('48x36 map; feet and spawn are valid; entrance cannot fire on entry',()=>{
  assert.deepEqual([MAP_W,MAP_H,T],[48,36,32]);assert.deepEqual(PLAYER_BOX,{w:20,h:14});assert.equal(collides(v,SPAWN.x,SPAWN.y),null);assert.equal(overlapsExit(SPAWN),false);assert.equal(overlapsExit({x:EXIT.x+EXIT.w/2,y:EXIT.y+20}),true);assert.ok(reach.count>500)
 })
-test('walkable mask uses the authored foot anchor instead of eroding white cells with the player box',()=>{
+test('walkable mask requires the complete player foot box, not only its bottom-center anchor',()=>{
  const point={x:384,y:64}
  assert.equal(isMaskPointWalkable(point.x,point.y),true)
  assert.equal(canOccupyMask(isMaskCellWalkable,WALKABLE_MASK_METADATA,point,PLAYER_BOX,v.transform),false)
- assert.equal(collides(v,point.x,point.y),null)
+ assert.equal(collidesPlayerAt(v,point.x,point.y)?.id,'walkable-mask')
 })
 for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, per-block reachability and interaction clearance`,()=>{
  const list=sounds.filter(s=>group==='ALL'||s.group===group),items=spawnLabItems(list,v)
@@ -22,6 +25,7 @@ for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, pe
  assert.equal(items.length,list.length);assert.equal(new Set(items.map(i=>i.id)).size,list.length);assert.equal(new Set(items.map(i=>`${i.x},${i.y}`)).size,list.length)
  assert.deepEqual(new Set(items.map(i=>i.id)),new Set(list.map(s=>s.sound_id)))
  assert.deepEqual(positions(items),positions(spawnLabItems([...list].reverse(),v)))
+ assert.equal(positionHash(items),EXPECTED_POSITION_HASHES[group],`${group}: deterministic coordinate hash`)
  assert.ok(items.every(i=>Math.hypot(i.x-SPAWN.x,i.y-SPAWN.y)>=2*T),'no discovery modal on zone entry')
  assert.ok(items.every(i=>!SLOT_CLEARINGS.some(r=>i.x>=r.x&&i.x<=r.x+r.w&&i.y>=r.y&&i.y<=r.y+r.h)),'entries, well, market and spawn stay readable')
  for(const block of [...new Set(list.map(s=>s.block))]){
@@ -30,7 +34,8 @@ for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, pe
    for(const i of items){
      assert.equal(canCollect(i,block,collected),i.block===block,`${i.id}: collect gate at ${block}`)
      if(i.block!==block)continue
-     assert.equal(collides(v,i.x,i.y,8),null,`${i.id}: authored-mask interaction clearance`)
+     assert.equal(collidesPlacementAt(v,i.x,i.y,8,block),null,`${i.id}: conservative placement clearance`)
+     assert.equal(collidesPlayerAt(v,i.x,i.y,0,block),null,`${i.id}: authored-mask player access`)
      assert.ok(stageReach.seen.has(`${i.x},${i.y}`),`${i.id}: stage ${block} reachable with player feet`)
      // Reconstruct the actual BFS route and sweep it with production movement.
      let k=`${i.x},${i.y}`,route=[];while(stageReach.parents.has(k)){route.push(k);k=stageReach.parents.get(k)}
@@ -40,18 +45,32 @@ for(const group of ['A','B','ALL'])test(`all real ${group} IDs, stable order, pe
    }
  }
 })
-test('buildings, trunks, fences, well, cart, bench and water block feet; roofs do not block as rectangles',()=>{
- for(const o of OBJECTS){if(!o.solid)continue;const s=o.solid;assert.ok(collides(v,s.x+s.w/2,s.y+s.h/2),o.id)}
- assert.equal(collides(v,7*T,29*T)?.id,'water')
+test('retained visual solids block placement but authored white mask remains player authority',()=>{
+ assert.equal(collidesPlayerAt(v,400,80),null,'white authored mask overrides the retained tree collider')
+ assert.equal(collidesPlacementAt(v,400,80)?.id,'tree-3')
+ assert.ok(OBJECTS.some(o=>o.id==='tree-3'&&o.solid),'tree collision metadata remains on the model')
+ assert.equal(collidesPlayerAt(v,7*T,29*T)?.id,'walkable-mask')
+ assert.equal(collidesPlacementAt(v,7*T,29*T)?.id,'walkable-mask')
  const witch=BUILDINGS[0];assert.equal(collides(v,witch.x,4*T)?.id,'walkable-mask')
 })
-test('swept collision resists 2-second stalls, diagonal corners and slides along the unblocked axis',()=>{
- const wall={spawn:SPAWN,solids:[{x:400,y:200,w:8,h:500,id:'thin-fence'}]}
- const stopped=moveWithCollision(wall,{x:350,y:350},1200,0);assert.ok(stopped.x<=390)
- const slide=moveWithCollision(wall,{x:350,y:300},180,120);assert.ok(slide.x<=390);assert.ok(slide.y>410)
- const corner={solids:[{x:400,y:400,w:160,h:160,id:'corner'}]}
- let p={x:350,y:350};for(let i=0;i<100;i++){p=moveWithCollision(corner,p,10,10);assert.equal(collides(corner,p.x,p.y),null)}
- let random=2;p={...SPAWN};for(let i=0;i<8000;i++){random=(Math.imul(random,1664525)+1013904223)>>>0;const a=random/2**32*Math.PI*2;p=moveWithCollision(v,p,Math.cos(a)*(i%20===0?300:12),Math.sin(a)*(i%20===0?300:12));assert.equal(collides(v,p.x,p.y),null)}
+test('swept movement cannot tunnel through thin authored black strips or mask corners at large dt',()=>{
+ const horizontal=moveWithCollision(v,{x:1320,y:264},64,0);assert.ok(horizontal.x<1384);assert.equal(collidesPlayerAt(v,horizontal.x,horizontal.y),null)
+ const vertical=moveWithCollision(v,{x:244,y:708},0,56);assert.ok(vertical.y<764);assert.equal(collidesPlayerAt(v,vertical.x,vertical.y),null)
+ let random=2,p={...SPAWN};for(let i=0;i<8000;i++){random=(Math.imul(random,1664525)+1013904223)>>>0;const a=random/2**32*Math.PI*2;p=moveWithCollision(v,p,Math.cos(a)*(i%20===0?300:12),Math.sin(a)*(i%20===0?300:12));assert.equal(collides(v,p.x,p.y),null)}
+})
+test('progression does not lock movement and remains available to placement rules',()=>{
+ assert.equal(collidesPlayerAt(v,400,80,0,Infinity),null)
+ assert.equal(collidesPlayerAt(v,400,80,0,1),null)
+ assert.equal(collidesPlayerAt(v,400,80,0,5),null)
+ assert.equal(collidesPlacementAt(v,400,80,0,1)?.id,'locked-northwest')
+ assert.equal(onPath(392,168),true)
+ assert.equal(collidesPlayerAt(v,392,168,0,1),null,'locked district path stays exempt')
+})
+test('movement and placement reachability are separate mask-authority layers',()=>{
+ const movement=reachableCells(v,T/4),placement=reachablePlacementCells(v,T/4)
+ assert.ok(movement.count>placement.count)
+ assert.ok(movement.seen.has('400,80'),'player can reach white mask over retained geometry')
+ assert.equal(placement.seen.has('400,80'),false,'placement reachability excludes the retained tree collider')
 })
 test('capacity and bad identities fail explicitly, never truncate or use obstacle fallback',()=>{
  assert.ok(safeSlots().length>=169)
@@ -82,7 +101,7 @@ test('block count is data-driven, including fewer and more than six blocks',()=>
    const list=Array.from({length:count*3},(_,i)=>({sound_id:`dynamic_${i}`,block:Math.floor(i/3)+1,group:'A'}))
    const world=buildVillage(list),items=spawnLabItems(list,world)
    assert.equal(items.length,list.length)
-   for(const i of items)assert.equal(collides(world,i.x,i.y,8,i.block),null)
+   for(const i of items)assert.equal(collidesPlacementAt(world,i.x,i.y,8,i.block),null)
  }
 })
 test('camera preserves aspect and 18-tile vertical scale at desktop and both mobile orientations',()=>{
@@ -113,7 +132,7 @@ test('approved blueprint controls landmarks, organic lane coverage and place den
 })
 
 test('pond water and dock rails block feet while authored dock planks remain walkable',()=>{
- for(const d of DOCK_WALKS){const hit=collides(v,d.x+d.w/2,d.y+d.h/2);assert.notEqual(hit?.id,'water')}
- for(const rail of DOCK_RAILS){assert.ok(v.solids.some(s=>s.id===rail.id));assert.ok(collides(v,rail.x+rail.w/2,rail.y+rail.h/2))}
- assert.equal(collides(v,6*T,26*T)?.id,'water')
+ for(const d of DOCK_WALKS){const hit=collidesPlayerAt(v,d.x+d.w/2,d.y+d.h/2);assert.notEqual(hit?.id,'water')}
+ for(const rail of DOCK_RAILS){assert.ok(v.solids.some(s=>s.id===rail.id));assert.ok(collidesPlacementAt(v,rail.x+rail.w/2,rail.y+rail.h/2))}
+ assert.equal(collidesPlayerAt(v,6*T,26*T)?.id,'walkable-mask')
 })

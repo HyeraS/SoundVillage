@@ -26,7 +26,7 @@ export const LEGACY_WORLD_MAP_V4_DESTINATIONS = Object.freeze({
   Urban: freezeTarget({ tx: 106, ty: 36, w: 10, h: 14, approach: { x: 3414, y: 1554 } }),
   Music: freezeTarget({ tx: 95, ty: 65, w: 11, h: 11, approach: { x: 3166, y: 2470 } }),
   Human: freezeTarget({ tx: 7, ty: 64, w: 13, h: 13, approach: { x: 438, y: 2498 } }),
-  Nature: freezeTarget({ tx: 11, ty: 35, w: 12, h: 14, approach: { x: 602, y: 1330 } }),
+  Nature: freezeTarget({ tx: 11, ty: 35, w: 12, h: 14, approach: { x: 712, y: 600 } }),
   Library: freezeTarget({ tx: 54, ty: 37, w: 12, h: 8, approach: { x: 1918, y: 1438 } }),
   Home: freezeTarget({ tx: 48, ty: 46, w: 8, h: 9, approach: { x: 1664, y: 1792 } }),
 })
@@ -44,7 +44,7 @@ export const LEGACY_WORLD_MAP_V4_PATHS = Object.freeze([
   { id: 'spoke-urban', points: [HUB, { x: 2280, y: 1500 }, { x: 2700, y: 1430 }, { x: 3150, y: 1400 }, C.Urban] },
   { id: 'spoke-music', points: [HUB, { x: 2250, y: 1690 }, { x: 2500, y: 1920 }, { x: 2860, y: 2140 }, C.Music] },
   { id: 'spoke-human', points: [HUB, { x: 1590, y: 1700 }, { x: 1280, y: 1940 }, { x: 870, y: 2180 }, C.Human] },
-  { id: 'spoke-nature', points: [HUB, { x: 1540, y: 1500 }, { x: 1230, y: 1430 }, { x: 900, y: 1370 }, C.Nature] },
+  { id: 'spoke-nature', points: [HUB, { x: 1540, y: 1200 }, { x: 1230, y: 900 }, { x: 1060, y: 720 }, { x: 920, y: 620 }, C.Nature] },
   { id: 'spoke-home', points: [HUB, { x: 1856, y: 1568 }, { x: 1792, y: 1696 }, C.Home] },
   { id: 'spoke-library', points: [HUB, C.Library] },
 ])

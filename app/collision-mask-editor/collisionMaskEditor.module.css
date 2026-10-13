@@ -365,6 +365,36 @@
   background: #a95438;
 }
 
+.inspector .applyButton {
+  border-color: #205f45;
+  color: #fff;
+  background: #267553;
+}
+
+.inspector .applyDisabled,
+.inspector .applyError,
+.inspector .applySuccess {
+  margin: 8px 0 0;
+  padding: 9px 10px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+.inspector .applyDisabled {
+  color: #6e625a;
+  background: #ece5da;
+}
+
+.inspector .applyError {
+  color: #8d2e22;
+  background: #ffe0d8;
+}
+
+.inspector .applySuccess {
+  color: #185f3b;
+  background: #ddf4e6;
+}
+
 .fileName {
   overflow: hidden;
   text-overflow: ellipsis;

@@ -39,7 +39,16 @@ import {
   LAB_WORLD_WIDTH,
   createLabRuntimeCollisionMask,
 } from '../../lib/labCollisionMaskEditor.mjs'
-import { NAVIGATION_MASK, isNavigationWalkable } from '../../lib/musicVillageConfig.mjs'
+import {
+  NAV_CELL as MUSIC_COLLISION_MASK_CELL_SIZE,
+  NAV_COLS as MUSIC_COLLISION_MASK_COLUMNS,
+  NAV_ROWS as MUSIC_COLLISION_MASK_ROWS,
+  PLAYER_BOX as MUSIC_COLLISION_PLAYER_BOX,
+  SPAWN as MUSIC_COLLISION_SPAWN,
+  WORLD_H as MUSIC_WORLD_HEIGHT,
+  WORLD_W as MUSIC_WORLD_WIDTH,
+  createMusicRuntimeCollisionMask,
+} from '../../lib/musicVillageConfig.mjs'
 import {
   NATURE_COLLISION_MASK_CELL_SIZE,
   NATURE_COLLISION_MASK_COLUMNS,
@@ -69,19 +78,17 @@ import { screenPointToWorld } from '../../lib/villageWorldTransform.mjs'
 
 const MAX_HISTORY = 30
 const DRAFT_ENDPOINT = '/api/internal/collision-mask-draft'
+const APPLY_ENDPOINT = '/api/internal/collision-mask-apply'
+const APPLY_ENABLED = process.env.NODE_ENV === 'development'
 const SELECTED_VILLAGE_KEY = 'soundvillage:collision-mask-editor:selected-village:v1'
 
 const MUSIC_RUNTIME_LAYERS = Object.freeze([
-  { src: '/assets/music-village-moonlit-v3/ground/chunk-nw.png', x: 0, y: 0, width: 768, height: 576 },
-  { src: '/assets/music-village-moonlit-v3/ground/chunk-ne.png', x: 768, y: 0, width: 768, height: 576 },
-  { src: '/assets/music-village-moonlit-v3/ground/chunk-sw.png', x: 0, y: 576, width: 768, height: 576 },
-  { src: '/assets/music-village-moonlit-v3/ground/chunk-se.png', x: 768, y: 576, width: 768, height: 576 },
-  { src: '/assets/music-village-moonlit-v3/foreground/occlusion.png', x: 0, y: 0, width: 1536, height: 1152 },
+  { src: '/assets/music-village-moonlit-v3/ground/chunk-nw.png', x: 0, y: 0, width: MUSIC_WORLD_WIDTH / 2, height: MUSIC_WORLD_HEIGHT / 2 },
+  { src: '/assets/music-village-moonlit-v3/ground/chunk-ne.png', x: MUSIC_WORLD_WIDTH / 2, y: 0, width: MUSIC_WORLD_WIDTH / 2, height: MUSIC_WORLD_HEIGHT / 2 },
+  { src: '/assets/music-village-moonlit-v3/ground/chunk-sw.png', x: 0, y: MUSIC_WORLD_HEIGHT / 2, width: MUSIC_WORLD_WIDTH / 2, height: MUSIC_WORLD_HEIGHT / 2 },
+  { src: '/assets/music-village-moonlit-v3/ground/chunk-se.png', x: MUSIC_WORLD_WIDTH / 2, y: MUSIC_WORLD_HEIGHT / 2, width: MUSIC_WORLD_WIDTH / 2, height: MUSIC_WORLD_HEIGHT / 2 },
+  { src: '/assets/music-village-moonlit-v3/foreground/occlusion.png', x: 0, y: 0, width: MUSIC_WORLD_WIDTH, height: MUSIC_WORLD_HEIGHT },
 ])
-
-function createRuntimeMusicMask() {
-  return Uint8Array.from(NAVIGATION_MASK, (type) => isNavigationWalkable(type) ? 1 : 0)
-}
 
 const VILLAGES = Object.freeze({
   nature: Object.freeze({
@@ -113,18 +120,18 @@ const VILLAGES = Object.freeze({
     id: 'music',
     label: '음악마을',
     eyebrow: 'MUSIC VILLAGE',
-    worldWidth: 1536,
-    worldHeight: 1152,
-    cellSize: 4,
-    columns: 384,
-    rows: 288,
-    playerFootprint: Object.freeze({ width: 12, height: 8 }),
-    spawn: Object.freeze({ x: 784, y: 948 }),
+    worldWidth: MUSIC_WORLD_WIDTH,
+    worldHeight: MUSIC_WORLD_HEIGHT,
+    cellSize: MUSIC_COLLISION_MASK_CELL_SIZE,
+    columns: MUSIC_COLLISION_MASK_COLUMNS,
+    rows: MUSIC_COLLISION_MASK_ROWS,
+    playerFootprint: Object.freeze({ width: MUSIC_COLLISION_PLAYER_BOX.w, height: MUSIC_COLLISION_PLAYER_BOX.h }),
+    spawn: Object.freeze({ x: MUSIC_COLLISION_SPAWN.x, y: MUSIC_COLLISION_SPAWN.y }),
     runtimeLayers: MUSIC_RUNTIME_LAYERS,
     runtimeBackgroundName: '실제 음악마을 런타임 맵',
     localDraftKey: 'soundvillage:collision-mask-editor:music:v1',
     exportFilename: 'music-walkable-mask.png',
-    createRuntimeMask: createRuntimeMusicMask,
+    createRuntimeMask: createMusicRuntimeCollisionMask,
   }),
   'urban-v3': Object.freeze({
     id: 'urban-v3',
@@ -357,6 +364,7 @@ function VillageMaskWorkspace({ active, onSelectVillage, profile, selectedVillag
   const [draftReady, setDraftReady] = useState(false)
   const [editRevision, setEditRevision] = useState(0)
   const [saveStatus, setSaveStatus] = useState('초안 확인 중')
+  const [applyState, setApplyState] = useState({ status: 'idle', message: '' })
 
   const maskStats = useMemo(() => {
     let walkable = 0
@@ -798,6 +806,37 @@ function VillageMaskWorkspace({ active, onSelectVillage, profile, selectedVillag
     replaceMask(profile.createRuntimeMask(), `현재 게임의 ${profile.label} 충돌 마스크를 다시 불러왔습니다.`)
   }
 
+  const applyMaskToGame = async () => {
+    if (!APPLY_ENABLED || applyState.status === 'applying') return
+    setApplyState({ status: 'applying', message: 'PNG와 런타임 모듈을 갱신하고 있습니다…' })
+    try {
+      const response = await fetch(APPLY_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          villageId: profile.id,
+          width: profile.columns,
+          height: profile.rows,
+          maskBase64: encodeMask(maskRef.current),
+        }),
+      })
+      const result = await response.json().catch(() => null)
+      if (!response.ok || !result?.ok) throw new Error(result?.code || `http_${response.status}`)
+      const time = new Date(result.appliedAt).toLocaleTimeString('ko-KR', {
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+      })
+      setApplyState({
+        status: 'success',
+        message: `적용 완료 ${time} · 흰색 ${result.walkablePixels.toLocaleString()} · 검은색 ${result.blockedPixels.toLocaleString()} · hash ${result.hash.slice(0, 12)}… 게임 페이지를 새로고침하세요.`,
+      })
+      setStatus(`${profile.label} canonical PNG와 generated runtime mask를 갱신했습니다. 실행 중인 게임 페이지는 새로고침하세요.`)
+    } catch (error) {
+      const code = error instanceof Error ? error.message : 'apply_failed'
+      setApplyState({ status: 'error', message: `적용 실패 (${code}). 파일은 기존 상태로 유지됩니다.` })
+      setStatus(`${profile.label} 마스크를 게임에 적용하지 못했습니다.`)
+    }
+  }
+
   const movePlayerToSpawn = () => {
     if (canOccupyCollisionMask(mask, profile.columns, profile.rows, profile.cellSize, profile.spawn, profile.playerFootprint)) {
       updatePlayer(profile.spawn)
@@ -815,7 +854,7 @@ function VillageMaskWorkspace({ active, onSelectVillage, profile, selectedVillag
         <div>
           <p className={styles.eyebrow}>INTERNAL MAP TOOL · {profile.eyebrow}</p>
           <h1>충돌 마스크 편집기</h1>
-          <p>보이는 길 위를 하얗게, 건물과 장애물은 검게 칠하세요. 이 페이지는 원격 DB나 게임 데이터를 수정하지 않습니다.</p>
+          <p>보이는 길 위를 하얗게, 건물과 장애물은 검게 칠하세요. 자동저장은 초안만 보존하며, 명시적으로 적용해야 게임 파일이 갱신됩니다.</p>
         </div>
         <div className={styles.headerMetrics} aria-label="마스크 요약">
           <span><b>{maskStats.walkablePercent}%</b> 이동 가능</span>
@@ -877,6 +916,23 @@ function VillageMaskWorkspace({ active, onSelectVillage, profile, selectedVillag
             <button type="button" onClick={restoreRuntimeBackground}>실제 {profile.label} 배경으로 복원</button>
             <label className={styles.fileButton}>기존 마스크 PNG 불러오기<input type="file" accept="image/png" onChange={importMask} /></label>
             <button type="button" className={styles.primaryButton} onClick={exportMask}>{profile.exportFilename} 저장</button>
+            <button
+              type="button"
+              className={styles.applyButton}
+              disabled={!APPLY_ENABLED || applyState.status === 'applying'}
+              onClick={applyMaskToGame}
+            >
+              {applyState.status === 'applying' ? '게임에 적용 중…' : '게임에 적용'}
+            </button>
+            {!APPLY_ENABLED && <p className={styles.applyDisabled}>production 및 비개발 환경에서는 파일 쓰기가 차단됩니다.</p>}
+            {applyState.message && (
+              <p
+                className={applyState.status === 'error' ? styles.applyError : styles.applySuccess}
+                role="status"
+              >
+                {applyState.message}
+              </p>
+            )}
           </section>
 
           <section>
@@ -919,7 +975,7 @@ function VillageMaskWorkspace({ active, onSelectVillage, profile, selectedVillag
 
           <section className={styles.note}>
             <h2>중요</h2>
-            <p>저장한 PNG는 아직 게임에 자동 적용되지 않습니다. 편집과 PNG 생성만 하며, 런타임 충돌 설정은 변경하지 않습니다.</p>
+            <p>‘게임에 적용’은 canonical PNG와 generated runtime module을 함께 갱신합니다. 적용 후 이미 열려 있는 게임 페이지를 새로고침하세요.</p>
           </section>
         </aside>
       </div>

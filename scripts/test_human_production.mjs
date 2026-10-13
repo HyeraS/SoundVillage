@@ -154,8 +154,13 @@ assert.equal(collides(village, SPAWN.x, SPAWN.y, 1), null)
 for (const collider of COLLIDER_TILE_RECTS) {
   const cx = (collider.x + collider.w / 2) * T
   const cy = (collider.y + collider.h / 2) * T
-  assert.ok(collides(village, cx, cy, 6), `${collider.tag} must block movement`)
+  const hit = collides(village, cx, cy, 6)
+  assert.ok(hit === null || hit.tag === 'blocked-mask', `${collider.tag} must not remain a separate runtime collision authority`)
 }
+assert.equal(collides(village, 232, 112, 6), null, 'white mask must override the legacy raised-bed collider')
+assert.equal(collides(village, 24 * T + T / 2, 8 * T + T / 2, 6)?.tag, 'blocked-mask', 'black mask must remain blocked')
+assert.equal(collides(village, 432, 656, 1), null, 'progression must not block movement through a white mask area')
+assert.equal(collides(village, 432, 656, 2), null, 'progression must open block 2 at its unlock')
 const diagonal = moveWithCollision(village, SPAWN, 5, 5, 6)
 assert.equal(collides(village, diagonal.x, diagonal.y, 6), null, 'axis-separated movement must end on an accessible mask cell')
 

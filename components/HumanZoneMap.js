@@ -329,6 +329,15 @@ export default function HumanZoneMap({
             markers.globalAlpha = 0.28
             markers.drawImage(village.assets.walkableMask, 0, 0, village.baseWorldWidth, village.baseWorldHeight)
             markers.restore()
+            markers.save()
+            markers.strokeStyle = '#fff45c'
+            markers.strokeRect(
+              playerX / scaleX - PLAYER_BOX.w / 2,
+              playerY / scaleY - PLAYER_BOX.h,
+              PLAYER_BOX.w,
+              PLAYER_BOX.h,
+            )
+            markers.restore()
           }
           for (const item of currentItems) {
             const state = markerStateFor(item, {

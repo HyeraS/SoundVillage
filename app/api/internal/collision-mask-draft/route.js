@@ -5,13 +5,16 @@ export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const DRAFT_DIRECTORY = path.join(process.cwd(), 'tmp', 'collision-mask-editor')
+const URBAN_DRAFT_TARGET = Object.freeze({ filename: 'urban-mask-draft.json', columns: 724, rows: 543 })
+
 const DRAFT_TARGETS = Object.freeze({
   animal: Object.freeze({ filename: 'animal-mask-draft.json', columns: 384, rows: 256 }),
   human: Object.freeze({ filename: 'human-mask-draft.json', columns: 384, rows: 288 }),
   lab: Object.freeze({ filename: 'lab-mask-draft.json', columns: 384, rows: 288 }),
   nature: Object.freeze({ filename: 'nature-mask-draft.json', columns: 384, rows: 288 }),
   music: Object.freeze({ filename: 'music-mask-draft.json', columns: 384, rows: 288 }),
-  urban: Object.freeze({ filename: 'urban-mask-draft.json', columns: 724, rows: 543 }),
+  urban: URBAN_DRAFT_TARGET,
+  'urban-v3': URBAN_DRAFT_TARGET,
 })
 
 function enabled() {
@@ -22,10 +25,14 @@ function unavailable() {
   return Response.json({ ok: false, code: 'not_found' }, { status: 404 })
 }
 
-function targetFromRequest(request) {
-  const village = new URL(request.url).searchParams.get('village') || 'music'
+export function resolveCollisionMaskDraftTarget(village = 'music') {
   const target = DRAFT_TARGETS[village]
   return target ? { ...target, village } : null
+}
+
+function targetFromRequest(request) {
+  const village = new URL(request.url).searchParams.get('village') || 'music'
+  return resolveCollisionMaskDraftTarget(village)
 }
 
 function draftPaths(target) {

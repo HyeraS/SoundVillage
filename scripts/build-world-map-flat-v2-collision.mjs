@@ -4,11 +4,9 @@ import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
 import {
   WORLD_COLLISION_CELL_SIZE,
-  WORLD_MAP_V4_COLLISION_OBJECTS,
   WORLD_PLAYER_FOOT_CLEARANCE,
   buildCollisionMasks,
 } from '../lib/worldMapCollision.mjs'
-import { WORLD_MAP_FLAT_V2_COLLISION_HOME } from '../lib/worldMapFlatV2.mjs'
 import { WORLD_MAP_V4 } from '../lib/worldMapV4Manifest.mjs'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -18,9 +16,9 @@ const CELL_SIZE = WORLD_COLLISION_CELL_SIZE
 const WIDTH = WORLD_MAP_V4.width / CELL_SIZE
 const HEIGHT = WORLD_MAP_V4.height / CELL_SIZE
 
-const collisionObjects = WORLD_MAP_V4_COLLISION_OBJECTS.map(object => (
-  object.objectId === 'landmark-home' ? WORLD_MAP_FLAT_V2_COLLISION_HOME : object
-))
+// The approved flat map is a free-roaming overview. Keep only the world
+// boundary at runtime; artwork landmarks do not create invisible blockers.
+const collisionObjects = []
 const masks = buildCollisionMasks(collisionObjects, WORLD_MAP_V4.width, WORLD_MAP_V4.height, {
   cellSize: CELL_SIZE,
   ...WORLD_PLAYER_FOOT_CLEARANCE,
@@ -39,7 +37,7 @@ export const WORLD_FLAT_V2_WALKABLE_MASK_META = Object.freeze({
   worldWidth: ${WORLD_MAP_V4.width},
   worldHeight: ${WORLD_MAP_V4.height},
   bitOrder: 'little',
-  source: 'modular-v4-colliders-with-flat-v2-home-registration',
+  source: 'flat-v2-open-world',
   clearance: Object.freeze({ halfWidth: ${WORLD_PLAYER_FOOT_CLEARANCE.halfWidth}, halfHeight: ${WORLD_PLAYER_FOOT_CLEARANCE.halfHeight} }),
 })
 
@@ -61,14 +59,13 @@ const [walkablePng, debugPng] = await Promise.all([
 const walkableCells = clearance.reduce((sum, value) => sum + value, 0)
 const report = {
   status: 'PASS',
-  source: 'modular-v4-colliders-with-flat-v2-home-registration',
+  source: 'flat-v2-open-world',
   width: WIDTH,
   height: HEIGHT,
   cellSize: CELL_SIZE,
   totalCells: clearance.length,
   walkableCells,
   blockedCells: clearance.length - walkableCells,
-  homeCollider: WORLD_MAP_FLAT_V2_COLLISION_HOME,
 }
 
 await mkdir(OUTPUT, { recursive: true })
@@ -80,4 +77,3 @@ await Promise.all([
 ])
 
 console.log(JSON.stringify(report, null, 2))
-
