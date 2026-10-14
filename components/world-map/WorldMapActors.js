@@ -9,7 +9,7 @@ const FALLBACK_FRAMES = CHARACTERS.player_frames
 
 export function WorldPortalHotspot({ portal, hovered, progress, locked, labelScale = 1 }) {
   const meta = ZONE_META[portal.zone]
-  const { x, y } = worldDestinationInteractionPoint(portal, TILE)
+  const { x, y } = portal.markerPoint ?? worldDestinationInteractionPoint(portal, TILE)
   const label = `${meta.emoji} ${meta.label}`
   const width = Math.max(104, 42 + label.length * 9)
   return (

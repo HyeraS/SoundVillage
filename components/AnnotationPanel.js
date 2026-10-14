@@ -785,18 +785,18 @@ export default function AnnotationPanel({ sound, zone, participantId, sessionId,
         }}
       />
 
-      {/* 바텀시트 패널 */}
+      {/* 화면 중앙 전사 패널 */}
       <div style={{
-        position: 'fixed', bottom: 0, left: '50%',
-        transform: visible ? 'translate(-50%, 0)' : 'translate(-50%, 100%)',
-        width: '100%', maxWidth: '520px',
+        position: 'fixed', top: '50%', left: '50%',
+        transform: visible ? 'translate(-50%, -50%)' : 'translate(-50%, calc(-50% + 100vh))',
+        width: 'calc(100% - 32px)', maxWidth: '520px',
         maxHeight: '88vh', overflowY: 'auto',
         background: palette.bg,
-        borderRadius: '22px 22px 0 0',
+        borderRadius: '22px',
         paddingBottom: 'env(safe-area-inset-bottom, 16px)',
         zIndex: 101,
         transition: 'transform 0.32s cubic-bezier(0.34,1.56,0.64,1)',
-        boxShadow: `0 -6px 60px ${palette.glow}, 0 -1px 0 ${palette.accent}33`,
+        boxShadow: `0 12px 60px ${palette.glow}, 0 0 0 1px ${palette.accent}33`,
         scrollbarWidth: 'none',
         msOverflowStyle: 'none',
       }}>

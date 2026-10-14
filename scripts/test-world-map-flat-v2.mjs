@@ -3,8 +3,9 @@ import { readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { WORLD_MAP_FLAT_V2_ASSET, WORLD_MAP_FLAT_V2_HOME } from '../lib/worldMapFlatV2.mjs'
+import { WORLD_MAP_FLAT_V2_ASSET, WORLD_MAP_FLAT_V2_HOME, WORLD_MAP_FLAT_V2_ZONE_APPROACHES } from '../lib/worldMapFlatV2.mjs'
 import { WORLD_MAP_RENDER_MODE, WORLD_MAP_RENDER_MODES, resolveWorldMapRenderMode } from '../lib/worldMapMode.mjs'
+import { WORLD_MAP_V4_LOGICAL_DESTINATIONS } from '../lib/worldMapV4Manifest.mjs'
 import {
   WORLD_DESTINATIONS,
   WORLD_HOME,
@@ -56,12 +57,15 @@ const route = getWorldNavigationRoute('Home')
 assert.deepEqual(route.authoredPoints, WORLD_MAP_FLAT_V2_HOME.guidePath)
 assert.deepEqual(route.points.at(-1), WORLD_MAP_FLAT_V2_HOME.target.approach)
 
-const nature = WORLD_DESTINATIONS.find(destination => destination.id === 'Nature')
-assert.deepEqual(nature.target.approach, { x:712, y:600 })
-const naturePosition = worldPlayerTopLeftAtFoot(nature.target.approach.x / 32, nature.target.approach.y / 32)
-assert.ok(isWorldPlayerWalkable(naturePosition.x, naturePosition.y), 'Nature building-front approach is walkable')
-const natureRoute = getWorldNavigationRoute('Nature')
-assert.deepEqual(natureRoute.points.at(-1), nature.target.approach)
+for (const [zone, doorApproach] of Object.entries(WORLD_MAP_FLAT_V2_ZONE_APPROACHES)) {
+  const destination = WORLD_DESTINATIONS.find(candidate => candidate.id === zone)
+  const originalDestination = WORLD_MAP_V4_LOGICAL_DESTINATIONS.find(candidate => candidate.id === zone)
+  assert.deepEqual(destination.target.approach, doorApproach, `${zone} uses its artwork door-front approach`)
+  assert.deepEqual(destination.target.markerPoint, originalDestination.target.approach, `${zone} keeps its original panel position`)
+  const position = worldPlayerTopLeftAtFoot(doorApproach.x / 32, doorApproach.y / 32)
+  assert.ok(isWorldPlayerWalkable(position.x, position.y), `${zone} door-front approach is walkable`)
+  assert.deepEqual(getWorldNavigationRoute(zone).points.at(-1), doorApproach, `${zone} route ends at its door`)
+}
 
 const [worldSource, sceneSource] = await Promise.all([
   readFile(path.join(ROOT, 'components/WorldMap.js'), 'utf8'),
@@ -77,5 +81,8 @@ console.log(JSON.stringify({
   status:'PASS',
   asset:{ width:webpInfo.width, height:webpInfo.height, pngBytes:pngStat.size, webpBytes:webpStat.size },
   home:{ approach:WORLD_HOME.approach, collision:WORLD_MAP_FLAT_V2_HOME.collision, routeWaypoints:route.points.length },
-  nature:{ approach:nature.target.approach, routeWaypoints:natureRoute.points.length },
+  zoneDoors:Object.fromEntries(Object.entries(WORLD_MAP_FLAT_V2_ZONE_APPROACHES).map(([zone, approach]) => [zone, {
+    approach,
+    routeWaypoints:getWorldNavigationRoute(zone).points.length,
+  }])),
 }, null, 2))
