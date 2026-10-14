@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { playSound, pauseSound, resumeSound, isSoundPaused, getCurrentTime, getListeningTime, resetAudio, resetListeningTime } from '@/lib/audioManager'
+import { playSound, pauseSound, resumeSound, isSoundPaused, getCurrentTime, getListeningTime, resetAudio, resetListeningTime, unlockAudio, isAudioPlaybackCancelled } from '@/lib/audioManager'
 import { getCandidateExpressions, saveVote } from '@/lib/supabase'
 import { getCurrencyBalance, getTotalEarned, getOwnedOutfits, getEquippedOutfit, setEquippedOutfit, purchaseOutfit } from '@/lib/currency'
 import { newOperationKey } from '@/lib/persistenceResult'
@@ -39,14 +39,27 @@ const ZONE_NPC = {
 /* ─────────────────────────────────────────────
    간단한 오디오 훅 (뮤지엄용 — 세그먼트 없음)
 ───────────────────────────────────────────── */
-function useMuseumPlayer(filePath, eventContext) {
-  const [playing,   setPlaying]   = useState(false)
+function useMuseumPlayer(filePath, audioIdentity, eventContext) {
+  const [status,    setStatus]    = useState('idle')
   const [progress,  setProgress]  = useState(0)
   const [playCount, setPlayCount] = useState(0)
+  const [successfulAudioIdentity, setSuccessfulAudioIdentity] = useState(null)
   const [error,     setError]     = useState('')
   const durRef    = useRef(null)
   const pausedRef = useRef(false)   // pause 상태 추적 (언로드 없이 재개 가능)
   const pollRef   = useRef(null)
+  const statusRef = useRef('idle')
+  const mountedRef = useRef(false)
+  const requestVersionRef = useRef(0)
+
+  const playing = status === 'playing'
+  const loading = status === 'loading'
+  const hasPlayedSuccessfully = successfulAudioIdentity === audioIdentity
+
+  const updateStatus = useCallback((nextStatus) => {
+    statusRef.current = nextStatus
+    if (mountedRef.current) setStatus(nextStatus)
+  }, [])
 
   const clearPoll = useCallback(() => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
@@ -55,6 +68,10 @@ function useMuseumPlayer(filePath, eventContext) {
   const startPoll = useCallback(() => {
     clearPoll()
     pollRef.current = setInterval(() => {
+      if (!mountedRef.current || statusRef.current !== 'playing') {
+        clearPoll()
+        return
+      }
       const pos = getCurrentTime()
       if (pos !== null && durRef.current) setProgress(Math.min(pos / durRef.current, 1))
     }, 100)
@@ -63,66 +80,104 @@ function useMuseumPlayer(filePath, eventContext) {
   // filePath 바뀌면 재생 상태 초기화
   useEffect(() => {
     let cancelled = false
+    mountedRef.current = true
+    requestVersionRef.current += 1
+    statusRef.current = 'idle'
     resetAudio()
     clearPoll()
     pausedRef.current = false
     durRef.current = null
     Promise.resolve().then(() => {
       if (cancelled) return
-      setPlaying(false)
+      setStatus('idle')
       setProgress(0)
       setPlayCount(0)
+      setSuccessfulAudioIdentity(null)
       setError('')
     })
-    return () => { cancelled = true }
-  }, [filePath, clearPoll])
+    return () => {
+      cancelled = true
+      mountedRef.current = false
+      requestVersionRef.current += 1
+      statusRef.current = 'idle'
+      pausedRef.current = false
+      clearPoll()
+      resetAudio()
+    }
+  }, [audioIdentity, filePath, clearPoll])
 
   const toggle = useCallback(async () => {
+    if (statusRef.current === 'loading') return
+
     // 재생 중 → 일시정지 (언로드 없이)
-    if (playing) {
+    if (statusRef.current === 'playing') {
       trackEvent('audio_paused', eventContext)
       pauseSound()
       clearPoll()
       pausedRef.current = true
-      setPlaying(false)
+      updateStatus('stopped')
       return
     }
 
     // 일시정지 상태 → 재개 (재다운로드 없음)
     if (pausedRef.current && isSoundPaused()) {
-      trackEvent('audio_resumed', eventContext)
-      resumeSound()
-      pausedRef.current = false
-      setPlaying(true)
-      startPoll()
+      const requestVersion = requestVersionRef.current
+      statusRef.current = 'loading'
+      setStatus('loading')
+      setError('')
+      void unlockAudio()
+      try {
+        await resumeSound()
+        if (!mountedRef.current || requestVersion !== requestVersionRef.current) return
+        pausedRef.current = false
+        updateStatus('playing')
+        trackEvent('audio_resumed', { ...eventContext, outcome: 'succeeded' })
+        startPoll()
+      } catch (resumeError) {
+        if (!mountedRef.current || requestVersion !== requestVersionRef.current || isAudioPlaybackCancelled(resumeError)) return
+        pausedRef.current = false
+        updateStatus('error')
+        setError('소리 재생을 재개하지 못했어요. 다시 시도해 주세요.')
+        trackEvent('museum_audio_failed', { ...eventContext, outcome: 'failed', error_code: resumeError?.code || 'audio_play_failed' })
+      }
       return
     }
 
     // 첫 재생 or 종료 후 재시작
+    const requestVersion = requestVersionRef.current + 1
+    requestVersionRef.current = requestVersion
+    statusRef.current = 'loading'
+    setStatus('loading')
     setError('')
     pausedRef.current = false
     trackEvent('museum_audio_play_attempted', eventContext)
+    void unlockAudio()
     try {
       const dur = await playSound(filePath, {
         onEnd: () => {
-          clearPoll(); pausedRef.current = false; setPlaying(false); setProgress(1)
+          if (!mountedRef.current || requestVersion !== requestVersionRef.current) return
+          clearPoll(); pausedRef.current = false; updateStatus('stopped'); setProgress(1)
           trackEvent('audio_completed', { ...eventContext, outcome: 'succeeded' })
         },
       })
+      if (!mountedRef.current || requestVersion !== requestVersionRef.current) return
       durRef.current = dur
-      setPlaying(true)
+      updateStatus('playing')
+      setSuccessfulAudioIdentity(audioIdentity)
       setPlayCount(c => c + 1)
       trackEvent('museum_audio_play_started', { ...eventContext, outcome: 'succeeded' })
       startPoll()
-    } catch {
-      setError('오디오를 불러올 수 없어요.')
-      trackEvent('museum_audio_failed', { ...eventContext, outcome: 'failed', error_code: 'audio_load_failed' })
+    } catch (playbackError) {
+      if (!mountedRef.current || requestVersion !== requestVersionRef.current || isAudioPlaybackCancelled(playbackError)) return
+      clearPoll()
+      pausedRef.current = false
+      updateStatus('error')
+      setError('소리를 재생하지 못했어요. 연결을 확인하고 다시 시도해 주세요.')
+      trackEvent('museum_audio_failed', { ...eventContext, outcome: 'failed', error_code: playbackError?.code || 'audio_play_failed' })
     }
-  }, [playing, filePath, clearPoll, startPoll, eventContext])
+  }, [audioIdentity, filePath, clearPoll, startPoll, eventContext, updateStatus])
 
-  useEffect(() => () => { clearPoll(); resetAudio() }, [clearPoll])
-  const getDuration = useCallback(() => durRef.current, [])
-  return { playing, progress, playCount, error, toggle, getDuration }
+  return { status, playing, loading, hasPlayedSuccessfully, progress, playCount, error, toggle }
 }
 
 /* ─────────────────────────────────────────────
@@ -411,7 +466,7 @@ function Shop({ participantId, onCurrencyChange }) {
 /* ─────────────────────────────────────────────
    SoundMuseum 메인
 ───────────────────────────────────────────── */
-export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, accessorySrc, characterLoadout, economyMode, economyViewMode = economyMode, dryRun = false, onCurrencyChange, onEconomyActivity, onDone, onExit }) {
+export default function SoundMuseum({ sound = null, zone, myExpression, participantId, sessionId, zoneCounts, outfitSrc, accessorySrc, characterLoadout, economyMode, economyViewMode = economyMode, dryRun = false, candidateLoader = getCandidateExpressions, onCurrencyChange, onEconomyActivity, onDone, onExit }) {
   const [qaInitialCard] = useState(() => {
     const internalBrowserQa = process.env.NODE_ENV === 'development'
       || process.env.NEXT_PUBLIC_ENABLE_INTERNAL_BROWSER_QA === 'true'
@@ -439,7 +494,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   const mountedRef = useRef(true)
   const museumInstanceRef = useRef(crypto.randomUUID())
 
-  const { playing, progress, playCount, error, toggle, getDuration } = useMuseumPlayer(sound?.file_path, {
+  const { status: audioStatus, playing, loading: audioLoading, hasPlayedSuccessfully, progress, playCount, error, toggle } = useMuseumPlayer(sound?.file_path, `${sound?.sound_id || ''}:${sound?.file_path || ''}`, {
     zone, sound_id: sound?.sound_id, target_type: 'audio', target_id: 'museum-audio',
   })
 
@@ -471,7 +526,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
       if (!cancelled) { setLoading(true); setCandidateError('') }
       trackEvent('museum_candidate_load_attempted', { zone, sound_id: sound.sound_id, target_type: 'candidate_list', target_id: 'museum-candidates' })
       try {
-        const data = await getCandidateExpressions(sound.sound_id, myExpression)
+        const data = await candidateLoader(sound.sound_id, myExpression)
         if (!cancelled) {
           const visibleCandidates = data.slice(0, 5)
           setCandidates(visibleCandidates)
@@ -493,7 +548,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
       }
     })
     return () => { cancelled = true }
-  }, [sound, myExpression, reloadNonce, zone])
+  }, [sound, myExpression, reloadNonce, zone, candidateLoader])
 
   // NPC 대사 순환
   useEffect(() => {
@@ -502,7 +557,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   }, [npc.lines.length])
 
   const handleSubmit = async () => {
-    if (voteInFlightRef.current || candidateError || playCount < 1) return
+    if (voteInFlightRef.current || candidateError || playCount < 1 || !hasPlayedSuccessfully) return
     voteInFlightRef.current = true
     setSubmitting(true)
     setSubmitError('')
@@ -560,7 +615,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   }
 
   const noCandidate = !loading && !candidateError && candidates.length === 0
-  const canSubmit   = !candidateError && playCount > 0 && (noCandidate || pick !== null)
+  const canSubmit   = !candidateError && playCount > 0 && hasPlayedSuccessfully && (noCandidate || pick !== null)
 
   // 투표 카드 — 기존 로직/마크업 그대로, 바깥 래퍼 크기만 LibraryRoom이 주는
   // 카드 슬롯(CARD_LAYOUT.vote, 뷰포트의 작은 영역)에 맞춰 100%/100%로 변경.
@@ -653,28 +708,40 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
             background: '#F0EBE0', borderRadius: '14px',
             padding: '14px 16px', border: `1px solid ${accent}24`,
           }}>
-            <button onClick={toggle} style={{
+            <button
+              onClick={toggle}
+              disabled={audioLoading}
+              aria-label={audioLoading ? '소리 불러오는 중' : playing ? '소리 일시정지' : '소리 재생'}
+              aria-busy={audioLoading}
+              data-testid="museum-audio-toggle"
+              data-audio-status={audioStatus}
+              data-audio-progress={progress}
+              style={{
               width: '100%', padding: '11px',
               background: playing ? `${accent}1E` : accent,
               border: `2px solid ${accent}`,
-              borderRadius: '12px', cursor: 'pointer',
+              borderRadius: '12px', cursor: audioLoading ? 'wait' : 'pointer',
               color: playing ? accent : '#fff',
               fontSize: '14px', fontWeight: 800,
               fontFamily: 'Nunito, sans-serif',
               display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
               transition: 'all 0.15s',
               boxShadow: playing ? 'none' : `0 4px 16px ${accent}44`,
+              opacity: audioLoading ? 0.7 : 1,
             }}>
-              {playing
+              {audioLoading
+                ? <><span aria-hidden="true">…</span> LOADING</>
+                : playing
                 ? <><span style={{ fontSize: '16px' }}>⏸</span> PAUSE</>
                 : <><span style={{ fontSize: '16px' }}>▶</span> PLAY CLIP</>
               }
             </button>
             <MiniWave progress={progress} accent={accent}/>
-            {error
-              ? <div style={{ fontSize: '11px', color: '#E24B4A', textAlign: 'center' }}>{error}</div>
-              : playCount > 0 && <div style={{ fontSize: '10px', color: '#8B6A3A', textAlign: 'center' }}>{playCount}회 재생</div>
-            }
+            {error && <div role="alert" style={{ fontSize: '11px', color: '#E24B4A', textAlign: 'center' }}>
+              {error}{' '}
+              <button type="button" onClick={toggle} disabled={audioLoading} style={{ color: 'inherit', textDecoration: 'underline', background: 'none', border: 0, cursor: 'pointer', font: 'inherit' }}>다시 시도</button>
+            </div>}
+            {playCount > 0 && <div style={{ fontSize: '10px', color: '#8B6A3A', textAlign: 'center' }}>{playCount}회 재생</div>}
           </div>
 
           {/* 내 표현 배지 — 표현이 있을 때만 표시 */}
@@ -730,7 +797,9 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                   return (
                     <div
                       key={c.id}
+                      aria-disabled={!hasPlayedSuccessfully}
                       onClick={() => {
+                        if (!hasPlayedSuccessfully) return
                         const previous = pick ? candidates[['A','B','C','D','E'].indexOf(pick)] : null
                         const nextPick = isSelected ? null : letter
                         trackEvent(isSelected ? 'museum_expression_deselected' : previous ? 'museum_expression_changed' : 'museum_expression_selected', {
@@ -746,7 +815,8 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                         borderRadius: '12px',
                         border: isSelected ? `2px solid ${accent}` : `1.5px solid ${accent}22`,
                         overflow: 'hidden',
-                        transition: 'all 0.15s', cursor: 'pointer',
+                        transition: 'all 0.15s', cursor: hasPlayedSuccessfully ? 'pointer' : 'not-allowed',
+                        opacity: hasPlayedSuccessfully ? 1 : 0.55,
                         boxShadow: isSelected ? `0 4px 14px ${accent}30` : 'none',
                       }}
                     >
@@ -829,13 +899,14 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
           )}
 
           {/* 제출 버튼 */}
-          {playCount < 1 && !error && (
+          {!hasPlayedSuccessfully && !error && (
             <div style={{ color:'#8B6A3A', fontSize:'11px', textAlign:'center' }}>음원을 실제로 재생한 뒤 투표할 수 있어요.</div>
           )}
           {submitError && <div role="alert" style={{ color: '#A43C32', fontSize: '12px', textAlign: 'center' }}>{submitError}</div>}
           <button
             onClick={handleSubmit}
             disabled={submitting || !canSubmit}
+            data-testid="museum-submit"
             style={{
               padding: '14px', borderRadius: '12px', border: 'none',
               background: canSubmit ? accent : '#C8B8A0',

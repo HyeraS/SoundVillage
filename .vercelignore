@@ -1,0 +1,31 @@
+# Local build output and dependencies
+.next*/
+node_modules/
+
+# Local credentials and editor state
+.env*
+!.env.example
+.vercel/
+.claude/
+*.code-workspace
+
+# Research, review, and source-art workspaces that are not imported at runtime
+/_review/
+/design/
+/assets/
+/tmp/
+/docs/
+/Cozy Christmas Market Map Design/
+/cozy animal village map design/
+/design_handoff_music_zone_map/
+/kenney_rpg-urban-pack/
+/mystery/
+
+# Repository-only tooling and handoff material
+/scripts/
+/supabase/
+CODEX_FUNCTIONAL_AUDIT_HANDOFF.md
+PROJECT_SUMMARY.md
+CLAUDE.md
+README.md
+/*.png

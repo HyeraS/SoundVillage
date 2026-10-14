@@ -18,6 +18,7 @@ export function proxy() {
 export const config = {
   matcher: [
     '/animal-test/:path*',
+    '/audio-reliability-test/:path*',
     '/attendance-test/:path*',
     '/character-studio-test/:path*',
     '/daily-quest-test/:path*',

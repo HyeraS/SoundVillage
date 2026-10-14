@@ -3,7 +3,12 @@ import { readFile, stat } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
-import { WORLD_MAP_FLAT_V2_ASSET, WORLD_MAP_FLAT_V2_HOME, WORLD_MAP_FLAT_V2_ZONE_APPROACHES } from '../lib/worldMapFlatV2.mjs'
+import {
+  WORLD_MAP_FLAT_V2_ASSET,
+  WORLD_MAP_FLAT_V2_HOME,
+  WORLD_MAP_FLAT_V2_ZONE_APPROACHES,
+  WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS,
+} from '../lib/worldMapFlatV2.mjs'
 import { WORLD_MAP_RENDER_MODE, WORLD_MAP_RENDER_MODES, resolveWorldMapRenderMode } from '../lib/worldMapMode.mjs'
 import { WORLD_MAP_V4_LOGICAL_DESTINATIONS } from '../lib/worldMapV4Manifest.mjs'
 import {
@@ -11,6 +16,7 @@ import {
   WORLD_HOME,
   WORLD_WALKABLE_MASK_META,
   isWorldPlayerWalkable,
+  worldDestinationContainsFoot,
   isWorldWalkableMaskCell,
   worldPlayerTopLeftAtFoot,
 } from '../lib/worldMapGeometry.mjs'
@@ -66,6 +72,22 @@ for (const [zone, doorApproach] of Object.entries(WORLD_MAP_FLAT_V2_ZONE_APPROAC
   assert.ok(isWorldPlayerWalkable(position.x, position.y), `${zone} door-front approach is walkable`)
   assert.deepEqual(getWorldNavigationRoute(zone).points.at(-1), doorApproach, `${zone} route ends at its door`)
 }
+
+const humanDestination = WORLD_DESTINATIONS.find(candidate => candidate.id === 'Human')
+assert.deepEqual(humanDestination.target.interactionBounds, WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS.Human)
+for (const point of [
+  humanDestination.target.approach,
+  { x:WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS.Human.left, y:WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS.Human.top },
+  { x:WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS.Human.right, y:WORLD_MAP_FLAT_V2_ZONE_INTERACTION_BOUNDS.Human.bottom },
+]) {
+  const position = worldPlayerTopLeftAtFoot(point.x / 32, point.y / 32)
+  assert.equal(worldDestinationContainsFoot(position, humanDestination.target), true, 'Human cafe storefront is interactive')
+}
+const humanMarkerPosition = worldPlayerTopLeftAtFoot(
+  humanDestination.target.markerPoint.x / 32,
+  humanDestination.target.markerPoint.y / 32,
+)
+assert.equal(worldDestinationContainsFoot(humanMarkerPosition, humanDestination.target), false, 'Human road panel stays outside the interaction region')
 
 const [worldSource, sceneSource] = await Promise.all([
   readFile(path.join(ROOT, 'components/WorldMap.js'), 'utf8'),

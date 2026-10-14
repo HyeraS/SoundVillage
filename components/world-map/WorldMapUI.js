@@ -18,9 +18,14 @@ import VillageCurrencyIcon, { VILLAGE_ORDER, villageKoreanName } from '@/compone
 const questRequests = createRewardRequestCoordinator()
 const attendanceRequests = createRewardRequestCoordinator()
 
-export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, economyMode = 'legacy', economyBalances = {}, homeState = 'default', onOpenHome, onOpenQuests, onOpenAttendance }) {
+export function WorldMapHUD({ totalCount, zoneProgress, collectionCounts = {}, balance = 0, economyMode = 'legacy', economyBalances = {}, activeDetail = null, onToggleDetail, homeState = 'default', onOpenHome, onOpenQuests, onOpenAttendance }) {
   const zones = Object.keys(ZONE_META)
-  const percent = Math.round(Object.values(zoneProgress).reduce((sum, value) => sum + value, 0) / zones.length * 100)
+  const assignedCount = zones.reduce((sum, zone) => sum + Math.max(0, Number(collectionCounts[zone]?.total) || 0), 0)
+  const collectedCount = Math.max(0, Number(totalCount) || 0)
+  const percent = assignedCount > 0
+    ? Math.round(Math.min(collectedCount / assignedCount, 1) * 100)
+    : Math.round(Object.values(zoneProgress).reduce((sum, value) => sum + value, 0) / zones.length * 100)
+  const collectionValue = assignedCount > 0 ? `${collectedCount}/${assignedCount}` : collectedCount
   const divider = <div className="world-map-hud__divider" style={{ width:1, height:36, background:'#C8A96E' }}/>
   return (
     <div className="world-map-hud" style={{ position:'absolute', inset:'0 0 auto', height:HUD_H, background:'#F5EDD8', borderBottom:'3px solid #C8A96E', display:'flex', alignItems:'center', padding:'0 16px', gap:12, fontFamily:'Nunito, sans-serif', zIndex:20, boxShadow:'0 2px 8px #0003' }}>
@@ -33,10 +38,10 @@ export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, economyMode
         <div style={{ height:8, background:'#D4C4A0', borderRadius:4, overflow:'hidden' }}><div style={{ height:'100%', borderRadius:4, background:'linear-gradient(90deg,#5B9E3A,#7BC850)', width:`${percent}%`, transition:'width .5s ease' }}/></div>
       </div>
       {divider}
-      <HudStat icon="⭐" value={totalCount} label="수집한 소리"/>
+      <button type="button" data-testid="world-collection-trigger" className="world-map-hud__stat world-map-hud__collection-trigger" aria-label={`수집 현황 열기, ${collectionValue}`} aria-expanded={activeDetail === 'collection'} aria-controls="world-collection-panel" onClick={() => onToggleDetail?.('collection')} style={{ display:'flex', alignItems:'center', gap:4, border:0, background:'transparent', padding:2, cursor:'pointer', fontFamily:'Nunito, sans-serif' }}><span style={{ fontSize:20 }}>⭐</span><div><div style={{ fontSize:16, fontWeight:800, color:'#B8860B', lineHeight:1, whiteSpace:'nowrap' }}>{collectionValue}</div><div style={{ fontSize:9, color:'#8B6A3A' }}>전체 수집</div></div></button>
       {divider}
       {economyMode === 'cutover'
-        ? <WorldWalletHUD balances={economyBalances}/>
+        ? <WorldWalletHUD balances={economyBalances} expanded={activeDetail === 'wallet'} onClick={() => onToggleDetail?.('wallet')}/>
         : <HudStat icon="🪙" value={balance} label="보유 화폐" title="상점에서 쓸 수 있는 화폐"/>}
       {divider}
       <HudButton icon="🏠" label="우리 집" ariaLabel="우리 집 꾸미기 열기" onClick={onOpenHome} kind="home" badge={homeState === 'invite-ready' ? '초대 가능' : null}/>
@@ -46,7 +51,7 @@ export function WorldMapHUD({ totalCount, zoneProgress, balance = 0, economyMode
       <HudButton icon="📅" label="출석" ariaLabel="출석 보상 열기" onClick={onOpenAttendance}/>
       {divider}
       <div className="world-map-hud__zones" style={{ display:'flex', gap:4, alignItems:'center' }}>
-        {zones.map(zone => { const progress = zoneProgress[zone] || 0; return <div key={zone} role="img" aria-label={`${ZONE_META[zone].label} 진행률 ${Math.round(progress * 100)}퍼센트`} title={`${ZONE_META[zone].label}: ${Math.round(progress * 100)}%`} style={{ width:24, height:24, borderRadius:6, background:progress >= 1 ? ZONE_META[zone].color : '#D4C4A0', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, border:'2px solid', borderColor:progress >= 1 ? ZONE_META[zone].color : '#C8A96E', opacity:progress > 0 ? 1 : .5 }}>{ZONE_META[zone].emoji}</div> })}
+        {zones.map(zone => { const progress = zoneProgress[zone] || 0; const counts = collectionCounts[zone] || {}; const countLabel = Number(counts.total) > 0 ? `, ${Number(counts.collected) || 0}/${Number(counts.total)}` : ''; return <div key={zone} role="img" aria-label={`${ZONE_META[zone].label} 진행률 ${Math.round(progress * 100)}퍼센트${countLabel}`} title={`${ZONE_META[zone].label}: ${Number(counts.collected) || 0}/${Number(counts.total) || 0} · ${Math.round(progress * 100)}%`} style={{ width:24, height:24, borderRadius:6, background:progress >= 1 ? ZONE_META[zone].color : '#D4C4A0', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, border:'2px solid', borderColor:progress >= 1 ? ZONE_META[zone].color : '#C8A96E', opacity:progress > 0 ? 1 : .5 }}>{ZONE_META[zone].emoji}</div> })}
       </div>
     </div>
   )
@@ -95,8 +100,8 @@ export function WorldDPad({ press, release, onConfirm, confirmLabel = '입장' }
   </div>
 }
 
-function PanelShell({ title, closeLabel, onClose, children }) {
-  return <><div onClick={event => onClose('backdrop', event)} style={{ position:'fixed', inset:0, zIndex:120 }}/><section aria-label={title} style={{ position:'absolute', top:HUD_H + 10, right:16, width:300, maxHeight:'70vh', overflowY:'auto', background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:16, boxShadow:'0 10px 40px #0005', zIndex:121, fontFamily:'Nunito, sans-serif', padding:14 }}><header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}><strong style={{ fontSize:13, color:'#3A2A14' }}>{title}</strong><button type="button" onClick={event => onClose('close_button', event)} aria-label={closeLabel} style={{ background:'#0001', border:0, borderRadius:'50%', width:28, height:28, cursor:'pointer' }}>✕</button></header>{children}</section></>
+function PanelShell({ panelId, title, closeLabel, onClose, children }) {
+  return <><div onClick={event => onClose('backdrop', event)} style={{ position:'fixed', inset:0, zIndex:120 }}/><section id={panelId} aria-label={title} style={{ position:'absolute', top:HUD_H + 10, right:16, width:300, maxHeight:'70vh', overflowY:'auto', background:'#F5EDD8', border:'2px solid #C8A96E', borderRadius:16, boxShadow:'0 10px 40px #0005', zIndex:121, fontFamily:'Nunito, sans-serif', padding:14 }}><header style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:10 }}><strong style={{ fontSize:13, color:'#3A2A14' }}>{title}</strong><button type="button" onClick={event => onClose('close_button', event)} aria-label={closeLabel} style={{ background:'#0001', border:0, borderRadius:'50%', width:28, height:28, cursor:'pointer' }}>✕</button></header>{children}</section></>
 }
 
 export function WorldQuestPanel({ participantId, economyMode = 'legacy', runtimeState = 'legacy', dryRun = false, onClose, instanceId }) {
@@ -137,8 +142,18 @@ export function WorldQuestPanel({ participantId, economyMode = 'legacy', runtime
   return <PanelShell title="📋 오늘의 퀘스트" closeLabel="오늘의 퀘스트 닫기" onClose={onClose}><div data-testid="quest-panel-state" data-state={displayState.status} data-code={displayState.code || ''}>{dryRun && <PreviewNotice/>}{displayState.status === 'loading' ? <PanelMessage>불러오는 중...</PanelMessage> : displayState.status === 'empty' ? <PanelMessage>오늘 배정된 퀘스트가 없어요.</PanelMessage> : displayState.status === 'blocked' ? <BlockedPanelMessage code={displayState.code}/> : displayState.status === 'error' ? <RetryPanelMessage kind="quest" code={displayState.code} pending={false} onRetry={retry}/> : <><div style={{ display:'grid', gap:7 }}>{quests.map(quest => <div key={quest.id} style={{ padding:'9px 11px', borderRadius:10, border:'1px solid #C8A96E55', background:quest.completed ? '#5B9E3A18' : '#00000006', fontSize:11, color:'#3A2A14' }}><strong>{quest.completed ? '✓ ' : ''}{quest.template?.description}</strong>{economyMode === 'legacy' && quest.template?.reward_currency != null && <span style={{ float:'right', color:'#B8860B' }}>+{quest.template.reward_currency}🪙</span>}</div>)}</div>{economyMode === 'cutover' && <p style={{fontSize:10,color:'#8B6A3A'}}>신규 경제 모드에서는 퀘스트 진행도만 기록되며 화폐 보상은 지급되지 않습니다.</p>}</>}</div></PanelShell>
 }
 
-function WorldWalletHUD({ balances }) {
-  return <div className="world-map-hud__wallets" aria-label="여섯 마을 지갑" style={{display:'grid',gridTemplateColumns:'repeat(3,minmax(42px,1fr))',gap:'2px 6px',minWidth:176}}>{VILLAGE_ORDER.map((village) => <div key={village} aria-label={`${villageKoreanName(village)} 화폐 ${Number(balances[village] || 0)}개`} style={{display:'flex',alignItems:'center',gap:3,minWidth:0}}><VillageCurrencyIcon village={village} style={{width:16,height:16,flex:'0 0 auto'}}/><strong style={{fontSize:10,fontVariantNumeric:'tabular-nums',whiteSpace:'nowrap'}}>{Number(balances[village] || 0).toLocaleString('ko-KR')}</strong></div>)}</div>
+function WorldWalletHUD({ balances, expanded, onClick }) {
+  return <button type="button" data-testid="world-wallet-trigger" className="world-map-hud__wallet-trigger" aria-label="마을 지갑 열기" aria-expanded={expanded} aria-controls="world-wallet-panel" onClick={onClick}><div className="world-map-hud__wallets" aria-label="여섯 마을 지갑">{VILLAGE_ORDER.map((village) => <div key={village} aria-label={`${villageKoreanName(village)} 화폐 ${Number(balances[village] || 0)}개`}><VillageCurrencyIcon village={village} style={{width:16,height:16,flex:'0 0 auto'}}/><strong>{Number(balances[village] || 0).toLocaleString('ko-KR')}</strong></div>)}</div><span className="world-map-hud__wallet-compact" aria-hidden="true"><span>👛</span><small>지갑</small></span></button>
+}
+
+export function WorldCollectionPanel({ counts = {}, onClose }) {
+  const totalCollected = VILLAGE_ORDER.reduce((sum, village) => sum + Math.max(0, Number(counts[village]?.collected) || 0), 0)
+  const totalAssigned = VILLAGE_ORDER.reduce((sum, village) => sum + Math.max(0, Number(counts[village]?.total) || 0), 0)
+  return <PanelShell panelId="world-collection-panel" title="⭐ 수집 현황" closeLabel="수집 현황 닫기" onClose={onClose}><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',padding:'0 2px 10px',color:'#3A2A14'}}><strong style={{fontSize:18}}>{totalCollected.toLocaleString('ko-KR')} / {totalAssigned.toLocaleString('ko-KR')}</strong><span style={{fontSize:10,color:'#8B6A3A'}}>전체 수집</span></div><div style={{display:'grid',gap:8}}>{VILLAGE_ORDER.map(village => { const collected=Math.max(0,Number(counts[village]?.collected)||0); const total=Math.max(0,Number(counts[village]?.total)||0); const progress=total>0?Math.min(collected/total,1):0; const meta=ZONE_META[village]; return <div key={village} style={{display:'grid',gridTemplateColumns:'30px 1fr auto',alignItems:'center',gap:8,padding:'8px 10px',background:'#fff8e8',border:'1px solid #C8A96E55',borderRadius:10}}><span aria-hidden="true" style={{fontSize:18,textAlign:'center'}}>{meta?.emoji}</span><div><strong style={{display:'block',fontSize:11,color:'#3A2A14'}}>{meta?.label || village}</strong><div style={{height:5,marginTop:4,background:'#D4C4A0',borderRadius:4,overflow:'hidden'}}><div style={{height:'100%',width:`${Math.round(progress*100)}%`,background:meta?.color || '#5B9E3A'}}/></div></div><strong style={{fontSize:11,color:'#72503A',fontVariantNumeric:'tabular-nums'}}>{collected}/{total}</strong></div> })}</div></PanelShell>
+}
+
+export function WorldWalletPanel({ balances = {}, onClose }) {
+  return <PanelShell panelId="world-wallet-panel" title="👛 마을 지갑" closeLabel="마을 지갑 닫기" onClose={onClose}><p style={{margin:'0 0 10px',fontSize:10,lineHeight:1.5,color:'#8B6A3A'}}>마을 화폐는 종류별로 따로 사용되며 서로 합산되지 않아요.</p><div style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:8}}>{VILLAGE_ORDER.map(village => <div key={village} aria-label={`${villageKoreanName(village)} 화폐 ${Number(balances[village] || 0)}개`} style={{display:'flex',alignItems:'center',gap:8,padding:'9px 10px',background:'#fff8e8',border:'1px solid #C8A96E66',borderRadius:10}}><VillageCurrencyIcon village={village} size={30}/><div><span style={{display:'block',fontSize:9,color:'#8B6A3A'}}>{villageKoreanName(village)} 화폐</span><strong style={{fontSize:14,color:'#3A2A14',fontVariantNumeric:'tabular-nums'}}>{Number(balances[village] || 0).toLocaleString('ko-KR')}</strong></div></div>)}</div></PanelShell>
 }
 
 export function WorldEconomyAttendancePanel({ attendance, runtimeState = 'cutover', onClaim, onRetry, onClose }) {

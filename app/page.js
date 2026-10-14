@@ -21,6 +21,7 @@ import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } fro
 import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
 import { useDuoSession } from '@/lib/duoSession'
 import { claimParticipantSession, endLocalParticipantSession, restoreParticipantSession, signInMasterSession } from '@/lib/participantAuth'
+import { clearParticipantEntrySession, readParticipantEntrySession, writeParticipantEntrySession } from '@/lib/participantEntrySession.mjs'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
@@ -259,15 +260,31 @@ export default function HomePage() {
         return
       }
 
+      const entryParticipantId = readParticipantEntrySession(window.sessionStorage)
+      if (!entryParticipantId) {
+        setAuthRestoring(false)
+        return
+      }
+
       restoreParticipantSession()
         .then(async participant => {
-          if (!participant) return
-          // 일반 참여자는 중간에 브라우저를 닫아도 이어서 진행해야 하지만,
+          if (!participant) {
+            clearParticipantEntrySession(window.sessionStorage)
+            return
+          }
+          // 일반 참여자는 같은 탭을 새로고침할 때만 자동 복구한다. 탭이나
+          // 브라우저를 닫으면 sessionStorage 표식이 사라져 다시 ID를 입력한다.
           // 여러 기기에서 쓰는 MASTER는 새 진입마다 비밀번호를 확인한다.
           // local scope는 현재 브라우저 세션만 끝내므로 다른 기기의 MASTER
           // 세션은 끊지 않는다.
           if (participant.participantId === 'MASTER') {
+            clearParticipantEntrySession(window.sessionStorage)
             await endLocalParticipantSession()
+            return
+          }
+          if (participant.participantId !== entryParticipantId) {
+            clearParticipantEntrySession(window.sessionStorage)
+            setAuthError('session_restore_failed')
             return
           }
           await initializeUserLogging('world')
@@ -281,7 +298,10 @@ export default function HomePage() {
           setVillagesUnlocked(isStudyAccessParticipantId(participant.participantId))
           setScreen('world')
         })
-        .catch(error => setAuthError(error?.code || 'session_restore_failed'))
+        .catch(error => {
+          clearParticipantEntrySession(window.sessionStorage)
+          setAuthError(error?.code || 'session_restore_failed')
+        })
         .finally(() => setAuthRestoring(false))
     }, 0)
     return () => window.clearTimeout(id)
@@ -766,6 +786,7 @@ export default function HomePage() {
     }
     const participant = await claimParticipantSession(pid, gid)
     await enterParticipantSession(participant)
+    writeParticipantEntrySession(window.sessionStorage, participant.participantId)
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
 
@@ -1141,6 +1162,7 @@ export default function HomePage() {
           initialZone={worldReturnZone}
           totalCount={totalCount}
           zoneProgress={zoneProgress}
+          collectionCounts={exhibitZoneCounts}
           balance={balance}
           economyMode={economy.effectiveMainMode}
           economyRuntimeState={economy.runtimeState}

@@ -86,13 +86,14 @@ assert.match(pageSource, /activeZone === FIRST_ZONE && currentBlock === 1 && all
 if (pageSource.includes("from '@/lib/temporaryUnlocks'")) {
   const unlockSource = await read('lib/temporaryUnlocks.js')
   assert.match(pageSource, /import \{ INTERNAL_BROWSER_QA, TEMPORARILY_UNLOCK_ALL_CONTENT \} from '@\/lib\/temporaryUnlocks'/)
-  assert.match(unlockSource, /export const TEMPORARILY_UNLOCK_ALL_CONTENT = process\.env\.NODE_ENV === 'development'/)
+  assert.match(unlockSource, /export const TEMPORARILY_UNLOCK_ALL_CONTENT = process\.env\.NODE_ENV === 'development'[\s\S]{0,140}?NEXT_PUBLIC_TEMPORARILY_UNLOCK_ALL_CONTENT === 'true'/)
   assert.match(pageSource, /const allZonesUnlocked = !worldLockQaEnabled && \([\s\S]{0,180}?TEMPORARILY_UNLOCK_ALL_CONTENT/)
 } else {
   assert.match(pageSource, /const TEMPORARILY_UNLOCK_ALL_ZONES = true/)
   assert.match(pageSource, /const allZonesUnlocked = !worldLockQaEnabled && \([\s\S]{0,180}?TEMPORARILY_UNLOCK_ALL_ZONES/)
 }
 assert.match(pageSource, /lockedZones=\{allZonesUnlocked \? \[\] : ZONES_LOCKED_AT_START\}/)
+assert.match(pageSource, /collectionCounts=\{exhibitZoneCounts\}/)
 
 assert.match(pageSource, /process\.env\.NODE_ENV === 'development'[\s\S]{0,260}?worldOverview/)
 assert.match(pageSource, /process\.env\.NODE_ENV === 'development' && query\.get\('natureQa'\) === '1'/)
@@ -120,7 +121,11 @@ assert.match(worldSource, /activateNearbyDestination\('keyboard'\)/)
 assert.match(worldSource, /activateNearbyDestination\('touch'\)/)
 assert.match(worldSource, /e\.key === 'Enter' \|\| e\.key === ' '/)
 assert.match(worldSource, /<WorldMapHUD[\s\S]{0,260}?onOpenHome=\{onEnterHouse\}/)
-assert.match(await read('components/world-map/WorldMapUI.js'), /ariaLabel="우리 집 꾸미기 열기"[\s\S]{0,120}?onClick=\{onOpenHome\}/)
+const worldUiSource = await read('components/world-map/WorldMapUI.js')
+assert.match(worldUiSource, /ariaLabel="우리 집 꾸미기 열기"[\s\S]{0,120}?onClick=\{onOpenHome\}/)
+assert.match(worldUiSource, /WorldCollectionPanel/)
+assert.match(worldUiSource, /WorldWalletPanel/)
+assert.match(worldUiSource, /마을 지갑 열기/)
 assert.match(engineSource, /ArrowUp: 'up'[\s\S]*w: 'up'/)
 assert.match(interiorSource, /\.catch\(\(error\) => \{[\s\S]{0,900}?setLoadError\(true\)[\s\S]{0,120}?setLoaded\(true\)/)
 assert.match(interiorSource, /data-room-load-state=\{loadError \? 'fallback' : 'loaded'\}/)

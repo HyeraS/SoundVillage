@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { SPEED, TILE, ZONE_META, useKeys } from '@/components/GameEngine'
 import WorldMapScene, { WORLD_MAP_V4_OBJECT_COUNT } from '@/components/world-map/WorldMapScene'
 import { WorldCharacter, WorldLandmarkHotspot, WorldPortalHotspot } from '@/components/world-map/WorldMapActors'
-import { WorldAttendancePanel, WorldEconomyAttendancePanel, WorldDPad, WorldEnterPrompt, WorldMapHUD, WorldObjective, WorldQuestPanel } from '@/components/world-map/WorldMapUI'
+import { WorldAttendancePanel, WorldCollectionPanel, WorldEconomyAttendancePanel, WorldDPad, WorldEnterPrompt, WorldMapHUD, WorldObjective, WorldQuestPanel, WorldWalletPanel } from '@/components/world-map/WorldMapUI'
 import { useWorldMapAmbience } from '@/components/world-map/useWorldMapAmbience'
 import { inferInteractionMethod, trackEvent } from '@/lib/userEvents'
 import {
@@ -63,7 +63,7 @@ function getWorldQaOptions() {
   }
 }
 
-export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, initialZone = null, totalCount, zoneProgress = {}, balance = 0, economyMode = 'legacy', economyRuntimeState = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, onEconomyRetry, dryRun = false, dryRunAttendanceClaimed = false, onDryRunAttendanceClaim, outfitSrc, accessorySrc, characterLoadout, participantId = '', roomShareToken = null, homeHubStatus = {}, duo = null, duoConnectionState = null, lockedZones = [] }) {
+export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, initialZone = null, totalCount, zoneProgress = {}, collectionCounts = {}, balance = 0, economyMode = 'legacy', economyRuntimeState = 'legacy', economyBalances = {}, economyAttendance = null, onEconomyAttendanceClaim, onEconomyRetry, dryRun = false, dryRunAttendanceClaimed = false, onDryRunAttendanceClaim, outfitSrc, accessorySrc, characterLoadout, participantId = '', roomShareToken = null, homeHubStatus = {}, duo = null, duoConnectionState = null, lockedZones = [] }) {
   const lockedSet = useMemo(() => new Set(lockedZones), [lockedZones])
   const [worldQa] = useState(getWorldQaOptions)
   useWorldMapAmbience(!worldQa.overview)
@@ -77,6 +77,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
   const [nearHome, setNearHome] = useState(false)
   const [questOpen, setQuestOpen] = useState(false)
   const [attendanceOpen, setAttendanceOpen] = useState(false)
+  const [hudPanel, setHudPanel] = useState(null)
   const [questPanelInstanceId, setQuestPanelInstanceId] = useState(null)
   const [animationTick, setAnimationTick] = useState(0)
   const [mapReady, setMapReady] = useState(false)
@@ -85,13 +86,14 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
   const [failedAssetCount, setFailedAssetCount] = useState(0)
   const [collisionInfo, setCollisionInfo] = useState({ input:'idle', blockedX:false, blockedY:false, reason:'' })
   const [qaPerformance, setQaPerformance] = useState({ mapReadyMs:0, assetTransferBytes:0, assetDecodedBytes:0, assetResourceCount:0, averageFps:0, slowFrames:0, maxFrameMs:0, heapDelta:0 })
-  const { keys, press, release } = useKeys({ disabled:questOpen || attendanceOpen, screen:'world' })
+  const { keys, press, release } = useKeys({ disabled:questOpen || attendanceOpen || Boolean(hudPanel), screen:'world' })
   const posRef = useRef(pos)
   const dirRef = useRef(dir)
   const rafRef = useRef(null)
   const proximityRef = useRef('')
   const questOpenRef = useRef(false)
   const attendanceOpenRef = useRef(false)
+  const hudPanelRef = useRef(null)
   const loadedAssetIdsRef = useRef(new Set())
   const mapLoadStartedRef = useRef(0)
   const initialHeapRef = useRef(0)
@@ -109,6 +111,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
 
   useEffect(() => { questOpenRef.current = questOpen }, [questOpen])
   useEffect(() => { attendanceOpenRef.current = attendanceOpen }, [attendanceOpen])
+  useEffect(() => { hudPanelRef.current = hudPanel }, [hudPanel])
   useEffect(() => {
     const updateViewport = () => setViewport({ width:window.innerWidth, height:window.innerHeight })
     updateViewport(); window.addEventListener('resize', updateViewport)
@@ -152,18 +155,26 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
     attendanceOpenRef.current = false; setAttendanceOpen(false)
     trackEvent('attendance_panel_closed', { target_type:'panel', target_id:'world-attendance-panel', close_reason:reason, interaction_method:event ? inferInteractionMethod(event.nativeEvent || event) : 'programmatic' })
   }, [])
+  const closeHudPanel = useCallback(() => setHudPanel(null), [])
+  const toggleHudPanel = useCallback(panel => {
+    if (questOpenRef.current) closeQuestPanel('navigation')
+    if (attendanceOpenRef.current) closeAttendancePanel('navigation')
+    setHudPanel(current => current === panel ? null : panel)
+  }, [closeAttendancePanel, closeQuestPanel])
   const toggleQuestPanel = useCallback(event => {
     if (questOpenRef.current) return closeQuestPanel('close_button', event)
     if (attendanceOpenRef.current) closeAttendancePanel('navigation')
+    closeHudPanel()
     questOpenRef.current = true; setQuestPanelInstanceId(crypto.randomUUID()); setQuestOpen(true)
     trackEvent('quest_panel_opened', { target_type:'panel', target_id:'world-quest-panel', interaction_method:inferInteractionMethod(event.nativeEvent) })
-  }, [closeAttendancePanel, closeQuestPanel])
+  }, [closeAttendancePanel, closeHudPanel, closeQuestPanel])
   const toggleAttendancePanel = useCallback(event => {
     if (attendanceOpenRef.current) return closeAttendancePanel('close_button', event)
     if (questOpenRef.current) closeQuestPanel('navigation')
+    closeHudPanel()
     attendanceOpenRef.current = true; setAttendanceOpen(true)
     trackEvent('attendance_panel_opened', { target_type:'panel', target_id:'world-attendance-panel', interaction_method:inferInteractionMethod(event.nativeEvent) })
-  }, [closeAttendancePanel, closeQuestPanel])
+  }, [closeAttendancePanel, closeHudPanel, closeQuestPanel])
   useEffect(() => () => {
     if (questOpenRef.current) trackEvent('quest_panel_closed', { target_type:'panel', target_id:'world-quest-panel', close_reason:'component_unmounted' })
     if (attendanceOpenRef.current) trackEvent('attendance_panel_closed', { target_type:'panel', target_id:'world-attendance-panel', close_reason:'component_unmounted' })
@@ -192,7 +203,7 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
       }
       const input = keys.current; const current = posRef.current; const speed = SPEED * delta
       let dx = 0, dy = 0, nextDir = dirRef.current, attempted = false
-      const autoWalk = questOpenRef.current || attendanceOpenRef.current ? null : autoWalkRef.current
+      const autoWalk = questOpenRef.current || attendanceOpenRef.current || hudPanelRef.current ? null : autoWalkRef.current
       if (autoWalk && !autoWalk.arrived) {
         const foot = worldPlayerFootCenter(current.x, current.y)
         let target = autoWalk.points[autoWalk.index]
@@ -238,13 +249,14 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
   useEffect(() => {
     const handleKey = e => {
       if (e.key === 'Escape' && !e.repeat) {
+        if (hudPanel) { e.preventDefault(); closeHudPanel(); return }
         if (questOpenRef.current) { e.preventDefault(); closeQuestPanel('escape', e); return }
         if (attendanceOpenRef.current) { e.preventDefault(); closeAttendancePanel('escape', e); return }
       }
-      if ((e.key === 'Enter' || e.key === ' ') && !e.repeat && !questOpenRef.current && !attendanceOpenRef.current) { e.preventDefault(); activateNearbyDestination('keyboard') }
+      if ((e.key === 'Enter' || e.key === ' ') && !e.repeat && !questOpenRef.current && !attendanceOpenRef.current && !hudPanel) { e.preventDefault(); activateNearbyDestination('keyboard') }
     }
     window.addEventListener('keydown', handleKey); return () => window.removeEventListener('keydown', handleKey)
-  }, [activateNearbyDestination, closeAttendancePanel, closeQuestPanel])
+  }, [activateNearbyDestination, closeAttendancePanel, closeHudPanel, closeQuestPanel, hudPanel])
 
   const sceneStats = useMemo(() => WORLD_MAP_RENDER_MODE === WORLD_MAP_RENDER_MODES.FLAT_V2 ? { objects:[], chunks:[] } : queryWorldMapObjects(camera), [camera])
   const playerFoot = worldPlayerFootCenter(pos.x, pos.y)
@@ -264,7 +276,9 @@ export default function WorldMap({ onEnterZone, onEnterMuseum, onEnterHouse, ini
     {(duo?.status && duo.status !== 'idle' || duoConnectionState?.status === 'error') && <div data-testid="duo-world-status" role={duoConnectionState?.status === 'error' ? 'alert' : 'status'} style={{ position:'fixed', zIndex:250, top:12, left:'50%', transform:'translateX(-50%)', padding:'8px 14px', border:'2px solid #3A2A14', borderRadius:12, background:'#FFF8E8', color:'#3A2A14', fontWeight:800, fontSize:12 }}>
       {duoConnectionState?.status === 'error' ? `실시간 입장 실패: ${duoConnectionState.code}` : duo.status === 'joined' ? '실시간 동행 연결됨' : duo.status === 'disconnected' ? '연결이 끊겨 다시 연결하는 중…' : duo.status === 'stale' ? '이 탭의 연결 시간이 만료됐어요.' : duo.status === 'closed' ? '실시간 세션이 종료됐어요.' : '실시간 동행 연결 중…'}
     </div>}
-    {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} balance={balance} economyMode={economyMode} economyBalances={economyBalances} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>}
+    {!worldQa.overview && <WorldMapHUD totalCount={totalCount} zoneProgress={zoneProgress} collectionCounts={collectionCounts} balance={balance} economyMode={economyMode} economyBalances={economyBalances} activeDetail={hudPanel} onToggleDetail={toggleHudPanel} homeState={homeState} onOpenHome={onEnterHouse} onOpenQuests={toggleQuestPanel} onOpenAttendance={toggleAttendancePanel}/>}
+    {hudPanel === 'collection' && <WorldCollectionPanel counts={collectionCounts} onClose={closeHudPanel}/>}
+    {hudPanel === 'wallet' && economyMode === 'cutover' && <WorldWalletPanel balances={economyBalances} onClose={closeHudPanel}/>}
     {questOpen && <WorldQuestPanel participantId={participantId} economyMode={economyMode} runtimeState={economyRuntimeState} dryRun={dryRun} onClose={closeQuestPanel} instanceId={questPanelInstanceId}/>}
     {attendanceOpen && (dryRun
       ? <WorldAttendancePanel participantId={participantId} runtimeState={economyRuntimeState} dryRun qaClaimed={dryRunAttendanceClaimed} onQaClaim={onDryRunAttendanceClaim} onClose={closeAttendancePanel}/>

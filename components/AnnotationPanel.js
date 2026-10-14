@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetAudio, resetListeningTime } from '@/lib/audioManager';
+import { playSound, stopSound, seekTo, getCurrentTime, getListeningTime, resetAudio, resetListeningTime, unlockAudio, isAudioPlaybackCancelled } from '@/lib/audioManager';
 import { saveAnnotation } from '@/lib/supabase';
 import { newOperationKey } from '@/lib/persistenceResult';
 import { rewardEventFields } from '@/lib/economyRuntimeState.mjs';
@@ -204,10 +204,11 @@ function ConfidenceSelector({ value, onChange, accent }) {
    - ≤4s: 전체 재생, 끝나면 다시듣기 버튼
    - >4s: 가변 세그먼트 (도입→핵심→마무리)
 ───────────────────────────────────────────── */
-function useSegmentedPlayer(filePath, eventContext) {
-  const [playing,     setPlaying]     = useState(false);
+function useSegmentedPlayer(filePath, audioIdentity, eventContext) {
+  const [status,      setStatus]      = useState('idle');
   const [progress,    setProgress]    = useState(null);
   const [playCount,   setPlayCount]   = useState(0);
+  const [successfulAudioIdentity, setSuccessfulAudioIdentity] = useState(null);
   const [audioError,  setAudioError]  = useState('');
   const [isSegmented, setIsSegmented] = useState(false);
   const [segLabel,    setSegLabel]    = useState('');
@@ -219,24 +220,37 @@ function useSegmentedPlayer(filePath, eventContext) {
   const segIdxRef   = useRef(0);
   const playingRef  = useRef(false);
   const pollRef     = useRef(null);
+  const statusRef   = useRef('idle');
+  const mountedRef  = useRef(false);
+  const requestVersionRef = useRef(0);
 
-  const clearPoll = () => {
+  const playing = status === 'playing';
+  const loading = status === 'loading';
+  const hasPlayedSuccessfully = successfulAudioIdentity === audioIdentity;
+
+  const updateStatus = useCallback((nextStatus) => {
+    statusRef.current = nextStatus;
+    if (mountedRef.current) setStatus(nextStatus);
+  }, []);
+
+  const clearPoll = useCallback(() => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
-  };
+  }, []);
 
-  const finish = useCallback(() => {
+  const finish = useCallback((requestVersion = requestVersionRef.current) => {
+    if (!mountedRef.current || requestVersion !== requestVersionRef.current) return;
     clearPoll();
     playingRef.current = false;
-    setPlaying(false);
+    updateStatus('stopped');
     setProgress(1);
     setSegLabel('');
     trackEvent('audio_completed', { ...eventContext, outcome: 'succeeded' });
-  }, [eventContext]);
+  }, [clearPoll, eventContext, updateStatus]);
 
   const startPoll = useCallback(() => {
     clearPoll();
     pollRef.current = setInterval(() => {
-      if (!playingRef.current) { clearPoll(); return; }
+      if (!mountedRef.current || !playingRef.current) { clearPoll(); return; }
       const pos = getCurrentTime();
       if (pos === null) return;
 
@@ -268,26 +282,35 @@ function useSegmentedPlayer(filePath, eventContext) {
         setProgress(Math.min(elapsed / total, 1));
       }
     }, 50);
-  }, [finish]);
+  }, [clearPoll, finish]);
 
   const toggle = useCallback(async () => {
-    if (playing) {
+    if (statusRef.current === 'loading') return;
+
+    if (statusRef.current === 'playing') {
       trackEvent('audio_paused', eventContext);
       stopSound();
       clearPoll();
       playingRef.current = false;
-      setPlaying(false);
+      updateStatus('stopped');
       return;
     }
 
+    const requestVersion = requestVersionRef.current + 1;
+    requestVersionRef.current = requestVersion;
+    statusRef.current = 'loading';
+    setStatus('loading');
     setAudioError('');
     setProgress(0);
     trackEvent('audio_play_attempted', eventContext);
+    void unlockAudio();
 
     try {
       const dur = await playSound(filePath, {
-        onEnd: () => { if (playingRef.current) finish(); },
+        onEnd: () => { if (playingRef.current) finish(requestVersion); },
       });
+
+      if (!mountedRef.current || requestVersion !== requestVersionRef.current) return;
 
       durationRef.current = dur;
       const segs = computeSegments(dur);
@@ -299,15 +322,20 @@ function useSegmentedPlayer(filePath, eventContext) {
       setIsShort(dur <= 4);
       setIsSegmented(!!segs);
       setSegLabel(segs ? segs[0].label : '');
-      setPlaying(true);
+      updateStatus('playing');
+      setSuccessfulAudioIdentity(audioIdentity);
       setPlayCount(c => c + 1);
       trackEvent('audio_play_started', { ...eventContext, outcome: 'succeeded' });
       startPoll();
-    } catch {
-      setAudioError('오디오 파일을 불러올 수 없어요.');
-      trackEvent('audio_failed', { ...eventContext, outcome: 'failed', error_code: 'audio_load_failed' });
+    } catch (error) {
+      if (!mountedRef.current || requestVersion !== requestVersionRef.current || isAudioPlaybackCancelled(error)) return;
+      playingRef.current = false;
+      clearPoll();
+      updateStatus('error');
+      setAudioError('소리를 재생하지 못했어요. 연결을 확인하고 다시 시도해 주세요.');
+      trackEvent('audio_failed', { ...eventContext, outcome: 'failed', error_code: error?.code || 'audio_play_failed' });
     }
-  }, [playing, filePath, finish, startPoll, eventContext]);
+  }, [audioIdentity, filePath, finish, startPoll, clearPoll, eventContext, updateStatus]);
 
   const seekVirtual = useCallback((ratio) => {
     if (!playingRef.current) return;
@@ -334,13 +362,40 @@ function useSegmentedPlayer(filePath, eventContext) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+    mountedRef.current = true;
+    requestVersionRef.current += 1;
+    statusRef.current = 'idle';
     resetAudio();
-    return () => { clearPoll(); resetAudio(); };
-  }, [filePath]);
+    clearPoll();
+    playingRef.current = false;
+    durationRef.current = null;
+    segsRef.current = null;
+    segIdxRef.current = 0;
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      setStatus('idle');
+      setProgress(null);
+      setPlayCount(0);
+      setSuccessfulAudioIdentity(null);
+      setAudioError('');
+      setIsSegmented(false);
+      setSegLabel('');
+      setIsShort(false);
+      setSegments(null);
+    });
+    return () => {
+      cancelled = true;
+      mountedRef.current = false;
+      requestVersionRef.current += 1;
+      statusRef.current = 'idle';
+      playingRef.current = false;
+      clearPoll();
+      resetAudio();
+    };
+  }, [audioIdentity, filePath, clearPoll]);
 
-  const getDuration = useCallback(() => durationRef.current, []);
-
-  return { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segments, toggle, seekVirtual, getDuration };
+  return { status, playing, loading, hasPlayedSuccessfully, progress, playCount, audioError, isSegmented, segLabel, isShort, segs: segments, toggle, seekVirtual };
 }
 
 /* ─────────────────────────────────────────────
@@ -364,13 +419,11 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
   const inputStartedRef             = useRef(false);
 
   const { accent, card, glow } = palette;
-  const { playing, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual } =
-    useSegmentedPlayer(sound.file_path, { zone, sound_id: sound.sound_id, target_type: 'audio', target_id: 'annotation-audio' });
-
-  const played = playCount > 0;
+  const { status: audioStatus, playing, loading, hasPlayedSuccessfully, progress, playCount, audioError, isSegmented, segLabel, isShort, segs, toggle, seekVirtual } =
+    useSegmentedPlayer(sound.file_path, `${sound.sound_id}:${sound.file_path}`, { zone, sound_id: sound.sound_id, target_type: 'audio', target_id: 'annotation-audio' });
 
   // 재생해야 입력창이 활성화되므로, 첫 재생이 끝나는 시점에 포커스
-  useEffect(() => { if (played) inputRef.current?.focus(); }, [played]);
+  useEffect(() => { if (hasPlayedSuccessfully) inputRef.current?.focus(); }, [hasPlayedSuccessfully]);
   useEffect(() => {
     mountedRef.current = true;
     return () => { mountedRef.current = false; };
@@ -378,7 +431,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
 
   const handleSubmit = async () => {
     if (inFlightRef.current) return;
-    if (!played) { setError('먼저 소리를 들어주세요 🎧'); return; }
+    if (!hasPlayedSuccessfully) { setError('먼저 소리를 들어주세요 🎧'); return; }
     if (!text.trim()) { setError('의성어를 입력해주세요 🎵'); return; }
     setSubmitting(true);
     inFlightRef.current = true;
@@ -443,9 +496,11 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
 
   const statusMsg = audioError
     ? null
+    : loading
+      ? '소리를 불러오는 중…'
     : playing
       ? (SEG_STATUS[segLabel] || '듣는 중... 소리를 잘 느껴보세요 👂')
-      : played
+      : hasPlayedSuccessfully
         ? '파형을 클릭하면 해당 구간부터 다시 들을 수 있어요'
         : '▶ 재생 버튼을 눌러 소리를 들어보세요';
 
@@ -482,7 +537,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
         boxShadow: `0 0 24px ${glow}`,
       }}>
         {/* 짧은 클립 안내 */}
-        {isShort && !played && (
+        {isShort && !hasPlayedSuccessfully && (
           <div style={{ textAlign: 'center', fontSize: '11px', color: `${accent}bb`, marginBottom: '8px', fontWeight: 600 }}>
             짧은 소리예요 · 여러 번 들어보세요
           </div>
@@ -501,25 +556,30 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
           {/* 재생/정지 버튼 */}
           <button
             onClick={toggle}
-            aria-label={playing ? '소리 정지' : '소리 재생'}
+            disabled={loading}
+            aria-label={loading ? '소리 불러오는 중' : playing ? '소리 정지' : '소리 재생'}
+            aria-busy={loading}
+            data-audio-status={audioStatus}
+            data-audio-progress={progress ?? ''}
             data-testid="annotation-audio-toggle"
             style={{
               width: '52px', height: '52px', borderRadius: '50%',
               background: playing ? `${accent}28` : accent,
               border: `2px solid ${accent}`,
               color: playing ? accent : '#fff',
-              cursor: 'pointer',
+              cursor: loading ? 'wait' : 'pointer',
+              opacity: loading ? 0.7 : 1,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               transition: 'all 0.15s',
               boxShadow: playing ? `0 0 20px ${accent}66` : `0 4px 12px ${accent}44`,
               flexShrink: 0,
             }}
           >
-            <PlayIcon playing={playing} />
+            {loading ? <span aria-hidden="true">…</span> : <PlayIcon playing={playing} />}
           </button>
 
           {/* 다시 듣기 버튼 — 한 번 이상 재생 후 표시 */}
-          {played && !playing && (
+          {hasPlayedSuccessfully && !playing && !loading && (
             <button
               onClick={toggle}
               style={{
@@ -540,14 +600,17 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
 
         <div style={{ textAlign: 'center', fontSize: '11px', marginTop: '8px', minHeight: '16px' }}>
           {audioError
-            ? <span style={{ color: '#E24B4A' }}>{audioError}</span>
+            ? <span role="alert" style={{ color: '#E24B4A' }}>
+                {audioError}{' '}
+                <button type="button" onClick={toggle} disabled={loading} style={{ color: 'inherit', textDecoration: 'underline', background: 'none', border: 0, cursor: 'pointer', font: 'inherit' }}>다시 시도</button>
+              </span>
             : <span style={{ color: segLabel === 'middle' ? accent : '#6B6660' }}>{statusMsg}</span>
           }
         </div>
       </div>
 
       {/* 의성어 입력 */}
-      <div style={{ opacity: !played ? 0.45 : 1, transition: 'opacity 0.3s' }}>
+      <div style={{ opacity: !hasPlayedSuccessfully ? 0.45 : 1, transition: 'opacity 0.3s' }}>
         <label style={{ fontSize: '12px', color: '#9A9585', display: 'block', marginBottom: '7px', fontWeight: 600 }}>
           ✏️ 이 소리를 글자로 표현한다면?
         </label>
@@ -555,7 +618,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
           ref={inputRef}
           type="text"
           value={text}
-          disabled={!played}
+          disabled={!hasPlayedSuccessfully}
           onChange={(e) => {
             const next = e.target.value;
             const before = text.length;
@@ -576,7 +639,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
             }
             if (e.key === 'Enter' && !e.repeat && !submitting) handleSubmit()
           }}
-          placeholder={!played ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
+          placeholder={!hasPlayedSuccessfully ? '▶ 먼저 소리를 들어보세요' : '예: 쨍그랑, Whoosh, 뚝뚝뚝, 치이익...'}
           maxLength={80}
           style={{
             width: '100%', boxSizing: 'border-box',
@@ -587,7 +650,7 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
             fontFamily: 'Nunito, sans-serif', fontWeight: 600,
             outline: 'none', transition: 'border-color 0.15s',
             letterSpacing: '0.5px',
-            cursor: !played ? 'not-allowed' : 'text',
+            cursor: !hasPlayedSuccessfully ? 'not-allowed' : 'text',
           }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '5px' }}>
@@ -627,15 +690,15 @@ function Stage1Panel({ sound, zone, palette, participantId, sessionId, economyMo
         </button>
         <button
           onClick={handleSubmit}
-          disabled={submitting || !played || !text.trim()}
+          disabled={submitting || !hasPlayedSuccessfully || !text.trim()}
           style={{
             flex: 1, padding: '13px', borderRadius: '12px', border: 'none',
-            background: played && text.trim() ? accent : '#ffffff15',
-            color: played && text.trim() ? '#fff' : '#6B6660',
+            background: hasPlayedSuccessfully && text.trim() ? accent : '#ffffff15',
+            color: hasPlayedSuccessfully && text.trim() ? '#fff' : '#6B6660',
             fontSize: '15px', fontWeight: 700, fontFamily: 'Nunito, sans-serif',
-            cursor: played && text.trim() && !submitting ? 'pointer' : 'not-allowed',
+            cursor: hasPlayedSuccessfully && text.trim() && !submitting ? 'pointer' : 'not-allowed',
             transition: 'all 0.15s',
-            boxShadow: played && text.trim() ? `0 4px 20px ${accent}55` : 'none',
+            boxShadow: hasPlayedSuccessfully && text.trim() ? `0 4px 20px ${accent}55` : 'none',
           }}
         >
           {submitting ? '저장 중...' : '✅ 제출하기'}
