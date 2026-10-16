@@ -13,6 +13,9 @@ const AUTH_ERROR_MESSAGES = {
   anonymous_sign_in_failed: '인증 세션을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.',
   master_sign_in_failed: 'MASTER 비밀번호가 올바르지 않습니다.',
   master_account_mismatch: 'MASTER 계정 연결을 확인하지 못했습니다. 관리자에게 문의해 주세요.',
+  shared_demo_sign_in_failed: 'USER1 시연 계정에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.',
+  shared_demo_account_mismatch: 'USER1 시연 계정 연결을 확인하지 못했습니다. 관리자에게 문의해 주세요.',
+  shared_demo_unavailable: 'USER1 시연 계정이 아직 준비되지 않았습니다. 관리자에게 문의해 주세요.',
   session_restore_failed: '기존 인증 세션을 복구하지 못했습니다. 참여자 ID를 다시 확인해 주세요.',
   claim_unavailable: '인증 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.',
 }
