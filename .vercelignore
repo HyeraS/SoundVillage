@@ -29,3 +29,11 @@ PROJECT_SUMMARY.md
 CLAUDE.md
 README.md
 /*.png
+
+# Local presentation authoring, chart, and render artifacts
+.chart-data-*/
+.codex-build/
+/output/presentation/
+/tmp/pdfs/repo_visuals.png
+/tmp/pdfs/source_montage.png
+/tmp/pdfs/source_pages/

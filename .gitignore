@@ -8,6 +8,14 @@ scripts/download_errors.csv
 .DS_Store
 __pycache__/
 
+# Local presentation authoring, chart, and render artifacts
+.chart-data-*/
+.codex-build/
+output/presentation/
+tmp/pdfs/repo_visuals.png
+tmp/pdfs/source_montage.png
+tmp/pdfs/source_pages/
+
 # 구매한 itch.io 에셋 번들 원본 (수천 개 파일 — 필요한 부분만 public/assets/에 골라 복사해서 사용)
 full version/
 town full/
