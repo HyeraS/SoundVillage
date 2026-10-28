@@ -635,6 +635,7 @@ node --test scripts/security/shared-demo-session.test.mjs
 - `docs/security/duo-es256-realtime-residual-risk.md`
 - `docs/game-economy/multi-village-economy-v1.md`
 - `docs/game-economy/stage-3c-cutover-runbook.md`
+- `docs/AUDIO_REPLACEMENT_RUNBOOK.md`
 
 이 문서와 실제 코드가 다를 경우 실제 코드, Vercel environment, Supabase migration ledger,
 최근 배포 기록을 함께 대조하고 문서를 갱신한다.
