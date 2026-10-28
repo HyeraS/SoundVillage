@@ -45,10 +45,24 @@ try {
     p_auth_user_id: userA.id, p_group_id: 'A', p_participant_id: participantA,
   }), 'reconnect A')
   assert.equal(reconnectA.status, 'ok')
-  const stolenA = await mustSucceed(await admin.rpc('claim_study_participant_admin', {
+  sessionA = (await mustSucceed(await clientA.rpc('start_or_resume_study_session_v2', {
+    p_client_instance_id: crypto.randomUUID(),
+  }), 'A starts study session before moving browsers')).studySessionId
+  const movedA = await mustSucceed(await admin.rpc('claim_study_participant_admin', {
     p_auth_user_id: userB.id, p_group_id: 'A', p_participant_id: participantA,
-  }), 'reject stolen A')
-  assert.equal(stolenA.status, 'participant_claimed')
+  }), 'move A to browser B')
+  assert.equal(movedA.status, 'ok')
+  assert.equal(movedA.session_replaced, true)
+  assert.deepEqual(await mustSucceed(await clientA.rpc('get_my_study_participant'), 'old browser A loses participant'), [])
+  assert.equal((await mustSucceed(await clientB.rpc('get_my_study_participant'), 'browser B owns participant A'))[0].participant_id, participantA)
+  assert.equal((await mustSucceed(await admin.from('study_sessions').select('auth_user_id').eq('id', sessionA).single(), 'study session moves to B')).auth_user_id, userB.id)
+  const reclaimedA = await mustSucceed(await admin.rpc('claim_study_participant_admin', {
+    p_auth_user_id: userA.id, p_group_id: 'A', p_participant_id: participantA,
+  }), 'move A back to browser A')
+  assert.equal(reclaimedA.status, 'ok')
+  assert.equal(reclaimedA.session_replaced, true)
+  assert.deepEqual(await mustSucceed(await clientB.rpc('get_my_study_participant'), 'browser B loses participant after move back'), [])
+  assert.equal((await mustSucceed(await admin.from('study_sessions').select('auth_user_id').eq('id', sessionA).single(), 'study session moves back to A')).auth_user_id, userA.id)
   const wrongGroup = await mustSucceed(await admin.rpc('claim_study_participant_admin', {
     p_auth_user_id: userB.id, p_group_id: 'A', p_participant_id: participantB,
   }), 'reject wrong group')

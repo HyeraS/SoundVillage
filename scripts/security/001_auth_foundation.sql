@@ -181,7 +181,10 @@ create or replace function public.claim_study_participant_admin(
 language plpgsql security definer
 set search_path = ''
 as $$
-declare v_row public.study_participants%rowtype;
+declare
+  v_row public.study_participants%rowtype;
+  v_existing_participant_id text;
+  v_previous_auth_user_id uuid;
 begin
   if coalesce(auth.role(), '') <> 'service_role' then raise exception 'service_role_required'; end if;
   if p_participant_id !~ '^[A-Z0-9_-]{1,64}$' or p_group_id not in ('A', 'B') then
@@ -192,17 +195,35 @@ begin
   if not found then return jsonb_build_object('status', 'participant_not_registered'); end if;
   if v_row.status <> 'active' then return jsonb_build_object('status', 'participant_inactive'); end if;
   if v_row.group_id <> p_group_id then return jsonb_build_object('status', 'group_mismatch'); end if;
-  if v_row.auth_user_id is not null and v_row.auth_user_id <> p_auth_user_id then
-    return jsonb_build_object('status', 'participant_claimed');
+  if v_row.participant_id in ('MASTER', 'USER1') then
+    return jsonb_build_object('status', 'participant_takeover_forbidden');
   end if;
+
+  select participant_id into v_existing_participant_id
+  from public.study_participants
+  where auth_user_id = p_auth_user_id and participant_id <> p_participant_id
+  for update;
+  if v_existing_participant_id in ('MASTER', 'USER1') then
+    return jsonb_build_object('status', 'auth_session_reserved');
+  end if;
+
+  v_previous_auth_user_id := v_row.auth_user_id;
   update public.study_participants
-    set auth_user_id = coalesce(auth_user_id, p_auth_user_id),
+    set auth_user_id = null
+    where auth_user_id = p_auth_user_id and participant_id <> p_participant_id;
+  update public.study_participants
+    set auth_user_id = p_auth_user_id,
         claimed_at = coalesce(claimed_at, now()), last_seen_at = now()
     where participant_id = p_participant_id
     returning * into v_row;
+  if v_previous_auth_user_id is not null and v_previous_auth_user_id <> p_auth_user_id then
+    delete from public.participant_realtime_room_members
+    where auth_user_id = v_previous_auth_user_id;
+  end if;
   return jsonb_build_object(
     'status', 'ok', 'participant_id', v_row.participant_id,
-    'group_id', v_row.group_id
+    'group_id', v_row.group_id,
+    'session_replaced', v_previous_auth_user_id is not null and v_previous_auth_user_id <> p_auth_user_id
   );
 end;
 $$;

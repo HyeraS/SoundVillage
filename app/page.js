@@ -21,7 +21,7 @@ import { getEconomyRoom, getEconomySharedRoom, getOrCreateEconomyRoomShare } fro
 import { createDuoInvite, getDuoRoom, heartbeatDuo, joinDuoInvite, recoverDuo, revokeDuo } from '@/lib/duoApi.client'
 import { useDuoSession } from '@/lib/duoSession'
 import { claimParticipantSession, endLocalParticipantSession, restoreParticipantSession, signInMasterSession } from '@/lib/participantAuth'
-import { clearParticipantEntrySession, readParticipantEntrySession, writeParticipantEntrySession } from '@/lib/participantEntrySession.mjs'
+import { clearParticipantEntrySession, consumeParticipantSessionNotice, writeParticipantSessionNotice } from '@/lib/participantEntrySession.mjs'
 import { OUTFIT_SHEETS } from '@/components/AssetRegistry'
 import { useEconomyRuntime } from '@/components/economy-v1/EconomyRuntimeProvider'
 import { isStudyAccessParticipantId, getStudyAccessGroup } from '@/lib/studyAccess.mjs'
@@ -46,6 +46,8 @@ const ZONES_LOCKED_AT_START = ZONES.filter(z => z !== FIRST_ZONE)
 const NATURE_QA_PARTICIPANT_ID = 'NATURE_QA_LOCAL'
 const HUMAN_QA_PARTICIPANT_ID = 'HUMAN_QA_LOCAL'
 const DUO_RECOVERY_KEY = 'soundvillage-duo-v2-recovery'
+const PARTICIPANT_SESSION_CHECK_MS = 4000
+const NON_EXCLUSIVE_PARTICIPANT_IDS = new Set(['MASTER', 'USER1'])
 
 function readDuoRecovery() {
   if (typeof window === 'undefined') return null
@@ -260,52 +262,61 @@ export default function HomePage() {
         return
       }
 
-      const entryParticipantId = readParticipantEntrySession(window.sessionStorage)
-      if (!entryParticipantId) {
-        setAuthRestoring(false)
-        return
-      }
-
-      restoreParticipantSession()
-        .then(async participant => {
-          if (!participant) {
-            clearParticipantEntrySession(window.sessionStorage)
-            return
-          }
-          // 일반 참여자는 같은 탭을 새로고침할 때만 자동 복구한다. 탭이나
-          // 브라우저를 닫으면 sessionStorage 표식이 사라져 다시 ID를 입력한다.
-          // 여러 기기에서 쓰는 MASTER는 새 진입마다 비밀번호를 확인한다.
-          // local scope는 현재 브라우저 세션만 끝내므로 다른 기기의 MASTER
-          // 세션은 끊지 않는다.
-          if (participant.participantId === 'MASTER') {
-            clearParticipantEntrySession(window.sessionStorage)
-            await endLocalParticipantSession()
-            return
-          }
-          if (participant.participantId !== entryParticipantId) {
-            clearParticipantEntrySession(window.sessionStorage)
-            setAuthError('session_restore_failed')
-            return
-          }
-          await initializeUserLogging('world')
-          const progress = await getMyExperimentProgress()
-          trackedParticipantRef.current = participant.participantId
-          previousScreenRef.current = 'world'
-          resetEconomy()
-          setParticipantId(participant.participantId)
-          setGroupId(participant.groupId)
-          setExperimentProgress(progress)
-          setVillagesUnlocked(isStudyAccessParticipantId(participant.participantId))
-          setScreen('world')
-        })
-        .catch(error => {
-          clearParticipantEntrySession(window.sessionStorage)
-          setAuthError(error?.code || 'session_restore_failed')
-        })
-        .finally(() => setAuthRestoring(false))
+      // 참여자는 새로고침을 포함한 새 진입마다 ID를 다시 입력한다. Supabase
+      // 인증 세션은 같은 ID의 빠른 재연결에만 사용하고 화면 자동 진입에는
+      // 사용하지 않는다.
+      clearParticipantEntrySession(window.sessionStorage)
+      const notice = consumeParticipantSessionNotice(window.sessionStorage)
+      if (notice) setAuthError(notice)
+      setAuthRestoring(false)
     }, 0)
     return () => window.clearTimeout(id)
   }, [resetEconomy])
+
+  useEffect(() => {
+    if (!participantId || localQaRef.current || NON_EXCLUSIVE_PARTICIPANT_IDS.has(participantId)) return undefined
+
+    let disposed = false
+    let checking = false
+
+    const endMovedSession = async () => {
+      if (disposed) return
+      disposed = true
+      clearParticipantEntrySession(window.sessionStorage)
+      writeParticipantSessionNotice(window.sessionStorage, 'session_moved')
+      await endLocalParticipantSession().catch(() => {})
+      window.location.reload()
+    }
+
+    const verifyActiveBrowser = async () => {
+      if (disposed || checking || document.visibilityState === 'hidden') return
+      checking = true
+      try {
+        const participant = await restoreParticipantSession()
+        if (!participant || participant.participantId !== participantId) await endMovedSession()
+      } catch (error) {
+        // 일시적인 네트워크 오류만으로 실험 화면을 종료하지 않는다. 서버가
+        // 명시적으로 참여자를 비활성화한 경우에만 세션 종료로 처리한다.
+        if (error?.code === 'participant_inactive') await endMovedSession()
+      } finally {
+        checking = false
+      }
+    }
+
+    const intervalId = window.setInterval(verifyActiveBrowser, PARTICIPANT_SESSION_CHECK_MS)
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') verifyActiveBrowser()
+    }
+    window.addEventListener('focus', verifyActiveBrowser)
+    document.addEventListener('visibilitychange', handleVisibility)
+
+    return () => {
+      disposed = true
+      window.clearInterval(intervalId)
+      window.removeEventListener('focus', verifyActiveBrowser)
+      document.removeEventListener('visibilitychange', handleVisibility)
+    }
+  }, [participantId])
 
   // 집꾸미기 초대 링크(?house=<호스트>)로 들어온 경우 — app/interior-test/page.js가
   // 검증용으로 먼저 갖고 있던 로직을 실제 앱(루트 경로)에도 그대로 옮긴 것.
@@ -786,7 +797,6 @@ export default function HomePage() {
     }
     const participant = await claimParticipantSession(pid, gid)
     await enterParticipantSession(participant)
-    writeParticipantEntrySession(window.sessionStorage, participant.participantId)
     // participantId가 set된 후 카운트 갱신은 useEffect에서 처리
   }
 

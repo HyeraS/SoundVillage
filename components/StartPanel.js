@@ -7,7 +7,7 @@ import { isStudyAccessParticipantId, normalizeStudyAccessId } from '@/lib/studyA
 ───────────────────────────────────────────── */
 const AUTH_ERROR_MESSAGES = {
   participant_not_registered: '등록되지 않은 참여자 ID입니다. 진행자에게 확인해 주세요.',
-  participant_claimed: '이미 다른 브라우저에 연결된 참여자 ID입니다. 진행자에게 재연결을 요청해 주세요.',
+  participant_claimed: '기존 서버 설정에서는 다른 브라우저로 이동할 수 없습니다. 관리자에게 확인해 주세요.',
   participant_inactive: '현재 비활성화된 참여자 ID입니다. 진행자에게 문의해 주세요.',
   group_mismatch: '배정된 그룹과 선택한 그룹이 다릅니다.',
   anonymous_sign_in_failed: '인증 세션을 시작하지 못했습니다. 잠시 후 다시 시도해 주세요.',
@@ -17,6 +17,9 @@ const AUTH_ERROR_MESSAGES = {
   shared_demo_account_mismatch: 'USER1 시연 계정 연결을 확인하지 못했습니다. 관리자에게 문의해 주세요.',
   shared_demo_unavailable: 'USER1 시연 계정이 아직 준비되지 않았습니다. 관리자에게 문의해 주세요.',
   session_restore_failed: '기존 인증 세션을 복구하지 못했습니다. 참여자 ID를 다시 확인해 주세요.',
+  session_moved: '이 참여자 ID가 다른 브라우저에서 접속되어 현재 브라우저의 접속이 종료되었습니다. 계속하려면 ID를 다시 입력해 주세요.',
+  participant_takeover_forbidden: '이 계정은 일반 참여자 이동 방식으로 접속할 수 없습니다.',
+  auth_session_reserved: '현재 인증 세션은 전용 계정에 연결되어 있습니다. 페이지를 새로고침한 뒤 다시 시도해 주세요.',
   claim_unavailable: '인증 서버에 연결하지 못했습니다. 잠시 후 다시 시도해 주세요.',
 }
 

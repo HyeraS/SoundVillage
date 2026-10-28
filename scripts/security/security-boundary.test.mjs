@@ -57,6 +57,28 @@ test('museum, shared rooms, and Realtime use constrained interfaces', async () =
   assert.match(interior, /get_shared_room/)
 })
 
+test('participant login moves ownership while protected accounts stay on dedicated auth paths', async () => {
+  const [foundation, migration, auth, page] = await Promise.all([
+    read('scripts/security/001_auth_foundation.sql'),
+    read('scripts/security/016_participant_session_takeover.sql'),
+    read('lib/participantAuth.js'),
+    read('app/page.js'),
+  ])
+  for (const sql of [foundation, migration]) {
+    assert.match(sql, /where participant_id = p_participant_id for update/i)
+    assert.match(sql, /set auth_user_id = p_auth_user_id/i)
+    assert.match(sql, /session_replaced/i)
+    assert.match(sql, /participant_id in \('MASTER', 'USER1'\)/i)
+    assert.doesNotMatch(sql, /return jsonb_build_object\('status', 'participant_claimed'\)/i)
+  }
+  assert.match(migration, /update public\.study_sessions[\s\S]*set auth_user_id = p_auth_user_id/i)
+  assert.match(auth, /currentRow\.participant_id !== normalizedParticipantId/)
+  assert.match(auth, /signOut\(\{ scope: 'local' \}\)/)
+  assert.match(page, /PARTICIPANT_SESSION_CHECK_MS = 4000/)
+  assert.match(page, /restoreParticipantSession\(\)/)
+  assert.match(page, /session_moved/)
+})
+
 test('room save events link by operation key without participant-backed room IDs', async () => {
   const interior = await read('components/InteriorDecorRoom.js')
   const attemptEvent = interior.match(/trackEvent\('room_save_attempted',[\s\S]*?\}, \{ critical: true \}\)/)?.[0] || ''

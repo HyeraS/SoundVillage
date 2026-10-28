@@ -58,6 +58,7 @@ test('bootstrap is disposable, loopback-guarded, transactional, and ordered', as
   assert(source.indexOf('register-study-data.mjs') < source.indexOf('002_enforce_participant_rls.sql'))
   assert(source.indexOf('experiment-rules-preflight.sql') < source.indexOf('006_experiment_rules_and_uniqueness.sql'))
   assert(source.indexOf('006_experiment_rules_and_uniqueness.sql') < source.indexOf('007_participant_room_rpc_only.sql'))
+  assert(source.indexOf('007_participant_room_rpc_only.sql') < source.indexOf('016_participant_session_takeover.sql'))
   assert.match(source, /schema-reconciliation-snapshot\.sql/)
   assert.match(source, /schema-reconciliation-validator\.mjs/)
   assert.match(source, /has_table_privilege\('authenticated','public\.participant_room','TRUNCATE'\)/)

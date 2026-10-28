@@ -113,6 +113,7 @@ run_sql "$REPO_ROOT/scripts/security/experiment-rules-preflight.sql"
 cp "$REPO_ROOT/scripts/security/006_experiment_rules_and_uniqueness.sql" supabase/migrations/20260911001400_experiment_rules.sql
 supabase migration up --local
 cp "$REPO_ROOT/scripts/security/007_participant_room_rpc_only.sql" supabase/migrations/20260911001500_participant_room_rpc_only.sql
+cp "$REPO_ROOT/scripts/security/016_participant_session_takeover.sql" supabase/migrations/20260911001600_participant_session_takeover.sql
 supabase migration up --local
 
 run_sql "$REPO_ROOT/scripts/security/user-event-logging-verify.sql"
