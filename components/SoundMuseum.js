@@ -481,7 +481,7 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
   const [candidates,  setCandidates]  = useState([])
   const [loading,     setLoading]     = useState(true)
   const [pick,        setPick]        = useState(null) // 'A'|'B'|'C'|'D'|'E'
-  const [confidence,  setConfidence]  = useState(3)   // 1=low 3=medium 5=high
+  const [confidence,  setConfidence]  = useState(3)   // 1~5점, 기본값 3점
   const [submitting,  setSubmitting]  = useState(false)
   const [candidateError, setCandidateError] = useState('')
   const [submitError, setSubmitError] = useState('')
@@ -873,10 +873,12 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                 textAlign: 'center', fontSize: '15px', fontWeight: 800,
                 color: accent, marginBottom: '8px',
               }}>
-                {CONFIDENCE_LABELS[confidence - 1]}
+                {confidence}점 · {CONFIDENCE_LABELS[confidence - 1]}
               </div>
               <input
                 type="range" min={1} max={5} step={1}
+                aria-label="이 표현에 얼마나 동의하나요?"
+                aria-valuetext={`${confidence}점 · ${CONFIDENCE_LABELS[confidence - 1]}`}
                 value={confidence}
                 onChange={e => {
                   const next = Number(e.target.value)
@@ -886,13 +888,32 @@ export default function SoundMuseum({ sound = null, zone, myExpression, particip
                 style={{ width: '100%', accentColor: accent, cursor: 'pointer' }}
               />
               <div style={{
-                display: 'flex', justifyContent: 'space-between',
-                fontSize: '8px', color: '#A09080', marginTop: '2px', padding: '0 1px',
+                display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))',
+                gap: '4px', marginTop: '6px',
               }}>
                 {CONFIDENCE_LABELS.map((label, i) => (
-                  <span key={i} style={{ flex: i === 0 || i === CONFIDENCE_LABELS.length - 1 ? 'none' : 1, textAlign: 'center' }}>
-                    {label}
-                  </span>
+                  <button
+                    key={i}
+                    type="button"
+                    aria-pressed={confidence === i + 1}
+                    aria-label={`${i + 1}점 · ${label}`}
+                    onClick={() => {
+                      const next = i + 1
+                      if (next === confidence) return
+                      trackEvent('confidence_changed', { zone, sound_id: sound.sound_id, target_type: 'confidence', target_id: `museum-confidence-${next}`, value_before: { confidence }, value_after: { confidence: next } })
+                      setConfidence(next)
+                    }}
+                    style={{
+                      minHeight: '44px', padding: '6px 2px', borderRadius: '8px',
+                      border: `1px solid ${confidence === i + 1 ? accent : `${accent}33`}`,
+                      background: confidence === i + 1 ? `${accent}18` : '#FFFDF8',
+                      color: confidence === i + 1 ? accent : '#79684F',
+                      fontFamily: 'inherit', cursor: 'pointer', textAlign: 'center',
+                    }}
+                  >
+                    <span style={{ display: 'block', fontSize: '13px', fontWeight: 800 }}>{i + 1}점</span>
+                    <span style={{ display: 'block', fontSize: '9px', marginTop: '3px' }}>{label}</span>
+                  </button>
                 ))}
               </div>
             </div>
